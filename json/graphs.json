@@ -144,7 +144,7 @@
                 },
                 "states": {
                     "hover": {
-                        "lineWidthPlus": "0"
+                        "lineWidthPlus": 0.0
                     }
                 }
             },
@@ -208,7 +208,7 @@
                 },
                 "states": {
                     "hover": {
-                        "lineWidthPlus": "0"
+                        "lineWidthPlus": 0.0
                     }
                 }
             },
@@ -273,7 +273,7 @@
                 },
                 "states": {
                     "hover": {
-                        "lineWidthPlus": "0"
+                        "lineWidthPlus": 0.0
                     }
                 }
             },
