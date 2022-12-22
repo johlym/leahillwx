@@ -1,0 +1,512 @@
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en-US" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+    <head >
+        <meta charset="UTF-8" />
+        <title>Lea Hill Weather - Live Auburn, WA Weather</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <meta name="description" content="Weather conditions for Lea Hill, Auburn, WA as observed by a personal weather station and the weewx weather software"/>
+        <meta name="robots" content="noodp"/>
+        <link rel="canonical" href="http://leahillwx.org" />
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Lea Hill Weather - Live Auburn, WA Weather" />
+        <meta property="og:description" content="Weather conditions for Lea Hill, Auburn, WA as observed by a personal weather station and the weewx weather software" />
+        <meta property="og:url" content="http://leahillwx.org" />
+        <meta property="og:site_name" content="Lea Hill Weather - Live Auburn, WA Weather" />
+
+        <link rel='dns-prefetch' href='//code.highcharts.com' />
+        <link rel='dns-prefetch' href='//fonts.googleapis.com' />
+        <link rel='dns-prefetch' href='//stackpath.bootstrapcdn.com' />
+        <link rel='dns-prefetch' href='//cdnjs.cloudflare.com' />
+
+        <link rel='stylesheet' href='//fonts.googleapis.com/css?family=Roboto%3A300%2C400%2C700&#038;ver=1.0' type='text/css' media='all' />
+        <link rel='stylesheet' href='//stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' type='text/css' media='all' />
+        <link rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.9/css/weather-icons.min.css?ver=4.7.4' type='text/css' media='all' />
+        <link rel='stylesheet' href='//stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css' type='text/css' media='all' />
+        <link rel='stylesheet' href='../style.css?ver=1671752958' type='text/css' media='all' id="belchertownStyle" />
+        <link rel='stylesheet' href='../belchertown-dark.min.css?ver=1671752958' type='text/css' media='all' id="belchertownStyle" />
+        
+        <link rel="manifest" href="../manifest.json" crossorigin="use-credentials">
+        <link rel="apple-touch-icon" href="../images/station.png">
+        <link rel="apple-touch-icon" sizes="48x48" href="../images/station48.png">
+        <link rel="apple-touch-icon" sizes="72x72" href="../images/station72.png">
+        <link rel="apple-touch-icon" sizes="96x96" href="../images/station96.png">
+        <link rel="apple-touch-icon" sizes="144x144" href="../images/station144.png">
+        <link rel="apple-touch-icon" sizes="168x168" href="../images/station168.png">
+        <link rel="apple-touch-icon" sizes="192x192" href="../images/station192.png">
+        
+        <!--[if lt IE 9]>
+        <script type='text/javascript' src='//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js'></script>
+        <![endif]-->
+        <script type='text/javascript' src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"></script>
+        <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.33/moment-timezone-with-data.min.js"></script>
+        <script type='text/javascript' src='//code.highcharts.com/stock/highstock.js'></script>
+        <script type='text/javascript' src='//code.highcharts.com/highcharts-more.js'></script>
+        <script type='text/javascript' src='//code.highcharts.com/modules/exporting.js'></script>
+        <script type='text/javascript' src='//code.highcharts.com/modules/solid-gauge.js'></script>
+        <script type='text/javascript' src='//stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js'></script>
+        <script type='text/javascript' src='../js/belchertown.js?1671752958'></script>
+        <script>
+            // Set the session variables for the theme
+            if ( sessionStorage.getItem('theme') === null ) {
+                sessionStorage.setItem('theme', 'light');
+            }
+            if ( sessionStorage.getItem('currentTheme') === null ) {
+                sessionStorage.setItem('currentTheme', 'light');
+            }
+        </script>
+        
+        <link rel='shortlink' href="http://leahillwx.org" />
+                
+        <link rel="icon" href="../favicon.ico" />
+        
+
+        <script src="https://sausages.leahillwx.org/script.js" data-site="LREPUUZF" defer></script>
+    </head>
+    
+    <body class="page-template-default page full-width-content light" itemscope itemtype="https://schema.org/WebPage">
+        <div class="site-container">
+            <header class="site-header">
+                <div class="wrap">
+                    <div class="title-area">
+                        <p class="site-title" itemprop="headline">
+                            <a href="../">
+                                Lea Hill WX
+                            </a>
+                        </p>
+                    </div>
+                    <div class="widget-area header-widget-area">
+                        <section id="nav_menu">
+                            <div class="widget-wrap">
+                                <nav class="nav-header" itemscope itemtype="https://schema.org/SiteNavigationElement">
+                                    <ul id="menu-menu" class="menu genesis-nav-menu">
+                                        <!-- class = current-menu-item -->
+                                        <li class="menu-item menu-item-home"><a href=".." itemprop="url"><span itemprop="name">Home</span></a></li>
+                                        <li class="menu-item menu-item-1"><a href="../graphs" itemprop="url"><span itemprop="name">Graphs</span></a></li>
+                                        <li class="menu-item menu-item-2"><a href="../records" itemprop="url"><span itemprop="name">Records</span></a></li>
+                                        <li class="menu-item menu-item-3"><a href="../reports" itemprop="url"><span itemprop="name">Reports</span></a></li>
+                                        <li class="menu-item menu-item-4"><a href="../about" itemprop="url"><span itemprop="name">About</span></a></li>
+                                        <label class="themeSwitchLabel">
+                                            <input type="checkbox" id="themeSwitch" >
+                                            <span class="slider round"></span>
+                                        </label>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </header>
+
+    <script type="text/javascript">
+        var moment_locale = "en-US";
+        moment.locale(moment_locale);
+        
+        jQuery(document).ready(function() {
+            jQuery("#year-outtemp-max-ts").text( tzAdjustedMoment(1658880120).format( "LLL" ) );
+            jQuery("#at-outtemp-max-ts").text( tzAdjustedMoment(1658880120).format( "LLL" ) );
+            
+            jQuery("#year-outtemp-min-ts").text( tzAdjustedMoment(1641032157).format( "LLL" ) );
+            jQuery("#at-outtemp-min-ts").text( tzAdjustedMoment(1640627100).format( "LLL" ) );
+            
+            jQuery("#year-apptemp-max-ts").text( tzAdjustedMoment(1658882225).format( "LLL" ) );
+            jQuery("#year-apptemp-min-ts").text( tzAdjustedMoment(1671721556).format( "LLL" ) );
+            jQuery("#at-apptemp-max-ts").text( tzAdjustedMoment(1658882225).format( "LLL" ) );
+            jQuery("#at-apptemp-min-ts").text( tzAdjustedMoment(1671721556).format( "LLL" ) );
+            
+            jQuery("#year-heatindex-max-ts").text( tzAdjustedMoment(1658875796).format( "LLL" ) );
+            jQuery("#at-heatindex-max-ts").text( tzAdjustedMoment(1658875796).format( "LLL" ) );
+            
+            jQuery("#year-windchill-min-ts").text( tzAdjustedMoment(1671721556).format( "LLL" ) );
+            jQuery("#at-windchill-min-ts").text( tzAdjustedMoment(1671721556).format( "LLL" ) );
+            
+            jQuery("#year-outtemp-range-max-ts").text( tzAdjustedMoment(1665903600).format( "LL" ) );
+            jQuery("#at-outtemp-range-max-ts").text( tzAdjustedMoment(1665903600).format( "LL" ) );
+            
+            jQuery("#year-outtemp-range-min-ts").text( tzAdjustedMoment(1671436800).format( "LL" ) );
+            jQuery("#at-outtemp-range-min-ts").text( tzAdjustedMoment(1640419200).format( "LL" ) );
+            
+            jQuery("#year-windGust-max-ts").text( tzAdjustedMoment(1649111042).format( "LLL" ) );
+            jQuery("#at-windGust-max-ts").text( tzAdjustedMoment(1649111042).format( "LLL" ) );
+            
+            jQuery("#year-windrun-max-ts").text( tzAdjustedMoment(1641216900).format( "LL" ) );
+            jQuery("#at-windrun-max-ts").text( tzAdjustedMoment(1641216900).format( "LL" ) );
+            
+            jQuery("#year-rainiest-day-ts").text( tzAdjustedMoment(1646035200).format( "LL" ) );
+            jQuery("#at-rainiest-day-ts").text( tzAdjustedMoment(1646035200).format( "LL" ) );
+            
+            jQuery("#year-rainRate-max-ts").text( tzAdjustedMoment(1641199931).format( "LLL" ) );
+            jQuery("#at-rainRate-max-ts").text( tzAdjustedMoment(1641199931).format( "LLL" ) );
+            
+            jQuery("#year-outHumidity-max-ts").text( tzAdjustedMoment(1641444898).format( "LLL" ) );
+            jQuery("#at-outHumidity-max-ts").text( tzAdjustedMoment(1641444898).format( "LLL" ) );
+            
+            jQuery("#year-outHumidity-min-ts").text( tzAdjustedMoment(1649368842).format( "LLL" ) );
+            jQuery("#at-outHumidity-min-ts").text( tzAdjustedMoment(1649368842).format( "LLL" ) );
+            
+            jQuery("#year-dewpoint-max-ts").text( tzAdjustedMoment(1660876394).format( "LLL" ) );
+            jQuery("#at-dewpoint-max-ts").text( tzAdjustedMoment(1660876394).format( "LLL" ) );
+            
+            jQuery("#year-dewpoint-min-ts").text( tzAdjustedMoment(1671729327).format( "LLL" ) );
+            jQuery("#at-dewpoint-min-ts").text( tzAdjustedMoment(1671729327).format( "LLL" ) );
+            
+            jQuery("#year-barometer-max-ts").text( tzAdjustedMoment(1642791240).format( "LLL" ) );
+            jQuery("#at-barometer-max-ts").text( tzAdjustedMoment(1640323200).format( "LLL" ) );
+            
+            jQuery("#year-barometer-min-ts").text( tzAdjustedMoment(1641563975).format( "LLL" ) );
+            jQuery("#at-barometer-min-ts").text( tzAdjustedMoment(1641563975).format( "LLL" ) );
+            
+            jQuery("#year-radiation-max-ts").text( tzAdjustedMoment(1641243956).format( "LLL" ) );
+            jQuery("#at-radiation-max-ts").text( tzAdjustedMoment(1641243956).format( "LLL" ) );
+            
+            jQuery("#year-uv-max-ts").text( tzAdjustedMoment(1654457520).format( "LLL" ) );
+            jQuery("#at-uv-max-ts").text( tzAdjustedMoment(1654457520).format( "LLL" ) );
+            
+            jQuery("#year-days-with-rainfall-ts").text( tzAdjustedMoment(1670832000).format( "LL" ) );
+            // Take the number of days (18) - 1 and multiply by 86400 (seconds in a day) to get total seconds. Then subtract from the end epoch to give you the epoch "days ago"
+            // Removed the year with ", YYYY, or "/YYYY" or ".YYYY" or "-YYYY"
+            if (1670832000 > 0) {
+                var start_day_epoch = 1670832000 - ((18 - 1) * 86400);
+                //jQuery("#at-days-with-rainfall-range-ts").text( tzAdjustedMoment(start_day_epoch).format('LL').replace(/([A-Z])|[, \/\-\.]+\b[0-9]{4}\b/g, '$1') + " - " + tzAdjustedMoment(1670832000).format('LL') );
+                jQuery("#at-days-with-rainfall-range-ts").text( tzAdjustedMoment(start_day_epoch).format('MMMM DD') + " - " + tzAdjustedMoment(1670832000).format('LL') );
+            } else {
+                jQuery("#at-days-with-rainfall-range-ts").text("---");
+            }
+
+            jQuery("#year-days-without-rainfall-ts").text( tzAdjustedMoment(1662102000).format( "LL" ) );
+            // Take the number of days (45) - 1 and multiply by 86400 (seconds in a day) to get total seconds. Then subtract from the end epoch to give you the epoch "days ago"
+            // Removed the year with ", YYYY, or "/YYYY" or ".YYYY" or "-YYYY"
+            if (1662102000 > 0) {
+                var start_day_epoch = 1662102000 - ((45 - 1) * 86400);
+                //jQuery("#at-days-without-rainfall-range-ts").text( tzAdjustedMoment(start_day_epoch).format('LL').replace(/([A-Z])|[, \/\-\.]+\b[0-9]{4}\b/g, '$1') + " - " + tzAdjustedMoment(1662102000).format('LL') );
+                jQuery("#at-days-without-rainfall-range-ts").text( tzAdjustedMoment(start_day_epoch).format('MMMM DD') + " - " + tzAdjustedMoment(1662102000).format('LL') );
+            } else {
+                jQuery("#at-days-without-rainfall-range-ts").text("---");
+            }
+            
+
+        });
+    </script>
+
+    <div class="site-inner">
+        <main class="content">
+            <article class="weewx records" itemscope itemtype="https://schema.org/CreativeWork">
+
+<div class="wx-stn-info-container">
+    <div class="row">
+        <div class="col-sm-1 wx-stn-info-current-obs">
+            <span class="obs-header-icon">
+                <img id="wxicon" src="../images/cloudy.png">
+            </span>
+            <span class="obs-header-outtemp">23.0 &#176;F</span>
+        </div>
+        <div class="col-sm-5">
+            <div class="wx-stn-name">
+                <h1>Weather Observation Records</h1>
+            </div>
+        </div>
+        <div class="col-sm-5" style="float:right;">
+            <div class="wx-stn-info">
+                Collection source: <a href="/about">WS-2902C</a>
+            </div>
+            <div class="col-sm-10 wx-stn-info-social" style="float:right;">
+                <div class="wx-stn-share">
+                <div id="fb-root"></div>
+                <script>(function(d, s, id) {
+                  var js, fjs = d.getElementsByTagName(s)[0];
+                  if (d.getElementById(id)) return;
+                  js = d.createElement(s); js.id = id;
+                  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5";
+                  fjs.parentNode.insertBefore(js, fjs);
+                }(document, 'script', 'facebook-jssdk'));</script>
+                <div class="fb-like" data-href="https://leahillwx.org" data-width="500px" data-layout="button_count" data-action="like" data-show-faces="false" data-share="true"></div>
+            <div class="wx-share-sep"></div>
+                <script>
+                    !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+                </script>
+                <a href="https://twitter.com/share" class="twitter-share-button" data-url="https://leahillwx.org" data-text="Check out my website: My Weather Website Weather Conditions" data-via="_johlym" data-hashtags="#weather #wawx #wx">Tweet</a>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div class="clear"></div>
+</div>
+
+                <!-- Begin row -->
+                <div class="row">
+                    <div class="col-sm-12 wx-records-description">
+                    </div>
+                </div>
+                <!-- End row -->
+
+                <!-- Records table row -->
+                <div class="row records-table">
+                    <table class="table-striped">
+                        <tbody>
+                            <tr>
+                                <td class="records-header" colspan=5>Temperature Records</td>
+                            </tr>
+                            <tr>
+                                <td colspan=1> </td>
+                                <td class="records-header-year" colspan=2>2022</td>
+                                <td class="records-header-alltime" colspan=2>All Time</td>
+                            </tr>
+                            <tr>
+                                <td>Highest Temperature</td>
+                                <td class="leftborder">94.5 &#176;F</td>
+                                <td><span id="year-outtemp-max-ts"></span></td><!-- moment.js -->
+                                <td class="leftborder">94.5 &#176;F</td>
+                                <td><span id="at-outtemp-max-ts"></span></td><!-- moment.js -->
+                            </tr>
+                            <tr>
+                                <td>Lowest Temperature</td>
+                                <td class="leftborder">17.0 &#176;F</td>
+                                <td id="year-outtemp-min-ts"></td><!-- moment.js -->
+                                <td class="leftborder">16.4 &#176;F</td><!-- moment.js -->
+                                <td id="at-outtemp-min-ts"></td><!-- moment.js -->
+                            </tr>
+                            <tr>
+                                <td>Highest Apparent Temperature</td>
+                                <td class="leftborder">98.9 &#176;F</td>
+                                <td id="year-apptemp-max-ts"></td><!-- moment.js -->
+                                <td class="leftborder">98.9 &#176;F</td>
+                                <td id="at-apptemp-max-ts"></td><!-- moment.js -->
+                            </tr>
+                            <tr>
+                                <td>Lowest Apparent Temperature</td>
+                                <td class="leftborder">7.2 &#176;F</td>
+                                <td id="year-apptemp-min-ts"></td><!-- moment.js -->
+                                <td class="leftborder">7.2 &#176;F</td>
+                                <td id="at-apptemp-min-ts"></td><!-- moment.js -->
+                            </tr>
+                            <tr>
+                                <td>Highest Heat Index</td>
+                                <td class="leftborder">96.4 &#176;F</td>
+                                <td id="year-heatindex-max-ts"></td><!-- moment.js -->
+                                <td class="leftborder">96.4 &#176;F</td>
+                                <td id="at-heatindex-max-ts"></td><!-- moment.js -->
+                            </tr>
+                            <tr>
+                                <td>Lowest Wind Chill</td>
+                                <td class="leftborder">7.8 &#176;F</td>
+                                <td id="year-windchill-min-ts"></td><!-- moment.js -->
+                                <td class="leftborder">7.8 &#176;F</td>
+                                <td id="at-windchill-min-ts"></td><!-- moment.js -->
+                            </tr>
+                            <tr>
+                                <td>Largest Daily Temperature Range</td>
+                                <td class="leftborder">39.2  &#176;F</td>
+                                <td><span id="year-outtemp-range-max-ts"></span><br>(Min: 48.6  &#176;F - Max: 87.8  &#176;F )</td><!-- moment.js -->
+                                <td class="leftborder">39.2  &#176;F</td>
+                                <td><span id="at-outtemp-range-max-ts"></span><br>(Min: 48.6  &#176;F - Max: 87.8  &#176;F )</td><!-- moment.js -->
+                            </tr>
+                            <tr>
+                                <td>Smallest Daily Temperature Range</td>
+                                <td class="leftborder">3.6  &#176;F</td>
+                                <td><span id="year-outtemp-range-min-ts"></span><br>(Min: 30.2  &#176;F - Max: 33.8  &#176;F )</td><!-- moment.js -->
+                                <td class="leftborder">1.2  &#176;F</td>
+                                <td><span id="at-outtemp-range-min-ts"></span><br>(Min: 34.8  &#176;F - Max: 36  &#176;F )</td><!-- moment.js -->
+                            </tr>
+
+                            <tr>
+                                <td class="records-header" colspan=5>Wind Records</td>
+                            </tr>
+                            <tr>
+                                <td colspan=1> </td>
+                                <td class="records-header-year" colspan=2>2022</td>
+                                <td class="records-header-alltime" colspan=2>All Time</td>
+                            </tr>
+                            <tr>
+                                <td>Strongest Wind Gust</td>
+                                <td class="leftborder">22 mph</td>
+                                <td id="year-windGust-max-ts"></td><!-- moment.js -->
+                                <td class="leftborder">22 mph</td>
+                                <td id="at-windGust-max-ts"></td><!-- moment.js -->
+                            </tr>
+                            <tr>
+                                <td>Highest Daily Wind Run</td>
+                                <td class="leftborder">62.8 miles</td>
+                                <td id="year-windrun-max-ts"></td><!-- moment.js -->
+                                <td class="leftborder">62.8 miles</td>
+                                <td id="at-windrun-max-ts"></td><!-- moment.js -->
+                            </tr>
+                            <tr>
+                                <td class="records-header" colspan=5>Rain Records</td>
+                            </tr>
+                            <tr>
+                                <td colspan=1> </td>
+                                <td class="records-header-year" colspan=2>2022</td>
+                                <td class="records-header-alltime" colspan=2>All Time</td>
+                            </tr>
+                            <tr>
+                                <td>Highest Daily Rainfall</td>
+                                <td class="leftborder">3.44  in</td>
+                                <td id="year-rainiest-day-ts"></td><!-- moment.js -->
+                                <td class="leftborder">3.44  in</td>
+                                <td id="at-rainiest-day-ts"></td>
+                            </tr>
+                            <tr>
+                                <td>Highest Daily Rain Rate</td>
+                                <td class="leftborder">1.06 in/hr</td>
+                                <td id="year-rainRate-max-ts"></td><!-- moment.js -->
+                                <td class="leftborder">1.06 in/hr</td>
+                                <td id="at-rainRate-max-ts"></td><!-- moment.js -->
+                            </tr>
+                            <tr>
+                                <td>Month with Highest Total Rainfall</td>
+                                <td class="leftborder">11.14  in</td>
+                                <td>January</td>
+                                <td class="leftborder">11.14  in</td>
+                                <td>January, 2022</td>
+                            </tr>
+                            <tr>
+                                <td>Total Rainfall for</td>
+                                <td class="leftborder">50.45 in</td>
+                                <td>2022</td>
+                                <td class="leftborder">50.45  in</td>
+                                <td>2022</td>
+                            </tr>
+                            <tr>
+                                <td>Consecutive Days With Rain</td>
+                                <td class="leftborder">18 days</td>
+                                <td>ending <span id="year-days-with-rainfall-ts"></span></td><!-- moment.js -->
+                                <td class="leftborder">18 days</td>
+                                <td id="at-days-with-rainfall-range-ts"></td><!-- moment.js -->
+                            </tr>
+                            <tr>
+                                <td>Consecutive Days Without Rain</td>
+                                <td class="leftborder">45 days</td>
+                                <td>ending <span id="year-days-without-rainfall-ts"></span></td><!-- moment.js -->
+                                <td class="leftborder">45 days</td>
+                                <td id="at-days-without-rainfall-range-ts"></td><!-- moment.js -->
+                            </tr>
+
+                            <tr>
+                                <td class="records-header" colspan=5>Humidity Records</td>
+                            </tr>
+                            <tr>
+                                <td colspan=1> </td>
+                                <td class="records-header-year" colspan=2>2022</td>
+                                <td class="records-header-alltime" colspan=2>All Time</td>
+                            </tr>
+                            <tr>
+                                <td>Highest Humidity</td>
+                                <td class="leftborder">99%</td>
+                                <td id="year-outHumidity-max-ts"></td><!-- moment.js -->
+                                <td class="leftborder">99%</td>
+                                <td id="at-outHumidity-max-ts"></td><!-- moment.js -->
+                            </tr>
+                            <tr>
+                                <td>Lowest Humidity</td>
+                                <td class="leftborder">19%</td>
+                                <td id="year-outHumidity-min-ts"></td><!-- moment.js -->
+                                <td class="leftborder">19%</td>
+                                <td id="at-outHumidity-min-ts"></td><!-- moment.js -->
+                            </tr>
+                            <tr>
+                                <td>Highest Dewpoint</td>
+                                <td class="leftborder">70.2 &#176;F</td>
+                                <td id="year-dewpoint-max-ts"></td><!-- moment.js -->
+                                <td class="leftborder">70.2 &#176;F</td>
+                                <td id="at-dewpoint-max-ts"></td><!-- moment.js -->
+                            </tr>
+                            <tr>
+                                <td>Lowest Dewpoint</td>
+                                <td class="leftborder">-0.9 &#176;F</td>
+                                <td id="year-dewpoint-min-ts"></td><!-- moment.js -->
+                                <td class="leftborder">-0.9 &#176;F</td>
+                                <td id="at-dewpoint-min-ts"></td><!-- moment.js -->
+                            </tr>
+
+                            <tr>
+                                <td class="records-header" colspan=5>Barometer Records</td>
+                            </tr>
+                            <tr>
+                                <td colspan=1> </td>
+                                <td class="records-header-year" colspan=2>2022</td>
+                                <td class="records-header-alltime" colspan=2>All Time</td>
+                            </tr>
+                            <tr>
+                                <td>Highest Barometer</td>
+                                <td class="leftborder">1039.1 mbar</td>
+                                <td id="year-barometer-max-ts"></td><!-- moment.js -->
+                                <td class="leftborder">1053.2 mbar</td>
+                                <td id="at-barometer-max-ts"></td><!-- moment.js -->
+                            </tr>
+                            <tr>
+                                <td>Lowest Barometer</td>
+                                <td class="leftborder">989.9 mbar</td>
+                                <td id="year-barometer-min-ts"></td><!-- moment.js -->
+                                <td class="leftborder">989.9 mbar</td>
+                                <td id="at-barometer-min-ts"></td><!-- moment.js -->
+                            </tr>
+
+                            <tr>
+                                <td class="records-header" colspan=5>Sun Records</td>
+                            </tr>
+                            <tr>
+                                <td colspan=1> </td>
+                                <td class="records-header-year" colspan=2>2022</td>
+                                <td class="records-header-alltime" colspan=2>All Time</td>
+                            </tr>
+                            <tr>
+                                <td>Highest Solar Radiation</td>
+                                <td class="leftborder">268 W/m&#178;</td>
+                                <td id="year-radiation-max-ts"></td><!-- moment.js -->
+                                <td class="leftborder">268 W/m&#178;</td>
+                                <td id="at-radiation-max-ts"></td><!-- moment.js -->
+                            </tr>
+                            <tr>
+                                <td>Highest UV</td>
+                                <td class="leftborder">10.0</td>
+                                <td id="year-uv-max-ts"></td><!-- moment.js -->
+                                <td class="leftborder">10.0</td>
+                                <td id="at-uv-max-ts"></td><!-- moment.js -->
+                            </tr>
+                                          
+                            <!-- Add new table entries -->
+                            
+                        </tbody>
+                    </table>
+                </div>
+                <!-- End records table row -->
+
+            </article>
+        </div>
+    </div>
+
+
+		</div><!-- close div tag from header.html.tmpl -->
+
+		<footer class="site-footer">
+			<div class="wrap">
+                <div class="row">
+                    <div class="col-sm-4 footerLeft">
+                        Copyright &copy; 2022 leahillwx.org
+                    </div>
+                    <div class="col-sm-5 footerCenter">
+                        <strong>Data is not guaranteed to be accurate. Consult professional forecasts before making decisions based on the information presented here.</strong>
+                    </div>
+                    <div class="col-sm-3 footerRight">
+                        weewx theme by <a href="https://obrienlabs.net" target="_blank">Pat O'Brien</a>
+                    </div>
+                </div>
+			</div>
+		</footer>
+		
+		<script type='text/javascript' src='../js/responsive-menu.js'></script>
+		
+		<!-- Belchertown Skin Version: 1.3b1 -->
+        <!-- Page Generated: 12/22/2022 03:49:00 PM -->
+
+    </body>
+</html>

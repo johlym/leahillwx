@@ -1,0 +1,231 @@
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en-US" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+    <head >
+        <meta charset="UTF-8" />
+        <title>Lea Hill Weather - Live Auburn, WA Weather</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <meta name="description" content="Weather conditions for Lea Hill, Auburn, WA as observed by a personal weather station and the weewx weather software"/>
+        <meta name="robots" content="noodp"/>
+        <link rel="canonical" href="http://leahillwx.org" />
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Lea Hill Weather - Live Auburn, WA Weather" />
+        <meta property="og:description" content="Weather conditions for Lea Hill, Auburn, WA as observed by a personal weather station and the weewx weather software" />
+        <meta property="og:url" content="http://leahillwx.org" />
+        <meta property="og:site_name" content="Lea Hill Weather - Live Auburn, WA Weather" />
+
+        <link rel='dns-prefetch' href='//code.highcharts.com' />
+        <link rel='dns-prefetch' href='//fonts.googleapis.com' />
+        <link rel='dns-prefetch' href='//stackpath.bootstrapcdn.com' />
+        <link rel='dns-prefetch' href='//cdnjs.cloudflare.com' />
+
+        <link rel='stylesheet' href='//fonts.googleapis.com/css?family=Roboto%3A300%2C400%2C700&#038;ver=1.0' type='text/css' media='all' />
+        <link rel='stylesheet' href='//stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' type='text/css' media='all' />
+        <link rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.9/css/weather-icons.min.css?ver=4.7.4' type='text/css' media='all' />
+        <link rel='stylesheet' href='//stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css' type='text/css' media='all' />
+        <link rel='stylesheet' href='../style.css?ver=1671752958' type='text/css' media='all' id="belchertownStyle" />
+        <link rel='stylesheet' href='../belchertown-dark.min.css?ver=1671752958' type='text/css' media='all' id="belchertownStyle" />
+        
+        <link rel="manifest" href="../manifest.json" crossorigin="use-credentials">
+        <link rel="apple-touch-icon" href="../images/station.png">
+        <link rel="apple-touch-icon" sizes="48x48" href="../images/station48.png">
+        <link rel="apple-touch-icon" sizes="72x72" href="../images/station72.png">
+        <link rel="apple-touch-icon" sizes="96x96" href="../images/station96.png">
+        <link rel="apple-touch-icon" sizes="144x144" href="../images/station144.png">
+        <link rel="apple-touch-icon" sizes="168x168" href="../images/station168.png">
+        <link rel="apple-touch-icon" sizes="192x192" href="../images/station192.png">
+        
+        <!--[if lt IE 9]>
+        <script type='text/javascript' src='//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js'></script>
+        <![endif]-->
+        <script type='text/javascript' src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"></script>
+        <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.33/moment-timezone-with-data.min.js"></script>
+        <script type='text/javascript' src='//code.highcharts.com/stock/highstock.js'></script>
+        <script type='text/javascript' src='//code.highcharts.com/highcharts-more.js'></script>
+        <script type='text/javascript' src='//code.highcharts.com/modules/exporting.js'></script>
+        <script type='text/javascript' src='//code.highcharts.com/modules/solid-gauge.js'></script>
+        <script type='text/javascript' src='//stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js'></script>
+        <script type='text/javascript' src='../js/belchertown.js?1671752958'></script>
+        <script>
+            // Set the session variables for the theme
+            if ( sessionStorage.getItem('theme') === null ) {
+                sessionStorage.setItem('theme', 'light');
+            }
+            if ( sessionStorage.getItem('currentTheme') === null ) {
+                sessionStorage.setItem('currentTheme', 'light');
+            }
+        </script>
+        
+        <link rel='shortlink' href="http://leahillwx.org" />
+                
+        <link rel="icon" href="../favicon.ico" />
+        
+
+        <script src="https://sausages.leahillwx.org/script.js" data-site="LREPUUZF" defer></script>
+    </head>
+    
+    <body class="page-template-default page full-width-content light" itemscope itemtype="https://schema.org/WebPage">
+        <div class="site-container">
+            <header class="site-header">
+                <div class="wrap">
+                    <div class="title-area">
+                        <p class="site-title" itemprop="headline">
+                            <a href="../">
+                                Lea Hill WX
+                            </a>
+                        </p>
+                    </div>
+                    <div class="widget-area header-widget-area">
+                        <section id="nav_menu">
+                            <div class="widget-wrap">
+                                <nav class="nav-header" itemscope itemtype="https://schema.org/SiteNavigationElement">
+                                    <ul id="menu-menu" class="menu genesis-nav-menu">
+                                        <!-- class = current-menu-item -->
+                                        <li class="menu-item menu-item-home"><a href=".." itemprop="url"><span itemprop="name">Home</span></a></li>
+                                        <li class="menu-item menu-item-1"><a href="../graphs" itemprop="url"><span itemprop="name">Graphs</span></a></li>
+                                        <li class="menu-item menu-item-2"><a href="../records" itemprop="url"><span itemprop="name">Records</span></a></li>
+                                        <li class="menu-item menu-item-3"><a href="../reports" itemprop="url"><span itemprop="name">Reports</span></a></li>
+                                        <li class="menu-item menu-item-4"><a href="../about" itemprop="url"><span itemprop="name">About</span></a></li>
+                                        <label class="themeSwitchLabel">
+                                            <input type="checkbox" id="themeSwitch" >
+                                            <span class="slider round"></span>
+                                        </label>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </header>
+    
+    <script>        
+        jQuery(document).ready(function() {
+            var month = getURLvar("mo");
+            var year = getURLvar("yr");
+            if ( ( year !== undefined ) && ( month !== undefined ) ) {
+                url = '../NOAA/NOAA-'+year+'-'+month+'.txt';
+            } else if ( year !== undefined ) {
+                url = '../NOAA/NOAA-'+year+'.txt';
+            } else {
+                url = '../NOAA/NOAA-2022-12.txt';
+            }
+            
+            // Load the file into the pre
+            //jQuery('#noaa_contents').load( url );
+            populatePre( url );
+            
+            // Change the direct href link
+            jQuery(".noaa_direct_link").attr( "href", url );
+        });
+        
+        // Change the div to the right NOAA file
+        // I normally use PHP for this, but JavaScript seems to work well for the skin
+        // Source: https://stackoverflow.com/a/18933218/1177153
+        function populatePre(url) {
+            var xhr = new XMLHttpRequest();
+            xhr.onload = function () {
+                raw_content = this.responseText;
+                updated_content = raw_content.replace('<sup>','').replace('</sup>','').replace('&deg;','');
+                document.getElementById('noaa_contents').textContent = updated_content;
+            };
+            xhr.open('GET', url);
+            xhr.send();
+        }
+    </script>
+
+    <div class="site-inner">
+        <main class="content">    
+            <article class="weewx reports" itemscope itemtype="https://schema.org/CreativeWork">
+
+<div class="wx-stn-info-container">
+    <div class="row">
+        <div class="col-sm-1 wx-stn-info-current-obs">
+            <span class="obs-header-icon">
+                <img id="wxicon" src="../images/cloudy.png">
+            </span>
+            <span class="obs-header-outtemp">23.0 &#176;F</span>
+        </div>
+        <div class="col-sm-5">
+            <div class="wx-stn-name">
+                <h1>Weather Observation Reports</h1>
+            </div>
+        </div>
+        <div class="col-sm-5" style="float:right;">
+            <div class="wx-stn-info">
+                Collection source: <a href="/about">WS-2902C</a>
+            </div>
+            <div class="col-sm-10 wx-stn-info-social" style="float:right;">
+                <div class="wx-stn-share">
+                <div id="fb-root"></div>
+                <script>(function(d, s, id) {
+                  var js, fjs = d.getElementsByTagName(s)[0];
+                  if (d.getElementById(id)) return;
+                  js = d.createElement(s); js.id = id;
+                  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5";
+                  fjs.parentNode.insertBefore(js, fjs);
+                }(document, 'script', 'facebook-jssdk'));</script>
+                <div class="fb-like" data-href="https://leahillwx.org" data-width="500px" data-layout="button_count" data-action="like" data-show-faces="false" data-share="true"></div>
+            <div class="wx-share-sep"></div>
+                <script>
+                    !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+                </script>
+                <a href="https://twitter.com/share" class="twitter-share-button" data-url="https://leahillwx.org" data-text="Check out my website: My Weather Website Weather Conditions" data-via="_johlym" data-hashtags="#weather #wawx #wx">Tweet</a>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div class="clear"></div>
+</div>
+
+                <div class="noaa_reports">
+                    <H1>NOAA Reports</H1>
+                    <div class="row">
+                        <div class="col-sm-12 wx-year-row">
+                            <a href="?yr=2022" class="noaa_rep_nav"><b>2022</b></a>: <a href="?yr=2022&amp;mo=01" class="noaa_rep_nav"><b>Jan</b></a> <a href="?yr=2022&amp;mo=02" class="noaa_rep_nav"><b>Feb</b></a> <a href="?yr=2022&amp;mo=03" class="noaa_rep_nav"><b>Mar</b></a> <a href="?yr=2022&amp;mo=04" class="noaa_rep_nav"><b>Apr</b></a> <a href="?yr=2022&amp;mo=05" class="noaa_rep_nav"><b>May</b></a> <a href="?yr=2022&amp;mo=06" class="noaa_rep_nav"><b>Jun</b></a> <a href="?yr=2022&amp;mo=07" class="noaa_rep_nav"><b>Jul</b></a> <a href="?yr=2022&amp;mo=08" class="noaa_rep_nav"><b>Aug</b></a> <a href="?yr=2022&amp;mo=09" class="noaa_rep_nav"><b>Sep</b></a> <a href="?yr=2022&amp;mo=10" class="noaa_rep_nav"><b>Oct</b></a> <a href="?yr=2022&amp;mo=11" class="noaa_rep_nav"><b>Nov</b></a> <a href="?yr=2022&amp;mo=12" class="noaa_rep_nav"><b>Dec</b></a><br><a href="?yr=2021" class="noaa_rep_nav"><b>2021</b></a>: <span class="noaa_rep_nav"><b>Jan</b></span> <span class="noaa_rep_nav"><b>Feb</b></span> <span class="noaa_rep_nav"><b>Mar</b></span> <span class="noaa_rep_nav"><b>Apr</b></span> <span class="noaa_rep_nav"><b>May</b></span> <span class="noaa_rep_nav"><b>Jun</b></span> <span class="noaa_rep_nav"><b>Jul</b></span> <span class="noaa_rep_nav"><b>Aug</b></span> <span class="noaa_rep_nav"><b>Sep</b></span> <span class="noaa_rep_nav"><b>Oct</b></span> <span class="noaa_rep_nav"><b>Nov</b></span> <a href="?yr=2021&amp;mo=12" class="noaa_rep_nav"><b>Dec</b></a><br>
+                        </div>
+                    </div>
+                    <a href="#" class="noaa_direct_link">Click here</a> to view this report directly or click on a month or year to change the NOAA report.
+                    <br><br>
+                    <div class="noaa_report_container">
+                        <pre id="noaa_contents"></pre>
+                    </div> <!-- END noaa_report_container -->
+                </div> <!-- END noaa_reports -->
+
+            </article>
+        </main>
+    </div>
+
+
+		</div><!-- close div tag from header.html.tmpl -->
+
+		<footer class="site-footer">
+			<div class="wrap">
+                <div class="row">
+                    <div class="col-sm-4 footerLeft">
+                        Copyright &copy; 2022 leahillwx.org
+                    </div>
+                    <div class="col-sm-5 footerCenter">
+                        <strong>Data is not guaranteed to be accurate. Consult professional forecasts before making decisions based on the information presented here.</strong>
+                    </div>
+                    <div class="col-sm-3 footerRight">
+                        weewx theme by <a href="https://obrienlabs.net" target="_blank">Pat O'Brien</a>
+                    </div>
+                </div>
+			</div>
+		</footer>
+		
+		<script type='text/javascript' src='../js/responsive-menu.js'></script>
+		
+		<!-- Belchertown Skin Version: 1.3b1 -->
+        <!-- Page Generated: 12/22/2022 03:49:00 PM -->
+
+    </body>
+</html>

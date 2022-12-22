@@ -1,0 +1,269 @@
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en-US" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+    <head >
+        <meta charset="UTF-8" />
+        <title>Lea Hill Weather - Live Auburn, WA Weather</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <meta name="description" content="Weather conditions for Lea Hill, Auburn, WA as observed by a personal weather station and the weewx weather software"/>
+        <meta name="robots" content="noodp"/>
+        <link rel="canonical" href="http://leahillwx.org" />
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Lea Hill Weather - Live Auburn, WA Weather" />
+        <meta property="og:description" content="Weather conditions for Lea Hill, Auburn, WA as observed by a personal weather station and the weewx weather software" />
+        <meta property="og:url" content="http://leahillwx.org" />
+        <meta property="og:site_name" content="Lea Hill Weather - Live Auburn, WA Weather" />
+
+        <link rel='dns-prefetch' href='//code.highcharts.com' />
+        <link rel='dns-prefetch' href='//fonts.googleapis.com' />
+        <link rel='dns-prefetch' href='//stackpath.bootstrapcdn.com' />
+        <link rel='dns-prefetch' href='//cdnjs.cloudflare.com' />
+
+        <link rel='stylesheet' href='//fonts.googleapis.com/css?family=Roboto%3A300%2C400%2C700&#038;ver=1.0' type='text/css' media='all' />
+        <link rel='stylesheet' href='//stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' type='text/css' media='all' />
+        <link rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.9/css/weather-icons.min.css?ver=4.7.4' type='text/css' media='all' />
+        <link rel='stylesheet' href='//stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css' type='text/css' media='all' />
+        <link rel='stylesheet' href='../style.css?ver=1671752958' type='text/css' media='all' id="belchertownStyle" />
+        <link rel='stylesheet' href='../belchertown-dark.min.css?ver=1671752958' type='text/css' media='all' id="belchertownStyle" />
+        
+        <link rel="manifest" href="../manifest.json" crossorigin="use-credentials">
+        <link rel="apple-touch-icon" href="../images/station.png">
+        <link rel="apple-touch-icon" sizes="48x48" href="../images/station48.png">
+        <link rel="apple-touch-icon" sizes="72x72" href="../images/station72.png">
+        <link rel="apple-touch-icon" sizes="96x96" href="../images/station96.png">
+        <link rel="apple-touch-icon" sizes="144x144" href="../images/station144.png">
+        <link rel="apple-touch-icon" sizes="168x168" href="../images/station168.png">
+        <link rel="apple-touch-icon" sizes="192x192" href="../images/station192.png">
+        
+        <!--[if lt IE 9]>
+        <script type='text/javascript' src='//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js'></script>
+        <![endif]-->
+        <script type='text/javascript' src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"></script>
+        <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.33/moment-timezone-with-data.min.js"></script>
+        <script type='text/javascript' src='//code.highcharts.com/stock/highstock.js'></script>
+        <script type='text/javascript' src='//code.highcharts.com/highcharts-more.js'></script>
+        <script type='text/javascript' src='//code.highcharts.com/modules/exporting.js'></script>
+        <script type='text/javascript' src='//code.highcharts.com/modules/solid-gauge.js'></script>
+        <script type='text/javascript' src='//stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js'></script>
+        <script type='text/javascript' src='../js/belchertown.js?1671752958'></script>
+        <script>
+            // Set the session variables for the theme
+            if ( sessionStorage.getItem('theme') === null ) {
+                sessionStorage.setItem('theme', 'light');
+            }
+            if ( sessionStorage.getItem('currentTheme') === null ) {
+                sessionStorage.setItem('currentTheme', 'light');
+            }
+        </script>
+        
+        <link rel='shortlink' href="http://leahillwx.org" />
+                
+        <link rel="icon" href="../favicon.ico" />
+        
+
+        <script src="https://sausages.leahillwx.org/script.js" data-site="LREPUUZF" defer></script>
+    </head>
+    
+    <body class="page-template-default page full-width-content light" itemscope itemtype="https://schema.org/WebPage">
+        <div class="site-container">
+            <header class="site-header">
+                <div class="wrap">
+                    <div class="title-area">
+                        <p class="site-title" itemprop="headline">
+                            <a href="../">
+                                Lea Hill WX
+                            </a>
+                        </p>
+                    </div>
+                    <div class="widget-area header-widget-area">
+                        <section id="nav_menu">
+                            <div class="widget-wrap">
+                                <nav class="nav-header" itemscope itemtype="https://schema.org/SiteNavigationElement">
+                                    <ul id="menu-menu" class="menu genesis-nav-menu">
+                                        <!-- class = current-menu-item -->
+                                        <li class="menu-item menu-item-home"><a href=".." itemprop="url"><span itemprop="name">Home</span></a></li>
+                                        <li class="menu-item menu-item-1"><a href="../graphs" itemprop="url"><span itemprop="name">Graphs</span></a></li>
+                                        <li class="menu-item menu-item-2"><a href="../records" itemprop="url"><span itemprop="name">Records</span></a></li>
+                                        <li class="menu-item menu-item-3"><a href="../reports" itemprop="url"><span itemprop="name">Reports</span></a></li>
+                                        <li class="menu-item menu-item-4"><a href="../about" itemprop="url"><span itemprop="name">About</span></a></li>
+                                        <label class="themeSwitchLabel">
+                                            <input type="checkbox" id="themeSwitch" >
+                                            <span class="slider round"></span>
+                                        </label>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </header>
+
+    <div class="site-inner">
+        <main class="content">	
+            <article class="weewx graphs" itemscope itemtype="https://schema.org/CreativeWork">
+
+                <script type="text/javascript">
+                    var graph = getURLvar("graph");
+                    if ( graph === undefined ) {
+                        // If no URL VAR, default to the graph group defined in Extras
+                        graph = "day";
+                    }
+                    var thisPageGraphs = graphgroups_raw[graph];
+                    
+                    jQuery(document).ready(function() {
+                        if (graph == "all") { 
+                            // Build all graphs
+                            var i = 0;
+                            for (var graphgroup in graphgroups_raw) {
+                                // Rename the graph-outer div to remove CSS
+                                jQuery(".graph-outer").attr("class", "graph-outer-all");
+                                
+                                var page_content = "";
+                                if ( graphpage_content[graphgroup] ) {
+                                    page_content = graphpage_content[graphgroup];
+                                }
+                                
+                                // Loop through every graph group defined and add a title section
+                                jQuery(".graph-outer-all").append('\
+                                    <div class="' + graphgroup + '_outer row" style="margin:25px 0px 25px 0px;clear:both;">\
+                                        <div class="graphpage-title wx-buttons-description">\
+                                            <a href="./?graph='+graphgroup+'">'+ graphgroups_titles[graphgroup] +'</a>\
+                                        </div>\
+                                        <div class="graphpage-content col-sm-12">'+page_content+'</div>\
+                                        <div class="' + graphgroup + '"></div>\
+                                    </div>\
+                                ');
+                                
+                                if ( i > 0 ) {
+                                    jQuery("." + graphgroup + "_outer").css("border-top", "1px solid #ccc");
+                                }
+                                
+                                // Within each title section add the chart divs with the graph group prepending to avoid conflicts
+                                graphgroups_raw[graphgroup].forEach( graphID => {
+                                    jQuery("."+graphgroup).append('<div class="col-sm-6"><div id="' + graphgroup + "_" + graphID + '" style="width:100%;height:100%;margin-top:20px;"></div></div>');
+                                });
+                                
+                                // Render the charts with the prepend_renderTo set to true
+                                showChart(graphgroup, true);
+                                
+                                i++;
+                            };
+                        } else {
+                            // Loop through the graph group for this page and add the graph divs to the page
+                            try {
+                                thisPageGraphs.forEach( graphID => {
+                                    jQuery(".graph-outer").append('<div class="col-sm-12"><div id="' + graphID + '" style="width:100%;height:100%;margin-top:20px;"></div></div>');
+                                });
+                                
+                                // Set page title
+                                jQuery(".graphpage-title").html(graphgroups_titles[graph]);
+                                
+                                // Set page content
+                                jQuery(".graphpage-content").html(graphpage_content[graph]);
+                                
+                                // Render the charts
+                                showChart(graph);
+                            } catch(err) {
+                                console.log("ERROR: Cannot add graphs from [" + graph + "] graph group: " + err.message);
+                            }
+                        }
+                    });
+                </script>
+                
+<div class="wx-stn-info-container">
+    <div class="row">
+        <div class="col-sm-1 wx-stn-info-current-obs">
+            <span class="obs-header-icon">
+                <img id="wxicon" src="../images/cloudy.png">
+            </span>
+            <span class="obs-header-outtemp">23.0 &#176;F</span>
+        </div>
+        <div class="col-sm-5">
+            <div class="wx-stn-name">
+                <h1>Weather Observation Graphs</h1>
+            </div>
+        </div>
+        <div class="col-sm-5" style="float:right;">
+            <div class="wx-stn-info">
+                Collection source: <a href="/about">WS-2902C</a>
+            </div>
+            <div class="col-sm-10 wx-stn-info-social" style="float:right;">
+                <div class="wx-stn-share">
+                <div id="fb-root"></div>
+                <script>(function(d, s, id) {
+                  var js, fjs = d.getElementsByTagName(s)[0];
+                  if (d.getElementById(id)) return;
+                  js = d.createElement(s); js.id = id;
+                  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5";
+                  fjs.parentNode.insertBefore(js, fjs);
+                }(document, 'script', 'facebook-jssdk'));</script>
+                <div class="fb-like" data-href="https://leahillwx.org" data-width="500px" data-layout="button_count" data-action="like" data-show-faces="false" data-share="true"></div>
+            <div class="wx-share-sep"></div>
+                <script>
+                    !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+                </script>
+                <a href="https://twitter.com/share" class="twitter-share-button" data-url="https://leahillwx.org" data-text="Check out my website: My Weather Website Weather Conditions" data-via="_johlym" data-hashtags="#weather #wawx #wx">Tweet</a>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div class="clear"></div>
+</div>
+
+                <!-- Begin row -->
+                <div class="row">
+                    <div class="col-sm-12 wx-buttons">
+                        <a href="./?graph=all"><button type="button" class="btn btn-primary wx-btn-year">All</button></a>
+                        <a href="./?graph=homepage"><button type="button" class="btn btn-primary">Homepage</button></a> <a href="./?graph=day"><button type="button" class="btn btn-primary">Day</button></a> <a href="./?graph=week"><button type="button" class="btn btn-primary">Week</button></a> <a href="./?graph=month"><button type="button" class="btn btn-primary">Month</button></a> <a href="./?graph=year"><button type="button" class="btn btn-primary">Year</button></a> 
+                    </div>
+                    <div class="col-sm-12 wx-buttons-description">
+                        <span class='graphpage-title'></span>
+                    </div>
+                </div>
+                <!-- End row -->
+                
+                <div class="graphpage-content col-sm-12"></div><!-- JS populated -->
+                
+                <div class="graph-outer"></div><!-- JS populated -->
+                
+                <div class="clear"></div>
+                
+            </article>
+        </main>
+    </div>
+
+
+		</div><!-- close div tag from header.html.tmpl -->
+
+		<footer class="site-footer">
+			<div class="wrap">
+                <div class="row">
+                    <div class="col-sm-4 footerLeft">
+                        Copyright &copy; 2022 leahillwx.org
+                    </div>
+                    <div class="col-sm-5 footerCenter">
+                        <strong>Data is not guaranteed to be accurate. Consult professional forecasts before making decisions based on the information presented here.</strong>
+                    </div>
+                    <div class="col-sm-3 footerRight">
+                        weewx theme by <a href="https://obrienlabs.net" target="_blank">Pat O'Brien</a>
+                    </div>
+                </div>
+			</div>
+		</footer>
+		
+		<script type='text/javascript' src='../js/responsive-menu.js'></script>
+		
+		<!-- Belchertown Skin Version: 1.3b1 -->
+        <!-- Page Generated: 12/22/2022 03:49:00 PM -->
+
+    </body>
+</html>
+

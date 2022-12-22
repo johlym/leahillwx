@@ -1,0 +1,303 @@
+{
+    "aggregate_type": "None",
+    "time_length": "90000",
+    "type": "line",
+    "colors": "#7cb5ec, #b2df8a, #f7a35c, #8c6bb1, #dd3497, #e4d354, #268bd2, #f45b5b, #6a3d9a, #33a02c",
+    "tooltip_date_format": "LLL",
+    "homepage": {
+        "title": "Homepage",
+        "show_button": "true",
+        "button_text": "Homepage",
+        "time_length": "today",
+        "tooltip_date_format": "LLL",
+        "gapsize": "60",
+        "chart1": {
+            "title": "Temperature",
+            "outTemp": {
+                "zIndex": "1",
+                "name": "Temperature"
+            },
+            "windchill": {},
+            "heatindex": {
+                "color": "#f7a35c"
+            },
+            "dewpoint": {
+                "color": "purple"
+            }
+        },
+        "chart2": {
+            "title": "Wind Rose",
+            "windRose": {}
+        },
+        "chart3": {
+            "title": "Rain",
+            "rainRate": {
+                "yAxis": "1"
+            },
+            "rainTotal": {
+                "name": "Rain Total"
+            }
+        },
+        "chart4": {
+            "title": "Barometer",
+            "type": "spline",
+            "barometer": {
+                "color": "#BECC00",
+                "yAxis_tickinterval": "0.01"
+            }
+        }
+    },
+    "day": {
+        "title": "Today",
+        "show_button": "true",
+        "button_text": "Day",
+        "time_length": "today",
+        "tooltip_date_format": "LLL",
+        "gapsize": "60",
+        "chart1": {
+            "title": "Temperature",
+            "outTemp": {
+                "zIndex": "1",
+                "name": "Temperature"
+            },
+            "windchill": {},
+            "heatindex": {
+                "color": "#f7a35c"
+            },
+            "dewpoint": {
+                "color": "purple"
+            }
+        },
+        "chart2": {
+            "title": "Wind Speed and Direction",
+            "yAxis_min": "0",
+            "windDir": {
+                "zIndex": "1",
+                "yAxis": "1",
+                "yAxis_max": "360",
+                "lineWidth": "0",
+                "marker": {
+                    "enabled": "true"
+                },
+                "states": {
+                    "hover": {
+                        "lineWidthPlus": 0.0
+                    }
+                }
+            },
+            "windGust": {},
+            "windSpeed": {
+                "zIndex": "2"
+            }
+        },
+        "chart3": {
+            "title": "Rain",
+            "rainRate": {
+                "yAxis": "1"
+            },
+            "rainTotal": {
+                "name": "Rain Total"
+            }
+        },
+        "chart4": {
+            "title": "Barometer",
+            "type": "spline",
+            "barometer": {
+                "color": "#BECC00"
+            }
+        }
+    },
+    "week": {
+        "title": "This Week",
+        "show_button": "true",
+        "button_text": "Week",
+        "time_length": "604800",
+        "tooltip_date_format": "LLLL",
+        "aggregate_type": "max",
+        "aggregate_interval": "60",
+        "gapsize": "60",
+        "chart1": {
+            "title": "Temperature",
+            "outTemp": {
+                "zIndex": "1",
+                "name": "Temperature"
+            },
+            "windchill": {},
+            "heatindex": {
+                "color": "#f7a35c"
+            },
+            "dewpoint": {
+                "color": "purple"
+            }
+        },
+        "chart2": {
+            "title": "Wind Speed and Direction",
+            "yAxis_min": "0",
+            "windDir": {
+                "zIndex": "1",
+                "yAxis": "1",
+                "yAxis_max": "360",
+                "lineWidth": "0",
+                "aggregate_type": "avg",
+                "marker": {
+                    "enabled": "true"
+                },
+                "states": {
+                    "hover": {
+                        "lineWidthPlus": 0.0
+                    }
+                }
+            },
+            "windGust": {},
+            "windSpeed": {
+                "zIndex": "2"
+            }
+        },
+        "chart3": {
+            "title": "Rain",
+            "rainRate": {
+                "yAxis": "1"
+            },
+            "rainTotal": {
+                "name": "Rain Total"
+            }
+        },
+        "chart4": {
+            "title": "Barometer",
+            "aggregate_type": "avg",
+            "barometer": {
+                "color": "#BECC00"
+            }
+        }
+    },
+    "month": {
+        "title": "This Month",
+        "show_button": "true",
+        "button_text": "Month",
+        "type": "spline",
+        "time_length": "2592000",
+        "tooltip_date_format": "dddd LL",
+        "aggregate_type": "max",
+        "aggregate_interval": "86400",
+        "gapsize": "86400",
+        "chart1": {
+            "title": "Temperature",
+            "outTemp": {
+                "zIndex": "1",
+                "name": "Max Temperature",
+                "color": "red"
+            },
+            "outTemp_min": {
+                "name": "Min Temperature",
+                "observation_type": "outTemp",
+                "aggregate_type": "min",
+                "color": "#7cb5ec"
+            }
+        },
+        "chart2": {
+            "title": "Wind Speed and Direction",
+            "yAxis_min": "0",
+            "windDir": {
+                "zIndex": "1",
+                "yAxis": "1",
+                "yAxis_max": "360",
+                "lineWidth": "0",
+                "aggregate_type": "avg",
+                "marker": {
+                    "enabled": "true"
+                },
+                "states": {
+                    "hover": {
+                        "lineWidthPlus": 0.0
+                    }
+                }
+            },
+            "windGust": {},
+            "windSpeed": {
+                "zIndex": "2"
+            }
+        },
+        "chart3": {
+            "title": "Rain",
+            "type": "line",
+            "rainRate": {
+                "yAxis": "1"
+            },
+            "rainTotal": {
+                "name": "Rain Total"
+            }
+        },
+        "chart4": {
+            "title": "Barometer",
+            "aggregate_type": "avg",
+            "barometer": {
+                "color": "#BECC00"
+            }
+        }
+    },
+    "year": {
+        "title": "This Year",
+        "show_button": "true",
+        "button_text": "Year",
+        "type": "spline",
+        "time_length": "year",
+        "tooltip_date_format": "dddd LL",
+        "aggregate_type": "max",
+        "aggregate_interval": "86400",
+        "gapsize": "86400",
+        "chart1": {
+            "title": "Temperature",
+            "outTemp": {
+                "zIndex": "1",
+                "name": "Max Temperature",
+                "color": "red"
+            },
+            "outTemp_min": {
+                "name": "Min Temperature",
+                "observation_type": "outTemp",
+                "aggregate_type": "min",
+                "color": "#7cb5ec"
+            }
+        },
+        "chart2": {
+            "title": "Wind Speed and Direction",
+            "yAxis_min": "0",
+            "windDir": {
+                "zIndex": "1",
+                "yAxis": "1",
+                "yAxis_max": "360",
+                "lineWidth": "0",
+                "aggregate_type": "avg",
+                "marker": {
+                    "enabled": "true"
+                },
+                "states": {
+                    "hover": {
+                        "lineWidthPlus": 0.0
+                    }
+                }
+            },
+            "windGust": {},
+            "windSpeed": {
+                "zIndex": "2"
+            }
+        },
+        "chart3": {
+            "title": "Rain",
+            "type": "line",
+            "rainRate": {
+                "yAxis": "1"
+            },
+            "rainTotal": {
+                "name": "Rain Total"
+            }
+        },
+        "chart4": {
+            "title": "Barometer",
+            "aggregate_type": "avg",
+            "barometer": {
+                "color": "#BECC00"
+            }
+        }
+    }
+}
