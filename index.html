@@ -30,8 +30,8 @@
         <link rel='stylesheet' href='//stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' type='text/css' media='all' />
         <link rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.9/css/weather-icons.min.css?ver=4.7.4' type='text/css' media='all' />
         <link rel='stylesheet' href='//stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css' type='text/css' media='all' />
-        <link rel='stylesheet' href='./style.css?ver=1671774857' type='text/css' media='all' id="belchertownStyle" />
-        <link rel='stylesheet' href='./belchertown-dark.min.css?ver=1671774857' type='text/css' media='all' id="belchertownStyle" />
+        <link rel='stylesheet' href='./style.css?ver=1671775156' type='text/css' media='all' id="belchertownStyle" />
+        <link rel='stylesheet' href='./belchertown-dark.min.css?ver=1671775156' type='text/css' media='all' id="belchertownStyle" />
         
         <link rel="manifest" href="./manifest.json" crossorigin="use-credentials">
         <link rel="apple-touch-icon" href="./images/station.png">
@@ -54,7 +54,7 @@
         <script type='text/javascript' src='//code.highcharts.com/modules/exporting.js'></script>
         <script type='text/javascript' src='//code.highcharts.com/modules/solid-gauge.js'></script>
         <script type='text/javascript' src='//stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js'></script>
-        <script type='text/javascript' src='./js/belchertown.js?1671774857'></script>
+        <script type='text/javascript' src='./js/belchertown.js?1671775156'></script>
         <script>
             // Set the session variables for the theme
             if ( sessionStorage.getItem('theme') === null ) {
@@ -131,12 +131,12 @@
                 get_aqi_color( "21" );
 
 
-                get_outTemp_color( "degree_F", "23.5" );
+                get_outTemp_color( "degree_F", "23.4" );
             
-                rotateThis( "169" );
+                rotateThis( "163" );
 
                 // Update the Last Updated timestamp with moment.js,
-                updated = tzAdjustedMoment( 1671774840 ).format("LL, LTS");
+                updated = tzAdjustedMoment( 1671775140 ).format("LL, LTS");
                 updated_text = "Last Updated " + updated;
                 jQuery(".updated").html( updated_text );
             
@@ -252,7 +252,7 @@
                                         <img id="wxicon" src="./images/cloudy.png">
                                     </div>
                                     <div class="col-sm-6 current_temp">
-                                        <div class="outtemp_outer"><span class="outtemp">23.5</span><sup class="outtempunitlabelsuper"> &#176;F</sup></div><!-- AJAX -->
+                                        <div class="outtemp_outer"><span class="outtemp">23.4</span><sup class="outtempunitlabelsuper"> &#176;F</sup></div><!-- AJAX -->
                                     </div>
                                 </div>
                                 <div class="row">
@@ -265,7 +265,7 @@
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
-                                        <div class="feelslike">Feels like: 17.2 &#176;F</div><!-- AJAX -->
+                                        <div class="feelslike">Feels like: 16.7 &#176;F</div><!-- AJAX -->
                                         <div class="stn-high-low">
                                             <table class="stn-high-low-table">
                                                 <tbody>
@@ -297,7 +297,7 @@
                                                 SSE
                                                 </span>
                                                 <span class="curwinddeg">
-                                                169&#176;
+                                                163&#176;
                                                 </span>
                                             </div>
                                             <div class="arrow"></div>
@@ -318,7 +318,7 @@
                                                     </td>
                                                     <td class="border-left gust">&nbsp;
                                                         <span class="curwindgust">
-                                                            2
+                                                            3
                                                         </span>
                                                     </td>
                                                 </tr>
@@ -339,7 +339,7 @@
                         <div class="station-observations weather-obs-top">
                             <table cellpadding="0" cellspacing="0">
                                 <tbody>
-                                    <tr><td class='station-observations-label'>Barometer</td><td><span class=barometer>1020.5 mbar</span><!-- AJAX --> <span class="pressure-trend"><i class="fa fa-arrow-down barometer-down"></i></span></td></tr><tr><td class='station-observations-label'>Dew Point</td><td><span class=dewpoint>10.2 &#176;F</span><!-- AJAX --></td></tr><tr><td class='station-observations-label'>Humidity</td><td><span class=outHumidity>56%</span><!-- AJAX --></td></tr><tr><td class='station-observations-label'>Rain</td><td><span class='dayRain'>0.00 in</span><!-- AJAX -->&nbsp;<span class='border-left'>&nbsp;</span><span class='rainRate'>0.00 in/hr</span><!-- AJAX --></td></tr>
+                                    <tr><td class='station-observations-label'>Barometer</td><td><span class=barometer>1020.4 mbar</span><!-- AJAX --> <span class="pressure-trend"><i class="fa fa-arrow-down barometer-down"></i></span></td></tr><tr><td class='station-observations-label'>Dew Point</td><td><span class=dewpoint>9.1 &#176;F</span><!-- AJAX --></td></tr><tr><td class='station-observations-label'>Humidity</td><td><span class=outHumidity>54%</span><!-- AJAX --></td></tr><tr><td class='station-observations-label'>Rain</td><td><span class='dayRain'>0.00 in</span><!-- AJAX -->&nbsp;<span class='border-left'>&nbsp;</span><span class='rainRate'>0.00 in/hr</span><!-- AJAX --></td></tr>
                                 </tbody>
                             </table>
                             <!-- Station Observations Hook -->
@@ -384,7 +384,7 @@
                                                                 <h4 class="modal-title" id="almanac">Almanac Information</h4>
                                                             </div>
                                                             <div class="almanac-extras-modal-body modal-body">
-<div id='celestial_widget' class='widget'> <div class='widget_contents'> <div id='celestial_details'> <div class='celestial_body'> <table class='celestial'> <tr><th>&#9728; Sun</th><th></th></tr> <tr> <td class='label'>Start civil twilight</td> <td class='data'>07:16:36 AM</td> </tr> <tr> <td class='label'>Rise</td> <td class='data'>07:52:41 AM</td> </tr> <tr> <td class='label'>Transit</td> <td class='data'>12:07:26 PM</td> </tr> <tr> <td class='label'>Set</td> <td class='data'>04:22:11 PM</td> </tr> <tr> <td class='label'>End Civil Twilight</td> <td class='data'>04:58:16 PM</td> </tr> <tr> <td class='label'>Azimuth</td> <td class='data'>300.2&deg;</td> </tr> <tr> <td class='label'>Altitude</td> <td class='data'>-54.2&deg;</td> </tr> <tr> <td class='label'>Right ascension</td> <td class='data'>271.5&deg;</td> </tr> <tr> <td class='label'>Declination</td> <td class='data'>-23.4&deg;</td> </tr><tr><td class='label'>Equinox</td><td class='data'>03/20/2023 02:24:15 PM</td></tr><tr><td class='label'>Solstice</td><td class='data'>06/21/2023 07:57:55 AM</td></tr><tr> <td class='label'>Total daylight</td> <td class='data'>8 hours, 29 minutes, 29 seconds<br/>2 seconds more than yesterday</td> </tr> </table> </div> <div class='celestial_body'> <table class='celestial'> <tr><th>&#9789; Moon</th><th></th></tr> <tr><td class='label'>&nbsp;</td><td class='data'>&nbsp;</td></tr> <tr> <td class='label'>Rise</td> <td class='data'>07:27:30 AM</td> </tr> <tr> <td class='label'>Transit</td> <td class='data'>11:28:50 AM</td> </tr> <tr> <td class='label'>Set</td> <td class='data'>03:25:57 PM</td> </tr> <tr><td class='label'>&nbsp;</td><td class='data'>&nbsp;</td></tr> <tr> <td class='label'>Azimuth</td> <td class='data'>299.3&deg;</td> </tr> <tr> <td class='label'>Altitude</td> <td class='data'>-59.3&deg;</td> </tr> <tr> <td class='label'>Right ascension</td> <td class='data'>268.3&deg;</td> </tr> <tr> <td class='label'>Declination</td> <td class='data'>-27.5&deg;</td> </tr><tr> <td class='label'>New moon</td> <td class='data'>12/23/2022 02:16:51 AM</td> </tr> <tr> <td class='label'>Full moon</td> <td class='data'>01/06/2023 03:07:52 PM</td> </tr><tr> <td class='label'>Phase</td> <td class='data'>New<br/> 0% full</td> </tr> </table> </div> </div> </div> </div> <div class='clear'></div><div class='almanac_last_updated'></div>
+<div id='celestial_widget' class='widget'> <div class='widget_contents'> <div id='celestial_details'> <div class='celestial_body'> <table class='celestial'> <tr><th>&#9728; Sun</th><th></th></tr> <tr> <td class='label'>Start civil twilight</td> <td class='data'>07:16:36 AM</td> </tr> <tr> <td class='label'>Rise</td> <td class='data'>07:52:41 AM</td> </tr> <tr> <td class='label'>Transit</td> <td class='data'>12:07:26 PM</td> </tr> <tr> <td class='label'>Set</td> <td class='data'>04:22:11 PM</td> </tr> <tr> <td class='label'>End Civil Twilight</td> <td class='data'>04:58:16 PM</td> </tr> <tr> <td class='label'>Azimuth</td> <td class='data'>301.7&deg;</td> </tr> <tr> <td class='label'>Altitude</td> <td class='data'>-55.0&deg;</td> </tr> <tr> <td class='label'>Right ascension</td> <td class='data'>271.5&deg;</td> </tr> <tr> <td class='label'>Declination</td> <td class='data'>-23.4&deg;</td> </tr><tr><td class='label'>Equinox</td><td class='data'>03/20/2023 02:24:15 PM</td></tr><tr><td class='label'>Solstice</td><td class='data'>06/21/2023 07:57:55 AM</td></tr><tr> <td class='label'>Total daylight</td> <td class='data'>8 hours, 29 minutes, 29 seconds<br/>2 seconds more than yesterday</td> </tr> </table> </div> <div class='celestial_body'> <table class='celestial'> <tr><th>&#9789; Moon</th><th></th></tr> <tr><td class='label'>&nbsp;</td><td class='data'>&nbsp;</td></tr> <tr> <td class='label'>Rise</td> <td class='data'>07:27:30 AM</td> </tr> <tr> <td class='label'>Transit</td> <td class='data'>11:28:50 AM</td> </tr> <tr> <td class='label'>Set</td> <td class='data'>03:25:57 PM</td> </tr> <tr><td class='label'>&nbsp;</td><td class='data'>&nbsp;</td></tr> <tr> <td class='label'>Azimuth</td> <td class='data'>300.9&deg;</td> </tr> <tr> <td class='label'>Altitude</td> <td class='data'>-59.9&deg;</td> </tr> <tr> <td class='label'>Right ascension</td> <td class='data'>268.3&deg;</td> </tr> <tr> <td class='label'>Declination</td> <td class='data'>-27.5&deg;</td> </tr><tr> <td class='label'>New moon</td> <td class='data'>12/23/2022 02:16:51 AM</td> </tr> <tr> <td class='label'>Full moon</td> <td class='data'>01/06/2023 03:07:52 PM</td> </tr><tr> <td class='label'>Phase</td> <td class='data'>New<br/> 0% full</td> </tr> </table> </div> </div> </div> </div> <div class='clear'></div><div class='almanac_last_updated'></div>
                                                             </div><!-- AJAX -->
                                                             <div class="modal-footer">
                                                                 <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
@@ -561,7 +561,7 @@
 		<script type='text/javascript' src='./js/responsive-menu.js'></script>
 		
 		<!-- Belchertown Skin Version: 1.3b1 -->
-        <!-- Page Generated: 12/22/2022 09:54:00 PM -->
+        <!-- Page Generated: 12/22/2022 09:59:00 PM -->
 
     </body>
 </html>
