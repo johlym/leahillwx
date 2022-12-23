@@ -3,8 +3,8 @@
     "station_url": "https://leahillwx.org",
     "version": "4.5.1",
     "belchertown_version": "1.3b1",
-    "weewxuptime": "0 days, 0 hours, 59 minutes",
-    "serveruptime": "230 days, 23 hours, 56 minutes",
+    "weewxuptime": "0 days, 0 hours, 4 minutes",
+    "serveruptime": "231 days, 0 hours, 1 minute",
     "serverLocale": "en_US",
     "serverLocaleJS": "en-US",
     "localeEncoding": "UTF-8",
@@ -47,14 +47,14 @@
         "bearing_raw": "193.84015273730722"
     },
     "station_observations": {
-        "current": {"barometer": "1017.6 mbar", "dewpoint": "31.9 \u00b0F", "outHumidity": "99%", "rainWithRainRate": ""}
+        "current": {"barometer": "1017.8 mbar", "dewpoint": "31.9 \u00b0F", "outHumidity": "99%", "rainWithRainRate": ""}
     },
     "unit_rounding": {"ET": "2", "visibility": "2", "THSW": "1", "UV": "1", "altimeter": "1", "altitude": "0", "appTemp": "1", "appTemp1": "1", "barometer": "1", "beaufort": "0", "cloudbase": "0", "consBatteryVoltage": "1", "cooldeg": "0", "dateTime": "0", "dayRain": "2", "dewpoint": "1", "dewpoint1": "1", "extraHumid1": "0", "extraHumid2": "0", "extraHumid3": "0", "extraHumid4": "0", "extraHumid5": "0", "extraHumid6": "0", "extraHumid7": "0", "extraHumid8": "0", "extraTemp1": "1", "extraTemp2": "1", "extraTemp3": "1", "extraTemp4": "1", "extraTemp5": "1", "extraTemp6": "1", "extraTemp7": "1", "extraTemp8": "1", "growdeg": "0", "gustdir": "0", "hail": "2", "hailRate": "2", "heatdeg": "0", "heatindex": "1", "heatindex1": "1", "heatingTemp": "1", "heatingVoltage": "1", "hourRain": "2", "humidex": "1", "humidex1": "1", "inDewpoint": "1", "inHumidity": "0", "inTemp": "1", "interval": "0", "leafTemp1": "1", "leafTemp2": "1", "leafTemp3": "1", "leafTemp4": "1", "leafWet1": "0", "leafWet2": "0", "lightning_distance": "1", "lightning_disturber_count": "0", "lightning_noise_count": "0", "lightning_strike_count": "0", "maxSolarRad": "0", "monthRain": "2", "no2": "0", "outHumidity": "0", "outTemp": "1", "pm10_0": "0", "pm1_0": "0", "pm2_5": "0", "pressure": "1", "radiation": "0", "rain": "2", "rain24": "2", "rainRate": "2", "referenceVoltage": "1", "rms": "1", "rxCheckPercent": "0", "snow": "2", "snowDepth": "2", "snowMoisture": "0", "snowRate": "2", "soilMoist1": "0", "soilMoist2": "0", "soilMoist3": "0", "soilMoist4": "0", "soilTemp1": "1", "soilTemp2": "1", "soilTemp3": "1", "soilTemp4": "1", "stormRain": "2", "stormStart": "0", "supplyVoltage": "1", "totalRain": "2", "vecavg": "1", "vecdir": "0", "wind": "0", "windDir": "0", "windGust": "0", "windGustDir": "0", "windSpeed": "0", "windSpeed10": "0", "windchill": "1", "windgustvec": "0", "windrun": "1", "windvec": "0", "yearRain": "2"},
     "unit_label": {"ET": " in", "visibility": "miles", "THSW": " \u00b0F", "UV": "", "altimeter": " mbar", "altitude": " feet", "appTemp": " \u00b0F", "appTemp1": " \u00b0F", "barometer": " mbar", "beaufort": "", "cloudbase": " feet", "consBatteryVoltage": " V", "cooldeg": "\u00b0F-day", "dateTime": "", "dayRain": " in", "dewpoint": " \u00b0F", "dewpoint1": " \u00b0F", "extraHumid1": "%", "extraHumid2": "%", "extraHumid3": "%", "extraHumid4": "%", "extraHumid5": "%", "extraHumid6": "%", "extraHumid7": "%", "extraHumid8": "%", "extraTemp1": " \u00b0F", "extraTemp2": " \u00b0F", "extraTemp3": " \u00b0F", "extraTemp4": " \u00b0F", "extraTemp5": " \u00b0F", "extraTemp6": " \u00b0F", "extraTemp7": " \u00b0F", "extraTemp8": " \u00b0F", "growdeg": "\u00b0F-day", "gustdir": "\u00b0", "hail": " in", "hailRate": " in/hr", "heatdeg": "\u00b0F-day", "heatindex": " \u00b0F", "heatindex1": " \u00b0F", "heatingTemp": " \u00b0F", "heatingVoltage": " V", "hourRain": " in", "humidex": " \u00b0F", "humidex1": " \u00b0F", "inDewpoint": " \u00b0F", "inHumidity": "%", "inTemp": " \u00b0F", "interval": " minutes", "leafTemp1": " \u00b0F", "leafTemp2": " \u00b0F", "leafTemp3": " \u00b0F", "leafTemp4": " \u00b0F", "leafWet1": "", "leafWet2": "", "lightning_distance": " miles", "lightning_disturber_count": "", "lightning_noise_count": "", "lightning_strike_count": "", "maxSolarRad": " W/m\u00b2", "monthRain": " in", "no2": "\u00b5g/m\u00b3", "outHumidity": "%", "outTemp": " \u00b0F", "pm10_0": "\u00b5g/m\u00b3", "pm1_0": "\u00b5g/m\u00b3", "pm2_5": "\u00b5g/m\u00b3", "pressure": " mbar", "radiation": " W/m\u00b2", "rain": " in", "rain24": " in", "rainRate": " in/hr", "referenceVoltage": " V", "rms": " mph", "rxCheckPercent": "%", "snow": " in", "snowDepth": " in", "snowMoisture": "%", "snowRate": " in/hr", "soilMoist1": " cb", "soilMoist2": " cb", "soilMoist3": " cb", "soilMoist4": " cb", "soilTemp1": " \u00b0F", "soilTemp2": " \u00b0F", "soilTemp3": " \u00b0F", "soilTemp4": " \u00b0F", "stormRain": " in", "stormStart": "", "supplyVoltage": " V", "totalRain": " in", "vecavg": " mph", "vecdir": "\u00b0", "wind": " mph", "windDir": "\u00b0", "windGust": " mph", "windGustDir": "\u00b0", "windSpeed": " mph", "windSpeed10": " mph", "windchill": " \u00b0F", "windgustvec": " mph", "windrun": " miles", "windvec": " mph", "yearRain": " in"},
     "current": {
-        "datetime": "12/23/2022 02:59:00 PM",
-        "datetime_raw": "1671836340",
-        "epoch": "1671836356",
+        "datetime": "12/23/2022 03:04:00 PM",
+        "datetime_raw": "1671836640",
+        "epoch": "1671836660",
         "outTemp": "32.2 &#176;F",
         "outTemp_formatted": "32.2",
         "outHumidity": "99%",
@@ -62,8 +62,8 @@
         "windchill": "32.2 &#176;F",
         "heatindex": "32.2 &#176;F",
         "dewpoint": "31.9 &#176;F",
-        "barometer": "1017.6 mbar",
-        "barometer_trend": "1.3 mbar",
+        "barometer": "1017.8 mbar",
+        "barometer_trend": "1.2 mbar",
         "windspeed": "0 mph",
         "winddir": "   N/A",
         "winddir_formatted": "   N/A",
@@ -343,14 +343,14 @@
     },
     "almanac": {
         "sunrise": "07:53:14 AM",
-        "sunrise_epoch": "1671810794.3357408",
+        "sunrise_epoch": "1671810794.2789512",
         "sunrise_hour": "07",
         "sunrise_minute": "53",
         "sunset": "04:22:39 PM",
-        "sunset_epoch": "1671841359.5907125",
+        "sunset_epoch": "1671841359.6475022",
         "sunset_hour": "16",
         "sunset_minute": "22",
-        "almanac_extras_modal_html": "<div id='celestial_widget' class='widget'> <div class='widget_contents'> <div id='celestial_details'> <div class='celestial_body'> <table class='celestial'> <tr><th>&#9728; Sun</th><th></th></tr> <tr> <td class='label'>Start civil twilight</td> <td class='data'>07:17:04 AM</td> </tr> <tr> <td class='label'>Rise</td> <td class='data'>07:53:14 AM</td> </tr> <tr> <td class='label'>Transit</td> <td class='data'>12:07:56 PM</td> </tr> <tr> <td class='label'>Set</td> <td class='data'>04:22:39 PM</td> </tr> <tr> <td class='label'>End Civil Twilight</td> <td class='data'>04:58:49 PM</td> </tr> <tr> <td class='label'>Azimuth</td> <td class='data'>219.2&deg;</td> </tr> <tr> <td class='label'>Altitude</td> <td class='data'>9.6&deg;</td> </tr> <tr> <td class='label'>Right ascension</td> <td class='data'>272.3&deg;</td> </tr> <tr> <td class='label'>Declination</td> <td class='data'>-23.4&deg;</td> </tr>        <tr><td class='label'>Equinox</td><td class='data'>03/20/2023 02:24:15 PM</td></tr><tr><td class='label'>Solstice</td><td class='data'>06/21/2023 07:57:55 AM</td></tr>        <tr> <td class='label'>Total daylight</td> <td class='data'>8 hours, 29 minutes, 25 seconds<br/>7 seconds more than yesterday</td> </tr> </table> </div> <div class='celestial_body'> <table class='celestial'> <tr><th>&#9789; Moon</th><th></th></tr> <tr><td class='label'>&nbsp;</td><td class='data'>&nbsp;</td></tr> <tr> <td class='label'>Rise</td> <td class='data'>08:42:40 AM</td> </tr> <tr> <td class='label'>Transit</td> <td class='data'>12:35:32 PM</td> </tr> <tr> <td class='label'>Set</td> <td class='data'>04:28:50 PM</td> </tr> <tr><td class='label'>&nbsp;</td><td class='data'>&nbsp;</td></tr> <tr> <td class='label'>Azimuth</td> <td class='data'>210.4&deg;</td> </tr> <tr> <td class='label'>Altitude</td> <td class='data'>8.3&deg;</td> </tr> <tr> <td class='label'>Right ascension</td> <td class='data'>280.3&deg;</td> </tr> <tr> <td class='label'>Declination</td> <td class='data'>-28.3&deg;</td> </tr>        <tr> <td class='label'>Full moon</td> <td class='data'>01/06/2023 03:07:52 PM</td> </tr> <tr> <td class='label'>New moon</td> <td class='data'>01/21/2023 12:53:13 PM</td> </tr>        <tr> <td class='label'>Phase</td> <td class='data'>New<br/> 1% full</td> </tr> </table> </div> </div> </div> </div> <div class='clear'></div><div class='almanac_last_updated'></div>",
+        "almanac_extras_modal_html": "<div id='celestial_widget' class='widget'> <div class='widget_contents'> <div id='celestial_details'> <div class='celestial_body'> <table class='celestial'> <tr><th>&#9728; Sun</th><th></th></tr> <tr> <td class='label'>Start civil twilight</td> <td class='data'>07:17:04 AM</td> </tr> <tr> <td class='label'>Rise</td> <td class='data'>07:53:14 AM</td> </tr> <tr> <td class='label'>Transit</td> <td class='data'>12:07:56 PM</td> </tr> <tr> <td class='label'>Set</td> <td class='data'>04:22:39 PM</td> </tr> <tr> <td class='label'>End Civil Twilight</td> <td class='data'>04:58:49 PM</td> </tr> <tr> <td class='label'>Azimuth</td> <td class='data'>220.2&deg;</td> </tr> <tr> <td class='label'>Altitude</td> <td class='data'>9.0&deg;</td> </tr> <tr> <td class='label'>Right ascension</td> <td class='data'>272.3&deg;</td> </tr> <tr> <td class='label'>Declination</td> <td class='data'>-23.4&deg;</td> </tr>        <tr><td class='label'>Equinox</td><td class='data'>03/20/2023 02:24:15 PM</td></tr><tr><td class='label'>Solstice</td><td class='data'>06/21/2023 07:57:55 AM</td></tr>        <tr> <td class='label'>Total daylight</td> <td class='data'>8 hours, 29 minutes, 25 seconds<br/>7 seconds more than yesterday</td> </tr> </table> </div> <div class='celestial_body'> <table class='celestial'> <tr><th>&#9789; Moon</th><th></th></tr> <tr><td class='label'>&nbsp;</td><td class='data'>&nbsp;</td></tr> <tr> <td class='label'>Rise</td> <td class='data'>08:42:40 AM</td> </tr> <tr> <td class='label'>Transit</td> <td class='data'>12:35:32 PM</td> </tr> <tr> <td class='label'>Set</td> <td class='data'>04:28:50 PM</td> </tr> <tr><td class='label'>&nbsp;</td><td class='data'>&nbsp;</td></tr> <tr> <td class='label'>Azimuth</td> <td class='data'>211.4&deg;</td> </tr> <tr> <td class='label'>Altitude</td> <td class='data'>7.9&deg;</td> </tr> <tr> <td class='label'>Right ascension</td> <td class='data'>280.4&deg;</td> </tr> <tr> <td class='label'>Declination</td> <td class='data'>-28.3&deg;</td> </tr>        <tr> <td class='label'>Full moon</td> <td class='data'>01/06/2023 03:07:52 PM</td> </tr> <tr> <td class='label'>New moon</td> <td class='data'>01/21/2023 12:53:13 PM</td> </tr>        <tr> <td class='label'>Phase</td> <td class='data'>New<br/> 1% full</td> </tr> </table> </div> </div> </div> </div> <div class='clear'></div><div class='almanac_last_updated'></div>",
         "moon": {
             "moon_fullness": "1",
             "moon_phase": "New",
