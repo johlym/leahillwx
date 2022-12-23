@@ -65,7 +65,7 @@ jQuery(document).ready(function() {
         } else if (window.location.search.indexOf('?theme=auto') === 0) {
             belchertown_debug("Theme: Setting auto theme because of URL override");
             sessionStorage.setItem('theme', 'auto')
-            autoTheme(16, 22, 07, 52)
+            autoTheme(16, 22, 07, 53)
         }
     }
 
@@ -1440,7 +1440,7 @@ function connect() {
     if (reconnect_using_inactive_timestamp) {
             updated = tzAdjustedMoment(inactive_timestamp).format("LL, LTS");
         } else {
-            updated = tzAdjustedMoment("1671782340").format("LL, LTS");
+            updated = tzAdjustedMoment("1671782640").format("LL, LTS");
         }
     reported = "Connecting to weather station real time data. Last Updated " + updated;
     jQuery(".updated").html(reported);
@@ -1469,7 +1469,7 @@ function onConnect() {
     if (reconnect_using_inactive_timestamp) {
         updated = tzAdjustedMoment(inactive_timestamp).format("LL, LTS");
     } else {
-        updated = tzAdjustedMoment("1671782340").format("LL, LTS");
+        updated = tzAdjustedMoment("1671782640").format("LL, LTS");
     }
     if (pageName == "pi") {
         reported = "Connecting. Last Updated " + updated;
@@ -1501,7 +1501,7 @@ function onFailure() {
     if (client.isConnected()) {
         updated = tzAdjustedMoment(epoch).format("LL, LTS");
     } else {
-        updated = tzAdjustedMoment("1671782340").format("LL, LTS");
+        updated = tzAdjustedMoment("1671782640").format("LL, LTS");
     }
     jQuery(".updated").html("Failed connecting to the weather station. Please try again later! Last Updated " + updated);
     console.log("MQTT: " + tzAdjustedMoment(epoch).format() + ": Cannot connect to MQTT broker");
@@ -1518,7 +1518,7 @@ function onConnectionLost(responseObject) {
     if (client.isConnected()) {
         updated = tzAdjustedMoment(epoch).format("LL, LTS");
     } else {
-        updated = tzAdjustedMoment("1671782340").format("LL, LTS");
+        updated = tzAdjustedMoment("1671782640").format("LL, LTS");
     }
     jQuery(".updated").html("Lost connection to the weather station. Please try again later! Last Updated " + updated);
     if (responseObject.errorCode !== 0) {
