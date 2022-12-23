@@ -31,8 +31,8 @@
         <link rel='stylesheet' href='//stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' type='text/css' media='all' />
         <link rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.9/css/weather-icons.min.css?ver=4.7.4' type='text/css' media='all' />
         <link rel='stylesheet' href='//stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css' type='text/css' media='all' />
-        <link rel='stylesheet' href='../style.css?ver=1671793759' type='text/css' media='all' id="belchertownStyle" />
-        <link rel='stylesheet' href='../belchertown-dark.min.css?ver=1671793759' type='text/css' media='all' id="belchertownStyle" />
+        <link rel='stylesheet' href='../style.css?ver=1671794058' type='text/css' media='all' id="belchertownStyle" />
+        <link rel='stylesheet' href='../belchertown-dark.min.css?ver=1671794058' type='text/css' media='all' id="belchertownStyle" />
         
         <link rel="manifest" href="../manifest.json" crossorigin="use-credentials">
         <link rel="apple-touch-icon" href="../images/station.png">
@@ -55,7 +55,7 @@
         <script type='text/javascript' src='//code.highcharts.com/modules/exporting.js'></script>
         <script type='text/javascript' src='//code.highcharts.com/modules/solid-gauge.js'></script>
         <script type='text/javascript' src='//stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js'></script>
-        <script type='text/javascript' src='../js/belchertown.js?1671793759'></script>
+        <script type='text/javascript' src='../js/belchertown.js?1671794058'></script>
         <script>
             // Set the session variables for the theme
             if ( sessionStorage.getItem('pi_theme') === null ) {
@@ -92,12 +92,12 @@
         jQuery(document).ready(function() {
             get_outTemp_color( "degree_F", "24.8" );
             
-            rotateThis( "179" );
+            rotateThis( "190" );
             
             connect(); // Begin mqtt after weewx initial load
             
             // Update the Last Updated timestamp with moment.js,
-            updated = tzAdjustedMoment( 1671793740 ).format("LL, LTS");
+            updated = tzAdjustedMoment( 1671794040 ).format("LL, LTS");
             updated_text = "Last Updated " + updated;
             jQuery(".updated").html( updated_text );
             
@@ -138,7 +138,7 @@
                     <div class="clear"></div>
                 
                     <div class="tempstats">
-                        <div class="feelslike">Feels like: 19.9 &#176;F</div><!-- AJAX -->
+                        <div class="feelslike">Feels like: 19.8 &#176;F</div><!-- AJAX -->
                         <div class="highlow">
                             High <span class="high">25.0 &#176;F</span> | Low <span class="low">22.8 &#176;F</span>
                         </div><!-- AJAX -->
@@ -170,7 +170,7 @@
                                 <tr>
                                     <td class='station-observations-label'>Barometer</td>
                                     <td>
-                                        <span class="barometer">1015.7 mbar</span><!-- AJAX -->
+                                        <span class="barometer">1015.6 mbar</span><!-- AJAX -->
                                         <span class="pressure-trend">
                                             <i class="fa fa-arrow-down barometer-down"></i>
                                         </span>
@@ -197,7 +197,7 @@
                                     S
                                     </span>
                                     <span class="curwinddeg">
-                                    179&#176;
+                                    190&#176;
                                 </span>
                             </div>
                             <div class="arrow"></div>
@@ -213,7 +213,7 @@
                             <tr>
                                 <td>
                                     <span class="curwindspeed">
-                                        0.4
+                                        0.7
                                     </span>
                                 </td><!-- AJAX -->
                                 <td class="border-left">&nbsp;
