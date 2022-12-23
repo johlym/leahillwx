@@ -31,8 +31,8 @@
         <link rel='stylesheet' href='//stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' type='text/css' media='all' />
         <link rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.9/css/weather-icons.min.css?ver=4.7.4' type='text/css' media='all' />
         <link rel='stylesheet' href='//stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css' type='text/css' media='all' />
-        <link rel='stylesheet' href='../style.css?ver=1671813556' type='text/css' media='all' id="belchertownStyle" />
-        <link rel='stylesheet' href='../belchertown-dark.min.css?ver=1671813556' type='text/css' media='all' id="belchertownStyle" />
+        <link rel='stylesheet' href='../style.css?ver=1671813860' type='text/css' media='all' id="belchertownStyle" />
+        <link rel='stylesheet' href='../belchertown-dark.min.css?ver=1671813860' type='text/css' media='all' id="belchertownStyle" />
         
         <link rel="manifest" href="../manifest.json" crossorigin="use-credentials">
         <link rel="apple-touch-icon" href="../images/station.png">
@@ -55,7 +55,7 @@
         <script type='text/javascript' src='//code.highcharts.com/modules/exporting.js'></script>
         <script type='text/javascript' src='//code.highcharts.com/modules/solid-gauge.js'></script>
         <script type='text/javascript' src='//stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js'></script>
-        <script type='text/javascript' src='../js/belchertown.js?1671813556'></script>
+        <script type='text/javascript' src='../js/belchertown.js?1671813860'></script>
         <script>
             // Set the session variables for the theme
             if ( sessionStorage.getItem('pi_theme') === null ) {
@@ -90,14 +90,14 @@
         ajaxforecast(); // Initial call to load forecast data like 8 day outlook, weather icon and observation text
         
         jQuery(document).ready(function() {
-            get_outTemp_color( "degree_F", "26.6" );
+            get_outTemp_color( "degree_F", "27.0" );
             
             rotateThis( "   N/A" );
             
             connect(); // Begin mqtt after weewx initial load
             
             // Update the Last Updated timestamp with moment.js,
-            updated = tzAdjustedMoment( 1671813540 ).format("LL, LTS");
+            updated = tzAdjustedMoment( 1671813840 ).format("LL, LTS");
             updated_text = "Last Updated " + updated;
             jQuery(".updated").html( updated_text );
             
@@ -132,13 +132,13 @@
                 <div class="col-xs-6 temp-observation">
                     <div class="obs-group">
                         <img id="wxicon" src="../images/cloudy.png"><!-- AJAX -->
-                        <div class="outtemp_outer"><span class="outtemp">26.6</span><sup class="outtempunitlabelsuper"> &#176;F</sup></div><!-- AJAX -->
+                        <div class="outtemp_outer"><span class="outtemp">27.0</span><sup class="outtempunitlabelsuper"> &#176;F</sup></div><!-- AJAX -->
                         <div class="current-obs-text">Cloudy</div><!-- AJAX -->
                     </div>
                     <div class="clear"></div>
                 
                     <div class="tempstats">
-                        <div class="feelslike">Feels like: 22.2 &#176;F</div><!-- AJAX -->
+                        <div class="feelslike">Feels like: 22.6 &#176;F</div><!-- AJAX -->
                         <div class="highlow">
                             High <span class="high">27.1 &#176;F</span> | Low <span class="low">22.8 &#176;F</span>
                         </div><!-- AJAX -->
@@ -156,7 +156,7 @@
                                 <tr>
                                     <td class='station-observations-label'>Dew Point</td>
                                     <td>
-                                        <span class="dewpoint">25.4 &#176;F</span><!-- AJAX -->
+                                        <span class="dewpoint">25.7 &#176;F</span><!-- AJAX -->
                                     </td>
                                 </tr>                            
                                 <tr>
@@ -170,9 +170,9 @@
                                 <tr>
                                     <td class='station-observations-label'>Barometer</td>
                                     <td>
-                                        <span class="barometer">1015.1 mbar</span><!-- AJAX -->
+                                        <span class="barometer">1015.0 mbar</span><!-- AJAX -->
                                         <span class="pressure-trend">
-                                            <i class="fa fa-arrow-down barometer-down"></i>
+                                            <i class="fa fa-arrow-up barometer-up"></i>
                                         </span>
                                     </td>
                                 </tr>
