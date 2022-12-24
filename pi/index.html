@@ -31,8 +31,8 @@
         <link rel='stylesheet' href='//stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' type='text/css' media='all' />
         <link rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.9/css/weather-icons.min.css?ver=4.7.4' type='text/css' media='all' />
         <link rel='stylesheet' href='//stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css' type='text/css' media='all' />
-        <link rel='stylesheet' href='../style.css?ver=1671842058' type='text/css' media='all' id="belchertownStyle" />
-        <link rel='stylesheet' href='../belchertown-dark.min.css?ver=1671842058' type='text/css' media='all' id="belchertownStyle" />
+        <link rel='stylesheet' href='../style.css?ver=1671842357' type='text/css' media='all' id="belchertownStyle" />
+        <link rel='stylesheet' href='../belchertown-dark.min.css?ver=1671842357' type='text/css' media='all' id="belchertownStyle" />
         
         <link rel="manifest" href="../manifest.json" crossorigin="use-credentials">
         <link rel="apple-touch-icon" href="../images/station.png">
@@ -55,7 +55,7 @@
         <script type='text/javascript' src='//code.highcharts.com/modules/exporting.js'></script>
         <script type='text/javascript' src='//code.highcharts.com/modules/solid-gauge.js'></script>
         <script type='text/javascript' src='//stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js'></script>
-        <script type='text/javascript' src='../js/belchertown.js?1671842058'></script>
+        <script type='text/javascript' src='../js/belchertown.js?1671842357'></script>
         <script>
             // Set the session variables for the theme
             if ( sessionStorage.getItem('pi_theme') === null ) {
@@ -97,7 +97,7 @@
             connect(); // Begin mqtt after weewx initial load
             
             // Update the Last Updated timestamp with moment.js,
-            updated = tzAdjustedMoment( 1671842040 ).format("LL, LTS");
+            updated = tzAdjustedMoment( 1671842340 ).format("LL, LTS");
             updated_text = "Last Updated " + updated;
             jQuery(".updated").html( updated_text );
             
@@ -162,9 +162,9 @@
                                 <tr>
                                     <td class='station-observations-label'>Rain</td>
                                     <td>
-                                        <span class="dayRain">0.06 in</span><!-- AJAX -->
+                                        <span class="dayRain">0.08 in</span><!-- AJAX -->
                                         <span class="border-left">&nbsp;</span>
-                                        <span class="rainRate">0.08 in/hr</span><!-- AJAX -->
+                                        <span class="rainRate">0.16 in/hr</span><!-- AJAX -->
                                     </td>
                                 </tr>
                                 <tr>
