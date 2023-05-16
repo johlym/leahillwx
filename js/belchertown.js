@@ -65,7 +65,7 @@ jQuery(document).ready(function() {
         } else if (window.location.search.indexOf('?theme=auto') === 0) {
             belchertown_debug("Theme: Setting auto theme because of URL override");
             sessionStorage.setItem('theme', 'auto')
-            autoTheme(16, 23, 07, 53)
+            autoTheme(20, 38, 05, 32)
         }
     }
 
@@ -89,6 +89,7 @@ jQuery(document).ready(function() {
             }, 500);
         }
     });
+
 
 });
 
@@ -580,8 +581,12 @@ function update_weewx_data(data) {
     jQuery(".high").html(high);
     jQuery(".low").html(low);
 
-    // Barometer trending by finding a negative number
-    count = (data["current"]["barometer_trend"].match(/-/g) || []).length
+    try {
+        // Barometer trending by finding a negative number
+        count = (data["current"]["barometer_trend"].match(/-/g) || []).length
+    } catch (err) {
+        // Returned "current" data does not have this value
+    }
 
     if (count >= 1) {
         jQuery(".pressure-trend").html('<i class="fa fa-arrow-down barometer-down"></i>');
@@ -593,14 +598,21 @@ function update_weewx_data(data) {
     jQuery(".dailymaxgust").html(parseFloat(data["day"]["wind"]["max"]).toFixed(1));
 
     // Daily Snapshot Stats Section
-    jQuery(".snapshot-records-today-header").html(tzAdjustedMoment(data["current"]["epoch"]).format('dddd, LL'));
-    jQuery(".snapshot-records-month-header").html(tzAdjustedMoment(data["current"]["epoch"]).format('MMMM YYYY'));
+    try {
+        jQuery(".snapshot-records-today-header").html(tzAdjustedMoment(data["current"]["epoch"]).format('dddd, LL'));
+        jQuery(".snapshot-records-month-header").html(tzAdjustedMoment(data["current"]["epoch"]).format('MMMM YYYY'));
+    } catch (err) {
+        // Returned "current" data does not have this value
+    }
+
+
     jQuery(".dailystatshigh").html(data["day"]["outTemp"]["max"]);
     jQuery(".dailystatslow").html(data["day"]["outTemp"]["min"]);
     jQuery(".dailystatswindavg").html(data["day"]["wind"]["average"]);
     jQuery(".dailystatswindmax").html(data["day"]["wind"]["max"]);
     jQuery(".dailystatsrain").html(data["day"]["rain"]["sum"]);
     jQuery(".dailystatsrainrate").html(data["day"]["rain"]["max"]);
+    jQuery(".dailywindrun").html(data["day"]["wind"]["windrun"]);
 
     // Month Snapshot Stats Section
     jQuery(".monthstatshigh").html(data["month"]["outTemp"]["max"]);
@@ -613,6 +625,8 @@ function update_weewx_data(data) {
     // Sunrise and Sunset            
     jQuery(".sunrise-value").html(tzAdjustedMoment(parseFloat(data["almanac"]["sunrise_epoch"]).toFixed(0)).format("LT"));
     jQuery(".sunset-value").html(tzAdjustedMoment(parseFloat(data["almanac"]["sunset_epoch"]).toFixed(0)).format("LT"));
+    jQuery(".moonrise-value").html(tzAdjustedMoment(parseFloat(data["almanac"]["moon"]["moon_rise_epoch"]).toFixed(0)).format("LT"));
+    jQuery(".moonset-value").html(tzAdjustedMoment(parseFloat(data["almanac"]["moon"]["moon_set_epoch"]).toFixed(0)).format("LT"));
 
     // Moon icon, phase and illumination percent
     jQuery(".moon-icon").html(moon_icon(data["almanac"]["moon"]["moon_index"]));        
@@ -621,8 +635,12 @@ function update_weewx_data(data) {
     // Close current modal if open
     jQuery('#almanac').modal('hide');
     jQuery(".almanac-extras-modal-body").html(data["almanac"]["almanac_extras_modal_html"]);
-    almanac_updated = "Last Updated " + tzAdjustedMoment(data["current"]["datetime_raw"]).format("LL, LTS");
-    jQuery(".almanac_last_updated").html(almanac_updated);
+    try {
+        almanac_updated = "Last Updated " + tzAdjustedMoment(data["current"]["datetime_raw"]).format("LL, LTS");
+        jQuery(".almanac_last_updated").html(almanac_updated);
+    } catch (err) {
+        // Returned "current" data does not have this value
+    }
 }
 
 //  function returns html for moon-icon according to moonphase value and currentTheme setting
@@ -1074,10 +1092,19 @@ function update_forecast_data(data) {
     } else if (forecast_provider == "aeris") {
         var forecast_subtitle = tzAdjustedMoment(data["timestamp"]).format('LLL');
 
-        var wxicon = get_relative_url() + "/images/" + aeris_icon(data["current"][0]["response"]["ob"]["icon"]) + ".png";
+        try {
+            var wxicon = get_relative_url() + "/images/" + aeris_icon(data["current"][0]["response"]["ob"]["icon"]) + ".png";
+        } catch (err) {
+            // Returned "current" data does not have this value
+        }
         
         // Current observation text
-        jQuery(".current-obs-text").html(aeris_coded_weather(data["current"][0]["response"]["ob"]["weatherPrimaryCoded"], true));
+        try {
+            jQuery(".current-obs-text").html(aeris_coded_weather(data["current"][0]["response"]["ob"]["weatherPrimaryCoded"], true));
+        } catch (err) {
+            // Returned "current" data does not have this value
+        }
+
         
         // AQI
         if (data["aqi"][0]["success"] && !data["aqi"][0]["error"]) {
@@ -1102,14 +1129,19 @@ function update_forecast_data(data) {
         }
 
         // Visibility text in station observation table
-        if (("us" == "si") || ("us" == "ca")) {
-            // si and ca = kilometer
-            visibility = data["current"][0]["response"]["ob"]["visibilityKM"];
+        try {
+            if (("us" == "si") || ("us" == "ca")) {
+                // si and ca = kilometer
+                visibility = data["current"][0]["response"]["ob"]["visibilityKM"];
 
-        } else {
-            // us and uk2 and default = miles
-            visibility = data["current"][0]["response"]["ob"]["visibilityMI"];
+            } else {
+                // us and uk2 and default = miles
+                visibility = data["current"][0]["response"]["ob"]["visibilityMI"];
+            }
+        } catch (err) {
+            // Returned "current" data does not have this value
         }
+
         try {
             visibility_output = parseFloat(parseFloat(visibility)).toLocaleString("en-US", {minimumFractionDigits: unit_rounding_array["visibility"], maximumFractionDigits: unit_rounding_array["visibility"]}) + " " + unit_label_array["visibility"];
 
@@ -1143,11 +1175,13 @@ function update_forecast_data(data) {
                     avgTemp = data[(forecast_interval)][0]["response"][0]["periods"][i]["avgTempC"];
                     minTemp = data[(forecast_interval)][0]["response"][0]["periods"][i]["minTempC"];
                     maxTemp = data[(forecast_interval)][0]["response"][0]["periods"][i]["maxTempC"];
+                    var dewPoint = data[(forecast_interval)][0]["response"][0]["periods"][i]["dewpointC"];
                 } else {
                     // Default
                     avgTemp = data[(forecast_interval)][0]["response"][0]["periods"][i]["avgTempF"];
                     minTemp = data[(forecast_interval)][0]["response"][0]["periods"][i]["minTempF"];
                     maxTemp = data[(forecast_interval)][0]["response"][0]["periods"][i]["maxTempF"];
+                    var dewPoint = data[(forecast_interval)][0]["response"][0]["periods"][i]["dewpointF"];
                 }
 
                 //  for 1hr interval determine temperature range, set to a minimum value of 2; also avoids div by zero
@@ -1188,6 +1222,9 @@ function update_forecast_data(data) {
                 */
                 var precip = data[(forecast_interval)][0]["response"][0]["periods"][i]["pop"] || 0;
 
+                // Humidity
+                var humidity = data[(forecast_interval)][0]["response"][0]["periods"][i]["humidity"];
+
                 /*
                 Determine snow unit. "snowCM" and "snowIN" are specified
                 to always return a number. We still convert to 0 if we ever get
@@ -1223,6 +1260,8 @@ function update_forecast_data(data) {
                     "snow_depth": snow_depth,
                     "snow_unit": snow_unit,
                     "precip": precip,
+                    "humidity": humidity,
+                    "dewPoint": dewPoint,
                     "forecast_link": forecast_link
                 });
             }
@@ -1246,9 +1285,10 @@ function update_forecast_data(data) {
                     }
                     output_html += '<span id="weekday">' + forecast_time(i, forecast_interval, forecast_row[i]["weekday"]) + '</span>';
                     output_html += '<br>';
-                    output_html += '<div class="forecast-conditions">';
+                    output_html += '<div class="forecast-conditions"';
+                    output_html += '>'
                     output_html += '<div class="forecast-temp-graph" style="padding-top:';
-                    //  padding = ( ( highTemp - forecast_row[i]["avgTemp"] = offset ) * 100 / ( rangeTemp) ) where 100 ~ max calculated space available for padding 
+                    //  padding = ( ( highTemp - forecast_row[i]["avgTemp"] = offset ) * 100 / ( rangeTemp) ) where 100 ~ max calculated space available for padding
                     output_html += parseInt((highTemp - forecast_row[i]["avgTemp"] + offset) * 100 / (rangeTemp)) + 'px">';
                     output_html += '<div class="forecast-image">';
                     output_html += '<img id="icon" src="' + forecast_row[i]["image_url"] + '">';
@@ -1436,11 +1476,10 @@ var inactive_timestamp = "";
 
 // MQTT connect
 function connect() {
-    belchertown_debug("MQTT: Connecting to MQTT Websockets: driver.cloudmqtt.com 38977 (SSL Enabled)");
     if (reconnect_using_inactive_timestamp) {
             updated = tzAdjustedMoment(inactive_timestamp).format("LL, LTS");
         } else {
-            updated = tzAdjustedMoment("1671907500").format("LL, LTS");
+            updated = tzAdjustedMoment("1684215600").format("LL, LTS");
         }
     reported = "Connecting to weather station real time data. Last Updated " + updated;
     jQuery(".updated").html(reported);
@@ -1448,13 +1487,21 @@ function connect() {
     jQuery(".offlineMarker").hide();
     jQuery(".loadingMarker").show();
 
+    belchertown_debug("MQTT: Connecting to MQTT Websockets: driver.cloudmqtt.com 38977 (SSL Enabled)");
+    var useSSL = true;
     client = new Paho.Client("driver.cloudmqtt.com", 38977, mqttclient);
     client.onConnectionLost = onConnectionLost;
     client.onMessageArrived = onMessageArrived;
     var options = {
-        useSSL: true,
+        useSSL: useSSL,
         userName:"fzgtsfzu",
         password:"QCbjLaQoi7oP",
+        // mqttVersion: 4 is spec MQTTv3.1.1 - mqttVersion: 3 is spec MQTTv3.1
+        mqttVersion: 4,
+        // If mqttVersionExplicit is true, it will force the connection to use the selected MQTT Version or will fail to connect.
+        // If mqttVersionExplicit is false and mqttVersion is 4, it will try mqttVersion: 4 and if it fails it will fallback to mqttVersion: 3
+        // Here's the relevant code: https://github.com/eclipse/paho.mqtt.javascript/blob/f5859463aba9a9b7c19f99ab7c4849a723f8d832/src/paho-mqtt.js#L1610
+        mqttVersionExplicit: false,
         reconnect: true,
         onSuccess: onConnect,
         onFailure: onFailure
@@ -1469,7 +1516,7 @@ function onConnect() {
     if (reconnect_using_inactive_timestamp) {
         updated = tzAdjustedMoment(inactive_timestamp).format("LL, LTS");
     } else {
-        updated = tzAdjustedMoment("1671907500").format("LL, LTS");
+        updated = tzAdjustedMoment("1684215600").format("LL, LTS");
     }
     if (pageName == "pi") {
         reported = "Connecting. Last Updated " + updated;
@@ -1482,9 +1529,12 @@ function onConnect() {
     jQuery(".loadingMarker").show();
     client.subscribe("leahill/loop");
     if (getURLvar("stayconnected") && (getURLvar("stayconnected") == "true" || getURLvar("stayconnected") == "1")) {
-        belchertown_debug("stayconnected URL var found: ignoring disconnect_live_website_visitor value");
+        belchertown_debug("MQTT: stayconnected URL var found: ignoring disconnect_live_website_visitor value");
     } else {
-        if (pageName != "pi") {
+        if  (pageName == "pi" || pageName == "kiosk.html") {
+            belchertown_debug("MQTT: ignoring disconnect_live_website_visitor value for page: " + pageName);
+        }
+        else {
             var activityTimeout = setTimeout(inactive, 1800000); // Stop automatic ajax refresh
         }
     }
@@ -1501,7 +1551,7 @@ function onFailure() {
     if (client.isConnected()) {
         updated = tzAdjustedMoment(epoch).format("LL, LTS");
     } else {
-        updated = tzAdjustedMoment("1671907500").format("LL, LTS");
+        updated = tzAdjustedMoment("1684215600").format("LL, LTS");
     }
     jQuery(".updated").html("Failed connecting to the weather station. Please try again later! Last Updated " + updated);
     console.log("MQTT: " + tzAdjustedMoment(epoch).format() + ": Cannot connect to MQTT broker");
@@ -1518,7 +1568,7 @@ function onConnectionLost(responseObject) {
     if (client.isConnected()) {
         updated = tzAdjustedMoment(epoch).format("LL, LTS");
     } else {
-        updated = tzAdjustedMoment("1671907500").format("LL, LTS");
+        updated = tzAdjustedMoment("1684215600").format("LL, LTS");
     }
     jQuery(".updated").html("Lost connection to the weather station. Please try again later! Last Updated " + updated);
     if (responseObject.errorCode !== 0) {
@@ -1565,29 +1615,32 @@ function update_current_wx(data) {
 
     // This message is a weewx archive update. Update weewx data, forecast data and highcharts graphs
     if (data.hasOwnProperty("interval_minute")) {
-            // Delays are recommended to allow the other skins to complete processing
-            belchertown_debug("MQTT: MQTT message indicates this is an archive interval.");
-            if (pageName != "pi") {
-                setTimeout(showChart, 30000, homepage_graphgroup); // Load updated charts. 
-            }
-            ajaxweewx().then(function(weewx_data) { // This call will make sure json/weewx_data.json is loaded before anything else
-                setTimeout(update_weewx_data.bind(null, weewx_data), 10000); // Initial call to update (date, daily high, low, etc)
-                setTimeout(belchertown_debug.bind(null, weewx_data), 10000); // Make weewx_data.json available in debugging console
-                setTimeout(ajaxforecast, 10000); // Update forecast data
-            }).catch(function(e) {
-                console.log(e);
-            });
-        } else {
-            // Only show the updated time on non-archive packets
-            epoch = parseFloat(data["dateTime"]).toFixed(0);
-            updated = tzAdjustedMoment(epoch).format("LL, LTS");
-            if (pageName == "pi") {
-                updated_text = "Connected. Received " + updated;
-            } else {
-                updated_text = "Connected to weather station live. Data received " + updated;
-            }
-            jQuery(".updated").html(updated_text);
+        // Delays are recommended to allow the other skins to complete processing
+        belchertown_debug("MQTT: MQTT message indicates this is an archive interval.");
+        if (pageName == "pi" || pageName == "kiosk.html") {
+            belchertown_debug("Skipping chart update for page " + pageName + ", no charts to be updated.");
         }
+        else {
+            setTimeout(showChart, 30000, homepage_graphgroup); // Load updated charts.
+        }
+        ajaxweewx().then(function(weewx_data) { // This call will make sure json/weewx_data.json is loaded before anything else
+            setTimeout(update_weewx_data.bind(null, weewx_data), 10000); // Initial call to update (date, daily high, low, etc)
+            setTimeout(belchertown_debug.bind(null, weewx_data), 10000); // Make weewx_data.json available in debugging console
+            setTimeout(ajaxforecast, 10000); // Update forecast data
+        }).catch(function(e) {
+            console.log(e);
+        });
+    } else {
+        // Only show the updated time on non-archive packets
+        epoch = parseFloat(data["dateTime"]).toFixed(0);
+        updated = tzAdjustedMoment(epoch).format("LL, LTS");
+        if (pageName == "pi") {
+            updated_text = "Connected. Received " + updated;
+        } else {
+            updated_text = "Connected to weather station live. Data received " + updated;
+        }
+        jQuery(".updated").html(updated_text);
+    }
     // If we're in this function, show the online beacon and hide the others
     jQuery(".onlineMarker").show(); // Show the online beacon
     jQuery(".offlineMarker").hide();
@@ -1725,7 +1778,7 @@ function update_current_wx(data) {
 Highcharts.setOptions({
     global: {
         //useUTC: false
-        timezoneOffset: 480.0
+        timezoneOffset: 420.0
     },
     lang: {
         months: moment.months(),
@@ -2490,6 +2543,7 @@ function showChart(json_file, prepend_renderTo = false) {
                 var currentSeries = options.series;
                 var currentSeriesData = options.series[0].data;
                 var range_unit = options.series[0].range_unit;
+                var rounding = options.series[0].rounding;
                 var newSeriesData = [];
                 var currentSeriesColor = options.series[0].color;
                 currentSeriesData.forEach(seriesData => {
@@ -2504,6 +2558,7 @@ function showChart(json_file, prepend_renderTo = false) {
                     data: newSeriesData,
                     obsType: "haysChart",
                     obsUnit: range_unit,
+                    rounding: rounding,
                     color: currentSeriesColor,
                     fillColor: currentSeriesColor,
                     connectEnds: false,
@@ -2635,6 +2690,7 @@ function showChart(json_file, prepend_renderTo = false) {
                 var currentSeries = options.series;
                 var currentSeriesData = options.series[0].data;
                 var range_unit = options.series[0].range_unit;
+                var rounding = options.series[0].rounding;
                 var newSeriesData = [];
                 currentSeriesData.forEach(seriesData => {
                     if (options.series[0].color) {
@@ -2655,7 +2711,8 @@ function showChart(json_file, prepend_renderTo = false) {
                 options.series.push({
                     data: newSeriesData,
                     obsType: "weatherRange",
-                    obsUnit: range_unit
+                    obsUnit: range_unit,
+                    rounding: rounding
                 });
             }
 
@@ -2699,7 +2756,7 @@ function showChart(json_file, prepend_renderTo = false) {
 function tzAdjustedMoment(input) {
     let tz = "";
     if (!tz) {
-        return moment.unix(input).utcOffset(-480.0);
+        return moment.unix(input).utcOffset(-420.0);
     } else {
         return moment.unix(input).tz(tz);
     }
