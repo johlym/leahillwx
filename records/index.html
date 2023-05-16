@@ -14,7 +14,6 @@
 
         <meta name="description" content="Weather conditions for Lea Hill, Auburn, WA as observed by a personal weather station and the weewx weather software"/>
         <meta name="robots" content="noodp"/>
-        <link rel="canonical" href="https://leahillwx.org" />
         <meta property="og:locale" content="en_US" />
         <meta property="og:type" content="website" />
         <meta property="og:title" content="Lea Hill Weather - Live Auburn, WA Weather" />
@@ -31,9 +30,9 @@
         <link rel='stylesheet' href='//stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' type='text/css' media='all' />
         <link rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.9/css/weather-icons.min.css?ver=4.7.4' type='text/css' media='all' />
         <link rel='stylesheet' href='//stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css' type='text/css' media='all' />
-        <link rel='stylesheet' href='../style.css?ver=1684214837' type='text/css' media='all' id="belchertownStyle" />
-        <link rel='stylesheet' href='../belchertown-dark.min.css?ver=1684214837' type='text/css' media='all' id="belchertownStyle" />
-        
+        <link rel='stylesheet' href='../style.css?ver=1684217536' type='text/css' media='all' id="belchertownStyle" />
+        <link rel='stylesheet' href='../belchertown-dark.min.css?ver=1684217536' type='text/css' media='all' id="belchertownStyle" />
+
         <link rel="manifest" href="../manifest.json" crossorigin="use-credentials">
         <link rel="apple-touch-icon" href="../images/station.png">
         <link rel="apple-touch-icon" sizes="48x48" href="../images/station48.png">
@@ -49,12 +48,12 @@
         <script type='text/javascript' src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"></script>
         <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.33/moment-timezone-with-data.min.js"></script>
-        <script type='text/javascript' src='//code.highcharts.com/stock/highstock.js'></script>
-        <script type='text/javascript' src='//code.highcharts.com/highcharts-more.js'></script>
-        <script type='text/javascript' src='//code.highcharts.com/modules/exporting.js'></script>
-        <script type='text/javascript' src='//code.highcharts.com/modules/solid-gauge.js'></script>
+        <script type='text/javascript' src='//code.highcharts.com/stock/10/highstock.js'></script>
+        <script type='text/javascript' src='//code.highcharts.com/10/highcharts-more.js'></script>
+        <script type='text/javascript' src='//code.highcharts.com/10/modules/exporting.js'></script>
+        <script type='text/javascript' src='//code.highcharts.com/10/modules/solid-gauge.js'></script>
         <script type='text/javascript' src='//stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js'></script>
-        <script type='text/javascript' src='../js/belchertown.js?1684214837'></script>
+        <script type='text/javascript' src='../js/belchertown.js?1684217536'></script>
         <script>
             // Set the session variables for the theme
             if ( sessionStorage.getItem('theme') === null ) {
@@ -70,7 +69,7 @@
         <link rel="icon" href="../favicon.ico" />
         
 
-        <script src="https://sausages.leahillwx.org/script.js" data-site="LREPUUZF" defer></script>
+
     </head>
     
     <body class="page-template-default page full-width-content light" itemscope itemtype="https://schema.org/WebPage">
@@ -91,10 +90,10 @@
                                     <ul id="menu-menu" class="menu genesis-nav-menu">
                                         <!-- class = current-menu-item -->
                                         <li class="menu-item menu-item-home"><a href=".." itemprop="url"><span itemprop="name">Home</span></a></li>
-                                        <li class="menu-item menu-item-1"><a href="../graphs" itemprop="url"><span itemprop="name">Graphs</span></a></li>
-                                        <li class="menu-item menu-item-2"><a href="../records" itemprop="url"><span itemprop="name">Records</span></a></li>
-                                        <li class="menu-item menu-item-3"><a href="../reports" itemprop="url"><span itemprop="name">Reports</span></a></li>
-                                        <li class="menu-item menu-item-4"><a href="../about" itemprop="url"><span itemprop="name">About</span></a></li>
+                                        <li class="menu-item menu-item-1"><a href="../graphs/" itemprop="url"><span itemprop="name">Graphs</span></a></li>
+                                        <li class="menu-item menu-item-2"><a href="../records/" itemprop="url"><span itemprop="name">Records</span></a></li>
+                                        <li class="menu-item menu-item-3"><a href="../reports/" itemprop="url"><span itemprop="name">Reports</span></a></li>
+                                        <li class="menu-item menu-item-4"><a href="../about/" itemprop="url"><span itemprop="name">About</span></a></li>
                                         <label class="themeSwitchLabel">
                                             <input type="checkbox" id="themeSwitch" >
                                             <span class="slider round"></span>
@@ -205,7 +204,7 @@
             <span class="obs-header-icon">
                 <img id="wxicon" src="../images/mostly-cloudy-night.png">
             </span>
-            <span class="obs-header-outtemp">67.8 &#176;F</span>
+            <span class="obs-header-outtemp">65.5 &#176;F</span>
         </div>
         <div class="col-sm-5">
             <div class="wx-stn-name">
@@ -488,7 +487,7 @@
                         <strong>Data is not guaranteed to be accurate. Consult professional forecasts before making decisions based on the information presented here.</strong>
                     </div>
                     <div class="col-sm-3 footerRight">
-                        weewx theme by <a href="https://obrienlabs.net" target="_blank">Pat O'Brien</a>
+                        weewx theme by <a href="https://github.com/poblabs/weewx-belchertown" target="_blank">Pat O'Brien</a>
                     </div>
                 </div>
 			</div>
@@ -496,8 +495,8 @@
 		
 		<script type='text/javascript' src='../js/responsive-menu.js'></script>
 		
-		<!-- Belchertown Skin Version: 1.3b1 -->
-        <!-- Page Generated: 05/15/2023 10:27:00 PM -->
+		<!-- Belchertown Skin Version: 1.3.1 -->
+        <!-- Page Generated: 05/15/2023 11:12:00 PM -->
 
     </body>
 </html>

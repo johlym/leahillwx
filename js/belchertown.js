@@ -1479,7 +1479,7 @@ function connect() {
     if (reconnect_using_inactive_timestamp) {
             updated = tzAdjustedMoment(inactive_timestamp).format("LL, LTS");
         } else {
-            updated = tzAdjustedMoment("1684215600").format("LL, LTS");
+            updated = tzAdjustedMoment("1684217520").format("LL, LTS");
         }
     reported = "Connecting to weather station real time data. Last Updated " + updated;
     jQuery(".updated").html(reported);
@@ -1516,7 +1516,7 @@ function onConnect() {
     if (reconnect_using_inactive_timestamp) {
         updated = tzAdjustedMoment(inactive_timestamp).format("LL, LTS");
     } else {
-        updated = tzAdjustedMoment("1684215600").format("LL, LTS");
+        updated = tzAdjustedMoment("1684217520").format("LL, LTS");
     }
     if (pageName == "pi") {
         reported = "Connecting. Last Updated " + updated;
@@ -1551,7 +1551,7 @@ function onFailure() {
     if (client.isConnected()) {
         updated = tzAdjustedMoment(epoch).format("LL, LTS");
     } else {
-        updated = tzAdjustedMoment("1684215600").format("LL, LTS");
+        updated = tzAdjustedMoment("1684217520").format("LL, LTS");
     }
     jQuery(".updated").html("Failed connecting to the weather station. Please try again later! Last Updated " + updated);
     console.log("MQTT: " + tzAdjustedMoment(epoch).format() + ": Cannot connect to MQTT broker");
@@ -1568,7 +1568,7 @@ function onConnectionLost(responseObject) {
     if (client.isConnected()) {
         updated = tzAdjustedMoment(epoch).format("LL, LTS");
     } else {
-        updated = tzAdjustedMoment("1684215600").format("LL, LTS");
+        updated = tzAdjustedMoment("1684217520").format("LL, LTS");
     }
     jQuery(".updated").html("Lost connection to the weather station. Please try again later! Last Updated " + updated);
     if (responseObject.errorCode !== 0) {
