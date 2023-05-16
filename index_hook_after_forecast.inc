@@ -1,0 +1,1 @@
+<a name="windy-webcam-nearby-widget" data-params='{"lat":"47.3275","lon":"-122.226389"}'></a><script async type="text/javascript" src="https://webcams.windy.com/webcams/public/widget/script/nearby.js"></script>
