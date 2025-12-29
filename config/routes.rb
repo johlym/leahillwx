@@ -5,5 +5,7 @@ Rails.application.routes.draw do
     end
   end
 
+  mount OasRails::Engine => "/docs/api"
+
   get "up" => "rails/health#show", as: :rails_health_check
 end
