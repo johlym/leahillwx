@@ -239,6 +239,10 @@ GEM
       erb
       psych (>= 4.0.0)
       tsort
+    redis (5.4.1)
+      redis-client (>= 0.22.0)
+    redis-client (0.26.2)
+      connection_pool
     regexp_parser (2.11.3)
     reline (0.6.3)
       io-console (~> 0.5)
@@ -323,23 +327,23 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
-  bootsnap
+  bootsnap (~> 1.20)
   brakeman
   bundler-audit
   capybara
-  cssbundling-rails
+  cssbundling-rails (~> 1.4)
   debug
-  jbuilder
-  jsbundling-rails
-  pg (~> 1.1)
-  propshaft
-  puma (>= 5.0)
+  jbuilder (~> 2.14)
+  jsbundling-rails (~> 1.3)
+  pg (~> 1.6)
+  propshaft (~> 1.3)
+  puma (>= 7.1)
   rails (~> 8.1.1)
+  redis (>= 5.4)
   rubocop-rails-omakase
   selenium-webdriver
-  stimulus-rails
-  turbo-rails
-  tzinfo-data
+  stimulus-rails (~> 1.3)
+  turbo-rails (~> 2.0)
   web-console
 
 BUNDLED WITH
