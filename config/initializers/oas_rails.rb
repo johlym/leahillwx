@@ -52,6 +52,7 @@ OasRails.configure do |config|
   # config.rapidoc_theme_configuration
   # default: {}
 
+  config.rapidoc_theme = "rails"
   # Excluding custom controllers or controllers#action
   # Example: ["projects", "users#new"]
   # config.ignored_actions = []
@@ -70,16 +71,15 @@ OasRails.configure do |config|
   # config.security_schema = :bearer
 
   # Custom security schemas
-  # You can uncomment and modify to use custom security schemas
   # Please follow the documentation: https://spec.openapis.org/oas/latest.html#security-scheme-object
-  #
-  # config.security_schemas = {
-  #  bearer:{
-  #   "type": "apiKey",
-  #   "name": "api_key",
-  #   "in": "header"
-  #  }
-  # }
+  config.security_schemas = {
+    api_key: {
+      type: "apiKey",
+      name: "X-Api-Key",
+      in: "header",
+      description: "API key for authentication"
+    }
+  }
 
   # ###########################
   # Default Responses (Errors)
