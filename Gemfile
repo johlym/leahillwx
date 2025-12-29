@@ -2,6 +2,7 @@ source "https://rubygems.org"
 
 gem "bootsnap", "~> 1.20", require: false
 gem "cssbundling-rails", "~> 1.4"
+gem "dotenv", "~> 3.2"
 gem "jbuilder", "~> 2.14"
 gem "jsbundling-rails", "~> 1.3"
 gem "pg", "~> 1.6"
