@@ -3,10 +3,8 @@ class ApiController < ApplicationController
   private
 
   def authenticate
-    if ActiveSupport::SecurityUtils.secure_compare(request.headers["X-Api-Key"].to_s, ENV["MEASUREMENT_API_KEY"].to_s)
-      return
+    authenticate_or_request_with_http_token do |token, _options|
+      ActiveSupport::SecurityUtils.secure_compare(token, ENV["MEASUREMENT_API_KEY"].to_s)
     end
-
-    render json: { error: "Unauthorized" }, status: :unauthorized
   end
 end

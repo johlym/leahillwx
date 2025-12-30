@@ -74,10 +74,9 @@ OasRails.configure do |config|
   # Please follow the documentation: https://spec.openapis.org/oas/latest.html#security-scheme-object
   config.security_schemas = {
     api_key: {
-      type: "apiKey",
-      name: "X-Api-Key",
-      in: "header",
-      description: "API key for authentication"
+      type: "http",
+      scheme: "bearer",
+      description: "Bearer token for authentication"
     }
   }
 
