@@ -1,0 +1,135 @@
+{
+  "components": {
+    "schemas": {
+      "WeatherMeasurement": {
+        "type": "object",
+        "properties": {
+          "reading_date_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of the measurement (ISO 8601)"
+          },
+          "barometer_abs": {
+            "type": "number",
+            "format": "float",
+            "description": "Absolute barometric pressure (inHg)"
+          },
+          "barometer_rel": {
+            "type": "number",
+            "format": "float",
+            "description": "Relative barometric pressure (inHg)"
+          },
+          "day_max_wind": {
+            "type": "number",
+            "format": "float",
+            "description": "Maximum wind speed for the day (mph)"
+          },
+          "gust_speed": {
+            "type": "number",
+            "format": "float",
+            "description": "Current wind gust speed (mph)"
+          },
+          "humidity": {
+            "type": "integer",
+            "description": "Relative humidity (%)"
+          },
+          "light": {
+            "type": "number",
+            "format": "float",
+            "description": "Light intensity (lux)"
+          },
+          "rain_day": {
+            "type": "number",
+            "format": "float",
+            "description": "Total rainfall for the day (in)"
+          },
+          "rain_event": {
+            "type": "number",
+            "format": "float",
+            "description": "Rainfall for current event (in)"
+          },
+          "rain_rate": {
+            "type": "number",
+            "format": "float",
+            "description": "Current rain rate (in/hr)"
+          },
+          "temperature": {
+            "type": "number",
+            "format": "float",
+            "description": "Temperature reading (°F)"
+          },
+          "uv": {
+            "type": "integer",
+            "description": "UV radiation level (W/m²)"
+          },
+          "uvi": {
+            "type": "number",
+            "format": "float",
+            "description": "UV index (0-11+)"
+          },
+          "wind_dir": {
+            "type": "integer",
+            "description": "Wind direction (degrees 0-360)"
+          },
+          "wind_speed": {
+            "type": "number",
+            "format": "float",
+            "description": "Current wind speed (mph)"
+          }
+        },
+        "required": [
+          "reading_date_time",
+          "barometer_abs",
+          "barometer_rel",
+          "day_max_wind",
+          "gust_speed",
+          "humidity",
+          "light",
+          "rain_day",
+          "rain_event",
+          "rain_rate",
+          "temperature",
+          "uv",
+          "uvi",
+          "wind_dir",
+          "wind_speed"
+        ],
+        "example": {
+          "reading_date_time": "2025-12-29T15:00:00Z",
+          "barometer_abs": 29.92,
+          "barometer_rel": 30.01,
+          "day_max_wind": 12.5,
+          "gust_speed": 8.3,
+          "humidity": 65,
+          "light": 45000.0,
+          "rain_day": 0.0,
+          "rain_event": 0.0,
+          "rain_rate": 0.0,
+          "temperature": 72.5,
+          "uv": 3,
+          "uvi": 3.0,
+          "wind_dir": 180,
+          "wind_speed": 5.5
+        }
+      }
+    },
+    "requestBodies": {
+      "createWeatherMeasurement": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": ["weather_measurement"],
+              "properties": {
+                "weather_measurement": {
+                  "$ref": "#/components/schemas/WeatherMeasurement"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

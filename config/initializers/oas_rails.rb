@@ -1,5 +1,8 @@
 # config/initializers/oas_rails.rb
 OasRails.configure do |config|
+  # Source OAS file for reusable components
+  config.source_oas_path = "lib/assets/oas.json"
+
   # Basic Information about the API
   config.info.title = "leahillwx.org API documentation"
   config.info.version = "1.0.0"

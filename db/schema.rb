@@ -10,27 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_29_232605) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_30_003013) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "weather_measurements", force: :cascade do |t|
-    t.float "barometer_abs"
-    t.float "barometer_rel"
+    t.float "barometer_abs", null: false
+    t.float "barometer_rel", null: false
     t.datetime "created_at", null: false
-    t.float "day_max_wind"
-    t.float "gust_speed"
-    t.integer "humidity"
-    t.float "light"
-    t.float "rain_day"
-    t.float "rain_event"
-    t.float "rain_rate"
-    t.datetime "reading_date_time"
-    t.float "temperature"
+    t.float "day_max_wind", null: false
+    t.float "gust_speed", null: false
+    t.integer "humidity", null: false
+    t.float "light", null: false
+    t.float "rain_day", null: false
+    t.float "rain_event", null: false
+    t.float "rain_rate", null: false
+    t.datetime "reading_date_time", null: false
+    t.float "temperature", null: false
     t.datetime "updated_at", null: false
-    t.integer "uv"
-    t.float "uvi"
-    t.integer "wind_dir"
-    t.float "wind_speed"
+    t.integer "uv", null: false
+    t.float "uvi", null: false
+    t.integer "wind_dir", null: false
+    t.float "wind_speed", null: false
   end
 end
