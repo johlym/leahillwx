@@ -8,4 +8,40 @@ class WeatherMeasurement < ApplicationRecord
 
   # Are barometer absolute, barometer relative, day max wind, gust speed, light, rain day, rain event, rain rate, uvi, wind speed greater than or equal to 0?
   validates :barometer_abs, :barometer_rel, :day_max_wind, :gust_speed, :light, :rain_day, :rain_event, :rain_rate, :uvi, :wind_speed, numericality: { greater_than_or_equal_to: 0 }
+
+  def barometer_abs_mmhg
+    barometer_abs * 3.38637526
+  end
+
+  def barometer_rel_mmhg
+    barometer_rel * 3.38637526
+  end
+
+  def day_max_wind_kmph
+    day_max_wind * 1.60934
+  end
+
+  def gust_speed_kmph
+    gust_speed * 1.60934
+  end
+
+  def wind_speed_kmph
+    wind_speed * 1.60934
+  end
+
+  def temperature_f
+    (temperature * 9 / 5) + 32
+  end
+
+  def rain_day_in
+    rain_day * 25.4
+  end
+
+  def rain_event_in
+    rain_event * 25.4
+  end
+
+  def rain_rate_in
+    rain_rate * 25.4
+  end
 end
