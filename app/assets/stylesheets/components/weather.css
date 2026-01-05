@@ -7,5 +7,5 @@
 }
 
 .current-weather-date {
-  @apply mt-4 text-md text-primary;
+  @apply mt-4 text-base text-primary;
 }
