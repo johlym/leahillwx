@@ -48,7 +48,7 @@ class WeatherMeasurement < ApplicationRecord
   end
 
   def friendly_reading_date_time
-    reading_date_time.strftime("%B %d, %Y %I:%M %p %Z")
+    reading_date_time.strftime("%B %d, %Y %I:%M:%S %p %Z")
   end
 
   private
