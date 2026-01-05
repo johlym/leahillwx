@@ -420,6 +420,11 @@
     "@tailwindcss/oxide-win32-arm64-msvc" "4.1.18"
     "@tailwindcss/oxide-win32-x64-msvc" "4.1.18"
 
+"@tailwindplus/elements@^1.0.0":
+  version "1.0.21"
+  resolved "https://registry.yarnpkg.com/@tailwindplus/elements/-/elements-1.0.21.tgz#01b8b0e46d833c64f4461939f1b745f4786205bf"
+  integrity sha512-CShPoilDolGpzT9J4MVTCexOijwURW+MHGNMoS5ijiD2FVNk1XHFvEuy6mTeKQ5dOAYNLGwK3VjMOQ8io42H+Q==
+
 "@tybys/wasm-util@^0.10.1":
   version "0.10.1"
   resolved "https://registry.yarnpkg.com/@tybys/wasm-util/-/wasm-util-0.10.1.tgz#ecddd3205cf1e2d5274649ff0eedd2991ed7f414"

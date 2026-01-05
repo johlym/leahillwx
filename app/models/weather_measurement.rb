@@ -44,4 +44,8 @@ class WeatherMeasurement < ApplicationRecord
   def rain_rate_in
     rain_rate * 25.4
   end
+
+  def friendly_reading_date_time
+    reading_date_time.strftime("%B %d, %Y %I:%M %p %Z")
+  end
 end
