@@ -1,6 +1,4 @@
 <%= turbo_stream_from "weather_measurements" %>
 <div class="mx-auto w-full flex flex-col justify-center bg-linear-to-b from-primary-50 to-primary-100">
-  <div id="current_weather">
-    <%= render "current_weather", current: @current %>
-  </div>
+  <%= render "current_weather", current: @current %>
 </div>
