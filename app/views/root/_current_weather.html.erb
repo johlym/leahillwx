@@ -1,8 +1,8 @@
 <div id="current_weather" class="text-center">
   <% if current %>
   <h2 class="current-weather"><%= current.temperature_f %> °F <small>(<%= current.temperature %> °C)</small></h2>
-  <p class="mt-8 text-lg font-medium text-primary">More weather measurements coming soon. Refresh to get a new number.</p>
-  <p class="mt-8 text-md text-primary">Reading as of <%= current.friendly_reading_date_time %></p>
+  <p class="current-weather-secondary">More weather measurements coming soon. Refresh to get a new number.</p>
+  <p class="current-weather-date">Reading as of <%= current.friendly_reading_date_time %></p>
   <% else %>
   <h2 class="current-weather">No measurements available.</h2>
   <% end %>
