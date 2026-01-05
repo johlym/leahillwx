@@ -1,5 +1,6 @@
 source "https://rubygems.org"
 
+gem "barnes", "~> 0.0.9"
 gem "bootsnap", "~> 1.20", require: false
 gem "cssbundling-rails", "~> 1.4"
 gem "dotenv", "~> 3.2"
