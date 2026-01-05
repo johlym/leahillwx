@@ -1,4 +1,6 @@
 class WeatherMeasurement < ApplicationRecord
+  after_create_commit :broadcast_update
+
   # Validations
   # Are all the fields present?
   validates :reading_date_time, :barometer_abs, :barometer_rel, :day_max_wind, :gust_speed, :light, :humidity, :temperature, :rain_day, :rain_event, :rain_rate, :uv, :uvi, :wind_dir, :wind_speed, presence: true
@@ -47,5 +49,16 @@ class WeatherMeasurement < ApplicationRecord
 
   def friendly_reading_date_time
     reading_date_time.strftime("%B %d, %Y %I:%M %p %Z")
+  end
+
+  private
+
+  def broadcast_update
+    Turbo::StreamsChannel.broadcast_replace_to(
+      "weather_measurements",
+      target: "current_weather",
+      partial: "root/current_weather",
+      locals: { current: self }
+    )
   end
 end
