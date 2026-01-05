@@ -1,5 +1,5 @@
 class RootController < ApplicationController
   def index
-    @current = WeatherMeasurement.order(reading_date_time: :desc).last
+    @current = WeatherMeasurement.last
   end
 end
