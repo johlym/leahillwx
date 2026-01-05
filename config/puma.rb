@@ -29,6 +29,7 @@ require "barnes"
 # threads. This includes Active Record's `pool` parameter in `database.yml`.
 threads_count = ENV.fetch("RAILS_MAX_THREADS", 3)
 threads threads_count, threads_count
+workers ENV.fetch("WEB_CONCURRENCY", 1)
 
 # Specifies the `port` that Puma will listen on to receive requests; default is 3000.
 port ENV.fetch("PORT", 3000)
@@ -40,8 +41,4 @@ plugin :tmp_restart
 # In other environments, only set the PID file if requested.
 pidfile ENV["PIDFILE"] if ENV["PIDFILE"]
 
-before_fork do
-  # worker specific setup
-
-  Barnes.start # Must have enabled worker mode for this to block to be called
-end
+Barnes.start
