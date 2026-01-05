@@ -30,7 +30,7 @@ class WeatherMeasurement < ApplicationRecord
   end
 
   def temperature_f
-    (temperature * 9 / 5) + 32
+    ((temperature * 9 / 5) + 32).round(2)
   end
 
   def rain_day_in
