@@ -1,0 +1,3 @@
+.current-weather {
+  @apply text-5xl font-semibold tracking-tight text-balance text-primary sm:text-7xl;
+}

@@ -1,3 +1,6 @@
 @import "tailwindcss";
+
 @import "./components/variables";
+
 @import "./components/header";
+@import "./components/weather";
