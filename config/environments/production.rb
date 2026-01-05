@@ -56,6 +56,13 @@ Rails.application.configure do
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [ :id ]
 
+  # ActionCable allowed request origins
+  config.action_cable.allowed_request_origins = [
+    "https://lhwx-e1aba94eba7d.herokuapp.com",
+    "https://two.leahillwx.org",
+    /https:\/\/.*\.leahillwx\.org/
+  ]
+
   # Enable DNS rebinding protection and other `Host` header attacks.
   # config.hosts = [
   #   "example.com",     # Allow requests from example.com
