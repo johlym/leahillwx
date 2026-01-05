@@ -1,7 +1,11 @@
 <div class="mx-auto w-full flex flex-col justify-center bg-linear-to-b from-primary-50 to-primary-100">
-  <div class="text-center ">
+  <div class="text-center">
+    <% if @current %>
     <h2 class="text-5xl font-semibold tracking-tight text-balance text-primary sm:text-7xl"><%= @current.temperature_f %> °F <small>(<%= @current.temperature %> °C)</small></h2>
     <p class="mt-8 text-lg font-medium text-primary">More weather measurements coming soon. Refresh to get a new number.</p>
     <p class="mt-8 text-md text-primary">Reading as of <%= @current.friendly_reading_date_time %></p>
+    <% else %>
+    <h2 class="text-5xl font-semibold tracking-tight text-balance text-primary sm:text-7xl">No measurements available.</h2>
+    <% end %>
   </div>
 </div>
