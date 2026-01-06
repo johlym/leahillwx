@@ -51,6 +51,6 @@ class Api::V1::WeatherMeasurementsController < ApiController
   private
 
   def permit_measurement_params(data)
-    data.permit(%i[reading_date_time barometer_abs barometer_rel day_max_wind gust_speed light humidity temperature rain_day rain_event rain_rate uv uvi wind_dir wind_speed])
+    data.permit(%i[reading_date_time barometer_abs barometer_rel gust_speed light humidity temperature rain_rate uv uvi wind_dir wind_speed])
   end
 end
