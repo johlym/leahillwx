@@ -33,27 +33,18 @@ class Api::V1::WeatherMeasurementsController < ApiController
       return render json: { error: "Maximum #{MAX_BULK_RECORDS} measurements allowed per request" }, status: :unprocessable_entity
     end
 
-    results = { created: 0, errors: [] }
-
-    ActiveRecord::Base.transaction do
-      measurements_params.each_with_index do |measurement_data, index|
-        wm = WeatherMeasurement.new(permit_measurement_params(measurement_data))
-        if wm.save
-          results[:created] += 1
-        else
-          results[:errors] << { index: index, errors: wm.errors.full_messages }
-        end
-      end
-
-      if results[:errors].any?
-        raise ActiveRecord::Rollback
-      end
+    now = Time.current
+    records = measurements_params.map do |measurement_data|
+      permit_measurement_params(measurement_data).to_h.merge(created_at: now, updated_at: now)
     end
 
-    if results[:errors].any?
-      render json: results, status: :unprocessable_entity
-    else
-      render json: results, status: :created
+    begin
+      WeatherMeasurement.insert_all!(records)
+      render json: { created: records.size }, status: :created
+    rescue ActiveRecord::RecordNotUnique => e
+      render json: { error: "Duplicate record: #{e.message}" }, status: :unprocessable_entity
+    rescue ActiveRecord::StatementInvalid => e
+      render json: { error: "Insert failed: #{e.message}" }, status: :unprocessable_entity
     end
   end
 
