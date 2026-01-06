@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       post :weather_measurement, to: "weather_measurements#create"
+      post "weather_measurement/bulk", to: "weather_measurements#bulk_create"
     end
   end
 
