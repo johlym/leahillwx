@@ -23,11 +23,11 @@
         <div class="navigation-links-container">
           <div class="navigation-links">
             <!-- Current: "bg-gray-900 dark:bg-gray-950/50 text-white", Default: "text-gray-300 hover:bg-white/5 hover:text-white" -->
-            <a href="#" class="navigation-link">Live (soon)</a>
-            <a href="#" class="navigation-link">Reports (soon)</a>
-            <a href="#" class="navigation-link">Records (soon)</a>
-            <a href="#" class="navigation-link">About (soon)</a>
-            <a href="#" class="navigation-link">Contact (soon)</a>
+            <%= link_to "Live", root_path, class: "navigation-link" %>
+            <%= link_to "Reports", root_path, class: "navigation-link" %>
+            <%= link_to "Records", root_path, class: "navigation-link" %>
+            <%= link_to "About", root_path, class: "navigation-link" %>
+            <%= link_to "Contact", root_path, class: "navigation-link" %>
           </div>
         </div>
       </div>
@@ -36,11 +36,11 @@
 
   <el-disclosure id="mobile-menu" hidden class="block sm:hidden">
     <div class="mobile-menu-container">
-      <a href="#" class="mobile-menu-link">Live (soon)</a>
-      <a href="#" class="mobile-menu-link">Reports (soon)</a>
-      <a href="#" class="mobile-menu-link">Records (soon)</a>
-      <a href="#" class="mobile-menu-link">About (soon)</a>
-      <a href="#" class="mobile-menu-link">Contact (soon)</a>
+      <%= link_to "Live", root_path, class: "mobile-menu-link" %>
+      <%= link_to "Reports", root_path, class: "mobile-menu-link" %>
+      <%= link_to "Records", root_path, class: "mobile-menu-link" %>
+      <%= link_to "About", root_path, class: "mobile-menu-link" %>
+      <%= link_to "Contact", root_path, class: "mobile-menu-link" %>
     </div>
   </el-disclosure>
 </nav>
