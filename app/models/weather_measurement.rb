@@ -21,18 +21,22 @@ class WeatherMeasurement < ApplicationRecord
     barometer_rel * 3.38637526
   end
 
-  def gust_speed_kmph
-    gust_speed * 1.60934
+  # meters/second to miles/hour
+  def gust_speed_mph
+    gust_speed * 2.23694
   end
 
-  def wind_speed_kmph
-    wind_speed * 1.60934
+  # meters/second to miles/hour
+  def wind_speed_mph
+    wind_speed * 2.23694
   end
 
+  # millimeters total to inch total
   def rain_day_in
     rain_day * 25.4
   end
 
+  # millimeters/hour to inch/hour
   def rain_rate_in
     rain_rate * 25.4
   end

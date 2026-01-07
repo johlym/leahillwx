@@ -1,7 +1,7 @@
 <div id="current_weather" class="text-center">
   <% if current %>
   <h2 class="current-weather"><%= current.temperature.to_fh %> °F <small>(<%= current.temperature %> °C)</small></h2>
-  <p class="current-weather-secondary">Feels like <%= current.feels_like.to_fh %> °F (<%= current.feels_like %> °C) | Wind speed: <%= current.wind_speed.to_mph %> MPH | Wind direction: <%= current.heading_compass %></p>
+  <p class="current-weather-secondary">Feels like <%= current.feels_like.to_fh %> °F (<%= current.feels_like %> °C) | Wind speed: <%= current.wind_speed_mph %> MPH | Wind direction: <%= current.heading_compass %></p>
   <p class="current-weather-secondary">Rainfall today: <%= current.rain_day_in %> in. (<%= current.rain_day %> mm) | Rainfall rate: <%= current.rain_rate_in %> in./hr. (<%= current.rain_rate %> mm/hr)</p>
   <p class="current-weather-secondary">More weather measurements coming soon. Measurements taken every 5 seconds and refreshed automatically.</p>
   <p class="current-weather-date">Reading as of <%= current.friendly_reading_date_time %>. Measurement #<%= current.id %></p>
