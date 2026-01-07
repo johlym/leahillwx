@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_06_055938) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_07_053119) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -21,6 +21,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_06_055938) do
     t.float "gust_speed", null: false
     t.integer "humidity", null: false
     t.float "light", null: false
+    t.float "rain_day", default: 0.0
     t.float "rain_rate", null: false
     t.datetime "reading_date_time", null: false
     t.float "temperature", null: false

@@ -5,7 +5,7 @@ class WeatherMeasurement < ApplicationRecord
 
   # Validations
   # Are all the fields present?
-  validates :reading_date_time, :barometer_abs, :barometer_rel, :gust_speed, :light, :humidity, :temperature, :rain_rate, :uv, :uvi, :wind_dir, :wind_speed, presence: true
+  validates :reading_date_time, :barometer_abs, :barometer_rel, :gust_speed, :light, :humidity, :temperature, :rain_day, :rain_rate, :uv, :uvi, :wind_dir, :wind_speed, presence: true
 
   # Are humidity, UV, wind direction integers?
   validates :humidity, :uv, :wind_dir, numericality: { only_integer: true }
