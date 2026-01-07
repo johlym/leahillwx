@@ -29,6 +29,10 @@ class WeatherMeasurement < ApplicationRecord
     wind_speed * 1.60934
   end
 
+  def rain_day_in
+    rain_day * 25.4
+  end
+
   def rain_rate_in
     rain_rate * 25.4
   end
