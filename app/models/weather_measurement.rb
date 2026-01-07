@@ -33,12 +33,12 @@ class WeatherMeasurement < ApplicationRecord
 
   # millimeters total to inch total
   def rain_day_in
-    rain_day * 25.4
+    rain_day / 25.4
   end
 
   # millimeters/hour to inch/hour
   def rain_rate_in
-    rain_rate * 25.4
+    rain_rate / 25.4
   end
 
   def feels_like
