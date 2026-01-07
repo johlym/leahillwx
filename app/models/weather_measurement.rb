@@ -1,5 +1,6 @@
 class WeatherMeasurement < ApplicationRecord
-  include FeelsLikeConcern
+  include FeelsLike
+  include HeadingToCompass
   after_create_commit :broadcast_update
 
   # Validations
@@ -34,6 +35,10 @@ class WeatherMeasurement < ApplicationRecord
 
   def feels_like
     feels_like_c(temp_c: temperature, humidity: humidity, wind_speed_mps: wind_speed)
+  end
+
+  def heading_compass
+    heading_to_compass
   end
 
   def friendly_reading_date_time

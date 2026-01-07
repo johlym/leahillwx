@@ -1,4 +1,4 @@
-module FeelsLikeConcern
+module FeelsLike
   extend ActiveSupport::Concern
 
   def feels_like_c(temp_c:, humidity:, wind_speed_mps:)
