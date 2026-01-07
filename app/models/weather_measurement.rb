@@ -1,4 +1,5 @@
 class WeatherMeasurement < ApplicationRecord
+  include FeelsLikeConcern
   after_create_commit :broadcast_update
 
   # Validations
@@ -27,12 +28,12 @@ class WeatherMeasurement < ApplicationRecord
     wind_speed * 1.60934
   end
 
-  def temperature_f
-    ((temperature * 9 / 5) + 32).round(2)
-  end
-
   def rain_rate_in
     rain_rate * 25.4
+  end
+
+  def feels_like
+    feels_like_c(temp_c: temperature, humidity: humidity, wind_speed_mps: wind_speed)
   end
 
   def friendly_reading_date_time
