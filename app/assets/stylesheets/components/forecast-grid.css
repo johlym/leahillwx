@@ -1,0 +1,7 @@
+.forecast-entry {
+  @apply border-b border-slate-200 px-5 py-3 flex flex-row items-center;
+
+  &:last-child {
+    @apply border-b-0;
+  }
+}

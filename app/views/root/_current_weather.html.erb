@@ -1,45 +1,36 @@
-<div id="current_weather" class="weather-container">
-  <div class="weather-grid">
-    <div class="weather-cell current-temperature">
-      <h2 class="weather-cell-heading">Current Temperature</h2>
-      <div class="weather-cell-content">
-        <span class="current-temperature-f"><%= current.temperature.to_fahrenheit %>° F</span>
-        <span class="current-temperature-c">(feels like <%= current.feels_like.to_fahrenheit %>° F)</span>
-        <span class="measurement-id">No. <%= number_with_delimiter(current.id) %></span>
-      </div>
-      
+<div id="current_weather" class="contents">
+  <div class="weather-cell current-temperature">
+    <h2 class="weather-cell-heading">Current Temperature</h2>
+    <div class="weather-cell-content">
+      <span class="current-temperature-f"><%= current.temperature.to_fahrenheit %>° F</span>
+      <span class="current-temperature-c">(feels like <%= current.feels_like.to_fahrenheit %>° F)</span>
+      <span class="measurement-id">No. <%= number_with_delimiter(current.id) %></span>
     </div>
-    <div class="weather-cell current-wind">
-      <h2 class="weather-cell-heading">Current Wind</h2>
-      <div class="weather-cell-content">
-        <span class="weather-cell-big"><%= current.wind_speed %> mph <%= current.heading_compass %></span>
-        <span class="weather-cell-small">Gusting to <%= current.gust_speed %> mph</span>
-      </div>
+  </div>
+  <div class="weather-cell current-wind">
+    <h2 class="weather-cell-heading">Current Wind</h2>
+    <div class="weather-cell-content">
+      <span class="weather-cell-big"><%= current.wind_speed %> mph <%= current.heading_compass %></span>
+      <span class="weather-cell-small">Gusting to <%= current.gust_speed %> mph</span>
     </div>
-    <div class="weather-cell current-humidity">
-      <h2 class="weather-cell-heading">Current Humidity</h2>
-      <div class="weather-cell-content">
-        <span class="weather-cell-big"><%= current.humidity %> %</span>
-      </div>
+  </div>
+  <div class="weather-cell current-humidity">
+    <h2 class="weather-cell-heading">Current Humidity</h2>
+    <div class="weather-cell-content">
+      <span class="weather-cell-big"><%= current.humidity %> %</span>
     </div>
-    <div class="weather-cell current-rain">
-      <h2 class="weather-cell-heading">Current Rain</h2>
-      <div class="weather-cell-content">
-        <span class="weather-cell-big"><%= current.rain_day_in %> in</span>
-        <span class="weather-cell-small">(<%= current.rain_rate_in %> in/hr)</span>
-      </div>
+  </div>
+  <div class="weather-cell current-rain">
+    <h2 class="weather-cell-heading">Current Rain</h2>
+    <div class="weather-cell-content">
+      <span class="weather-cell-big"><%= current.rain_day_in %> in</span>
+      <span class="weather-cell-small">(<%= current.rain_rate_in %> in/hr)</span>
     </div>
-    <div class="weather-cell current-pressure">
-      <h2 class="weather-cell-heading">Current Pressure</h2>
-      <div class="weather-cell-content">
-        <span class="weather-cell-big"><%= current.barometer_abs %> mb</span>
-      </div>
-    </div>
-    <div class="weather-cell weekly-forecast">
-      <h2 class="weather-cell-heading">Weekly Forecast</h2>
-      <div class="weather-cell-content">
-        <span class="weather-cell-small">WEEKLY FORECAST (SOON)</span>
-      </div>
+  </div>
+  <div class="weather-cell current-pressure">
+    <h2 class="weather-cell-heading">Current Pressure</h2>
+    <div class="weather-cell-content">
+      <span class="weather-cell-big"><%= current.barometer_abs %> mb</span>
     </div>
   </div>
 </div>

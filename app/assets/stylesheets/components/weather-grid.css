@@ -3,19 +3,20 @@
 }
 
 .weather-grid {
-  @apply grid grid-cols-12 grid-rows-6 gap-3;
+  @apply grid grid-cols-12 gap-3;
+  grid-template-rows: 150px 150px auto;
 }
 
 .weather-cell {
-  @apply p-2 border bg-slate-50 border-slate-200 rounded-sm flex flex-col;
+  @apply border border-slate-200 rounded-sm flex flex-col;
 }
 
 .weather-cell-heading {
-  @apply text-center font-bold pb-2 mb-2 border-b border-slate-200 text-slate-dark;
+  @apply text-center font-bold p-2 border-b border-slate-200 bg-slate-50 text-slate-dark;
 }
 
 .weather-cell-content {
-  @apply flex flex-col flex-1 justify-center;
+  @apply flex flex-col flex-1 justify-center p-2;
 }
 
 .measurement-id {
@@ -30,8 +31,12 @@
   @apply text-center font-semibold text-xl text-slate-500;
 }
 
+.weather-cell-forecast {
+  @apply p-2;
+}
+
 .current-temperature {
-  @apply col-span-6 row-span-4 flex flex-col;
+  @apply col-span-6 row-span-2 flex flex-col;
 }
 
 .current-temperature-value {
@@ -47,21 +52,21 @@
 }
 
 .current-wind {
-  @apply col-span-3 row-span-2 col-start-7;
+  @apply col-span-3 row-span-1 col-start-7;
 }
 
 .current-humidity {
-  @apply col-span-3 row-span-2 col-start-10;
+  @apply col-span-3 row-span-1 col-start-10;
 }
 
 .current-rain {
-  @apply col-span-3 row-span-2 col-start-7 row-start-3;
+  @apply col-span-3 row-span-1 col-start-7 row-start-2;
 }
 
 .current-pressure {
-  @apply col-span-3 row-span-2 col-start-10 row-start-3;
+  @apply col-span-3 row-span-1 col-start-10 row-start-2;
 }
 
 .weekly-forecast {
-  @apply col-span-12 row-span-2 row-start-5;
+  @apply col-span-12 row-span-1 row-start-3;
 }
