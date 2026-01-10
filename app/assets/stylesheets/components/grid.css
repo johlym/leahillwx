@@ -7,11 +7,19 @@
 }
 
 .weather-cell {
-  @apply p-2 border bg-slate-50 border-slate-200 rounded-sm;
+  @apply p-2 border bg-slate-50 border-slate-200 rounded-sm flex flex-col;
 }
 
 .weather-cell-heading {
   @apply text-center font-bold pb-2 mb-2 border-b border-slate-200 text-slate-dark;
+}
+
+.weather-cell-content {
+  @apply flex flex-col flex-1 justify-center;
+}
+
+.measurement-id {
+  @apply text-xs text-slate-400 text-center font-mono;
 }
 
 .weather-cell-big {
@@ -23,19 +31,19 @@
 }
 
 .current-temperature {
-  @apply col-span-6 row-span-4;
+  @apply col-span-6 row-span-4 flex flex-col;
 }
 
 .current-temperature-value {
-  @apply font-bold text-center;
+  @apply font-bold text-center relative h-full;
 }
 
 .current-temperature-f {
-  @apply text-6xl text-slate-800;
+  @apply text-6xl text-slate-800 font-bold text-center;
 }
 
 .current-temperature-c {
-  @apply text-xl text-slate-500;
+  @apply text-xl text-slate-500 text-center;
 }
 
 .current-wind {
