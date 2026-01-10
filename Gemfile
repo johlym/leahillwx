@@ -4,6 +4,7 @@ gem "barnes", "~> 0.0.9"
 gem "bootsnap", "~> 1.20", require: false
 gem "cssbundling-rails", "~> 1.4"
 gem "dotenv", "~> 3.2"
+gem "httparty", "~> 0.24.0"
 gem "jbuilder", "~> 2.14"
 gem "jsbundling-rails", "~> 1.3"
 gem "oas_rails", "~> 1.3"
@@ -12,6 +13,8 @@ gem "propshaft", "~> 1.3"
 gem "puma", ">= 7.1"
 gem "rails", "~> 8.1.1"
 gem "redis", ">= 5.4"
+gem "sidekiq", "~> 8.1"
+gem "sidekiq-cron", "~> 2.3"
 gem "stimulus-rails", "~> 1.3"
 gem "turbo-rails", "~> 2.0"
 
@@ -23,6 +26,7 @@ group :development, :test do
 end
 
 group :development do
+  gem "annotaterb"
   gem "web-console"
 end
 

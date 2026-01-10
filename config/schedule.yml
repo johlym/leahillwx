@@ -1,0 +1,7 @@
+download_open_weather_forecast_job:
+  cron: "every 10 minutes"
+  class: "DownloadOpenWeatherForecastJob"
+
+delete_old_forecasts_job:
+  cron: "every 1 day"
+  class: "DeleteOldForecastsJob"
