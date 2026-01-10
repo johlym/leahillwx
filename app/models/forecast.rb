@@ -12,6 +12,7 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
+# EXAMPLE FORECAST DATA OBJECT: see `docs/example_forecast.json`
 class Forecast < ApplicationRecord
   validates :forecast, presence: true
 end
