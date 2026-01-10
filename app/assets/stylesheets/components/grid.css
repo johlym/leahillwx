@@ -1,0 +1,59 @@
+.weather-container {
+  @apply container mx-auto max-w-5xl px-2 sm:px-6 lg:px-8 my-2;
+}
+
+.weather-grid {
+  @apply grid grid-cols-12 grid-rows-6 gap-3;
+}
+
+.weather-cell {
+  @apply p-2 border bg-slate-50 border-slate-200 rounded-sm;
+}
+
+.weather-cell-heading {
+  @apply text-center font-bold pb-2 mb-2 border-b border-slate-200 text-slate-dark;
+}
+
+.weather-cell-big {
+  @apply text-center font-bold text-4xl text-slate-800;
+}
+
+.weather-cell-small {
+  @apply text-center font-semibold text-xl text-slate-500;
+}
+
+.current-temperature {
+  @apply col-span-6 row-span-4;
+}
+
+.current-temperature-value {
+  @apply font-bold text-center;
+}
+
+.current-temperature-f {
+  @apply text-6xl text-slate-800;
+}
+
+.current-temperature-c {
+  @apply text-xl text-slate-500;
+}
+
+.current-wind {
+  @apply col-span-3 row-span-2 col-start-7;
+}
+
+.current-humidity {
+  @apply col-span-3 row-span-2 col-start-10;
+}
+
+.current-rain {
+  @apply col-span-3 row-span-2 col-start-7 row-start-3;
+}
+
+.current-pressure {
+  @apply col-span-3 row-span-2 col-start-10 row-start-3;
+}
+
+.weekly-forecast {
+  @apply col-span-12 row-span-2 row-start-5;
+}

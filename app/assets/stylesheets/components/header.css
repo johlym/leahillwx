@@ -1,9 +1,9 @@
 .header-navigation {
-  @apply relative bg-primary-50;
+  @apply relative bg-slate-50;
 }
 
 .header-navigation__container {
-  @apply mx-auto max-w-7xl px-2 sm:px-6 lg:px-8;
+  @apply mx-auto max-w-5xl px-2 sm:px-6 lg:px-8;
 }
 
 .header-navigation__container__inner {
@@ -15,7 +15,7 @@
 }
 
 .mobile-menu-button {
-  @apply relative inline-flex items-center justify-center rounded-md p-2 text-primary-500;
+  @apply relative inline-flex items-center justify-center rounded-md p-2 text-slate-500;
 }
 
 .navigation-container {
@@ -27,7 +27,7 @@
 }
 
 .site-title {
-  @apply text-primary font-bold;
+  @apply text-slate font-bold;
 }
 .navigation-links-container {
   @apply hidden sm:ml-6 sm:block;
@@ -36,14 +36,14 @@
   @apply flex space-x-4;
 }
 .navigation-link {
-  @apply rounded-md px-3 py-2 text-sm font-medium text-primary hover:bg-primary-100 hover:text-primary-700;
+  @apply rounded-md px-3 py-2 text-sm font-medium text-slate hover:bg-slate-100 hover:text-slate-700;
 }
 .current-navigation-link {
-  @apply rounded-md bg-primary px-3 py-2 text-sm font-medium text-white;
+  @apply rounded-md bg-slate px-3 py-2 text-sm font-medium text-white;
 }
 .mobile-menu-container {
   @apply space-y-1 px-2 pt-2 pb-3;
 }
 .mobile-menu-link {
-  @apply block rounded-md px-3 py-2 text-base font-medium text-primary hover:bg-primary-light hover:text-primary-dark;
+  @apply block rounded-md px-3 py-2 text-base font-medium text-slate hover:bg-slate-light hover:text-slate-dark;
 }
