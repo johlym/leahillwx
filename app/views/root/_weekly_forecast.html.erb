@@ -3,8 +3,8 @@
   <% @forecast.days.each do |entry| %>
   <div class="forecast-entry">
     <div class="date">
-      <p><%= entry.date.strftime("%A") %></p>
-      <p><%= entry.date.strftime("%b %-d") %></p>
+      <p class="month"><%= entry.date.strftime("%b") %></p>
+      <p class="day"><%= entry.date.strftime("%-d") %></p>
     </div>
     <div class="icon">
       <img src="https://openweathermap.org/img/wn/<%= entry.weather_icon %>@2x.png" alt="<%= entry.weather_description %>">
@@ -14,7 +14,7 @@
       <span class="low"><%= entry.temp_min.round %>°</span>
     </div>
     <div class="forecast"><%= entry.weather_description&.capitalize %></div>
-    <div class="wind"><%= entry.wind_speed.round %> m/s <%= entry.wind_gust ? "(gusts #{entry.wind_gust.round} m/s)" : "" %></div>
+    <div class="wind"><%= entry.wind_speed.round %> mph <%= entry.wind_gust ? "(gusts #{entry.wind_gust.round} mph)" : "" %></div>
   </div>
   <% end %>
 </div>

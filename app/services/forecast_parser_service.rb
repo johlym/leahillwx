@@ -45,7 +45,7 @@ class ForecastParserService
   class ForecastDay
     DIRECT_ATTRS = %i[
       dt sunrise sunset moonrise moonset moon_phase summary
-      pressure humidity dew_point wind_speed wind_deg wind_gust
+      pressure humidity dew_point wind_deg
       clouds pop rain snow uvi
     ].freeze
 
@@ -63,27 +63,36 @@ class ForecastParserService
     end
 
     def temp_day
-      @data.dig(:temp, :day)
+      celsius_to_fahrenheit(@data.dig(:temp, :day))
     end
 
     def temp_min
-      @data.dig(:temp, :min)
+      celsius_to_fahrenheit(@data.dig(:temp, :min))
     end
 
     def temp_max
-      @data.dig(:temp, :max)
+      celsius_to_fahrenheit(@data.dig(:temp, :max))
     end
 
     def temp_night
-      @data.dig(:temp, :night)
+      celsius_to_fahrenheit(@data.dig(:temp, :night))
     end
 
     def temp_eve
-      @data.dig(:temp, :eve)
+      celsius_to_fahrenheit(@data.dig(:temp, :eve))
     end
 
     def temp_morn
-      @data.dig(:temp, :morn)
+      celsius_to_fahrenheit(@data.dig(:temp, :morn))
+    end
+
+    # Wind accessors (converted to mph)
+    def wind_speed
+      ms_to_mph(@data[:wind_speed])
+    end
+
+    def wind_gust
+      ms_to_mph(@data[:wind_gust])
     end
 
     # Feels like accessors
@@ -92,19 +101,19 @@ class ForecastParserService
     end
 
     def feels_like_day
-      @data.dig(:feels_like, :day)
+      celsius_to_fahrenheit(@data.dig(:feels_like, :day))
     end
 
     def feels_like_night
-      @data.dig(:feels_like, :night)
+      celsius_to_fahrenheit(@data.dig(:feels_like, :night))
     end
 
     def feels_like_eve
-      @data.dig(:feels_like, :eve)
+      celsius_to_fahrenheit(@data.dig(:feels_like, :eve))
     end
 
     def feels_like_morn
-      @data.dig(:feels_like, :morn)
+      celsius_to_fahrenheit(@data.dig(:feels_like, :morn))
     end
 
     # Weather condition accessors
@@ -139,6 +148,18 @@ class ForecastParserService
 
     def sunset_time
       Time.at(sunset) if sunset
+    end
+
+    private
+
+    def celsius_to_fahrenheit(celsius)
+      return nil if celsius.nil?
+      (celsius * 9.0 / 5.0) + 32
+    end
+
+    def ms_to_mph(ms)
+      return nil if ms.nil?
+      ms * 2.23694
     end
   end
 end
