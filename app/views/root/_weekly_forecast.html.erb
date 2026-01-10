@@ -1,0 +1,20 @@
+<div class="weather-cell weekly-forecast">
+  <h2 class="weather-cell-heading">7-day Forecast</h2>
+  <% @forecast.days.each do |entry| %>
+  <div class="forecast-entry">
+    <div class="date">
+      <p><%= entry.date.strftime("%A") %></p>
+      <p><%= entry.date.strftime("%b %-d") %></p>
+    </div>
+    <div class="icon">
+      <img src="https://openweathermap.org/img/wn/<%= entry.weather_icon %>@2x.png" alt="<%= entry.weather_description %>">
+    </div>
+    <div class="high-low">
+      <span class="high"><%= entry.temp_max.round %>°</span>
+      <span class="low"><%= entry.temp_min.round %>°</span>
+    </div>
+    <div class="forecast"><%= entry.weather_description&.capitalize %></div>
+    <div class="wind"><%= entry.wind_speed.round %> m/s <%= entry.wind_gust ? "(gusts #{entry.wind_gust.round} m/s)" : "" %></div>
+  </div>
+  <% end %>
+</div>
