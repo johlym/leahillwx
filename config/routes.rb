@@ -13,9 +13,10 @@ Rails.application.routes.draw do
   mount OasRails::Engine => "/docs"
 
   # basic auth for sidekiq dashboard
-  if ENV["SIDEKIQ_USER"] && ENV["SIDEKIQ_PASSWORD"] && Rails.env.production?
-    Sidekiq::Web.use Rack::Auth::Basic do |user, password|
-      user == ENV["SIDEKIQ_USER"] && password == ENV["SIDEKIQ_PASSWORD"]
+  if Rails.env.production? && ENV["SIDEKIQ_USER"] && ENV["SIDEKIQ_PASSWORD"]
+    Sidekiq::Web.use Rack::Auth::Basic do |username, password|
+      ActiveSupport::SecurityUtils.secure_compare(::Digest::SHA256.hexdigest(username), ::Digest::SHA256.hexdigest(ENV["SIDEKIQ_USER"])) &
+        ActiveSupport::SecurityUtils.secure_compare(::Digest::SHA256.hexdigest(password), ::Digest::SHA256.hexdigest(ENV["SIDEKIQ_PASSWORD"]))
     end
   end
   mount Sidekiq::Web => "/sidekiq"
