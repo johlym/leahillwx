@@ -1,4 +1,5 @@
-require "sidekiq/web" # require the web UI
+require "sidekiq/web"
+require "sidekiq/cron/web"
 
 Rails.application.routes.draw do
   root "root#index"
@@ -20,6 +21,7 @@ Rails.application.routes.draw do
     end
   end
   mount Sidekiq::Web => "/sidekiq"
+
 
   get "up" => "rails/health#show", as: :rails_health_check
 end
