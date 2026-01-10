@@ -26,6 +26,10 @@
   @apply text-xs text-slate-400 text-center font-mono;
 }
 
+.live {
+  @apply text-xs text-white bg-red-600 px-1 py-0.5 rounded-sm;
+}
+
 .weather-cell-big {
   @apply text-center font-bold text-xl md:text-2xl lg:text-4xl text-slate-800;
 }

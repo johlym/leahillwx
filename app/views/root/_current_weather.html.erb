@@ -4,7 +4,7 @@
     <div class="weather-cell-content">
       <span class="current-temperature-f"><%= current.temperature.to_fahrenheit %>° F</span>
       <span class="current-temperature-c">(feels like <%= current.feels_like.to_fahrenheit %>° F)</span>
-      <span class="measurement-id">No. <%= number_with_delimiter(current.id) %></span>
+      <span class="measurement-id" data-controller="connection-status">No. <%= number_with_delimiter(current.id) %> <span class="live hidden" data-connection-status-target="badge">LIVE</span></span>
     </div>
   </div>
   <div class="weather-cell current-wind">
