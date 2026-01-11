@@ -64,7 +64,7 @@ class WeatherMeasurement < ApplicationRecord
 
   # Dew point: Td = T - [(100 - RH)/5], where Td is dew point, T is temperature, and RH is relative humidity (in Celsius/percent)
   def dew_point
-    temperature - ((100 - humidity) / 5)
+    temperature - ((100 - humidity) / 5.0)
   end
 
   def feels_like
