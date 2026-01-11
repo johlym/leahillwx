@@ -67,7 +67,7 @@
     @apply col-span-1 lg:col-span-2 lg:col-start-7 lg:row-start-2;
   }
 
-  &.current-uv {
+  &.current-solar {
     @apply col-span-1 lg:col-span-2 lg:col-start-9 lg:row-start-2;
   }
 
