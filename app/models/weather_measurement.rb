@@ -100,6 +100,9 @@ class WeatherMeasurement < ApplicationRecord
   def current_weather_template
     <<~ERB
       <%= render Ui::CurrentWeather::WeatherTileComponent.new(tile_type: "current-temperature", heading: "Current Temperature", measurement: current) %>
+      <%= render Ui::CurrentWeather::WeatherTileComponent.new(tile_type: "current-dew-point", heading: "Dew Point") do |c| %>
+        <% c.with_primary_value { "\#{helpers.number_with_precision(current.dew_point.to_fahrenheit, precision: 2, strip_insignificant_zeros: true)}° F" } %>
+      <% end %>
       <%= render Ui::CurrentWeather::WeatherTileComponent.new(tile_type: "current-wind", heading: "Current Wind") do |c| %>
         <% c.with_primary_value { "\#{helpers.number_with_precision(current.wind_speed_mph, precision: 2, strip_insignificant_zeros: true)} mph \#{current.heading_compass}" } %>
         <% c.with_secondary_value { "Gusting to \#{helpers.number_with_precision(current.gust_speed_mph, precision: 2, strip_insignificant_zeros: true)} mph" } %>
@@ -113,6 +116,9 @@ class WeatherMeasurement < ApplicationRecord
       <% end %>
       <%= render Ui::CurrentWeather::WeatherTileComponent.new(tile_type: "current-pressure", heading: "Current Pressure") do |c| %>
         <% c.with_primary_value { "\#{helpers.number_with_precision(current.barometer_abs, precision: 2, strip_insignificant_zeros: true)} mb" } %>
+      <% end %>
+      <%= render Ui::CurrentWeather::WeatherTileComponent.new(tile_type: "current-uv", heading: "UV Index") do |c| %>
+        <% c.with_primary_value { current.uv.to_s } %>
       <% end %>
     ERB
   end

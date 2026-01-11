@@ -1,5 +1,5 @@
 .weather-grid {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-3;
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-10 gap-3;
 
   @media (min-width: 1024px) {
     grid-template-rows: 150px 150px auto;
@@ -34,7 +34,7 @@
   }
 
   &.current-temperature {
-    @apply col-span-1 md:col-span-2 lg:col-span-6 lg:row-span-2;
+    @apply col-span-1 md:col-span-2 lg:col-span-4 lg:row-span-2;
 
     .weather-tile-content {
       .current-temperature-f {
@@ -47,23 +47,31 @@
     }
   }
 
+  &.current-dew-point {
+    @apply col-span-1 lg:col-span-2 lg:col-start-5 lg:row-start-1;
+  }
+
   &.current-wind {
-    @apply col-span-1 lg:col-span-3 lg:col-start-7;
+    @apply col-span-1 lg:col-span-2 lg:col-start-7 lg:row-start-1;
   }
 
   &.current-humidity {
-    @apply col-span-1 lg:col-span-3 lg:col-start-10;
+    @apply col-span-1 lg:col-span-2 lg:col-start-9 lg:row-start-1;
   }
 
   &.current-rain {
-    @apply col-span-1 lg:col-span-3 lg:col-start-7 lg:row-start-2;
+    @apply col-span-1 lg:col-span-2 lg:col-start-5 lg:row-start-2;
   }
 
   &.current-pressure {
-    @apply col-span-1 lg:col-span-3 lg:col-start-10 lg:row-start-2;
+    @apply col-span-1 lg:col-span-2 lg:col-start-7 lg:row-start-2;
+  }
+
+  &.current-uv {
+    @apply col-span-1 lg:col-span-2 lg:col-start-9 lg:row-start-2;
   }
 
   &.weekly-forecast {
-    @apply col-span-1 md:col-span-2 lg:col-span-12;
+    @apply col-span-1 md:col-span-2 lg:col-span-10;
   }
 }
