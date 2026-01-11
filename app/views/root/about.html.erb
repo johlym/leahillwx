@@ -1,0 +1,62 @@
+
+<article class="weather-container prose">
+<h1>About leahillwx.org</h1>
+
+<p>Positioned on Lea Hill in Auburn, WA, this weather station is powered by an Ambient Weather WS-2902C. Data samples are taken every 5 seconds and published live to this site.</p>
+
+<p>This station tracks the following weather measurements:</p>
+
+<ul>
+  <li>Temperature</li>
+  <li>Humidity</li>
+  <li>Barometric pressure</li>
+  <li>Wind</li>
+  <li>Direction</li>
+  <li>Speed</li>
+  <li>Rainfall</li>
+  <li>UV</li>
+</ul>
+
+<p>Everything else is recorded and interpolated using software.</p>
+
+<h2>Support</h2>
+<p>If you find this site and its data helpful, consider <%= link_to "buying me a coffee", "https://www.buymeacoffee.com/johnathan", target: "_blank", class: "underline" %> in return.</p>
+
+<h2>Weather Station Data Services</h2>
+<p>Data from this station is syndicated to the following services:</p>
+
+<ul>
+  <li>Weather Underground - <%= link_to "KWAAUBU154", "https://www.wunderground.com/personal-weather-station/ID/KWAAUBU154?utm_source=leahillwx.org&utm_medium=referral", target: "_blank", class: "underline" %></li>
+  <li>PWS Weather - <%= link_to "S50LEAHILL", "https://www.pwsweather.com/station/pws/S50LEAHILL?ref=leahillwxdotorg&utm_source=leahillwx.org&utm_medium=referral", target: "_blank", class: "underline" %></li>
+  <li>AWEKAS - <%= link_to "S50LEAHILL", "https://www.awekas.at/en/station.php?id=21599&utm_source=leahillwx.org&utm_medium=referral", target: "_blank", class: "underline" %></li>
+  <li>Weathercloud - <%= link_to "S50LEAHILL", "https://app.weathercloud.net/d7373931868#profile?utm_source=leahillwx.org&utm_medium=referral", target: "_blank", class: "underline" %></li>
+  <li>CWOP - <%= link_to "GW1125", "http://www.findu.com/cgi-bin/wxpage.cgi?last=24&call=GW1125&&utm_source=leahillwx.org&utm_medium=referral", target: "_blank", class: "underline" %></li>
+</ul>
+
+<h2>Other Links</h2>
+<p>Local National Weather Service office</p>
+
+<h2>Getting in Touch</h2>
+<p>Feel free to reach out to me through one of the following channels:</p>
+
+<ul>
+  <li>Email: email at johnathan dot org</li>
+</ul>
+
+<h2>Technical details</h2>
+<ul>
+  <li>Weather station: Ambient Weather WS-2902C</li>
+  <li>Data capture: Ecowitt GW11000</li>
+  <li>Data archive and site generation: WeeWX</li>
+  <li>Charting: HighCharts</li>
+  <li>WeeWx Skin: Belchertown</li>
+  <li>Hosting: Linode (get a $100 credit with this link)</li>
+</ul>
+
+<h2>Some semi-relevant details:</h2>
+<ul>
+  <li>Number of weather measurements: <%= @weather_measurement_count %></li>
+</ul>
+
+<p><strong>Disclosure:</strong> This page may contain affiliate links. At no cost to you, making a purchase using those links may result in an earned commission for the owner and maintainer of this site, which helps fund this project.</p>
+</article>

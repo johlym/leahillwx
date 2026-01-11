@@ -3,6 +3,7 @@ require "sidekiq/cron/web"
 
 Rails.application.routes.draw do
   root "root#index"
+  get "about", to: "root#about"
 
   namespace :api do
     namespace :v1 do
