@@ -21,10 +21,13 @@ module FeelsLike
   def wind_chill_c(temp_c, wind_speed_mps)
     wind_kmh = wind_speed_mps * 3.6
 
-    13.12 +
+    wc =
+      13.12 +
       0.6215 * temp_c -
       11.37 * wind_kmh**0.16 +
       0.3965 * temp_c * wind_kmh**0.16
+
+    [ wc, temp_c ].min
   end
 
   # --------------------
