@@ -1,5 +1,5 @@
 .header-navigation {
-  @apply relative bg-slate-50;
+  @apply relative;
 }
 
 .header-navigation__container {
@@ -15,7 +15,7 @@
 }
 
 .mobile-menu-button {
-  @apply relative inline-flex items-center justify-center rounded-md p-2 text-slate-500;
+  @apply relative inline-flex items-center justify-center rounded-md p-2 text-slate;
 }
 
 .navigation-container {

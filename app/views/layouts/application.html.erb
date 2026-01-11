@@ -22,10 +22,12 @@
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :application, "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
+    <script src="https://kit.fontawesome.com/20b018c776.js" crossorigin="anonymous"></script>
   </head>
 
-  <body class="bg-light-gray min-h-screen flex flex-col">
+  <body class="bg-linear-to-b from-slate-100 from-10% to-white to-60% min-h-screen flex flex-col">
     <%= render "layouts/shared/header" %>
     <%= yield %>
+    <%= render "layouts/shared/footer" %>
   </body>
 </html>

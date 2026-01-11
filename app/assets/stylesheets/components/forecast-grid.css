@@ -1,7 +1,67 @@
+.forecast-timestamp {
+  @apply text-xs text-gray-500 text-center py-1 bg-gray-50 border-b border-gray-200;
+}
+
 .forecast-entry {
-  @apply border-b border-slate-200 px-5 py-3 flex flex-row items-center;
+  @apply border-b border-slate-200 px-5 py-3 flex flex-row items-center justify-center sm:justify-start odd:bg-white even:bg-gray-50 odd:hover:bg-gray-50 even:hover:bg-gray-100;
 
   &:last-child {
     @apply border-b-0;
+  }
+
+  > .date-grid {
+    @apply min-w-[25%] sm:min-w-[75px] text-center flex flex-row sm:flex-col items-baseline sm:items-center gap-1 sm:gap-0;
+
+    > .dayname {
+      @apply font-bold uppercase text-2xl text-left md:text-center font-stretch-50% leading-4 sm:mb-1 min-w-[40px];
+    }
+
+    > .daynum {
+      @apply font-normal uppercase text-lg font-stretch-50% leading-4;
+    }
+  }
+
+  > .icon {
+    @apply min-w-[25%] sm:min-w-[50px] flex justify-end sm:justify-end;
+  }
+
+  > .high-low {
+    @apply min-w-[25%] sm:min-w-[100px] pl-2;
+
+    > .high {
+      @apply font-extralight font-stretch-50% text-4xl;
+    }
+
+    > .low {
+      @apply font-light font-stretch-50% text-2xl text-gray-500;
+    }
+  }
+
+  > .forecast-text {
+    @apply hidden sm:block sm:flex-1;
+
+    > .forecast-description {
+      @apply font-semibold;
+    }
+
+    > .forecast-summary {
+      @apply text-gray-600 italic text-sm pr-2;
+    }
+  }
+
+  > .wind {
+    @apply min-w-[25%] sm:min-w-[75px] text-right;
+
+    > .wind-speed {
+      @apply font-bold text-lg font-stretch-50%;
+    }
+
+    > .unit {
+      @apply text-sm;
+    }
+
+    > .wind-gust {
+      @apply text-xs text-gray-500 italic;
+    }
   }
 }

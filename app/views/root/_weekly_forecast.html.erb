@@ -1,20 +1,27 @@
 <div class="weather-cell weekly-forecast">
   <h2 class="weather-cell-heading">7-day Forecast</h2>
+  <p class="forecast-timestamp">as of <%= @forecast.created_at.strftime("%B %-d, %Y @ %H:%S") %>. Forecast data via <%= link_to "OpenWeatherMap", "https://openweathermap.org/?utm_source=leahillwx.org&utm_medium=referral", target: "_blank", class: "underline" %>.</p>
   <% @forecast.days.each do |entry| %>
   <div class="forecast-entry">
-    <div class="date">
-      <p class="month"><%= entry.date.strftime("%b") %></p>
-      <p class="day"><%= entry.date.strftime("%-d") %></p>
+    <div class="date-grid">
+      <p class="dayname"><%= entry.date.strftime("%a") %></p>
+      <p class="daynum"><%= entry.date.strftime("%b") %> <%= entry.date.strftime("%-d") %></p>
     </div>
     <div class="icon">
-      <img src="https://openweathermap.org/img/wn/<%= entry.weather_icon %>@2x.png" alt="<%= entry.weather_description %>">
+      <img src="https://openweathermap.org/img/wn/<%= entry.weather_icon %>@2x.png" width="50" height="50" alt="<%= entry.weather_description %>">
     </div>
     <div class="high-low">
       <span class="high"><%= entry.temp_max.round %>°</span>
       <span class="low"><%= entry.temp_min.round %>°</span>
     </div>
-    <div class="forecast"><%= entry.weather_description&.capitalize %></div>
-    <div class="wind"><%= entry.wind_speed.round %> mph <%= entry.wind_gust ? "(gusts #{entry.wind_gust.round} mph)" : "" %></div>
+    <div class="forecast-text">
+      <p class="forecast-description"><%= entry.weather_description&.titleize %></p>
+      <p class="forecast-summary"><%= entry.summary %>.</p>
+    </div>
+    <div class="wind">
+      <p><span class="wind-speed"><%= entry.wind_speed.round %></span> <span class="unit">mph</span> <i class="fa-fw fa-sharp-duotone fa-light fa-location-arrow-up" style="--fa-primary-color: #444444; --fa-secondary-color: #444444; --fa-secondary-opacity: 0.2; display: inline-block; transform: rotate(<%= entry.wind_deg %>deg);"></i></p>
+      <p class="wind-gust"><%= entry.wind_gust ? "#{entry.wind_gust.round} mph gusts" : "" %></p>
+    </div>
   </div>
   <% end %>
 </div>

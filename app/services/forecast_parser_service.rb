@@ -1,17 +1,20 @@
 class ForecastParserService
   def initialize(forecast)
-    @forecast = forecast.is_a?(Hash) ? forecast : forecast.forecast
+    @raw_forecast = forecast
+    @forecast_data = forecast.is_a?(Hash) ? forecast : forecast.forecast
   end
 
   def parse
-    ParsedForecast.new(@forecast)
+    created_at = @raw_forecast.respond_to?(:created_at) ? @raw_forecast.created_at : nil
+    ParsedForecast.new(@forecast_data, created_at: created_at)
   end
 
   class ParsedForecast
-    attr_reader :lat, :lon, :timezone, :timezone_offset, :alerts
+    attr_reader :lat, :lon, :timezone, :timezone_offset, :alerts, :created_at
 
-    def initialize(data)
+    def initialize(data, created_at: nil)
       @data = data.deep_symbolize_keys
+      @created_at = created_at
       @lat = @data[:lat]
       @lon = @data[:lon]
       @timezone = @data[:timezone]

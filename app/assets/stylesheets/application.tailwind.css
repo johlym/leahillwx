@@ -1,7 +1,9 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
+@import "./components/fonts";
 @import "./components/variables";
-
+@import "./components/primary";
 @import "./components/header";
 @import "./components/weather-grid";
 @import "./components/forecast-grid";

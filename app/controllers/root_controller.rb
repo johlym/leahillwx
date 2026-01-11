@@ -5,5 +5,6 @@ class RootController < ApplicationController
   end
 
   def about
+    @weather_measurement_count = WeatherMeasurement.count
   end
 end
