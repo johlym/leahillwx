@@ -7,12 +7,14 @@
       <p class="dayname"><%= entry.date.strftime("%a") %></p>
       <p class="daynum"><%= entry.date.strftime("%b") %> <%= entry.date.strftime("%-d") %></p>
     </div>
-    <div class="icon">
-      <img src="https://openweathermap.org/img/wn/<%= entry.weather_icon %>@2x.png" width="50" height="50" alt="<%= entry.weather_description %>">
-    </div>
-    <div class="high-low">
-      <span class="high"><%= entry.temp_max.round %>°</span>
-      <span class="low"><%= entry.temp_min.round %>°</span>
+    <div class="conditions">
+      <div class="icon">
+        <img src="https://openweathermap.org/img/wn/<%= entry.weather_icon %>@2x.png" width="50" height="50" alt="<%= entry.weather_description %>">
+      </div>
+      <div class="high-low">
+        <span class="high"><%= entry.temp_max.round %>°</span>
+        <span class="low"><%= entry.temp_min.round %>°</span>
+      </div>
     </div>
     <div class="forecast-text">
       <p class="forecast-description"><%= entry.weather_description&.titleize %></p>
