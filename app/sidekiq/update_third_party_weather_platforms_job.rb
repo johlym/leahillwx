@@ -2,7 +2,7 @@ class UpdateThirdPartyWeatherPlatformsJob
   include Sidekiq::Job
 
   def perform(*args)
-    wm = WeatherMeasurement.order(reading_date_time: :desc).first
+    wm = WeatherMeasurement.order(reading_date_time: :desc).first.id
     UpdateWeatherUndergroundJob.perform_async(wm)
     UpdatePwsWeatherJob.perform_async(wm)
     UpdateAwekasJob.perform_async(wm)
