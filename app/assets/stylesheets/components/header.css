@@ -2,7 +2,7 @@
   @apply bg-transparent;
 
   .nav {
-    @apply mx-auto flex max-w-5xl items-center justify-between p-4 lg:px-8;
+    @apply mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8;
 
     .logo-container {
       @apply flex lg:flex-1;

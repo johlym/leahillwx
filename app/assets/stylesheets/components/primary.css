@@ -1,5 +1,5 @@
 .weather-container {
-  @apply container mx-auto max-w-5xl px-2 sm:px-6 lg:px-8 my-2;
+  @apply container mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 my-2;
 }
 
 a {
