@@ -14,13 +14,10 @@
   <li>Direction</li>
   <li>Speed</li>
   <li>Rainfall</li>
-  <li>UV</li>
+  <li>UV (soon)</li>
 </ul>
 
 <p>Everything else is recorded and interpolated using software.</p>
-
-<h2>Support</h2>
-<p>If you find this site and its data helpful, consider <%= link_to "buying me a coffee", "https://www.buymeacoffee.com/johnathan", target: "_blank", class: "underline" %> in return.</p>
 
 <h2>Weather Station Data Services</h2>
 <p>Data from this station is syndicated to the following services:</p>
@@ -47,16 +44,17 @@
 <ul>
   <li>Weather station: Ambient Weather WS-2902C</li>
   <li>Data capture: Ecowitt GW11000</li>
-  <li>Data archive and site generation: WeeWX</li>
-  <li>Charting: HighCharts</li>
-  <li>WeeWx Skin: Belchertown</li>
-  <li>Hosting: Linode (get a $100 credit with this link)</li>
+  <li>Data is measured in metric units (Celsius, mm, etc.) and converted to imperial units (Fahrenheit, inches, etc.) for display. Pressure is captured in hPa/millibars and displayed the same.</li>
+  <li>All timestamps are recorded in UTC and coverted to <code>America/Los_Angeles</code> for display.</li>
+  <li>Forecasts: The <%= link_to "OpenWeatherMap API", "https://openweathermap.org/api?utm_source=leahillwx.org&utm_medium=referral", target: "_blank", class: "underline" %>, retrieved every 30 minutes.</li>
+  <li>Backend: data is captured through a custom Rust application and forwarded to this site via an HTTP endpoint.</li>
+  <li>Frontend: this site is built using Ruby on Rails. Data is stored in a PostgreSQL database.</li>
+  <li>Hosting: <%= link_to "Heroku", "https://www.heroku.com?utm_source=leahillwx.org&utm_medium=referral", target: "_blank", class: "underline" %></li>
 </ul>
 
 <h2>Some semi-relevant details:</h2>
 <ul>
   <li>Number of weather measurements: <%= number_with_delimiter(@weather_measurement_count) %></li>
+  <li>First measurement: <%= @first_weather_measurement.reading_date_time.in_time_zone("Pacific Time (US & Canada)").strftime("%B %d, %Y %I:%M %p %Z") %></li>
 </ul>
-
-<p><strong>Disclosure:</strong> This page may contain affiliate links. At no cost to you, making a purchase using those links may result in an earned commission for the owner and maintainer of this site, which helps fund this project.</p>
 </article>
