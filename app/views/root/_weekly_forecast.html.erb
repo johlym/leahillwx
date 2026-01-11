@@ -9,7 +9,7 @@
     </div>
     <div class="conditions">
       <div class="icon">
-        <img src="https://openweathermap.org/img/wn/<%= entry.weather_icon %>@2x.png" width="50" height="50" alt="<%= entry.weather_description %>">
+        <%= render "root/shared/weather_icon", icon: entry.weather_icon %>
       </div>
       <div class="high-low">
         <span class="high"><%= entry.temp_max.round %>°</span>
