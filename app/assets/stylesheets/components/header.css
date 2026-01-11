@@ -1,5 +1,5 @@
 .site-header {
-  @apply bg-white;
+  @apply bg-transparent;
 
   .nav {
     @apply mx-auto flex max-w-5xl items-center justify-between p-4 lg:px-8;
@@ -52,7 +52,7 @@
       @apply space-y-1 px-4 pb-4;
 
       .mobile-link {
-        @apply -mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-slate-900 hover:bg-slate-50;
+        @apply -mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-text no-underline hover:text-brand-primary;
       }
     }
   }
