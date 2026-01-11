@@ -5,9 +5,7 @@
 #  id                :bigint           not null, primary key
 #  barometer_abs     :float            not null
 #  barometer_rel     :float            not null
-#  dew_point         :float            default(0.0)
 #  gust_speed        :float            not null
-#  heat_index        :float            default(0.0)
 #  humidity          :integer          not null
 #  light             :float            not null
 #  rain_day          :float            default(0.0)
@@ -16,7 +14,6 @@
 #  temperature       :float            not null
 #  uv                :integer          not null
 #  uvi               :float            not null
-#  wind_chill        :float            default(0.0)
 #  wind_dir          :integer          not null
 #  wind_speed        :float            not null
 #  created_at        :datetime         not null
@@ -63,6 +60,11 @@ class WeatherMeasurement < ApplicationRecord
   # millimeters/hour to inch/hour
   def rain_rate_in
     rain_rate / 25.4
+  end
+
+  # Dew point: Td = T - [(100 - RH)/5], where Td is dew point, T is temperature, and RH is relative humidity (in Celsius/percent)
+  def dew_point
+    temperature - ((100 - humidity) / 5)
   end
 
   def feels_like
