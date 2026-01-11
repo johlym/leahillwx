@@ -13,8 +13,38 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
-one: {}
-# column: value
-#
-two: {}
-# column: value
+one:
+  forecast:
+    lat: 88.888
+    lon: 88.888
+    timezone: "America/Los_Angeles"
+    timezone_offset: -28800
+    daily:
+      - dt: 1768075200
+        sunrise: 1768060425
+        sunset: 1768091908
+        summary: "Expect a day of partly cloudy with rain"
+        temp:
+          day: 8.05
+          min: 3.23
+          max: 8.3
+          night: 6.76
+          eve: 7.43
+          morn: 3.27
+        feels_like:
+          day: 8.05
+          night: 6.76
+          eve: 7.43
+          morn: 2.15
+        pressure: 1029
+        humidity: 79
+        wind_speed: 2.13
+        wind_deg: 74
+        weather:
+          - id: 500
+            main: "Rain"
+            description: "light rain"
+            icon: "10d"
+        clouds: 75
+        pop: 1
+        uvi: 0.66

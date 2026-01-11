@@ -24,31 +24,29 @@
 one:
   barometer_abs: 1.5
   barometer_rel: 1.5
-  day_max_wind: 1.5
   gust_speed: 1.5
   light: 1.5
   humidity: 1.5
   temperature: 1.5
   rain_day: 1.5
-  rain_event: 1.5
   rain_rate: 1.5
   uv: 1.5
   uvi: 1.5
   wind_dir: 1.5
   wind_speed: 1.5
+  reading_date_time: 2026-01-11 02:09:08.30749
 
 two:
   barometer_abs: 1.5
   barometer_rel: 1.5
-  day_max_wind: 1.5
   gust_speed: 1.5
   light: 1.5
   humidity: 1.5
   temperature: 1.5
   rain_day: 1.5
-  rain_event: 1.5
   rain_rate: 1.5
   uv: 1.5
   uvi: 1.5
   wind_dir: 1.5
   wind_speed: 1.5
+  reading_date_time: 2026-01-11 02:09:08.30749
