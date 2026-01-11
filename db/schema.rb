@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_10_194200) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_11_222808) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -24,7 +24,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_10_194200) do
     t.float "barometer_abs", null: false
     t.float "barometer_rel", null: false
     t.datetime "created_at", null: false
+    t.float "dew_point", default: 0.0
     t.float "gust_speed", null: false
+    t.float "heat_index", default: 0.0
     t.integer "humidity", null: false
     t.float "light", null: false
     t.float "rain_day", default: 0.0
@@ -34,6 +36,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_10_194200) do
     t.datetime "updated_at", null: false
     t.integer "uv", null: false
     t.float "uvi", null: false
+    t.float "wind_chill", default: 0.0
     t.integer "wind_dir", null: false
     t.float "wind_speed", null: false
   end
