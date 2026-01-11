@@ -3,10 +3,10 @@ class UpdateThirdPartyWeatherPlatformsJob
 
   def perform(*args)
     wm = WeatherMeasurement.order(reading_date_time: :desc).first
-    UpdateWeatherUndergroundJob.perform_later(wm)
-    UpdatePwsWeatherJob.perform_later(wm)
-    UpdateAwekasJob.perform_later(wm)
-    UpdateWeathercloudJob.perform_later(wm)
-    UpdateCwopJob.perform_later(wm)
+    UpdateWeatherUndergroundJob.perform_async(wm)
+    UpdatePwsWeatherJob.perform_async(wm)
+    UpdateAwekasJob.perform_async(wm)
+    UpdateWeathercloudJob.perform_async(wm)
+    UpdateCwopJob.perform_async(wm)
   end
 end
