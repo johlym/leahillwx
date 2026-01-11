@@ -8,10 +8,14 @@ class Ui::CurrentWeather::WeatherTileComponent < ViewComponent::Base
   renders_one :primary_value
   renders_one :secondary_value
 
-  def initialize(tile_type:, heading:, measurement: nil)
+  def initialize(tile_type:, heading: nil, measurement: nil)
     @tile_type = tile_type
     @heading = heading
     @measurement = measurement
+  end
+
+  def heading?
+    heading.present?
   end
 
   def temperature?

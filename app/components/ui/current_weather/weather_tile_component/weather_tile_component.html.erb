@@ -1,5 +1,7 @@
 <div class="weather-tile <%= tile_type %>">
-  <h2 class="weather-tile-heading"><%= heading %></h2>
+  <% if heading? %>
+    <h2 class="weather-tile-heading"><%= heading %></h2>
+  <% end %>
   <div class="weather-tile-content">
     <% if temperature? %>
       <span class="current-temperature-f"><%= formatted_temperature %>° F</span>
