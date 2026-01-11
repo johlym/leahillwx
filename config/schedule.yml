@@ -5,3 +5,7 @@ download_open_weather_forecast_job:
 delete_old_forecasts_job:
   cron: "every 1 day"
   class: "DeleteOldForecastsJob"
+
+update_third_party_weather_platforms_job:
+  cron: "every 15 seconds"
+  class: "UpdateThirdPartyWeatherPlatformsJob"
