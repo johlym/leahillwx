@@ -17,10 +17,6 @@
   <% c.with_primary_value { "#{number_with_precision(current.barometer_abs, precision: 2, strip_insignificant_zeros: true)} mb" } %>
 <% end %>
 <%= render Ui::CurrentWeather::WeatherTileComponent.new(tile_type: "current-solar", heading: "Solar Irradiance") do |c| %>
-  <% if current.uv_milliwatts > 1000 %>
-    <% c.with_primary_value { "#{number_with_precision(current.uv_watts, precision: 2, strip_insignificant_zeros: true)} mW/m²" } %>
-  <% else %>
-    <% c.with_primary_value { "#{number_with_precision(current.uv_milliwatts, precision: 2, strip_insignificant_zeros: true)} mW/m²" } %>
-  <% end %>
+  <% c.with_primary_value { "#{number_with_precision(current.uv, precision: 2, strip_insignificant_zeros: true)} W/m2 Index" } %>
   <% c.with_secondary_value { "#{number_with_precision(current.light, precision: 2, strip_insignificant_zeros: true)} lux" } %>
 <% end %>

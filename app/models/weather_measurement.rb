@@ -79,15 +79,6 @@ class WeatherMeasurement < ApplicationRecord
     reading_date_time.in_time_zone("America/Los_Angeles").strftime("%B %d, %Y %I:%M:%S %p %Z")
   end
 
-  # from microwatts to watts (divide the power value by 1e+6)
-  def uv_milliwatts
-    uv / 1000
-  end
-
-  def uv_watts
-    uv / 1000000
-  end
-
   private
 
   def broadcast_update
