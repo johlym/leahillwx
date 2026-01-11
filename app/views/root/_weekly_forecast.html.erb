@@ -1,6 +1,6 @@
 <div class="weather-cell weekly-forecast">
   <h2 class="weather-cell-heading">7-day Forecast</h2>
-  <p class="forecast-timestamp">as of <%= @forecast.created_at.strftime("%B %-d, %Y @ %H:%S") %>. Forecast data via <%= link_to "OpenWeatherMap", "https://openweathermap.org/?utm_source=leahillwx.org&utm_medium=referral", target: "_blank", class: "underline" %>.</p>
+  <p class="forecast-timestamp">as of <%= @forecast.created_at.in_time_zone("America/Los_Angeles").strftime("%B %-d, %Y @ %H:%S") %>. Forecast data via <%= link_to "OpenWeatherMap", "https://openweathermap.org/?utm_source=leahillwx.org&utm_medium=referral", target: "_blank", class: "underline" %>.</p>
   <% @forecast.days.each do |entry| %>
   <div class="forecast-entry">
     <div class="date-grid">
