@@ -52,7 +52,8 @@ module FeelsLike
       0.00085282 * temp_f * rh**2 -
       0.00000199 * temp_f**2 * rh**2
 
-    f_to_c(hi_f)
+      hi_c = f_to_c(hi_f)
+      [ hi_c, temp_c ].max
   end
 
   def c_to_f(c)
