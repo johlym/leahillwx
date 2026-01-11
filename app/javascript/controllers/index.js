@@ -5,7 +5,9 @@
 import { application } from "./application"
 
 import HelloController from "./hello_controller"
-application.register("hello", HelloController)
-
 import ConnectionStatusController from "./connection_status_controller"
+import MobileMenuController from "./mobile_menu_controller"
+
+application.register("hello", HelloController)
 application.register("connection-status", ConnectionStatusController)
+application.register("mobile-menu", MobileMenuController)

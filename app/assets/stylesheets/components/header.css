@@ -1,49 +1,59 @@
-.header-navigation {
-  @apply relative;
-}
+.site-header {
+  @apply bg-white;
 
-.header-navigation__container {
-  @apply mx-auto max-w-5xl px-2 sm:px-6 lg:px-8;
-}
+  .nav {
+    @apply mx-auto flex max-w-5xl items-center justify-between p-4 lg:px-8;
 
-.header-navigation__container__inner {
-  @apply relative flex h-16 items-center justify-between;
-}
+    .logo-container {
+      @apply flex lg:flex-1;
 
-.mobile-menu-container {
-  @apply absolute inset-y-0 left-0 flex items-center sm:hidden;
-}
+      .logo {
+        @apply -m-1.5 p-1.5 flex items-center gap-2;
 
-.mobile-menu-button {
-  @apply relative inline-flex items-center justify-center rounded-md p-2 text-slate;
-}
+        .logo-image {
+          @apply h-8 w-auto;
+        }
 
-.navigation-container {
-  @apply flex flex-1 items-center justify-center sm:items-stretch sm:justify-start;
-}
+        .logo-text {
+          @apply text-lg font-bold text-slate-800;
+        }
+      }
+    }
 
-.site-title-container {
-  @apply flex shrink-0 items-center;
-}
+    .mobile-toggle-container {
+      @apply flex lg:hidden;
 
-.site-title {
-  @apply text-slate font-bold;
-}
-.navigation-links-container {
-  @apply hidden sm:ml-6 sm:block;
-}
-.navigation-links {
-  @apply flex space-x-4;
-}
-.navigation-link {
-  @apply rounded-md px-3 py-2 text-sm font-medium text-slate hover:bg-slate-100 hover:text-slate-700;
-}
-.current-navigation-link {
-  @apply rounded-md bg-slate px-3 py-2 text-sm font-medium text-white;
-}
-.mobile-menu-container {
-  @apply space-y-1 px-2 pt-2 pb-3;
-}
-.mobile-menu-link {
-  @apply block rounded-md px-3 py-2 text-base font-medium text-slate hover:bg-slate-light hover:text-slate-dark;
+      .mobile-toggle {
+        @apply -m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-slate-700;
+
+        .icon {
+          @apply text-xl;
+
+          &.hidden {
+            @apply hidden;
+          }
+        }
+      }
+    }
+
+    .nav-links {
+      @apply hidden lg:flex lg:gap-x-8;
+
+      .nav-link {
+        @apply text-sm/6 font-semibold text-slate-900 hover:text-slate-600;
+      }
+    }
+  }
+
+  .mobile-menu {
+    @apply lg:hidden;
+
+    .mobile-menu-inner {
+      @apply space-y-1 px-4 pb-4;
+
+      .mobile-link {
+        @apply -mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-slate-900 hover:bg-slate-50;
+      }
+    }
+  }
 }
