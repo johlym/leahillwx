@@ -8,14 +8,14 @@
       @apply flex lg:flex-1;
 
       .logo {
-        @apply -m-1.5 p-1.5 flex items-center gap-2;
+        @apply -m-1.5 p-1.5 flex items-center gap-2 text-text no-underline;
 
         .logo-image {
           @apply h-8 w-auto;
         }
 
         .logo-text {
-          @apply text-lg font-bold text-slate-800;
+          @apply text-lg font-bold;
         }
       }
     }
@@ -40,7 +40,7 @@
       @apply hidden lg:flex lg:gap-x-8;
 
       .nav-link {
-        @apply text-sm/6 font-semibold text-slate-900 hover:text-slate-600;
+        @apply text-sm/6 font-semibold text-text no-underline hover:text-brand-primary;
       }
     }
   }
