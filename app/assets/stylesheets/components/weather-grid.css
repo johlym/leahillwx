@@ -70,16 +70,4 @@
   &.current-solar {
     @apply col-span-1 lg:col-span-2 lg:col-start-9 lg:row-start-2;
   }
-
-  &.weekly-forecast {
-    @apply col-span-1 md:col-span-2 lg:col-span-6 lg:row-span-2;
-  }
-
-  &.sidebar-tile {
-    @apply col-span-1 md:col-span-2 lg:col-span-4;
-
-    > .weather-tile-content {
-      @apply justify-start items-center;
-    }
-  }
 }

@@ -7,4 +7,5 @@
 @import "./components/header";
 @import "./components/weather-grid";
 @import "./components/forecast-grid";
+@import "./components/forecast-section";
 @import "./components/footer";
