@@ -2,14 +2,18 @@
   @apply grid grid-cols-1 lg:grid-cols-10 gap-3 mt-3;
 
   .forecast-column {
-    @apply col-span-1 lg:col-span-6;
+    @apply col-span-1 lg:col-span-6 flex flex-col gap-3;
+
+    > div {
+      @apply row-span-1;
+    }
   }
 
   .sidebar-column {
     @apply col-span-1 lg:col-span-4 flex flex-col gap-3;
   }
 
-  .sidebar-tile {
+  .generic-tile {
     @apply border border-slate-200 bg-white rounded-sm flex flex-col shadow-lg;
 
     .weather-tile-heading {

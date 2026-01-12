@@ -10,12 +10,15 @@
   <div class="forecast-section">
     <div class="forecast-column">
       <%= render Ui::ForecastWeather::ForecastGridComponent.new(forecast: @forecast) %>
+      <%= render Ui::ForecastWeather::GenericTileComponent.new(heading: "Earthquakes") do %>
+        COMING SOON
+      <% end %>
     </div>
     <div class="sidebar-column">
-      <%= render Ui::ForecastWeather::SidebarTileComponent.new(heading: "NWS Radar") do %>
+      <%= render Ui::ForecastWeather::GenericTileComponent.new(heading: "NWS Radar") do %>
         <%= image_tag "https://radar.weather.gov/ridge/standard/PACNORTHWEST_loop.gif", alt: "Radar" %>
       <% end %>
-      <%= render Ui::ForecastWeather::SidebarTileComponent.new(heading: "Auburn Traffic Cameras") do %>
+      <%= render Ui::ForecastWeather::GenericTileComponent.new(heading: "Auburn Traffic Cameras") do %>
         <div class="grid grid-cols-2 gap-2">
           <div>
             <h3 class="text-sm text-center font-bold">A ST SE and 2nd ST SE</h3>
