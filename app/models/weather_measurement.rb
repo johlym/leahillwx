@@ -82,7 +82,7 @@ class WeatherMeasurement < ApplicationRecord
   private
 
   def broadcast_update
-    Turbo::StreamsChannel.broadcast_replace_to(
+    Turbo::StreamsChannel.broadcast_update_to(
       "weather_measurements",
       target: "current_weather",
       html: render_current_weather_html
