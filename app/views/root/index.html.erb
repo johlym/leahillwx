@@ -6,5 +6,29 @@
       <%= render partial: "current_weather", locals: { current: @current } %>
     </div>
     <%= render Ui::ForecastWeather::ForecastGridComponent.new(forecast: @forecast) %>
+    <%= render Ui::ForecastWeather::SidebarTileComponent.new(heading: "NWS Radar") do %>
+      <%= image_tag "https://radar.weather.gov/ridge/standard/PACNORTHWEST_loop.gif", alt: "Radar" %>
+    <% end %>
+    <%= render Ui::ForecastWeather::SidebarTileComponent.new(heading: "Auburn Traffic Cameras") do %>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <h3 class="text-sm text-center font-bold">A ST SE and 2nd ST SE</h3>
+          <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/226.jpg" %>
+        </div>
+        <div>
+          <h3 class="text-sm text-center font-bold">8th ST NE and Harvey</h3>
+          <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/28.jpg" %>
+        </div>
+        <div>
+          <h3 class="text-sm text-center font-bold">S 277th ST and Auburn Way N</h3>
+          <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/12.jpg" %>
+        </div>
+        <div>
+          <h3 class="text-sm text-center font-bold">SE 312th ST and 124th AVE SE</h3>
+          <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/161.jpg" %>
+        </div>
+      </div>
+    <% end %>
+    
   </div>
 </div>
