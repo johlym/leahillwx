@@ -1,3 +1,36 @@
+# == Schema Information
+#
+# Table name: report_entries
+#
+#  id               :bigint           not null, primary key
+#  avg_wind_speed   :float
+#  cool_degree_days :float
+#  day              :integer          not null
+#  heat_degree_days :float
+#  high_temp        :float
+#  high_temp_time   :string
+#  high_wind_speed  :float
+#  high_wind_time   :string
+#  low_temp         :float
+#  low_temp_time    :string
+#  mean_temp        :float
+#  partial_day      :boolean          default(FALSE), not null
+#  rain             :float
+#  wind_dir         :integer
+#  wind_dir_compass :string
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  report_id        :bigint           not null
+#
+# Indexes
+#
+#  index_report_entries_on_report_id          (report_id)
+#  index_report_entries_on_report_id_and_day  (report_id,day) UNIQUE
+#
+# Foreign Keys
+#
+#  fk_rails_...  (report_id => reports.id) ON DELETE => cascade
+#
 class ReportEntry < ApplicationRecord
   include WeatherUnitConversions
 

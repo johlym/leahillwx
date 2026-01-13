@@ -1,3 +1,30 @@
+# == Schema Information
+#
+# Table name: reports
+#
+#  id                        :bigint           not null, primary key
+#  avg_wind_speed            :float
+#  dominant_wind_dir         :integer
+#  dominant_wind_dir_compass :string
+#  month                     :integer          not null
+#  month_high_temp           :float
+#  month_high_temp_day       :integer
+#  month_high_wind_day       :integer
+#  month_high_wind_speed     :float
+#  month_low_temp            :float
+#  month_low_temp_day        :integer
+#  month_mean_temp           :float
+#  total_cool_degree_days    :float
+#  total_heat_degree_days    :float
+#  total_rain                :float
+#  year                      :integer          not null
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#
+# Indexes
+#
+#  index_reports_on_year_and_month  (year,month) UNIQUE
+#
 class Report < ApplicationRecord
   include WindVectorAveraging
   include WeatherUnitConversions
