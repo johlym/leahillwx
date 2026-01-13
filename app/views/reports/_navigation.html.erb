@@ -1,0 +1,38 @@
+<div class="report-navigation" data-controller="report-navigation">
+  <form action="<%= reports_path %>" method="get" data-report-navigation-target="form">
+    <div class="navigation-controls">
+      <label for="year-select">Year:</label>
+      <select id="year-select" 
+              name="year" 
+              data-report-navigation-target="yearSelect"
+              data-action="change->report-navigation#updateMonths"
+              data-current-year="<%= current_year %>"
+              data-current-month="<%= current_month %>">
+        <option value="">Select a Year</option>
+      </select>
+
+      <label for="month-select">Month:</label>
+      <select id="month-select" 
+              name="month" 
+              data-report-navigation-target="monthSelect"
+              disabled>
+        <option value="">Select a Month</option>
+      </select>
+
+      <button type="button" 
+              data-action="click->report-navigation#navigateToReport"
+              data-report-navigation-target="goButton"
+              disabled>
+        GO
+      </button>
+      
+      <% if defined?(current_year) && defined?(current_month) %>
+        <a href="<%= report_path(current_year, Date::MONTHNAMES[current_month].downcase) %>.txt" class="download-link">
+          Download Text Version
+        </a>
+      <% end %>
+    </div>
+  </form>
+  
+  <div class="navigation-message" data-report-navigation-target="message"></div>
+</div>

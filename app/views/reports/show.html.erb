@@ -1,45 +1,47 @@
 <div class="report-container">
+  <%= render partial: "reports/navigation", locals: { current_year: @report.year, current_month: @report.month } %>
+  
   <h1>Monthly Climatological Summary</h1>
-  <h2><%= report.month_name %> <%= report.year %></h2>
+  <h2><%= @report.month_name %> <%= @report.year %></h2>
 
   <div class="monthly-statistics">
     <h3>Monthly Statistics</h3>
     <table class="stats-table">
       <tr>
         <td>Mean Temperature:</td>
-        <td><%= number_with_precision(report.month_mean_temp, precision: 2) %>°F</td>
+        <td><%= number_with_precision(@report.month_mean_temp, precision: 2) %>°F</td>
       </tr>
       <tr>
         <td>High Temperature:</td>
-        <td><%= number_with_precision(report.month_high_temp, precision: 2) %>°F (Day <%= report.month_high_temp_day || 'N/A' %>)</td>
+        <td><%= number_with_precision(@report.month_high_temp, precision: 2) %>°F (Day <%= @report.month_high_temp_day || 'N/A' %>)</td>
       </tr>
       <tr>
         <td>Low Temperature:</td>
-        <td><%= number_with_precision(report.month_low_temp, precision: 2) %>°F (Day <%= report.month_low_temp_day || 'N/A' %>)</td>
+        <td><%= number_with_precision(@report.month_low_temp, precision: 2) %>°F (Day <%= @report.month_low_temp_day || 'N/A' %>)</td>
       </tr>
       <tr>
         <td>Heat Degree Days:</td>
-        <td><%= number_with_precision(report.total_heat_degree_days, precision: 2) %></td>
+        <td><%= number_with_precision(@report.total_heat_degree_days, precision: 2) %></td>
       </tr>
       <tr>
         <td>Cool Degree Days:</td>
-        <td><%= number_with_precision(report.total_cool_degree_days, precision: 2) %></td>
+        <td><%= number_with_precision(@report.total_cool_degree_days, precision: 2) %></td>
       </tr>
       <tr>
         <td>Total Precipitation:</td>
-        <td><%= number_with_precision(report.total_rain, precision: 2) %> in</td>
+        <td><%= number_with_precision(@report.total_rain, precision: 2) %> in</td>
       </tr>
       <tr>
         <td>Avg Wind Speed:</td>
-        <td><%= number_with_precision(report.avg_wind_speed, precision: 2) %> mph</td>
+        <td><%= number_with_precision(@report.avg_wind_speed, precision: 2) %> mph</td>
       </tr>
       <tr>
         <td>High Wind Speed:</td>
-        <td><%= number_with_precision(report.month_high_wind_speed, precision: 2) %> mph (Day <%= report.month_high_wind_day || 'N/A' %>)</td>
+        <td><%= number_with_precision(@report.month_high_wind_speed, precision: 2) %> mph (Day <%= @report.month_high_wind_day || 'N/A' %>)</td>
       </tr>
       <tr>
         <td>Dominant Wind Dir:</td>
-        <td><%= report.formatted_dominant_wind %></td>
+        <td><%= @report.formatted_dominant_wind %></td>
       </tr>
     </table>
   </div>
@@ -67,13 +69,13 @@
         </tr>
       </thead>
       <tbody>
-        <% entries = report.entries.ordered %>
-        <% (1..report.days_in_month).each do |day| %>
+        <% entries = @report.entries.ordered %>
+        <% (1..@report.days_in_month).each do |day| %>
           <% entry = entries.find { |e| e.day == day } %>
           <tr<%= ' class="partial-day"' if entry&.partial_day %>>
             <td><%= day %></td>
             <% if entry.nil? || !entry.has_data? %>
-              <% if day > Date.today.day && report.year == Date.today.year && report.month == Date.today.month %>
+              <% if day > Date.today.day && @report.year == Date.today.year && @report.month == Date.today.month %>
                 <td colspan="12" class="future-day"></td>
               <% else %>
                 <td colspan="12" class="no-data">N/A</td>
@@ -103,11 +105,11 @@
     <ul>
       <li>Times shown in 24-hour format (HH:MM) America/Los_Angeles timezone</li>
       <li>Days with no data shown as "N/A"</li>
-      <% if has_partial_days?(report) %>
+      <% if has_partial_days?(@report) %>
         <li>* Indicates partial day (incomplete measurements)</li>
       <% end %>
-      <% if generation_time %>
-        <li>Report generated in <%= generation_time %> seconds</li>
+      <% if @generation_time %>
+        <li>Report generated in <%= @generation_time %> seconds</li>
       <% end %>
     </ul>
   </div>

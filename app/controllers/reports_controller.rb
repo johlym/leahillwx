@@ -1,0 +1,63 @@
+class ReportsController < ApplicationController
+  def index
+    latest_report = Report.ordered.first
+
+    if latest_report
+      redirect_to report_path(latest_report.year, latest_report.month_name.downcase)
+    else
+      @message = "No reports available yet. Reports will be generated as weather data is collected."
+    end
+  end
+
+  def available
+    reports_data = Report.ordered.group_by(&:year)
+
+    result = reports_data.transform_values do |reports|
+      reports.map { |r| r.month_name.downcase }.sort_by { |name| Date::MONTHNAMES.index(name.capitalize) }
+    end
+
+    render json: result
+  end
+
+  def show
+    @start_time = Time.current
+
+    year = params[:year].to_i
+    month_name = params[:month_name]
+    month_num = Date::MONTHNAMES.index(month_name.capitalize)
+
+    unless month_num
+      render_not_found("Invalid month name: #{month_name}")
+      return
+    end
+
+    @report = Report.includes(:entries).find_by(year: year, month: month_num)
+
+    unless @report
+      render_not_found("Report not found for #{month_name.capitalize} #{year}")
+      return
+    end
+
+    @generation_time = (Time.current - @start_time).round(2)
+
+    respond_to do |format|
+      format.html # renders show.html.erb
+      format.text do
+        render plain: render_to_string(
+          partial: "reports/show_text",
+          locals: { report: @report, generation_time: @generation_time }
+        )
+      end
+    end
+  end
+
+  private
+
+  def render_not_found(message)
+    respond_to do |format|
+      format.html { render plain: message, status: :not_found }
+      format.text { render plain: message, status: :not_found }
+      format.json { render json: { error: message }, status: :not_found }
+    end
+  end
+end

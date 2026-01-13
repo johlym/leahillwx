@@ -23,6 +23,10 @@ Rails.application.routes.draw do
   end
   mount Sidekiq::Web => "/sidekiq"
 
+  # Reports routes
+  get "reports", to: "reports#index", as: :reports
+  get "reports/available", to: "reports#available", as: :available_reports
+  get "reports/:year/:month_name", to: "reports#show", as: :report
 
   get "up" => "rails/health#show", as: :rails_health_check
 end
