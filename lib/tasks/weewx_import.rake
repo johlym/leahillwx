@@ -212,10 +212,18 @@ namespace :weewx do
   def import_batch(batch)
     # Use upsert_all to skip duplicates based on unique index
     WeatherMeasurement.upsert_all(batch, unique_by: :reading_date_time, record_timestamps: true)
+  rescue ActiveRecord::RecordNotUnique => e
+    # Log duplicate records but don't raise - continue processing
+    puts "\nWarning: Duplicate weather measurements detected, skipping..."
+    Rails.logger.warn("Duplicate weather measurements in import: #{e.message}")
+  rescue ActiveRecord::StatementInvalid => e
+    # Log database errors but don't stop the entire import
+    puts "\nWarning: Database error in batch, skipping..."
+    Rails.logger.error("Database error in import batch: #{e.message}")
   rescue => e
-    puts "\nError importing batch: #{e.message}"
-    puts "First record in batch: #{batch.first.inspect}"
-    raise
+    # Log unexpected errors but continue
+    puts "\nWarning: Unexpected error importing batch: #{e.message}"
+    Rails.logger.error("Unexpected error in import batch: #{e.message}")
   end
 
   def import_batch_via_api(batch, api_url, api_key)
