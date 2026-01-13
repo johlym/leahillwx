@@ -1,10 +1,18 @@
 class ForecastParserService
   def initialize(forecast)
     @raw_forecast = forecast
-    @forecast_data = forecast.is_a?(Hash) ? forecast : forecast.forecast
+    @forecast_data = if forecast.nil?
+      nil
+    elsif forecast.is_a?(Hash)
+      forecast
+    else
+      forecast.forecast
+    end
   end
 
   def parse
+    return nil if @forecast_data.nil?
+
     created_at = @raw_forecast.respond_to?(:created_at) ? @raw_forecast.created_at : nil
     ParsedForecast.new(@forecast_data, created_at: created_at)
   end
