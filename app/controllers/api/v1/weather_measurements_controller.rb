@@ -11,7 +11,16 @@ class Api::V1::WeatherMeasurementsController < ApiController
   # @response Unprocessable Entity(422) [Hash{ errors: Array<String> }]
   # @response Unauthorized(401) [Hash{ error: String }]
   def create
-    @wm = WeatherMeasurement.new(permit_measurement_params(params.require(:weather_measurement)))
+    measurement_params = permit_measurement_params(params.require(:weather_measurement))
+
+    # Check if measurement with this timestamp already exists
+    if WeatherMeasurement.exists?(reading_date_time: measurement_params[:reading_date_time])
+      Rails.logger.info("Skipping duplicate measurement at #{measurement_params[:reading_date_time]}")
+      head :no_content # Return success but don't insert
+      return
+    end
+
+    @wm = WeatherMeasurement.new(measurement_params)
     if @wm.save
       head :no_content
     else

@@ -21,7 +21,7 @@
 #
 # Indexes
 #
-#  index_weather_measurements_on_reading_date_time  (reading_date_time) UNIQUE
+#  index_weather_measurements_on_reading_date_time  (reading_date_time)
 #
 class WeatherMeasurement < ApplicationRecord
   include FeelsLike

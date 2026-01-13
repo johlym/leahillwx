@@ -210,20 +210,31 @@ namespace :weewx do
   end
 
   def import_batch(batch)
-    # Use upsert_all to skip duplicates based on unique index
-    WeatherMeasurement.upsert_all(batch, unique_by: :reading_date_time, record_timestamps: true)
-  rescue ActiveRecord::RecordNotUnique => e
-    # Log duplicate records but don't raise - continue processing
-    puts "\nWarning: Duplicate weather measurements detected, skipping..."
-    Rails.logger.warn("Duplicate weather measurements in import: #{e.message}")
-  rescue ActiveRecord::StatementInvalid => e
-    # Log database errors but don't stop the entire import
-    puts "\nWarning: Database error in batch, skipping..."
-    Rails.logger.error("Database error in import batch: #{e.message}")
+    # Check for existing records
+    timestamps = batch.map { |r| r[:reading_date_time] }
+    existing_timestamps = WeatherMeasurement.where(reading_date_time: timestamps).pluck(:reading_date_time).to_set
+
+    # Filter out duplicates
+    new_records = batch.reject do |record|
+      if existing_timestamps.include?(record[:reading_date_time])
+        Rails.logger.info("Skipping duplicate measurement at #{record[:reading_date_time]}")
+        true
+      else
+        false
+      end
+    end
+
+    # Log duplicate count if any
+    if new_records.size < batch.size
+      duplicates_count = batch.size - new_records.size
+      puts "  (skipped #{duplicates_count} duplicates)"
+    end
+
+    # Insert only new records
+    WeatherMeasurement.insert_all!(new_records, record_timestamps: true) if new_records.any?
   rescue => e
-    # Log unexpected errors but continue
-    puts "\nWarning: Unexpected error importing batch: #{e.message}"
-    Rails.logger.error("Unexpected error in import batch: #{e.message}")
+    puts "\nWarning: Error importing batch: #{e.message}"
+    Rails.logger.error("Error in import batch: #{e.message}")
   end
 
   def import_batch_via_api(batch, api_url, api_key)
