@@ -33,17 +33,15 @@ class Api::V1::WeatherMeasurementsController < ApiController
       return render json: { error: "Maximum #{MAX_BULK_RECORDS} measurements allowed per request" }, status: :unprocessable_entity
     end
 
-    now = Time.current
+    # Convert to JSON-serializable array of hashes for Sidekiq
     records = measurements_params.map do |measurement_data|
-      permit_measurement_params(measurement_data).to_h.merge(created_at: now, updated_at: now)
+      permit_measurement_params(measurement_data).to_h.stringify_keys
     end
 
-    begin
-      result = WeatherMeasurement.insert_all!(records, unique_by: :reading_date_time)
-      render json: { created: result.rows.size, skipped: records.size - result.rows.size }, status: :created
-    rescue ActiveRecord::StatementInvalid => e
-      render json: { error: "Insert failed: #{e.message}" }, status: :unprocessable_entity
-    end
+    # Enqueue background job
+    BulkWriteMeasurementsJob.perform_async(records)
+
+    render json: { accepted: records.size, status: "processing" }, status: :accepted
   end
 
   private

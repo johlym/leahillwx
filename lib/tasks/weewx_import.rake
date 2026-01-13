@@ -210,7 +210,8 @@ namespace :weewx do
   end
 
   def import_batch(batch)
-    WeatherMeasurement.insert_all!(batch, record_timestamps: true, unique_by: :reading_date_time)
+    # Use upsert_all to skip duplicates based on unique index
+    WeatherMeasurement.upsert_all(batch, unique_by: :reading_date_time, record_timestamps: true)
   rescue => e
     puts "\nError importing batch: #{e.message}"
     puts "First record in batch: #{batch.first.inspect}"
@@ -232,7 +233,8 @@ namespace :weewx do
 
     if response.code.to_i >= 200 && response.code.to_i < 300
       result = JSON.parse(response.body)
-      { created: result["created"] || 0, skipped: result["skipped"] || 0 }
+      # API now returns 202 Accepted with background job queued
+      { created: result["accepted"] || 0, skipped: 0 }
     else
       puts "\nError from API: #{response.code} - #{response.body}"
       raise "API upload failed"
