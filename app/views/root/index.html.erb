@@ -16,10 +16,17 @@
     </div>
     <div class="sidebar-column">
       <%= render Ui::ForecastWeather::GenericTileComponent.new(heading: "NWS Radar") do %>
+      <p class="p-2">
         <%= image_tag "https://radar.weather.gov/ridge/standard/PACNORTHWEST_loop.gif", alt: "Radar" %>
+      </p>
       <% end %>
       <%= render Ui::ForecastWeather::GenericTileComponent.new(heading: "Auburn Traffic Cameras") do %>
-        <div class="grid grid-cols-2 gap-2">
+        <div data-controller="image-refresh">
+          <p class="forecast-timestamp">
+            Next refresh in <span data-image-refresh-target="countdown" class="font-mono">60</span> seconds.
+          </p>
+          <div class="grid grid-cols-2 gap-2 p-2" id="traffic_cameras">
+          
           <div>
             <h3 class="text-sm text-center font-bold">A ST SE and 2nd ST SE</h3>
             <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/226.jpg" %>
@@ -35,6 +42,7 @@
           <div>
             <h3 class="text-sm text-center font-bold">SE 312th ST and 124th AVE SE</h3>
             <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/161.jpg" %>
+          </div>
           </div>
         </div>
       <% end %>
