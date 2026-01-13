@@ -11,18 +11,17 @@ MONTHLY STATISTICS:
   High Wind Speed:      <%= report.formatted_wind_speed(report.month_high_wind_speed) %> mph (Day <%= report.month_high_wind_day || 'N/A' %>)
   Dominant Wind Dir:    <%= report.formatted_dominant_wind %>
 
-                   TEMPERATURE (°F), RAIN (in), WIND SPEED (mph)
+                    TEMPERATURE (°F), RAIN (in), WIND SPEED (mph)
 
-                                         HEAT   COOL         AVG
-      MEAN                               DEG    DEG          WIND                   DOM
-DAY   TEMP   HIGH   TIME    LOW   TIME   DAYS   DAYS   RAIN  SPEED   HIGH   TIME    DIR
----------------------------------------------------------------------------------------
+                                              HEAT   COOL          AVG
+DAY   MEAN   HIGH  TIME    LOW  TIME    DEG    DEG   RAIN   WIND   HIGH  TIME    DOM DIR
+--------------------------------------------------------------------------------------------
 <% entries = report.entries.ordered -%>
 <% (1..report.days_in_month).each do |day| -%>
 <% entry = entries.find { |e| e.day == day } -%>
 <%= format_text_row(day, entry, report) %>
 <% end -%>
----------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
 
 Notes:
 - Times shown in 24-hour format (HH:MM) America/Los_Angeles timezone
