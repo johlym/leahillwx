@@ -39,10 +39,8 @@ class Api::V1::WeatherMeasurementsController < ApiController
     end
 
     begin
-      WeatherMeasurement.insert_all!(records)
-      render json: { created: records.size }, status: :created
-    rescue ActiveRecord::RecordNotUnique => e
-      render json: { error: "Duplicate record: #{e.message}" }, status: :unprocessable_entity
+      result = WeatherMeasurement.insert_all!(records, unique_by: :reading_date_time)
+      render json: { created: result.rows.size, skipped: records.size - result.rows.size }, status: :created
     rescue ActiveRecord::StatementInvalid => e
       render json: { error: "Insert failed: #{e.message}" }, status: :unprocessable_entity
     end
