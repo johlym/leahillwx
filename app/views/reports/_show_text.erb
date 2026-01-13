@@ -1,0 +1,35 @@
+MONTHLY CLIMATOLOGICAL SUMMARY for <%= report.month_name %> <%= report.year %>
+
+MONTHLY STATISTICS:
+  Mean Temperature:     <%= report.formatted_temp(report.month_mean_temp) %>°F
+  High Temperature:     <%= report.formatted_temp(report.month_high_temp) %>°F (Day <%= report.month_high_temp_day || 'N/A' %>)
+  Low Temperature:      <%= report.formatted_temp(report.month_low_temp) %>°F (Day <%= report.month_low_temp_day || 'N/A' %>)
+  Heat Degree Days:     <%= report.formatted_degree_days(report.total_heat_degree_days) %>
+  Cool Degree Days:     <%= report.formatted_degree_days(report.total_cool_degree_days) %>
+  Total Precipitation:  <%= report.formatted_rain(report.total_rain) %> in
+  Avg Wind Speed:       <%= report.formatted_wind_speed(report.avg_wind_speed) %> mph
+  High Wind Speed:      <%= report.formatted_wind_speed(report.month_high_wind_speed) %> mph (Day <%= report.month_high_wind_day || 'N/A' %>)
+  Dominant Wind Dir:    <%= report.formatted_dominant_wind %>
+
+                   TEMPERATURE (°F), RAIN (in), WIND SPEED (mph)
+
+                                         HEAT   COOL         AVG
+      MEAN                               DEG    DEG          WIND                   DOM
+DAY   TEMP   HIGH   TIME    LOW   TIME   DAYS   DAYS   RAIN  SPEED   HIGH   TIME    DIR
+---------------------------------------------------------------------------------------
+<% entries = report.entries.ordered -%>
+<% (1..report.days_in_month).each do |day| -%>
+<% entry = entries.find { |e| e.day == day } -%>
+<%= format_text_row(day, entry, report) %>
+<% end -%>
+---------------------------------------------------------------------------------------
+
+Notes:
+- Times shown in 24-hour format (HH:MM) America/Los_Angeles timezone
+- Days with no data shown as "N/A"
+<% if has_partial_days?(report) -%>
+- * Indicates partial day (incomplete measurements)
+<% end -%>
+<% if generation_time -%>
+- Report generated in <%= generation_time %> seconds
+<% end -%>
