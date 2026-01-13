@@ -1,20 +1,35 @@
 namespace :weewx do
-  desc "Import weather data from WeeWX MySQL dump"
+  desc "Import weather data from WeeWX MySQL dump (set USE_API=true to upload via API)"
   task :import, [ :sql_file ] => :environment do |t, args|
     require "tempfile"
+    require "net/http"
+    require "json"
 
     sql_file = args[:sql_file] || raise("Usage: rake weewx:import[path/to/dump.sql]")
     sql_file = File.expand_path(sql_file)
+    use_api = ENV["USE_API"] == "true"
 
     unless File.exist?(sql_file)
       puts "Error: File not found: #{sql_file}"
       exit 1
     end
 
+    if use_api
+      api_key = ENV["MEASUREMENT_API_KEY"]
+      api_url = ENV["API_BASE_URL"] || "http://localhost:3000"
+
+      unless api_key
+        puts "Error: MEASUREMENT_API_KEY environment variable required for API upload"
+        exit 1
+      end
+    end
+
     puts "=" * 80
     puts "WeeWX Data Import"
     puts "=" * 80
     puts "SQL file: #{sql_file}"
+    puts "Upload method: #{use_api ? 'API' : 'Direct database'}"
+    puts "API URL: #{api_url}" if use_api
     puts ""
 
     # Parse the SQL dump and extract INSERT statements
@@ -30,9 +45,15 @@ namespace :weewx do
       puts "Processing batch #{idx + 1}/#{inserts.count}: #{records.count} records"
 
       records.each_slice(1000) do |batch|
-        import_batch(batch)
-        total_records += batch.count
-        print "  Imported: #{total_records} records\r"
+        if use_api
+          result = import_batch_via_api(batch, api_url, api_key)
+          total_records += result[:created]
+          print "  Imported: #{total_records} records (#{result[:skipped]} skipped)\r"
+        else
+          import_batch(batch)
+          total_records += batch.count
+          print "  Imported: #{total_records} records\r"
+        end
       end
     end
 
@@ -193,6 +214,31 @@ namespace :weewx do
   rescue => e
     puts "\nError importing batch: #{e.message}"
     puts "First record in batch: #{batch.first.inspect}"
+    raise
+  end
+
+  def import_batch_via_api(batch, api_url, api_key)
+    uri = URI("#{api_url}/api/v1/weather_measurement/bulk")
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = uri.scheme == "https"
+    http.read_timeout = 30
+
+    request = Net::HTTP::Post.new(uri.path)
+    request["Authorization"] = "Bearer #{api_key}"
+    request["Content-Type"] = "application/json"
+    request.body = { weather_measurements: batch }.to_json
+
+    response = http.request(request)
+
+    if response.code.to_i >= 200 && response.code.to_i < 300
+      result = JSON.parse(response.body)
+      { created: result["created"] || 0, skipped: result["skipped"] || 0 }
+    else
+      puts "\nError from API: #{response.code} - #{response.body}"
+      raise "API upload failed"
+    end
+  rescue => e
+    puts "\nError uploading batch via API: #{e.message}"
     raise
   end
 end
