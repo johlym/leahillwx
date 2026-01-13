@@ -9,3 +9,8 @@ delete_old_forecasts_job:
 update_third_party_weather_platforms_job:
   cron: "every 15 seconds"
   class: "UpdateThirdPartyWeatherPlatformsJob"
+
+generate_report_job:
+  cron: "every 12:01 AM in America/Los_Angeles"
+  class: "GenerateReportJob"
+  description: "Generate daily climatological report entry at 12:01 AM"
