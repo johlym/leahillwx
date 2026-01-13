@@ -189,7 +189,7 @@ namespace :weewx do
   end
 
   def import_batch(batch)
-    WeatherMeasurement.insert_all!(batch, record_timestamps: true)
+    WeatherMeasurement.insert_all!(batch, record_timestamps: true, unique_by: :reading_date_time)
   rescue => e
     puts "\nError importing batch: #{e.message}"
     puts "First record in batch: #{batch.first.inspect}"

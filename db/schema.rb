@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_13_054202) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_13_205847) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -80,7 +80,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_13_054202) do
     t.float "uvi", null: false
     t.integer "wind_dir", null: false
     t.float "wind_speed", null: false
-    t.index ["reading_date_time"], name: "index_weather_measurements_on_reading_date_time"
+    t.index ["reading_date_time"], name: "index_weather_measurements_on_reading_date_time", unique: true
   end
 
   add_foreign_key "report_entries", "reports", on_delete: :cascade

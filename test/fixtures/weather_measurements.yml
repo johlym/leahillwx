@@ -23,7 +23,7 @@
 #
 # Indexes
 #
-#  index_weather_measurements_on_reading_date_time  (reading_date_time)
+#  index_weather_measurements_on_reading_date_time  (reading_date_time) UNIQUE
 #
 one:
   barometer_abs: 1.5
