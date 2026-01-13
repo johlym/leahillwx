@@ -10,13 +10,14 @@ class BulkWriteMeasurementsJob
       m.merge("created_at" => now, "updated_at" => now)
     end
 
-    # Check for existing records
-    timestamps = records.map { |r| r["reading_date_time"] }
+    # Check for existing records - parse string timestamps to DateTime for comparison
+    timestamps = records.map { |r| Time.zone.parse(r["reading_date_time"]) }
     existing_timestamps = WeatherMeasurement.where(reading_date_time: timestamps).pluck(:reading_date_time).to_set
 
     # Filter out duplicates
     new_records = records.reject do |record|
-      if existing_timestamps.include?(record["reading_date_time"])
+      record_time = Time.zone.parse(record["reading_date_time"])
+      if existing_timestamps.include?(record_time)
         Rails.logger.info("Skipping duplicate measurement at #{record['reading_date_time']}")
         true
       else
