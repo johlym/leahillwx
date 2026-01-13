@@ -33,9 +33,10 @@ class Api::V1::WeatherMeasurementsController < ApiController
       return render json: { error: "Maximum #{MAX_BULK_RECORDS} measurements allowed per request" }, status: :unprocessable_entity
     end
 
-    # Convert to JSON-serializable array of hashes for Sidekiq
+    # Convert to plain Hash array for Sidekiq strict_args (no HashWithIndifferentAccess)
     records = measurements_params.map do |measurement_data|
-      permit_measurement_params(measurement_data).to_h.stringify_keys
+      # Use JSON round-trip to ensure plain Hash with string keys
+      JSON.parse(permit_measurement_params(measurement_data).to_json)
     end
 
     # Enqueue background job
