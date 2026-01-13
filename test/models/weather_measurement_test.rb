@@ -19,6 +19,10 @@
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #
+# Indexes
+#
+#  index_weather_measurements_on_reading_date_time  (reading_date_time)
+#
 require "test_helper"
 
 class WeatherMeasurementTest < ActiveSupport::TestCase

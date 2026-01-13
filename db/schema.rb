@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_11_230606) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_13_054202) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -18,6 +18,50 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_11_230606) do
     t.datetime "created_at", null: false
     t.jsonb "forecast"
     t.datetime "updated_at", null: false
+  end
+
+  create_table "report_entries", force: :cascade do |t|
+    t.float "avg_wind_speed"
+    t.float "cool_degree_days"
+    t.datetime "created_at", null: false
+    t.integer "day", null: false
+    t.float "heat_degree_days"
+    t.float "high_temp"
+    t.string "high_temp_time"
+    t.float "high_wind_speed"
+    t.string "high_wind_time"
+    t.float "low_temp"
+    t.string "low_temp_time"
+    t.float "mean_temp"
+    t.boolean "partial_day", default: false, null: false
+    t.float "rain"
+    t.bigint "report_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "wind_dir"
+    t.string "wind_dir_compass"
+    t.index ["report_id", "day"], name: "index_report_entries_on_report_id_and_day", unique: true
+    t.index ["report_id"], name: "index_report_entries_on_report_id"
+  end
+
+  create_table "reports", force: :cascade do |t|
+    t.float "avg_wind_speed"
+    t.datetime "created_at", null: false
+    t.integer "dominant_wind_dir"
+    t.string "dominant_wind_dir_compass"
+    t.integer "month", null: false
+    t.float "month_high_temp"
+    t.integer "month_high_temp_day"
+    t.integer "month_high_wind_day"
+    t.float "month_high_wind_speed"
+    t.float "month_low_temp"
+    t.integer "month_low_temp_day"
+    t.float "month_mean_temp"
+    t.float "total_cool_degree_days"
+    t.float "total_heat_degree_days"
+    t.float "total_rain"
+    t.datetime "updated_at", null: false
+    t.integer "year", null: false
+    t.index ["year", "month"], name: "index_reports_on_year_and_month", unique: true
   end
 
   create_table "weather_measurements", force: :cascade do |t|
@@ -36,5 +80,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_11_230606) do
     t.float "uvi", null: false
     t.integer "wind_dir", null: false
     t.float "wind_speed", null: false
+    t.index ["reading_date_time"], name: "index_weather_measurements_on_reading_date_time"
   end
+
+  add_foreign_key "report_entries", "reports", on_delete: :cascade
 end
