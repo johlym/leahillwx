@@ -81,6 +81,18 @@ export default class extends Controller {
     this.clearMessage()
   }
   
+  enableGoButton() {
+    const year = this.yearSelectTarget.value
+    const month = this.monthSelectTarget.value
+    
+    if (year && month) {
+      this.goButtonTarget.disabled = false
+      this.clearMessage()
+    } else {
+      this.goButtonTarget.disabled = true
+    }
+  }
+  
   navigateToReport() {
     const year = this.yearSelectTarget.value
     const month = this.monthSelectTarget.value
