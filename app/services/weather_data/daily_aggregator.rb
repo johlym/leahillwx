@@ -3,7 +3,7 @@ module WeatherData
     include WeatherUnitConversions
     include WindVectorAveraging
 
-    EXPECTED_MEASUREMENTS_PER_DAY = 17280
+    EXPECTED_MEASUREMENTS_PER_DAY = 1440
 
     attr_reader :date, :measurements
 
@@ -69,8 +69,8 @@ module WeatherData
     end
 
     def calculate_daily_stats
-      temps_f = measurements.map { |m| celsius_to_fahrenheit(m.temperature) }
-      mean_temp_f = temps_f.sum / temps_f.size
+      temps_c = measurements.map(&:temperature)
+      mean_temp_c = temps_c.sum / temps_c.size
 
       high_measurement = measurements.max_by(&:temperature)
       low_measurement = measurements.min_by(&:temperature)
@@ -85,11 +85,14 @@ module WeatherData
       final_rain = measurements.last&.rain_day || 0.0
       rain_inches = mm_to_inches(final_rain)
 
+      # Convert mean temp to Fahrenheit for degree day calculations
+      mean_temp_f = celsius_to_fahrenheit(mean_temp_c)
+
       {
-        mean_temp: mean_temp_f,
-        high_temp: celsius_to_fahrenheit(high_measurement.temperature),
+        mean_temp: mean_temp_c,
+        high_temp: high_measurement.temperature,
         high_temp_time: format_time(high_measurement.reading_date_time),
-        low_temp: celsius_to_fahrenheit(low_measurement.temperature),
+        low_temp: low_measurement.temperature,
         low_temp_time: format_time(low_measurement.reading_date_time),
         heat_degree_days: calculate_heat_degree_days(mean_temp_f),
         cool_degree_days: calculate_cool_degree_days(mean_temp_f),
@@ -103,7 +106,7 @@ module WeatherData
     end
 
     def partial_day?
-      measurements.count < (EXPECTED_MEASUREMENTS_PER_DAY * 0.9)
+      measurements.count < (EXPECTED_MEASUREMENTS_PER_DAY * 0.8)
     end
 
     def format_time(datetime)

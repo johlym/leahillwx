@@ -16,7 +16,8 @@ class ReportEntry < ApplicationRecord
 
   def formatted_temp(temp)
     return "N/A" if temp.nil?
-    format("%.2f", temp)
+    temp_f = celsius_to_fahrenheit(temp)
+    format("%.2f", temp_f)
   end
 
   def formatted_time(time)
