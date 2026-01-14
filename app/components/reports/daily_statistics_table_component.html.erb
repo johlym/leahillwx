@@ -1,0 +1,47 @@
+<div class="daily-data">
+  <h2>Daily Data</h2>
+  <p class="subtitle">Temperature (°F), Rain (in), Wind Speed (mph)</p>
+  
+  <div class="report-table-wrapper">
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th scope="col">Day</th>
+          <th scope="col">Average<br />Temperature</th>
+          <th scope="col">High<br />Temperature</th>
+          <th scope="col">Low<br />Temperature</th>
+          <th scope="col">Heat° Days</th>
+          <th scope="col">Cool° Days</th>
+          <th scope="col">Rain</th>
+          <th scope="col">Avg<br />Wind Speed</th>
+          <th scope="col">High<br />Wind Speed</th>
+          <th scope="col">Dom.<br />Wind Dir.</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% daily_data.each do |row| %>
+          <tr<%= ' class=partial-day' if row.partial_day? %>>
+            <td <% if !row.has_data? %><%= 'class=no-data' %><% end %>><%= row.day %><%= '*' if row.partial_day? %></td>
+            <% if !row.has_data? %>
+              <% if row.is_current_day %>
+                <td colspan="9" class="no-data">current day</td>
+              <% else %>
+                <td colspan="9" class="no-data">N/A</td>
+              <% end %>
+            <% else %>
+              <td class="<%= 'font-bold' if row.is_max_mean_temp %>"><%= number_with_precision(row.entry.mean_temp.to_fahrenheit, precision: 2) %>° F</td>
+              <td class="<%= 'font-bold' if row.is_max_high_temp %>"><%= number_with_precision(row.entry.high_temp.to_fahrenheit, precision: 2) %>° F @ <%= row.entry.high_temp_time || 'N/A' %></td>
+              <td class="<%= 'font-bold' if row.is_max_low_temp %>"><%= number_with_precision(row.entry.low_temp.to_fahrenheit, precision: 2) %>° F @ <%= row.entry.low_temp_time || 'N/A' %></td>
+              <td class="<%= 'font-bold' if row.is_max_heat_dd %>"><%= number_with_precision(row.entry.heat_degree_days, precision: 2) %></td>
+              <td class="<%= 'font-bold' if row.is_max_cool_dd %>"><%= number_with_precision(row.entry.cool_degree_days, precision: 2) %></td>
+              <td class="<%= 'font-bold' if row.is_max_rain %>"><%= number_with_precision(row.entry.rain, precision: 2) %> in</td>
+              <td class="<%= 'font-bold' if row.is_max_avg_wind %>"><%= number_with_precision(row.entry.avg_wind_speed, precision: 2) %> mph</td>
+              <td class="<%= 'font-bold' if row.is_max_high_wind %>"><%= number_with_precision(row.entry.high_wind_speed, precision: 2) %> mph @ <%= row.entry.high_wind_time || 'N/A' %></td>
+              <td><%= row.entry.formatted_wind_dir %> <i class="fa-fw fa-sharp-duotone fa-light fa-location-arrow-up" style="--fa-primary-color: #444444; --fa-secondary-color: #444444; --fa-secondary-opacity: 0.2; display: inline-block; transform: rotate(<%= row.entry.wind_dir %>deg);"></i></td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
