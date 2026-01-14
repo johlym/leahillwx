@@ -32,9 +32,9 @@
               <td class="<%= 'font-bold' if row.is_max_mean_temp %>"><%= number_with_precision(row.entry.mean_temp.to_fahrenheit, precision: 2) %>° F</td>
               <td class="<%= 'font-bold' if row.is_max_high_temp %>"><%= number_with_precision(row.entry.high_temp.to_fahrenheit, precision: 2) %>° F @ <%= row.entry.high_temp_time || 'N/A' %></td>
               <td class="<%= 'font-bold' if row.is_max_low_temp %>"><%= number_with_precision(row.entry.low_temp.to_fahrenheit, precision: 2) %>° F @ <%= row.entry.low_temp_time || 'N/A' %></td>
-              <td class="<%= 'font-bold' if row.is_max_heat_dd %>"><%= number_with_precision(row.entry.heat_degree_days, precision: 2) %></td>
-              <td class="<%= 'font-bold' if row.is_max_cool_dd %>"><%= number_with_precision(row.entry.cool_degree_days, precision: 2) %></td>
-              <td class="<%= 'font-bold' if row.is_max_rain %>"><%= number_with_precision(row.entry.rain, precision: 2) %> in</td>
+              <td class="<%= 'font-bold' if row.is_max_heat_dd %>"><%= number_with_precision(row.entry.heat_degree_days, precision: 2) %>°</td>
+              <td class="<%= 'font-bold' if row.is_max_cool_dd %>"><%= number_with_precision(row.entry.cool_degree_days, precision: 2) %>°</td>
+              <td class="<%= 'font-bold' if row.is_max_rain %>"><%= number_with_precision(row.entry.rain, precision: 2) %> in.</td>
               <td class="<%= 'font-bold' if row.is_max_avg_wind %>"><%= number_with_precision(row.entry.avg_wind_speed, precision: 2) %> mph</td>
               <td class="<%= 'font-bold' if row.is_max_high_wind %>"><%= number_with_precision(row.entry.high_wind_speed, precision: 2) %> mph @ <%= row.entry.high_wind_time || 'N/A' %></td>
               <td><%= row.entry.formatted_wind_dir %> <i class="fa-fw fa-sharp-duotone fa-light fa-location-arrow-up" style="--fa-primary-color: #444444; --fa-secondary-color: #444444; --fa-secondary-opacity: 0.2; display: inline-block; transform: rotate(<%= row.entry.wind_dir %>deg);"></i></td>
