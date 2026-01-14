@@ -43,7 +43,7 @@ export default class extends Controller {
     const years = Object.keys(this.availableReports).sort((a, b) => b - a)
     
     years.forEach(year => {
-      const option = document.createElement("option")
+      const option = document.createElement('option')
       option.value = year
       option.textContent = year
       this.yearSelectTarget.appendChild(option)
@@ -71,7 +71,7 @@ export default class extends Controller {
     }
     
     months.forEach(monthName => {
-      const option = document.createElement("option")
+      const option = document.createElement('option')
       option.value = monthName
       option.textContent = this.capitalize(monthName)
       this.monthSelectTarget.appendChild(option)
@@ -104,7 +104,7 @@ export default class extends Controller {
     
     window.location.href = `/reports/${year}/${month}`
   }
-  
+
   getMonthName(monthNumber) {
     const months = [
       "january", "february", "march", "april", "may", "june",
