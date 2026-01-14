@@ -16,9 +16,14 @@
     </div>
     <div class="sidebar-column">
       <%= render Ui::ForecastWeather::GenericTileComponent.new(heading: "NWS Radar") do %>
-      <p class="p-2">
-        <%= image_tag "https://radar.weather.gov/ridge/standard/PACNORTHWEST_loop.gif", alt: "Radar" %>
-      </p>
+        <div data-controller="image-refresh" data-image-refresh-interval-value="300000">
+          <p class="forecast-timestamp">
+            Next refresh in <span data-image-refresh-target="countdown" class="font-mono">300</span> seconds.
+          </p>
+          <p class="p-2">
+            <%= image_tag "https://radar.weather.gov/ridge/standard/PACNORTHWEST_loop.gif", alt: "Radar" %>
+          </p>
+        </div>
       <% end %>
       <%= render Ui::ForecastWeather::GenericTileComponent.new(heading: "Auburn Traffic Cameras") do %>
         <div data-controller="image-refresh">
