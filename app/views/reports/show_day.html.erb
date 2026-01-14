@@ -3,6 +3,8 @@
   
   <h1>Climatological Summary <small>for <%= @report.month_name %> <%= @day %>, <%= @report.year %></small></h1>
 
+  <%= render Reports::DownloadLinkComponent.new(path: report_day_path(@report.year, Date::MONTHNAMES[@report.month].downcase, @day)) %>
+
   <% if @daily_entry && @daily_entry.has_data? %>
     <%= render Reports::OverviewStatisticsTableComponent.new(report: @report, type: :daily, day: @day) %>
   <% else %>
