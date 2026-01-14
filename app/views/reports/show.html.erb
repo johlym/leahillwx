@@ -68,7 +68,7 @@
             <% is_current_day = day == Date.today.day && @report.year == Date.today.year && @report.month == Date.today.month %>
             <% next if is_future_day %>
             
-            <tr<%= ' class="partial-day"' if entry&.partial_day %>>
+            <tr<%= ' class=partial-day' if entry&.partial_day %>>
               <td <% if entry.nil? || !entry.has_data? %><%= 'class=no-data' %><% end %>><%= day %></td>
               <% if entry.nil? || !entry.has_data? %>
                 <% if is_current_day %>
