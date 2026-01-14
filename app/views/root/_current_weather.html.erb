@@ -18,5 +18,5 @@
 <% end %>
 <%= render Ui::CurrentWeather::WeatherTileComponent.new(tile_type: "current-solar", heading: "Solar Irradiance") do |c| %>
   <% c.with_primary_value { "#{number_with_precision(current.uv, precision: 2, strip_insignificant_zeros: true)} W/m2" } %>
-  <% c.with_secondary_value { "#{number_with_precision(current.light, precision: 2, strip_insignificant_zeros: true)} lux" } %>
+  <% c.with_secondary_value { "#{number_with_delimiter(number_with_precision(current.light, precision: 2, strip_insignificant_zeros: true))} lux" } %>
 <% end %>
