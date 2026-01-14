@@ -1,6 +1,6 @@
 <%= turbo_stream_from "weather_measurements" %>
 
-<div class="weather-container">
+<div class="primary-container">
   <div class="weather-grid">
     <div id="current_weather" class="contents">
       <%= render partial: "current_weather", locals: { current: @current } %>
