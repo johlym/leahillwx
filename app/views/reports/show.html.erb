@@ -13,7 +13,7 @@
       <li>Times shown in 24-hour format (HH:MM) in the <code>America/Los_Angeles</code> timezone</li>
       <li>Days with no data shown as "N/A"</li>
       <% if has_partial_days?(@report) %>
-        <li>An <code>*</code> and a row in <span class="text-yellow-800 bg-yellow-50 px-1">yellow</span> indicates partial day (incomplete measurements)</li>
+        <li>An <code>*</code> and a row in <span class="text-yellow-800 bg-yellow-50 px-1">yellow</span> indicates an incomplete set of measurements (less than 80% of the minimum measurements in a given day).</li>
       <% end %>
     </ul>
   </div>
