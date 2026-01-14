@@ -1,0 +1,26 @@
+<div class="primary-container report-container">
+  <%= render Reports::ReportNavigationComponent.new(current_year: @report.year, current_month: @report.month) %>
+  
+  <h1>Climatological Summary <small>for <%= @report.month_name %> <%= @day %>, <%= @report.year %></small></h1>
+
+  <% if @daily_entry && @daily_entry.has_data? %>
+    <%= render Reports::OverviewStatisticsTableComponent.new(report: @report, type: :daily, day: @day) %>
+  <% else %>
+    <div class="monthly-statistics">
+      <h2>Daily Summary</h2>
+      <p class="text-center text-slate-500 py-4">No data available for this day.</p>
+    </div>
+  <% end %>
+
+  <%= render Reports::StatisticsTableComponent.new(report: @report, day: @day, period_type: :hourly, has_partial_periods: @report.entries.hourly.for_day(@day).any?(&:partial_period)) %>
+
+  <div class="notes">
+    <h3>Notes:</h3>
+    <ul>
+      <li>Times shown in 24-hour format (HH:MM) in the <code>America/Los_Angeles</code> timezone</li>
+      <li>Hours with no data shown as "N/A"</li>
+      <li><%= link_to "← Back to Monthly Report", report_path(@report.year, Date::MONTHNAMES[@report.month].downcase) %></li>
+    </ul>
+  </div>
+  <p class="text-center text-xs">Report generated in <%= @generation_time %> seconds</p>
+</div>

@@ -27,6 +27,7 @@ Rails.application.routes.draw do
   get "reports", to: "reports#index", as: :reports
   get "reports/available", to: "reports#available", as: :available_reports
   get "reports/:year/:month_name", to: "reports#show", as: :report
+  get "reports/:year/:month_name/:day", to: "reports#show_day", as: :report_day
 
   get "up" => "rails/health#show", as: :rails_health_check
 end

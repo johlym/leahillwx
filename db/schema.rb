@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_13_233106) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_14_043401) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -30,16 +30,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_13_233106) do
     t.string "high_temp_time"
     t.float "high_wind_speed"
     t.string "high_wind_time"
+    t.integer "hour"
     t.float "low_temp"
     t.string "low_temp_time"
     t.float "mean_temp"
-    t.boolean "partial_day", default: false, null: false
+    t.boolean "partial_period", default: false, null: false
     t.float "rain"
     t.bigint "report_id", null: false
     t.datetime "updated_at", null: false
     t.integer "wind_dir"
     t.string "wind_dir_compass"
-    t.index ["report_id", "day"], name: "index_report_entries_on_report_id_and_day", unique: true
+    t.index ["report_id", "day", "hour"], name: "index_report_entries_on_report_day_hour", unique: true
     t.index ["report_id"], name: "index_report_entries_on_report_id"
   end
 

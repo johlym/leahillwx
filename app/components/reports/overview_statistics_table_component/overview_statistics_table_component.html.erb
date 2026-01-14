@@ -1,5 +1,5 @@
-<div class="monthly-statistics">
-  <h2>Monthly Statistics</h2>
+<div class="overview-statistics">
+  <h2><%= type == :monthly ? "Monthly" : "Daily" %> Overview</h2>
   <div class="stats-table-wrapper">
     <table class="stats-table">
       <thead>
@@ -25,7 +25,7 @@
           <td><%= number_with_precision(report.total_rain, precision: 2) %> in.</td>
           <td><%= number_with_precision(report.avg_wind_speed, precision: 2) %> mph</td>
           <td><%= number_with_precision(report.month_high_wind_speed, precision: 2) %> mph<br><span class="text-xs">(Day <%= report.month_high_wind_day || 'N/A' %>)</span></td>
-          <td><%= report.formatted_dominant_wind %></td>
+          <td><%= report.formatted_dominant_wind %> <%= render Elements::WindVaneComponent.new(direction: report.dominant_wind_dir) %></td>
         </tr>
       </tbody>
     </table>

@@ -46,6 +46,59 @@ namespace :reports do
     puts "=" * 80
   end
 
+  desc "Backfill hourly reports for a specific day or date range"
+  task :backfill_hourly, [ :start_date, :end_date ] => :environment do |_t, args|
+    start_date = args[:start_date] ? Date.parse(args[:start_date]) : Date.parse("2021-12-01")
+    end_date = args[:end_date] ? Date.parse(args[:end_date]) : Date.yesterday
+
+    puts "=" * 80
+    puts "Backfilling Hourly Weather Reports"
+    puts "=" * 80
+    puts "Start date: #{start_date}"
+    puts "End date:   #{end_date}"
+    puts "Total days: #{(end_date - start_date).to_i + 1}"
+    puts "Total hours: #{((end_date - start_date).to_i + 1) * 24}"
+    puts "=" * 80
+    puts
+
+    if start_date > end_date
+      puts "ERROR: Start date must be before or equal to end date"
+      exit 1
+    end
+
+    processed = 0
+    errors = 0
+    total_hours = ((end_date - start_date).to_i + 1) * 24
+
+    (start_date..end_date).each do |date|
+      puts "\nProcessing #{date}..."
+      (0..23).each do |hour|
+        datetime = Time.zone.parse("#{date} #{hour}:00:00")
+        print "  Hour #{hour.to_s.rjust(2, '0')}:00... "
+
+        begin
+          aggregator = WeatherData::HourlyAggregator.new(datetime)
+          entry = aggregator.aggregate
+
+          status = entry.partial_period ? "✓ (partial)" : "✓"
+          puts status
+          processed += 1
+        rescue StandardError => e
+          puts "✗ ERROR: #{e.message}"
+          errors += 1
+        end
+      end
+    end
+
+    puts
+    puts "=" * 80
+    puts "Hourly Backfill Complete"
+    puts "=" * 80
+    puts "Processed: #{processed}/#{total_hours} hours"
+    puts "Errors:    #{errors} hours"
+    puts "=" * 80
+  end
+
   desc "Purge and regenerate a specific report"
   task :purge, [ :year, :month ] => :environment do |_t, args|
     unless args[:year] && args[:month]

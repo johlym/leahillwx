@@ -1,14 +1,14 @@
-<div class="daily-data">
-  <h2>Daily Data</h2>
+<div class="<%= daily? ? 'daily-data' : 'hourly-data' %>">
+  <h2>Statistics by <%= daily? ? 'Day' : 'Hour' %></h2>
   <p class="subtitle">Temperature (°F), Rain (in), Wind Speed (mph)</p>
   <div class="partial-day-note">
-    An <code>*</code> and a row in <strong>yellow</strong> indicates an incomplete set of measurements (less than 80% of the minimum measurements in a given day).
+    <%= partial_note.html_safe %>
   </div>
   <div class="report-table-wrapper">
     <table class="report-table">
       <thead>
         <tr>
-          <th scope="col">Day</th>
+          <th scope="col"><%= period_label %></th>
           <th scope="col">Average<br />Temperature</th>
           <th scope="col">High<br />Temperature</th>
           <th scope="col">Low<br />Temperature</th>
@@ -21,12 +21,19 @@
         </tr>
       </thead>
       <tbody>
-        <% daily_data.each do |row| %>
-          <tr<%= ' class=partial-day' if row.partial_day? %>>
-            <td <% if !row.has_data? %><%= 'class=no-data' %><% end %>><%= row.day %><%= '*' if row.partial_day? %></td>
+        <% period_data.each do |row| %>
+          <tr<%= ' class=partial-day' if row.partial_period? %>>
+            <td <% if !row.has_data? %><%= 'class=no-data' %><% end %>>
+              <% if daily? %>
+                <%= link_to row.period, report_day_path(row.report.year, Date::MONTHNAMES[row.report.month].downcase, row.period) %>
+              <% else %>
+                <%= row.period %>
+              <% end %>
+              <%= '*' if row.partial_period? %>
+            </td>
             <% if !row.has_data? %>
-              <% if row.is_current_day %>
-                <td colspan="9" class="no-data">current day</td>
+              <% if row.is_current %>
+                <td colspan="9" class="no-data">current <%= daily? ? 'day' : 'hour' %></td>
               <% else %>
                 <td colspan="9" class="no-data">N/A</td>
               <% end %>
@@ -39,7 +46,7 @@
               <td class="<%= 'font-bold' if row.is_max_rain %>"><%= number_with_precision(row.entry.rain, precision: 2) %> in.</td>
               <td class="<%= 'font-bold' if row.is_max_avg_wind %>"><%= number_with_precision(row.entry.avg_wind_speed, precision: 2) %> mph</td>
               <td class="<%= 'font-bold' if row.is_max_high_wind %>"><%= number_with_precision(row.entry.high_wind_speed, precision: 2) %> mph @ <%= row.entry.high_wind_time || 'N/A' %></td>
-              <td><%= row.entry.formatted_wind_dir %> <i class="fa-fw fa-sharp-duotone fa-light fa-location-arrow-up" style="--fa-primary-color: #444444; --fa-secondary-color: #444444; --fa-secondary-opacity: 0.2; display: inline-block; transform: rotate(<%= row.entry.wind_dir %>deg);"></i></td>
+              <td><%= row.entry.formatted_wind_dir %> <%= render Elements::WindVaneComponent.new(direction: row.entry.wind_dir) %></td>
             <% end %>
           </tr>
         <% end %>

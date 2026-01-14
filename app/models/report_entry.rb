@@ -11,10 +11,11 @@
 #  high_temp_time   :string
 #  high_wind_speed  :float
 #  high_wind_time   :string
+#  hour             :integer
 #  low_temp         :float
 #  low_temp_time    :string
 #  mean_temp        :float
-#  partial_day      :boolean          default(FALSE), not null
+#  partial_period   :boolean          default(FALSE), not null
 #  rain             :float
 #  wind_dir         :integer
 #  wind_dir_compass :string
@@ -24,8 +25,8 @@
 #
 # Indexes
 #
-#  index_report_entries_on_report_id          (report_id)
-#  index_report_entries_on_report_id_and_day  (report_id,day) UNIQUE
+#  index_report_entries_on_report_day_hour  (report_id,day,hour) UNIQUE
+#  index_report_entries_on_report_id        (report_id)
 #
 # Foreign Keys
 #
@@ -37,11 +38,32 @@ class ReportEntry < ApplicationRecord
   belongs_to :report
 
   validates :day, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 31 }
-  validates :day, uniqueness: { scope: :report_id }
-  validates :partial_day, inclusion: { in: [ true, false ] }
+  validates :hour, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 23, allow_nil: true }
+  validates :day, uniqueness: { scope: [ :report_id, :hour ] }
+  validates :partial_period, inclusion: { in: [ true, false ] }
 
-  scope :ordered, -> { order(:day) }
+  scope :ordered, -> { order(:day, :hour) }
   scope :with_data, -> { where.not(mean_temp: nil) }
+  scope :daily, -> { where(hour: nil) }
+  scope :hourly, -> { where.not(hour: nil) }
+  scope :for_day, ->(day) { where(day: day) }
+  scope :for_hour, ->(hour) { where(hour: hour) }
+
+  def daily?
+    hour.nil?
+  end
+
+  def hourly?
+    hour.present?
+  end
+
+  def period_label
+    if hourly?
+      "Hour #{hour}"
+    else
+      "Day #{day}"
+    end
+  end
 
   def has_data?
     mean_temp.present? || high_temp.present? || low_temp.present?

@@ -11,10 +11,11 @@
 #  high_temp_time   :string
 #  high_wind_speed  :float
 #  high_wind_time   :string
+#  hour             :integer
 #  low_temp         :float
 #  low_temp_time    :string
 #  mean_temp        :float
-#  partial_day      :boolean          default(FALSE), not null
+#  partial_period   :boolean          default(FALSE), not null
 #  rain             :float
 #  wind_dir         :integer
 #  wind_dir_compass :string
@@ -24,8 +25,8 @@
 #
 # Indexes
 #
-#  index_report_entries_on_report_id          (report_id)
-#  index_report_entries_on_report_id_and_day  (report_id,day) UNIQUE
+#  index_report_entries_on_report_day_hour  (report_id,day,hour) UNIQUE
+#  index_report_entries_on_report_id        (report_id)
 #
 # Foreign Keys
 #
@@ -87,9 +88,9 @@ class ReportEntryTest < ActiveSupport::TestCase
     assert_equal "N/A", entry.formatted_temp(nil)
   end
 
-  test "partial_day should default to false" do
+  test "partial_period should default to false" do
     entry = @report.entries.create!(day: 1)
-    assert_equal false, entry.partial_day
+    assert_equal false, entry.partial_period
   end
 
   test "should handle all formatting methods" do

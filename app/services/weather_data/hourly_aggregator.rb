@@ -1,14 +1,14 @@
 module WeatherData
-  class DailyAggregator
+  class HourlyAggregator
     include WeatherUnitConversions
     include WindVectorAveraging
 
-    EXPECTED_MEASUREMENTS_PER_DAY = 1440
+    EXPECTED_MEASUREMENTS_PER_HOUR = 60
 
-    attr_reader :date, :measurements
+    attr_reader :datetime, :measurements
 
-    def initialize(date)
-      @date = date.is_a?(Date) ? date : Date.parse(date.to_s)
+    def initialize(datetime)
+      @datetime = datetime.is_a?(Time) ? datetime : Time.parse(datetime.to_s)
       @measurements = fetch_measurements
     end
 
@@ -16,33 +16,31 @@ module WeatherData
       report = find_or_create_report
       entry = create_or_update_entry(report)
 
-      WeatherData::MonthlyStatsCalculator.new(report).calculate
-
       entry
     end
 
     private
 
     def fetch_measurements
-      start_time = @date.in_time_zone("America/Los_Angeles").beginning_of_day
-      end_time = @date.in_time_zone("America/Los_Angeles").end_of_day
+      start_time = @datetime.in_time_zone("America/Los_Angeles").beginning_of_hour
+      end_time = @datetime.in_time_zone("America/Los_Angeles").end_of_hour
 
       WeatherMeasurement.where(reading_date_time: start_time..end_time)
                        .order(:reading_date_time)
     end
 
     def find_or_create_report
-      Report.find_or_create_by!(year: @date.year, month: @date.month)
+      Report.find_or_create_by!(year: @datetime.year, month: @datetime.month)
     end
 
     def create_or_update_entry(report)
-      entry = report.entries.find_or_initialize_by(day: @date.day)
+      entry = report.entries.find_or_initialize_by(day: @datetime.day, hour: @datetime.hour)
 
       if measurements.empty?
         entry.assign_attributes(no_data_attributes)
       else
-        entry.assign_attributes(calculate_daily_stats)
-        entry.partial_period = is_partial_day?
+        entry.assign_attributes(calculate_hourly_stats)
+        entry.partial_period = is_partial_hour?
       end
 
       entry.save!
@@ -64,11 +62,11 @@ module WeatherData
         high_wind_time: nil,
         wind_dir: nil,
         wind_dir_compass: nil,
-        partial_day: false
+        partial_period: false
       }
     end
 
-    def calculate_daily_stats
+    def calculate_hourly_stats
       temps_c = measurements.map(&:temperature)
       mean_temp_c = temps_c.sum / temps_c.size
 
@@ -95,8 +93,8 @@ module WeatherData
         high_temp_time: format_time(high_measurement.reading_date_time),
         low_temp: low_measurement.temperature,
         low_temp_time: format_time(low_measurement.reading_date_time),
-        heat_degree_days: calculate_heat_degree_days(mean_temp_f),
-        cool_degree_days: calculate_cool_degree_days(mean_temp_f),
+        heat_degree_days: calculate_heat_degree_days(mean_temp_f) / 24.0, # Proportional to hour
+        cool_degree_days: calculate_cool_degree_days(mean_temp_f) / 24.0, # Proportional to hour
         rain: rain_inches,
         avg_wind_speed: avg_wind_speed_mph,
         high_wind_speed: mps_to_mph(gust_measurement.gust_speed),
@@ -106,8 +104,8 @@ module WeatherData
       }
     end
 
-    def partial_day?
-      measurements.count < (EXPECTED_MEASUREMENTS_PER_DAY * 0.8)
+    def is_partial_hour?
+      measurements.count < (EXPECTED_MEASUREMENTS_PER_HOUR * 0.8)
     end
 
     def format_time(datetime)

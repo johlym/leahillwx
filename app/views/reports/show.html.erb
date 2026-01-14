@@ -1,11 +1,11 @@
 <div class="primary-container report-container">
   <%= render Reports::ReportNavigationComponent.new(current_year: @report.year, current_month: @report.month) %>
   
-  <h1>Monthly Climatological Summary <small>for <%= @report.month_name %> <%= @report.year %></small></h1>
+  <h1>Climatological Summary <small>for <%= @report.month_name %> <%= @report.year %></small></h1>
 
-  <%= render Reports::MonthlyStatisticsTableComponent.new(report: @report) %>
+  <%= render Reports::OverviewStatisticsTableComponent.new(report: @report) %>
 
-  <%= render Reports::DailyStatisticsTableComponent.new(report: @report, has_partial_days: has_partial_days?(@report)) %>
+  <%= render Reports::StatisticsTableComponent.new(report: @report, period_type: :daily, has_partial_periods: has_partial_days?(@report)) %>
 
   <div class="notes">
     <h3>Notes:</h3>

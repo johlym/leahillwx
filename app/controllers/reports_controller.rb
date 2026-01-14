@@ -51,6 +51,41 @@ class ReportsController < ApplicationController
     end
   end
 
+  def show_day
+    @start_time = Time.current
+
+    year = params[:year].to_i
+    month_name = params[:month_name]
+    @day = params[:day].to_i
+    month_num = Date::MONTHNAMES.index(month_name.capitalize)
+
+    unless month_num
+      render_not_found("Invalid month name: #{month_name}")
+      return
+    end
+
+    unless @day.between?(1, 31)
+      render_not_found("Invalid day: #{@day}")
+      return
+    end
+
+    @report = Report.includes(:entries).find_by(year: year, month: month_num)
+
+    unless @report
+      render_not_found("Report not found for #{month_name.capitalize} #{year}")
+      return
+    end
+
+    # Get the daily entry for summary statistics
+    @daily_entry = @report.entries.daily.find_by(day: @day)
+
+    @generation_time = (Time.current - @start_time).round(2)
+
+    respond_to do |format|
+      format.html # renders show_day.html.erb
+    end
+  end
+
   private
 
   def render_not_found(message)

@@ -9,7 +9,7 @@ module ReportsHelper
                day, "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A")
       end
     else
-      partial_indicator = entry.partial_day ? "*" : ""
+      partial_indicator = entry.partial_period ? "*" : ""
 
       format(
         "%3d %6s %6s %5s %6s %5s %6s %6s %6s %6s %6s %5s %10s%s",
@@ -32,6 +32,6 @@ module ReportsHelper
   end
 
   def has_partial_days?(report)
-    report.entries.any?(&:partial_day)
+    report.entries.any?(&:partial_period)
   end
 end
