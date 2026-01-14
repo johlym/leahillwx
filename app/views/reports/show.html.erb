@@ -46,18 +46,15 @@
         <thead>
           <tr>
             <th scope="col">Day</th>
-            <th scope="col">Mean<br>Temp</th>
-            <th scope="col">High</th>
-            <th scope="col">Time</th>
-            <th scope="col">Low</th>
-            <th scope="col">Time</th>
-            <th scope="col">Heat<br>Deg Days</th>
-            <th scope="col">Cool<br>Deg Days</th>
+            <th scope="col">Average<br />Temperature</th>
+            <th scope="col">High<br />Temperature</th>
+            <th scope="col">Low<br />Temperature</th>
+            <th scope="col">Heat° Days</th>
+            <th scope="col">Cool° Days</th>
             <th scope="col">Rain</th>
-            <th scope="col">Avg<br>Wind Speed</th>
-            <th scope="col">High<br>Wind</th>
-            <th scope="col">Time</th>
-            <th scope="col">Dom<br>Dir</th>
+            <th scope="col">Avg<br />Wind Speed</th>
+            <th scope="col">High<br />Wind Speed</th>
+            <th scope="col">Dom.<br />Wind Dir.</th>
           </tr>
         </thead>
         <tbody>
@@ -69,26 +66,23 @@
             <% next if is_future_day %>
             
             <tr<%= ' class=partial-day' if entry&.partial_day %>>
-              <td <% if entry.nil? || !entry.has_data? %><%= 'class=no-data' %><% end %>><%= day %></td>
+              <td <% if entry.nil? || !entry.has_data? %><%= 'class=no-data' %><% end %>><%= day %><%= '*' if entry&.partial_day %></td>
               <% if entry.nil? || !entry.has_data? %>
                 <% if is_current_day %>
-                  <td colspan="12" class="no-data">current day</td>
+                  <td colspan="9" class="no-data">current day</td>
                 <% else %>
-                  <td colspan="12" class="no-data">N/A</td>
+                  <td colspan="9" class="no-data">N/A</td>
                 <% end %>
               <% else %>
-                <td><%= number_with_precision(entry.mean_temp.to_fahrenheit, precision: 2) %></td>
-                <td><%= number_with_precision(entry.high_temp.to_fahrenheit, precision: 2) %></td>
-                <td><%= entry.high_temp_time || 'N/A' %></td>
-                <td><%= number_with_precision(entry.low_temp.to_fahrenheit, precision: 2) %></td>
-                <td><%= entry.low_temp_time || 'N/A' %></td>
+                <td><%= number_with_precision(entry.mean_temp.to_fahrenheit, precision: 2) %>° F</td>
+                <td><%= number_with_precision(entry.high_temp.to_fahrenheit, precision: 2) %>° F @ <%= entry.high_temp_time || 'N/A' %></td>
+                <td><%= number_with_precision(entry.low_temp.to_fahrenheit, precision: 2) %>° F @ <%= entry.low_temp_time || 'N/A' %></td>
                 <td><%= number_with_precision(entry.heat_degree_days, precision: 2) %></td>
                 <td><%= number_with_precision(entry.cool_degree_days, precision: 2) %></td>
-                <td><%= number_with_precision(entry.rain, precision: 2) %></td>
-                <td><%= number_with_precision(entry.avg_wind_speed, precision: 2) %></td>
-                <td><%= number_with_precision(entry.high_wind_speed, precision: 2) %></td>
-                <td><%= entry.high_wind_time || 'N/A' %></td>
-                <td><%= entry.formatted_wind_dir %><%= '*' if entry.partial_day %></td>
+                <td><%= number_with_precision(entry.rain, precision: 2) %> in</td>
+                <td><%= number_with_precision(entry.avg_wind_speed, precision: 2) %> mph</td>
+                <td><%= number_with_precision(entry.high_wind_speed, precision: 2) %> mph @ <%= entry.high_wind_time || 'N/A' %></td>
+                <td><%= entry.formatted_wind_dir %></td>
               <% end %>
             </tr>
           <% end %>
@@ -103,7 +97,7 @@
       <li>Times shown in 24-hour format (HH:MM) in the <code>America/Los_Angeles</code> timezone</li>
       <li>Days with no data shown as "N/A"</li>
       <% if has_partial_days?(@report) %>
-        <li>An <code>*</code> Indicates partial day (incomplete measurements)</li>
+        <li>An <code>*</code> and a row in <span class="text-yellow-800 bg-yellow-50 px-1">yellow</span> indicates partial day (incomplete measurements)</li>
       <% end %>
     </ul>
   </div>

@@ -117,7 +117,7 @@
 
           tr {
             th {
-              @apply py-3.5 px-3 text-center text-xs font-semibold text-gray-900 whitespace-nowrap;
+              @apply py-3.5 px-3 text-xs text-center font-semibold text-gray-900 whitespace-nowrap;
 
               &:first-child {
                 @apply pl-4 sm:pl-6 lg:pl-8;
@@ -131,12 +131,16 @@
         }
 
         tbody {
-          @apply divide-y divide-gray-200 bg-white;
+          @apply divide-y divide-gray-300 bg-white;
 
           tr {
             @apply odd:bg-gray-50;
             &.partial-day {
               @apply bg-yellow-50;
+
+              td {
+                @apply text-yellow-800;
+              }
             }
 
             td {
