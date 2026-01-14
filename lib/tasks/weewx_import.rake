@@ -1,5 +1,5 @@
 namespace :weewx do
-  desc "Import weather data from WeeWX MySQL dump (set USE_API=true to upload via API, UPDATE_RECORDS=true to update existing, OVERWRITE=true to replace all)"
+  desc "Import weather data from WeeWX MySQL dump (set USE_API=true to upload via API, UPDATE_RECORDS=true to update existing, OVERWRITE=true to replace all, VERBOSE=true for detailed logging, SINGLE=true for one-record-at-a-time mode)"
   task :import, [ :sql_file ] => :environment do |t, args|
     require "tempfile"
     require "net/http"
@@ -10,6 +10,7 @@ namespace :weewx do
     use_api = ENV["USE_API"] == "true"
     update_records = ENV["UPDATE_RECORDS"] == "true"
     overwrite = ENV["OVERWRITE"] == "true"
+    single_mode = ENV["SINGLE"] == "true"
 
     unless File.exist?(sql_file)
       puts "Error: File not found: #{sql_file}"
@@ -34,6 +35,7 @@ namespace :weewx do
     puts "API URL: #{api_url}" if use_api
     puts "Update mode: #{update_records}"
     puts "Overwrite mode: #{overwrite}"
+    puts "Single-record mode: #{single_mode}"
     puts ""
 
     # Parse the SQL dump and extract INSERT statements
@@ -44,19 +46,54 @@ namespace :weewx do
 
     # Process each insert statement
     total_records = 0
+    verbose = ENV["VERBOSE"] == "true"
+    batch_size = single_mode ? 1 : 1000
+
     inserts.each_with_index do |insert_sql, idx|
       records = parse_insert_values(insert_sql)
       puts "Processing batch #{idx + 1}/#{inserts.count}: #{records.count} records"
 
-      records.each_slice(1000) do |batch|
+      records.each_slice(batch_size) do |batch|
+        # Show record details in single mode or sample in verbose mode
+        if single_mode && batch.any?
+          record = batch.first
+          puts "  Record #{total_records + 1}:"
+          puts "    Epoch: #{record[:epoch]}"
+          puts "    Time: #{record[:reading_date_time]}"
+          puts "    Temp: #{record[:temperature]&.round(2)}°C"
+          puts "    Rain Day: #{record[:rain_day]&.round(2)}mm"
+          puts "    Rain Rate: #{record[:rain_rate]&.round(2)}mm/hr"
+          puts "    Humidity: #{record[:humidity]}%"
+          puts "    Wind: #{record[:wind_speed]&.round(2)}m/s @ #{record[:wind_dir]}°"
+          puts "    Pressure: #{record[:barometer_abs]&.round(2)}hPa"
+        elsif verbose && batch.any?
+          sample = batch.first
+          puts "  Sample record:"
+          puts "    Epoch: #{sample[:epoch]}"
+          puts "    Time: #{sample[:reading_date_time]}"
+          puts "    Temp: #{sample[:temperature]&.round(2)}°C"
+          puts "    Rain Day: #{sample[:rain_day]&.round(2)}mm"
+          puts "    Rain Rate: #{sample[:rain_rate]&.round(2)}mm/hr"
+          puts "    Humidity: #{sample[:humidity]}%"
+          puts "    Wind: #{sample[:wind_speed]&.round(2)}m/s"
+        end
+
         if use_api
           result = import_batch_via_api(batch, api_url, api_key, update_records, overwrite)
           total_records += result[:created]
-          print "  Imported: #{total_records} records (#{result[:skipped]} skipped)\r"
+          if single_mode
+            puts "    Imported"
+          else
+            print "  Imported: #{total_records} records (#{result[:skipped]} skipped)\r"
+          end
         else
           import_batch(batch, update_records, overwrite)
           total_records += batch.count
-          print "  Imported: #{total_records} records\r"
+          if single_mode
+            puts "    Imported"
+          else
+            print "  Imported: #{total_records} records\r"
+          end
         end
       end
     end
@@ -171,6 +208,7 @@ namespace :weewx do
     rain_rate_mm = is_us_units ? inches_to_mm(rain_rate&.to_f) : rain_rate&.to_f
 
     {
+      epoch: date_time.to_i,
       reading_date_time: Time.at(date_time.to_i).utc,
       barometer_abs: pressure_mbar || 0.0,
       barometer_rel: barometer_mbar || 0.0,
