@@ -1,5 +1,5 @@
 <div class="primary-container report-container">
-  <%= render partial: "reports/navigation", locals: { current_year: @report.year, current_month: @report.month } %>
+  <%= render Reports::ReportNavigationComponent.new(current_year: @report.year, current_month: @report.month) %>
   
   <h1>Monthly Climatological Summary <small>for <%= @report.month_name %> <%= @report.year %></small></h1>
 
