@@ -82,8 +82,9 @@ module WeatherData
       wind_speeds_mph = measurements.map { |m| mps_to_mph(m.wind_speed) }
       avg_wind_speed_mph = wind_speeds_mph.sum / wind_speeds_mph.size
 
-      final_rain = measurements.last&.rain_day || 0.0
-      rain_inches = mm_to_inches(final_rain)
+      # Sum rain_day values since each measurement is incremental rain for that period
+      total_rain_mm = measurements.sum(&:rain_day)
+      rain_inches = mm_to_inches(total_rain_mm)
 
       # Convert mean temp to Fahrenheit for degree day calculations
       mean_temp_f = celsius_to_fahrenheit(mean_temp_c)
