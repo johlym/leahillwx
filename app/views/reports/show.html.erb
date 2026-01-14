@@ -65,7 +65,7 @@
           <% (1..@report.days_in_month).each do |day| %>
             <% entry = entries.find { |e| e.day == day } %>
             <tr<%= ' class="partial-day"' if entry&.partial_day %>>
-              <td><%= day %></td>
+              <td <% if entry.nil? || !entry.has_data? %><%= 'class=no-data' %><% end %>><%= day %></td>
               <% if entry.nil? || !entry.has_data? %>
                 <% if day > Date.today.day && @report.year == Date.today.year && @report.month == Date.today.month %>
                   <td colspan="12" class="future-day"></td>
