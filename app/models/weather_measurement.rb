@@ -94,9 +94,14 @@ class WeatherMeasurement < ApplicationRecord
   end
 
   def render_current_weather_html
+    current_with_count = WeatherMeasurement
+      .select("weather_measurements.*, (SELECT COUNT(*) FROM weather_measurements) as total_count")
+      .order(reading_date_time: :desc)
+      .first
+
     ApplicationController.render(
       partial: "root/current_weather",
-      locals: { current: self }
+      locals: { current: current_with_count }
     )
   end
 end
