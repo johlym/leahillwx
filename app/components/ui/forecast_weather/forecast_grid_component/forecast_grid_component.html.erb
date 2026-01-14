@@ -21,7 +21,7 @@
       <p class="forecast-summary"><%= entry.summary %>.</p>
     </div>
     <div class="wind">
-      <p><span class="wind-speed"><%= entry.wind_speed.round %></span> <span class="unit">mph</span> <%= render Elements::WindVaneComponent.new(direction: entry.wind_dir) %></p>
+      <p><span class="wind-speed"><%= entry.wind_speed.round %></span> <span class="unit">mph</span> <%= render Elements::WindVaneComponent.new(direction: entry.wind_deg) %></p>
       <p class="wind-gust"><%= entry.wind_gust ? "#{entry.wind_gust.round} mph gusts" : "" %></p>
     </div>
   </div>
