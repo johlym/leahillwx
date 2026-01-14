@@ -1,4 +1,4 @@
-<%= render Ui::CurrentWeather::WeatherTileComponent.new(tile_type: "current-temperature", heading: "Current Temperature", measurement: current) %>
+<%= render Ui::CurrentWeather::WeatherTileComponent.new(tile_type: "current-temperature", heading: "Current Temperature", measurement: current, counter: current.total_count) %>
 <%= render Ui::CurrentWeather::WeatherTileComponent.new(tile_type: "current-dew-point", heading: "Dew Point") do |c| %>
   <% c.with_primary_value { "#{number_with_precision(current.dew_point.to_fahrenheit, precision: 2, strip_insignificant_zeros: true)}° F" } %>
 <% end %>

@@ -3,15 +3,16 @@
 class Ui::CurrentWeather::WeatherTileComponent < ViewComponent::Base
   include ActionView::Helpers::NumberHelper
 
-  attr_reader :tile_type, :heading, :measurement
+  attr_reader :tile_type, :heading, :measurement, :counter
 
   renders_one :primary_value
   renders_one :secondary_value
 
-  def initialize(tile_type:, heading: nil, measurement: nil)
+  def initialize(tile_type:, heading: nil, measurement: nil, counter: 0)
     @tile_type = tile_type
     @heading = heading
     @measurement = measurement
+    @counter = number_with_delimiter(counter)
   end
 
   def heading?
@@ -28,9 +29,5 @@ class Ui::CurrentWeather::WeatherTileComponent < ViewComponent::Base
 
   def formatted_feels_like
     number_with_precision(measurement.feels_like.to_fahrenheit, precision: 2, strip_insignificant_zeros: true)
-  end
-
-  def formatted_id
-    number_with_delimiter(measurement.id)
   end
 end

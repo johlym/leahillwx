@@ -6,7 +6,7 @@
     <% if temperature? %>
       <span class="current-temperature-f"><%= formatted_temperature %>° F</span>
       <span class="current-temperature-c">(feels like <%= formatted_feels_like %>° F)</span>
-      <span class="measurement-id" data-controller="connection-status">No. <%= formatted_id %> <span class="live hidden" data-connection-status-target="badge">LIVE</span></span>
+      <span class="measurement-id" data-controller="connection-status">No. <%= counter %> <span class="live hidden" data-connection-status-target="badge">LIVE</span></span>
     <% else %>
       <span class="weather-tile-big"><%= primary_value %></span>
       <% if secondary_value? %>
