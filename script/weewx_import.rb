@@ -26,6 +26,7 @@ class WeewxImporter
     interval: 2,
     pressure: 74,
     radiation: 75,
+    rain: 77,
     rainRate: 78,
     outHumidity: 67,
     outTemp: 68,
@@ -174,6 +175,7 @@ class WeewxImporter
     barometer_rel = calculate_sea_level_pressure(barometer_abs)
     wind_speed = convert_mph_to_ms(record[:windSpeed])
     gust_speed = convert_mph_to_ms(record[:windGust])
+    rain_day = convert_in_to_mm(record[:rain])
     rain_rate = convert_in_to_mm(record[:rainRate])
     light = convert_radiation_to_lux(record[:radiation])
 
@@ -184,6 +186,7 @@ class WeewxImporter
       gust_speed: gust_speed || 0,
       humidity: (record[:outHumidity] || 0).round.to_i,
       light: light || 0,
+      rain_day: rain_day || 0,
       rain_rate: rain_rate || 0,
       temperature: temperature || 0,
       uv: (record[:UV] || 0).round.to_i,
