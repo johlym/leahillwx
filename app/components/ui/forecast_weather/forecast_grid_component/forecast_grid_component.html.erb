@@ -21,7 +21,7 @@
       <p class="forecast-summary"><%= entry.summary %>.</p>
     </div>
     <div class="wind">
-      <p><span class="wind-speed"><%= entry.wind_speed.round %></span> <span class="unit">mph</span> <i class="fa-fw fa-sharp-duotone fa-light fa-location-arrow-up" style="--fa-primary-color: #444444; --fa-secondary-color: #444444; --fa-secondary-opacity: 0.2; display: inline-block; transform: rotate(<%= entry.wind_deg %>deg);"></i></p>
+      <p><span class="wind-speed"><%= entry.wind_speed.round %></span> <span class="unit">mph</span> <%= render Elements::WindVaneComponent.new(direction: entry.wind_dir) %></p>
       <p class="wind-gust"><%= entry.wind_gust ? "#{entry.wind_gust.round} mph gusts" : "" %></p>
     </div>
   </div>
