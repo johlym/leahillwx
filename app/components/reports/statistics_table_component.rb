@@ -43,11 +43,9 @@ module Reports
     end
 
     def partial_note
-      if daily?
-        "An <code>*</code> and a row in <strong>yellow</strong> indicates an incomplete set of measurements (less than 80% of the minimum measurements in a given day)."
-      else
-        "An <code>*</code> and a row in <strong>yellow</strong> indicates an incomplete set of measurements (less than 80% of the minimum measurements in a given hour)."
-      end
+      period_label = daily? ? "day" : "hour"
+      output = "An <i class=\"fa-regular fa-triangle-exclamation text-yellow-800\"></i> and a row in <strong>yellow</strong> indicates an incomplete set of measurements (less than 80% of the minimum measurements in a given #{period_label}."
+      output.html_safe
     end
 
     private

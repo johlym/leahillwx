@@ -23,16 +23,17 @@
       <tbody>
         <% period_data.each do |row| %>
           <tr<%= ' class=partial-day' if row.partial_period? %>>
-            <td <% if !row.has_data? %><%= 'class=no-data' %><% end %>>
+            <td class="flex items-center gap-1 <%= 'no-data' if !row.has_data? %>">
               <% if daily? %>
-                <%= link_to report_day_path(row.report.year, Date::MONTHNAMES[row.report.month].downcase, row.period), class: 'flex items-center gap-1' do %>
-                  <%= row.period %>
-                  <i class="fa-solid fa-magnifying-glass"></i>
+                <%= link_to report_day_path(row.report.year, Date::MONTHNAMES[row.report.month].downcase, row.period), class: "flex items-center gap-1" do %>
+                  <%= row.period %><i class="fa-solid fa-magnifying-glass"></i>
                 <% end %>
               <% else %>
                 <%= row.period %>
               <% end %>
-              <%= '*' if row.partial_period? %>
+              <% if row.partial_period? %>
+                <i class="fa-regular fa-triangle-exclamation text-yellow-800"></i>
+              <% end %>
             </td>
             <% if !row.has_data? %>
               <% if row.is_current %>
