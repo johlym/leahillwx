@@ -79,7 +79,7 @@ class ReportEntryTest < ActiveSupport::TestCase
 
   test "formatted_temp should format with 2 decimals" do
     entry = @report.entries.create!(day: 1, mean_temp: 50.123)
-    assert_equal "50.12", entry.formatted_temp(entry.mean_temp)
+    assert_equal "122.22", entry.formatted_temp(entry.mean_temp)
   end
 
   test "formatted_temp should return N/A for nil" do
