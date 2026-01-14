@@ -36,12 +36,13 @@ class WeewxImporter
     windSpeed: 112
   }.freeze
 
-  def initialize(path:, api_url:, api_key:, dry_run: false)
+  def initialize(path:, api_url:, api_key:, dry_run: false, update: false)
     @path = path
     @api_url = api_url
     @api_key = api_key
     @dry_run = dry_run
-    @stats = { processed: 0, skipped: 0, imported: 0, errors: 0 }
+    @update = update
+    @stats = { processed: 0, skipped: 0, imported: 0, errors: 0, updated: 0 }
   end
 
   def run
@@ -50,6 +51,7 @@ class WeewxImporter
     puts "Source file: #{@path}"
     puts "API URL: #{@api_url}"
     puts "Dry run: #{@dry_run}"
+    puts "Update mode: #{@update}"
     puts "Cutoff: #{Time.at(CUTOFF_TIMESTAMP).utc}"
     puts "=" * 50
     puts
@@ -100,6 +102,9 @@ class WeewxImporter
     puts "  Processed: #{@stats[:processed]}"
     puts "  Skipped (nil values): #{@stats[:skipped]}"
     puts "  Imported: #{@stats[:imported]}"
+    if @update
+      puts "  Updated: #{@stats[:updated]}"
+    end
     puts "  Errors: #{@stats[:errors]}"
     puts "=" * 50
   end
@@ -243,15 +248,25 @@ class WeewxImporter
     request = Net::HTTP::Post.new(uri.path)
     request["Content-Type"] = "application/json"
     request["Authorization"] = "Bearer #{@api_key}"
-    request.body = { weather_measurements: measurements }.to_json
+
+    body = { weather_measurements: measurements }
+    body[:update_records] = true if @update
+    request.body = body.to_json
 
     response = http.request(request)
 
     case response.code.to_i
-    when 201
+    when 201, 202
       result = JSON.parse(response.body)
-      @stats[:imported] += result["created"]
-      puts "  ✓ Batch #{batch_index + 1}: #{result['created']} records imported"
+      if @update
+        # In update mode, API returns 202 Accepted
+        @stats[:imported] += result["accepted"] || 0
+        puts "  ✓ Batch #{batch_index + 1}: #{result['accepted']} records queued for update"
+      else
+        @stats[:imported] += result["created"] || result["accepted"] || 0
+        created = result["created"] || result["accepted"] || 0
+        puts "  ✓ Batch #{batch_index + 1}: #{created} records imported"
+      end
     when 422
       result = JSON.parse(response.body)
       @stats[:errors] += result["errors"]&.length || 1
@@ -271,7 +286,8 @@ end
 options = {
   api_url: ENV.fetch("API_URL", "http://localhost:3000"),
   api_key: ENV.fetch("API_KEY", nil),
-  dry_run: false
+  dry_run: false,
+  update: false
 }
 
 OptionParser.new do |opts|
@@ -291,6 +307,10 @@ OptionParser.new do |opts|
 
   opts.on("--dry-run", "Parse and transform without making API calls") do
     options[:dry_run] = true
+  end
+
+  opts.on("--update", "Update existing records instead of skipping duplicates") do
+    options[:update] = true
   end
 
   opts.on("-h", "--help", "Show this help") do
@@ -315,7 +335,8 @@ importer = WeewxImporter.new(
   path: options[:path],
   api_url: options[:api_url],
   api_key: options[:api_key],
-  dry_run: options[:dry_run]
+  dry_run: options[:dry_run],
+  update: options[:update]
 )
 
 importer.run
