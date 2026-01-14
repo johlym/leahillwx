@@ -1,7 +1,8 @@
 module Reports
   class DailyStatisticsTableComponent < ViewComponent::Base
-    def initialize(report:)
+    def initialize(report:, has_partial_days:)
       @report = report
+      @has_partial_days = has_partial_days
     end
 
     def daily_data

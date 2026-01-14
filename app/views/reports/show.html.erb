@@ -5,16 +5,13 @@
 
   <%= render Reports::MonthlyStatisticsTableComponent.new(report: @report) %>
 
-  <%= render Reports::DailyStatisticsTableComponent.new(report: @report) %>
+  <%= render Reports::DailyStatisticsTableComponent.new(report: @report, has_partial_days: has_partial_days?(@report)) %>
 
   <div class="notes">
     <h3>Notes:</h3>
     <ul>
       <li>Times shown in 24-hour format (HH:MM) in the <code>America/Los_Angeles</code> timezone</li>
       <li>Days with no data shown as "N/A"</li>
-      <% if has_partial_days?(@report) %>
-        <li>An <code>*</code> and a row in <span class="text-yellow-800 bg-yellow-50 px-1">yellow</span> indicates an incomplete set of measurements (less than 80% of the minimum measurements in a given day).</li>
-      <% end %>
     </ul>
   </div>
   <p class="text-center text-xs">Report generated in <%= @generation_time %> seconds</p>

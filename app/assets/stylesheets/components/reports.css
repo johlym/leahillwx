@@ -109,6 +109,10 @@
       @apply text-xs text-slate-500 mb-2;
     }
 
+    .partial-day-note {
+      @apply bg-yellow-50 p-4 mb-4 border border-yellow-500 rounded-sm text-yellow-800;
+    }
+
     .report-table-wrapper {
       @apply overflow-x-auto;
 
