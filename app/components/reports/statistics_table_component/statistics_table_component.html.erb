@@ -25,7 +25,10 @@
           <tr<%= ' class=partial-day' if row.partial_period? %>>
             <td <% if !row.has_data? %><%= 'class=no-data' %><% end %>>
               <% if daily? %>
-                <%= link_to row.period, report_day_path(row.report.year, Date::MONTHNAMES[row.report.month].downcase, row.period) %>
+                <%= link_to report_day_path(row.report.year, Date::MONTHNAMES[row.report.month].downcase, row.period), class: 'flex items-center gap-1' do %>
+                  <%= row.period %>
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                <% end %>
               <% else %>
                 <%= row.period %>
               <% end %>

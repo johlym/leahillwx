@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["yearSelect", "monthSelect", "goButton", "message", "form"]
+  static targets = ["yearSelect", "monthSelect", "daySelect", "goButton", "message", "form"]
   
   connect() {
     this.loadAvailableReports()
@@ -23,6 +23,7 @@ export default class extends Controller {
       // Set current selections if provided
       const currentYear = this.yearSelectTarget.dataset.currentYear
       const currentMonth = this.yearSelectTarget.dataset.currentMonth
+      const currentDay = this.daySelectTarget.dataset.currentDay
       
       if (currentYear && currentMonth) {
         this.yearSelectTarget.value = currentYear
@@ -31,6 +32,13 @@ export default class extends Controller {
         // Select the current month by name
         const monthName = this.getMonthName(parseInt(currentMonth))
         this.monthSelectTarget.value = monthName
+        this.updateDays()
+        
+        // Select the current day if provided
+        if (currentDay) {
+          this.daySelectTarget.value = currentDay
+        }
+        
         this.goButtonTarget.disabled = false
       }
     } catch (error) {
@@ -56,6 +64,8 @@ export default class extends Controller {
     // Clear and disable month select
     this.monthSelectTarget.innerHTML = '<option value="">Select a Month</option>'
     this.monthSelectTarget.disabled = true
+    this.daySelectTarget.innerHTML = '<option value="">Day (optional)</option>'
+    this.daySelectTarget.disabled = true
     this.goButtonTarget.disabled = true
     
     if (!selectedYear) {
@@ -81,6 +91,44 @@ export default class extends Controller {
     this.clearMessage()
   }
   
+  updateDays() {
+    const selectedYear = this.yearSelectTarget.value
+    const selectedMonth = this.monthSelectTarget.value
+    
+    // Clear and disable day select
+    this.daySelectTarget.innerHTML = '<option value="">Day (optional)</option>'
+    this.daySelectTarget.disabled = true
+    this.goButtonTarget.disabled = true
+    
+    if (!selectedYear || !selectedMonth) {
+      return
+    }
+    
+    // Calculate days in the selected month
+    const monthIndex = this.getMonthIndex(selectedMonth)
+    const daysInMonth = new Date(parseInt(selectedYear), monthIndex + 1, 0).getDate()
+    
+    // Populate days
+    for (let day = 1; day <= daysInMonth; day++) {
+      const option = document.createElement('option')
+      option.value = day
+      option.textContent = day
+      this.daySelectTarget.appendChild(option)
+    }
+    
+    this.daySelectTarget.disabled = false
+    this.goButtonTarget.disabled = false
+    this.clearMessage()
+  }
+  
+  getMonthIndex(monthName) {
+    const months = [
+      "january", "february", "march", "april", "may", "june",
+      "july", "august", "september", "october", "november", "december"
+    ]
+    return months.indexOf(monthName.toLowerCase())
+  }
+  
   enableGoButton() {
     const year = this.yearSelectTarget.value
     const month = this.monthSelectTarget.value
@@ -96,13 +144,19 @@ export default class extends Controller {
   navigateToReport() {
     const year = this.yearSelectTarget.value
     const month = this.monthSelectTarget.value
+    const day = this.daySelectTarget.value
     
     if (!year || !month) {
       this.showMessage("Please select both year and month.")
       return
     }
     
-    window.location.href = `/reports/${year}/${month}`
+    // If day is selected, navigate to daily report; otherwise monthly report
+    if (day) {
+      window.location.href = `/reports/${year}/${month}/${day}`
+    } else {
+      window.location.href = `/reports/${year}/${month}`
+    }
   }
 
   getMonthName(monthNumber) {

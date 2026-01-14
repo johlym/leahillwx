@@ -1,5 +1,5 @@
 <div class="primary-container report-container">
-  <%= render Reports::ReportNavigationComponent.new(current_year: @report.year, current_month: @report.month) %>
+  <%= render Reports::ReportNavigationComponent.new(current_year: @report.year, current_month: @report.month, current_day: @day) %>
   
   <h1>Climatological Summary <small>for <%= @report.month_name %> <%= @day %>, <%= @report.year %></small></h1>
 

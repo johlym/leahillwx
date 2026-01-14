@@ -18,9 +18,21 @@
         <select id="month-select" 
                 name="month"
                 data-report-navigation-target="monthSelect"
-                data-action="change->report-navigation#enableGoButton"
+                data-action="change->report-navigation#updateDays"
                 disabled>
           <option value="">Select a Month</option>
+        </select>
+      </div>
+      
+      <div class="control-group">
+        <label for="day-select" class="sr-only">Day (optional):</label>
+        <select id="day-select" 
+                name="day"
+                data-report-navigation-target="daySelect"
+                data-action="change->report-navigation#enableGoButton"
+                data-current-day="<%= @current_day %>"
+                disabled>
+          <option value="">Day (optional)</option>
         </select>
       </div>
       
