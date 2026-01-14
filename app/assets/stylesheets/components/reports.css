@@ -19,18 +19,18 @@
         @apply flex flex-col;
 
         label {
-          @apply block text-sm/6 font-medium text-gray-900;
+          @apply block text-sm/6 font-medium text-slate-900;
         }
 
         select {
-          @apply block w-full appearance-none rounded-sm bg-white py-1.5 pl-3 pr-10 text-base text-gray-900 border border-gray-300 focus:border-slate-600 focus:ring-2 focus:ring-slate-600 sm:text-sm/6 shadow-sm;
+          @apply block w-full appearance-none rounded-sm bg-white py-1.5 pl-3 pr-10 text-base text-slate-900 border border-slate-300 focus:border-slate-600 focus:ring-2 focus:ring-slate-600 sm:text-sm/6 shadow-sm;
           background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
           background-position: right 0.5rem center;
           background-repeat: no-repeat;
           background-size: 1.5em 1.5em;
 
           &:disabled {
-            @apply opacity-50 cursor-not-allowed bg-gray-50;
+            @apply opacity-50 cursor-not-allowed bg-slate-50;
           }
         }
 
@@ -43,7 +43,7 @@
         }
 
         a.secondary-button {
-          @apply inline-flex items-center rounded-sm bg-white px-3.5 py-2 text-sm no-underline font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50;
+          @apply inline-flex items-center rounded-sm bg-white px-3.5 py-2 text-sm no-underline font-semibold text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50;
         }
       }
     }
@@ -56,7 +56,7 @@
       @apply overflow-x-auto;
 
       .stats-table {
-        @apply w-full divide-y divide-gray-300 border border-gray-300 rounded-sm;
+        @apply w-full divide-y divide-slate-300 border border-slate-300 rounded-sm;
         border-collapse: separate;
         border-spacing: 0;
         overflow: hidden;
@@ -64,7 +64,7 @@
         thead {
           tr {
             th {
-              @apply py-3.5 px-3 text-center text-sm font-semibold text-gray-900 whitespace-nowrap;
+              @apply py-3.5 px-3 text-center text-sm font-semibold text-slate-900 whitespace-nowrap;
 
               &:first-child {
                 @apply pl-4 sm:pl-6 lg:pl-8;
@@ -82,7 +82,7 @@
 
           tr {
             td {
-              @apply py-4 px-3 text-sm text-center text-gray-900 whitespace-nowrap;
+              @apply py-4 px-3 text-sm text-center text-slate-900 whitespace-nowrap;
 
               &:first-child {
                 @apply pl-4 sm:pl-6 lg:pl-8;
@@ -93,7 +93,7 @@
               }
 
               span.text-xs {
-                @apply text-xs text-gray-500;
+                @apply text-xs text-slate-500;
               }
             }
           }
@@ -106,24 +106,24 @@
     @apply mb-4;
 
     .subtitle {
-      @apply text-xs text-gray-500 mb-2;
+      @apply text-xs text-slate-500 mb-2;
     }
 
     .report-table-wrapper {
       @apply overflow-x-auto;
 
       .report-table {
-        @apply min-w-full divide-y divide-gray-300 border border-gray-300 rounded-sm;
+        @apply min-w-full divide-y divide-slate-300 border border-slate-300 rounded-sm;
         border-collapse: separate;
         border-spacing: 0;
         overflow: hidden;
 
         thead {
-          @apply bg-gray-50;
+          @apply bg-slate-50;
 
           tr {
             th {
-              @apply py-3.5 px-3 text-xs text-center font-semibold text-gray-900 whitespace-nowrap;
+              @apply py-3.5 px-3 text-xs text-center font-semibold text-slate-900 whitespace-nowrap;
 
               &:first-child {
                 @apply pl-4 sm:pl-6 lg:pl-8;
@@ -137,10 +137,10 @@
         }
 
         tbody {
-          @apply divide-y divide-gray-300 bg-white;
+          @apply divide-y divide-slate-300 bg-white;
 
           tr {
-            @apply odd:bg-gray-50;
+            @apply odd:bg-slate-50;
             &.partial-day {
               @apply bg-yellow-50;
 
@@ -150,7 +150,7 @@
             }
 
             td {
-              @apply py-3 px-2 text-xs text-center whitespace-nowrap text-gray-900;
+              @apply py-3 px-2 text-xs text-center whitespace-nowrap text-slate-900;
 
               &:first-child {
                 @apply pl-4 font-semibold sm:pl-6 lg:pl-8;
@@ -161,11 +161,11 @@
               }
 
               &.future-day {
-                @apply bg-gray-50;
+                @apply bg-slate-50;
               }
 
               &.no-data {
-                @apply bg-gray-100 text-gray-400 italic;
+                @apply bg-slate-100 text-slate-400 italic;
               }
             }
           }
