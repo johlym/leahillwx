@@ -64,11 +64,15 @@
           <% entries = @report.entries.ordered %>
           <% (1..@report.days_in_month).each do |day| %>
             <% entry = entries.find { |e| e.day == day } %>
+            <% is_future_day = day > Date.today.day && @report.year == Date.today.year && @report.month == Date.today.month %>
+            <% is_current_day = day == Date.today.day && @report.year == Date.today.year && @report.month == Date.today.month %>
+            <% next if is_future_day %>
+            
             <tr<%= ' class="partial-day"' if entry&.partial_day %>>
               <td <% if entry.nil? || !entry.has_data? %><%= 'class=no-data' %><% end %>><%= day %></td>
               <% if entry.nil? || !entry.has_data? %>
-                <% if day > Date.today.day && @report.year == Date.today.year && @report.month == Date.today.month %>
-                  <td colspan="12" class="future-day"></td>
+                <% if is_current_day %>
+                  <td colspan="12" class="no-data">current day</td>
                 <% else %>
                   <td colspan="12" class="no-data">N/A</td>
                 <% end %>
