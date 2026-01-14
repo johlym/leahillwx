@@ -17,26 +17,24 @@ class BulkWriteMeasurementsJob
 
     if update_records
       # Update existing records and insert new ones
-      records_to_insert = []
-      records_to_update = []
+      new_records = []
+      updated_count = 0
 
       records.each do |record|
         record_time = Time.zone.parse(record["reading_date_time"])
-        if existing_records[record_time]
-          records_to_update << record
+        if existing = existing_records[record_time]
+          # Update existing record
+          existing.update!(record.except("created_at"))
+          updated_count += 1
         else
-          records_to_insert << record
+          # New record to insert
+          new_records << record
         end
       end
 
-      # Use upsert_all to handle both inserts and updates
-      WeatherMeasurement.upsert_all(
-        records,
-        unique_by: :reading_date_time,
-        update_only: records.first.keys - [ "reading_date_time", "created_at" ]
-      ) if records.any?
-
-      Rails.logger.info("Bulk import: #{records_to_insert.size} created, #{records_to_update.size} updated")
+      # Insert new records in bulk
+      WeatherMeasurement.insert_all!(new_records) if new_records.any?
+      Rails.logger.info("Bulk import: #{new_records.size} created, #{updated_count} updated")
     else
       # Original behavior: filter out duplicates
       existing_timestamps = existing_records.keys.to_set

@@ -212,19 +212,33 @@ namespace :weewx do
   end
 
   def import_batch(batch, update_records = false)
-    if update_records
-      # Use upsert to update existing records or insert new ones
-      WeatherMeasurement.upsert_all(
-        batch,
-        unique_by: :reading_date_time,
-        record_timestamps: true
-      )
-    else
-      # Check for existing records
-      timestamps = batch.map { |r| r[:reading_date_time] }
-      existing_timestamps = WeatherMeasurement.where(reading_date_time: timestamps).pluck(:reading_date_time).to_set
+    # Check for existing records
+    timestamps = batch.map { |r| r[:reading_date_time] }
+    existing_records = WeatherMeasurement.where(reading_date_time: timestamps)
+                                         .index_by(&:reading_date_time)
 
+    if update_records
+      # Update existing records and insert new ones
+      new_records = []
+      updated_count = 0
+
+      batch.each do |record|
+        if existing = existing_records[record[:reading_date_time]]
+          # Update existing record
+          existing.update!(record)
+          updated_count += 1
+        else
+          # New record to insert
+          new_records << record
+        end
+      end
+
+      # Insert new records in bulk
+      WeatherMeasurement.insert_all!(new_records, record_timestamps: true) if new_records.any?
+      puts "  (#{new_records.size} created, #{updated_count} updated)" if updated_count > 0
+    else
       # Filter out duplicates
+      existing_timestamps = existing_records.keys.to_set
       new_records = batch.reject do |record|
         if existing_timestamps.include?(record[:reading_date_time])
           Rails.logger.info("Skipping duplicate measurement at #{record[:reading_date_time]}")
