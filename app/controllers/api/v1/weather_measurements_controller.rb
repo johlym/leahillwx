@@ -30,13 +30,14 @@ class Api::V1::WeatherMeasurementsController < ApiController
 
   # @tags Weather Measurements
   # @summary Bulk create weather measurements
-  # @request_body [Hash{ weather_measurements: Array<Hash> }] Array of weather measurement objects (max 1000)
+  # @request_body [Hash{ weather_measurements: Array<Hash>, update_records: Boolean }] Array of weather measurement objects (max 1000)
   # @security api_key
   # @response Created(201) [Hash{ created: Integer, errors: Array }]
   # @response Unprocessable Entity(422) [Hash{ error: String }]
   # @response Unauthorized(401) [Hash{ error: String }]
   def bulk_create
     measurements_params = params.require(:weather_measurements)
+    update_records = params[:update_records].to_s == "true"
 
     if measurements_params.length > MAX_BULK_RECORDS
       return render json: { error: "Maximum #{MAX_BULK_RECORDS} measurements allowed per request" }, status: :unprocessable_entity
@@ -49,7 +50,7 @@ class Api::V1::WeatherMeasurementsController < ApiController
     end
 
     # Enqueue background job
-    BulkWriteMeasurementsJob.perform_async(records)
+    BulkWriteMeasurementsJob.perform_async(records, update_records)
 
     render json: { accepted: records.size, status: "processing" }, status: :accepted
   end
