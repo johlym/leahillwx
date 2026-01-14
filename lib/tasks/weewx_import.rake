@@ -1,5 +1,5 @@
 namespace :weewx do
-  desc "Import weather data from WeeWX MySQL dump (set USE_API=true to upload via API, UPDATE_RECORDS=true to update existing)"
+  desc "Import weather data from WeeWX MySQL dump (set USE_API=true to upload via API, UPDATE_RECORDS=true to update existing, OVERWRITE=true to replace all)"
   task :import, [ :sql_file ] => :environment do |t, args|
     require "tempfile"
     require "net/http"
@@ -9,6 +9,7 @@ namespace :weewx do
     sql_file = File.expand_path(sql_file)
     use_api = ENV["USE_API"] == "true"
     update_records = ENV["UPDATE_RECORDS"] == "true"
+    overwrite = ENV["OVERWRITE"] == "true"
 
     unless File.exist?(sql_file)
       puts "Error: File not found: #{sql_file}"
@@ -32,6 +33,7 @@ namespace :weewx do
     puts "Upload method: #{use_api ? 'API' : 'Direct database'}"
     puts "API URL: #{api_url}" if use_api
     puts "Update mode: #{update_records}"
+    puts "Overwrite mode: #{overwrite}"
     puts ""
 
     # Parse the SQL dump and extract INSERT statements
@@ -48,11 +50,11 @@ namespace :weewx do
 
       records.each_slice(1000) do |batch|
         if use_api
-          result = import_batch_via_api(batch, api_url, api_key, update_records)
+          result = import_batch_via_api(batch, api_url, api_key, update_records, overwrite)
           total_records += result[:created]
           print "  Imported: #{total_records} records (#{result[:skipped]} skipped)\r"
         else
-          import_batch(batch, update_records)
+          import_batch(batch, update_records, overwrite)
           total_records += batch.count
           print "  Imported: #{total_records} records\r"
         end
@@ -211,14 +213,20 @@ namespace :weewx do
     inches * 25.4
   end
 
-  def import_batch(batch, update_records = false)
-    # Check for existing records
-    timestamps = batch.map { |r| r[:reading_date_time] }
-    existing_records = WeatherMeasurement.where(reading_date_time: timestamps)
-                                         .index_by(&:reading_date_time)
+  def import_batch(batch, update_records = false, overwrite = false)
+    if overwrite
+      # Overwrite mode: delete existing and insert all records
+      timestamps = batch.map { |r| r[:reading_date_time] }
+      deleted_count = WeatherMeasurement.where(reading_date_time: timestamps).delete_all
 
-    if update_records
+      # Insert all records
+      WeatherMeasurement.insert_all!(batch, record_timestamps: true) if batch.any?
+      puts "  (#{batch.size} inserted, #{deleted_count} deleted)" if deleted_count > 0
+    elsif update_records
       # Update existing records and insert new ones
+      timestamps = batch.map { |r| r[:reading_date_time] }
+      existing_records = WeatherMeasurement.where(reading_date_time: timestamps)
+                                           .index_by(&:reading_date_time)
       new_records = []
       updated_count = 0
 
@@ -262,7 +270,7 @@ namespace :weewx do
     Rails.logger.error("Error in import batch: #{e.message}")
   end
 
-  def import_batch_via_api(batch, api_url, api_key, update_records = false)
+  def import_batch_via_api(batch, api_url, api_key, update_records = false, overwrite = false)
     uri = URI("#{api_url}/api/v1/weather_measurement/bulk")
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = uri.scheme == "https"
@@ -274,6 +282,7 @@ namespace :weewx do
 
     body = { weather_measurements: batch }
     body[:update_records] = true if update_records
+    body[:overwrite] = true if overwrite
     request.body = body.to_json
 
     response = http.request(request)

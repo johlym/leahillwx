@@ -3,7 +3,7 @@ class BulkWriteMeasurementsJob
 
   sidekiq_options queue: :default, retry: 3
 
-  def perform(measurements, update_records = false)
+  def perform(measurements, update_records = false, overwrite = false)
     # measurements is an array of hashes (JSON-serializable)
     now = Time.current
     records = measurements.map do |m|
@@ -15,7 +15,15 @@ class BulkWriteMeasurementsJob
     existing_records = WeatherMeasurement.where(reading_date_time: timestamps)
                                          .index_by(&:reading_date_time)
 
-    if update_records
+    if overwrite
+      # Overwrite mode: delete existing and insert all records
+      timestamps = records.map { |r| Time.zone.parse(r["reading_date_time"]) }
+      deleted_count = WeatherMeasurement.where(reading_date_time: timestamps).delete_all
+
+      # Insert all records
+      WeatherMeasurement.insert_all!(records) if records.any?
+      Rails.logger.info("Bulk import (overwrite): #{records.size} inserted, #{deleted_count} deleted")
+    elsif update_records
       # Update existing records and insert new ones
       new_records = []
       updated_count = 0
