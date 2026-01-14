@@ -33,7 +33,7 @@
         </button>
       </div>
       
-      <% if defined?(@current_year) && defined?(@current_month) %>
+      <% if @current_year.present? && @current_month.present? %>
         <div class="control-group">
           <a class="secondary-button" href="<%= report_path(@current_year, Date::MONTHNAMES[@current_month].downcase) %>.txt">
             Download Text Version
