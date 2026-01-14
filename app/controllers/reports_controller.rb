@@ -83,6 +83,17 @@ class ReportsController < ApplicationController
 
     respond_to do |format|
       format.html # renders show_day.html.erb
+      format.text do
+        render plain: render_to_string(
+          partial: "reports/show_day_text",
+          locals: {
+            report: @report,
+            day: @day,
+            daily_entry: @daily_entry,
+            generation_time: @generation_time
+          }
+        )
+      end
     end
   end
 

@@ -1,0 +1,39 @@
+DAILY CLIMATOLOGICAL SUMMARY for <%= report.month_name %> <%= day %>, <%= report.year %>
+
+<% if daily_entry && daily_entry.has_data? %>
+DAILY STATISTICS:
+  Mean Temperature:     <%= daily_entry.formatted_temp(daily_entry.mean_temp) %>°F
+  High Temperature:     <%= daily_entry.formatted_temp(daily_entry.high_temp) %>°F @ <%= daily_entry.high_temp_time || 'N/A' %>
+  Low Temperature:      <%= daily_entry.formatted_temp(daily_entry.low_temp) %>°F @ <%= daily_entry.low_temp_time || 'N/A' %>
+  Heat Degree Days:     <%= daily_entry.formatted_degree_days(daily_entry.heat_degree_days) %>
+  Cool Degree Days:     <%= daily_entry.formatted_degree_days(daily_entry.cool_degree_days) %>
+  Total Precipitation:  <%= daily_entry.formatted_rain %> in
+  Avg Wind Speed:       <%= daily_entry.formatted_wind_speed(daily_entry.avg_wind_speed) %> mph
+  High Wind Speed:      <%= daily_entry.formatted_wind_speed(daily_entry.high_wind_speed) %> mph @ <%= daily_entry.high_wind_time || 'N/A' %>
+  Dominant Wind Dir:    <%= daily_entry.formatted_wind_dir %>
+<% else %>
+DAILY STATISTICS:
+  No data available for this day.
+<% end %>
+
+                    TEMPERATURE (°F), RAIN (in), WIND SPEED (mph)
+
+                                              HEAT   COOL          AVG
+HOUR  MEAN   HIGH  TIME    LOW  TIME    DEG    DEG   RAIN   WIND   HIGH  TIME    DOM DIR
+--------------------------------------------------------------------------------------------
+<% entries = report.entries.hourly.for_day(day).ordered -%>
+<% (0..23).each do |hour| -%>
+<% entry = entries.find { |e| e.hour == hour } -%>
+<%= format_hourly_text_row(hour, entry, report, day) %>
+<% end -%>
+--------------------------------------------------------------------------------------------
+
+Notes:
+- Times shown in 24-hour format (HH:MM) America/Los_Angeles timezone
+- Hours with no data shown as "N/A"
+<% if report.entries.hourly.for_day(day).any?(&:partial_period) -%>
+- * Indicates partial hour (incomplete measurements)
+<% end -%>
+<% if generation_time -%>
+- Report generated in <%= generation_time %> seconds
+<% end -%>
