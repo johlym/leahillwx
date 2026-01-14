@@ -1,5 +1,5 @@
 namespace :weewx do
-  desc "Import weather data from WeeWX MySQL dump (set USE_API=true to upload via API)"
+  desc "Import weather data from WeeWX MySQL dump (set USE_API=true to upload via API, UPDATE_RECORDS=true to update existing)"
   task :import, [ :sql_file ] => :environment do |t, args|
     require "tempfile"
     require "net/http"
@@ -8,6 +8,7 @@ namespace :weewx do
     sql_file = args[:sql_file] || raise("Usage: rake weewx:import[path/to/dump.sql]")
     sql_file = File.expand_path(sql_file)
     use_api = ENV["USE_API"] == "true"
+    update_records = ENV["UPDATE_RECORDS"] == "true"
 
     unless File.exist?(sql_file)
       puts "Error: File not found: #{sql_file}"
@@ -30,6 +31,7 @@ namespace :weewx do
     puts "SQL file: #{sql_file}"
     puts "Upload method: #{use_api ? 'API' : 'Direct database'}"
     puts "API URL: #{api_url}" if use_api
+    puts "Update mode: #{update_records}"
     puts ""
 
     # Parse the SQL dump and extract INSERT statements
@@ -46,11 +48,11 @@ namespace :weewx do
 
       records.each_slice(1000) do |batch|
         if use_api
-          result = import_batch_via_api(batch, api_url, api_key)
+          result = import_batch_via_api(batch, api_url, api_key, update_records)
           total_records += result[:created]
           print "  Imported: #{total_records} records (#{result[:skipped]} skipped)\r"
         else
-          import_batch(batch)
+          import_batch(batch, update_records)
           total_records += batch.count
           print "  Imported: #{total_records} records\r"
         end
@@ -209,35 +211,44 @@ namespace :weewx do
     inches * 25.4
   end
 
-  def import_batch(batch)
-    # Check for existing records
-    timestamps = batch.map { |r| r[:reading_date_time] }
-    existing_timestamps = WeatherMeasurement.where(reading_date_time: timestamps).pluck(:reading_date_time).to_set
+  def import_batch(batch, update_records = false)
+    if update_records
+      # Use upsert to update existing records or insert new ones
+      WeatherMeasurement.upsert_all(
+        batch,
+        unique_by: :reading_date_time,
+        record_timestamps: true
+      )
+    else
+      # Check for existing records
+      timestamps = batch.map { |r| r[:reading_date_time] }
+      existing_timestamps = WeatherMeasurement.where(reading_date_time: timestamps).pluck(:reading_date_time).to_set
 
-    # Filter out duplicates
-    new_records = batch.reject do |record|
-      if existing_timestamps.include?(record[:reading_date_time])
-        Rails.logger.info("Skipping duplicate measurement at #{record[:reading_date_time]}")
-        true
-      else
-        false
+      # Filter out duplicates
+      new_records = batch.reject do |record|
+        if existing_timestamps.include?(record[:reading_date_time])
+          Rails.logger.info("Skipping duplicate measurement at #{record[:reading_date_time]}")
+          true
+        else
+          false
+        end
       end
-    end
 
-    # Log duplicate count if any
-    if new_records.size < batch.size
-      duplicates_count = batch.size - new_records.size
-      puts "  (skipped #{duplicates_count} duplicates)"
-    end
+      # Log duplicate count if any
+      if new_records.size < batch.size
+        duplicates_count = batch.size - new_records.size
+        puts "  (skipped #{duplicates_count} duplicates)"
+      end
 
-    # Insert only new records
-    WeatherMeasurement.insert_all!(new_records, record_timestamps: true) if new_records.any?
+      # Insert only new records
+      WeatherMeasurement.insert_all!(new_records, record_timestamps: true) if new_records.any?
+    end
   rescue => e
     puts "\nWarning: Error importing batch: #{e.message}"
     Rails.logger.error("Error in import batch: #{e.message}")
   end
 
-  def import_batch_via_api(batch, api_url, api_key)
+  def import_batch_via_api(batch, api_url, api_key, update_records = false)
     uri = URI("#{api_url}/api/v1/weather_measurement/bulk")
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = uri.scheme == "https"
@@ -246,7 +257,10 @@ namespace :weewx do
     request = Net::HTTP::Post.new(uri.path)
     request["Authorization"] = "Bearer #{api_key}"
     request["Content-Type"] = "application/json"
-    request.body = { weather_measurements: batch }.to_json
+
+    body = { weather_measurements: batch }
+    body[:update_records] = true if update_records
+    request.body = body.to_json
 
     response = http.request(request)
 
