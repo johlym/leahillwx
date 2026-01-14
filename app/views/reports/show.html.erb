@@ -82,7 +82,7 @@
                 <td><%= number_with_precision(entry.rain, precision: 2) %> in</td>
                 <td><%= number_with_precision(entry.avg_wind_speed, precision: 2) %> mph</td>
                 <td><%= number_with_precision(entry.high_wind_speed, precision: 2) %> mph @ <%= entry.high_wind_time || 'N/A' %></td>
-                <td><%= entry.formatted_wind_dir %></td>
+                <td><%= entry.formatted_wind_dir %> <i class="fa-fw fa-sharp-duotone fa-light fa-location-arrow-up" style="--fa-primary-color: #444444; --fa-secondary-color: #444444; --fa-secondary-opacity: 0.2; display: inline-block; transform: rotate(<%= entry.wind_dir %>deg);"></i></td>
               <% end %>
             </tr>
           <% end %>
