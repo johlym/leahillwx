@@ -2,6 +2,14 @@ download_open_weather_forecast_job:
   cron: "every 10 minutes"
   class: "DownloadOpenWeatherForecastJob"
 
+download_open_weather_aqi_job:
+  cron: "every 10 minutes"
+  class: "DownloadOpenWeatherAqiJob"
+
+download_latest_earthquake_job:
+  cron: "every 10 minutes"
+  class: "DownloadLatestEarthquakeJob"
+
 delete_old_forecasts_job:
   cron: "every 1 day"
   class: "DeleteOldForecastsJob"
