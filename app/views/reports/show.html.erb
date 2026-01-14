@@ -1,116 +1,107 @@
 <div class="primary-container report-container">
   <%= render partial: "reports/navigation", locals: { current_year: @report.year, current_month: @report.month } %>
   
-  <h1>Monthly Climatological Summary</h1>
-  <h2><%= @report.month_name %> <%= @report.year %></h2>
+  <h1>Monthly Climatological Summary <small>for <%= @report.month_name %> <%= @report.year %></small></h1>
 
   <div class="monthly-statistics">
-    <h3>Monthly Statistics</h3>
-    <table class="stats-table">
-      <tr>
-        <td>Mean Temperature:</td>
-        <td><%= number_with_precision(@report.month_mean_temp, precision: 2) %>°F</td>
-      </tr>
-      <tr>
-        <td>High Temperature:</td>
-        <td><%= number_with_precision(@report.month_high_temp, precision: 2) %>°F (Day <%= @report.month_high_temp_day || 'N/A' %>)</td>
-      </tr>
-      <tr>
-        <td>Low Temperature:</td>
-        <td><%= number_with_precision(@report.month_low_temp, precision: 2) %>°F (Day <%= @report.month_low_temp_day || 'N/A' %>)</td>
-      </tr>
-      <tr>
-        <td>Heat Degree Days:</td>
-        <td><%= number_with_precision(@report.total_heat_degree_days, precision: 2) %></td>
-      </tr>
-      <tr>
-        <td>Cool Degree Days:</td>
-        <td><%= number_with_precision(@report.total_cool_degree_days, precision: 2) %></td>
-      </tr>
-      <tr>
-        <td>Total Precipitation:</td>
-        <td><%= number_with_precision(@report.total_rain, precision: 2) %> in</td>
-      </tr>
-      <tr>
-        <td>Avg Wind Speed:</td>
-        <td><%= number_with_precision(@report.avg_wind_speed, precision: 2) %> mph</td>
-      </tr>
-      <tr>
-        <td>High Wind Speed:</td>
-        <td><%= number_with_precision(@report.month_high_wind_speed, precision: 2) %> mph (Day <%= @report.month_high_wind_day || 'N/A' %>)</td>
-      </tr>
-      <tr>
-        <td>Dominant Wind Dir:</td>
-        <td><%= @report.formatted_dominant_wind %></td>
-      </tr>
-    </table>
+    <h2>Monthly Statistics</h2>
+    <div class="stats-table-wrapper">
+      <table class="stats-table">
+        <thead>
+          <tr>
+            <th scope="col">Mean Temp</th>
+            <th scope="col">High Temp</th>
+            <th scope="col">Low Temp</th>
+            <th scope="col">Heat DD</th>
+            <th scope="col">Cool DD</th>
+            <th scope="col">Total Precip</th>
+            <th scope="col">Avg Wind</th>
+            <th scope="col">High Wind</th>
+            <th scope="col">Wind Dir</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><%= number_with_precision(@report.month_mean_temp.to_fahrenheit, precision: 2) %>°F</td>
+            <td><%= number_with_precision(@report.month_high_temp.to_fahrenheit, precision: 2) %>°F<br><span class="text-xs">(Day <%= @report.month_high_temp_day || 'N/A' %>)</span></td>
+            <td><%= number_with_precision(@report.month_low_temp.to_fahrenheit, precision: 2) %>°F<br><span class="text-xs">(Day <%= @report.month_low_temp_day || 'N/A' %>)</span></td>
+            <td><%= number_with_precision(@report.total_heat_degree_days, precision: 2) %></td>
+            <td><%= number_with_precision(@report.total_cool_degree_days, precision: 2) %></td>
+            <td><%= number_with_precision(@report.total_rain, precision: 2) %> in</td>
+            <td><%= number_with_precision(@report.avg_wind_speed, precision: 2) %> mph</td>
+            <td><%= number_with_precision(@report.month_high_wind_speed, precision: 2) %> mph<br><span class="text-xs">(Day <%= @report.month_high_wind_day || 'N/A' %>)</span></td>
+            <td><%= @report.formatted_dominant_wind %></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div class="daily-data">
-    <h3>Daily Data</h3>
+    <h2>Daily Data</h2>
     <p class="subtitle">Temperature (°F), Rain (in), Wind Speed (mph)</p>
     
-    <table class="report-table">
-      <thead>
-        <tr>
-          <th>Day</th>
-          <th>Mean<br>Temp</th>
-          <th>High</th>
-          <th>Time</th>
-          <th>Low</th>
-          <th>Time</th>
-          <th>Heat<br>Deg Days</th>
-          <th>Cool<br>Deg Days</th>
-          <th>Rain</th>
-          <th>Avg<br>Wind Speed</th>
-          <th>High<br>Wind</th>
-          <th>Time</th>
-          <th>Dom<br>Dir</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% entries = @report.entries.ordered %>
-        <% (1..@report.days_in_month).each do |day| %>
-          <% entry = entries.find { |e| e.day == day } %>
-          <tr<%= ' class="partial-day"' if entry&.partial_day %>>
-            <td><%= day %></td>
-            <% if entry.nil? || !entry.has_data? %>
-              <% if day > Date.today.day && @report.year == Date.today.year && @report.month == Date.today.month %>
-                <td colspan="12" class="future-day"></td>
-              <% else %>
-                <td colspan="12" class="no-data">N/A</td>
-              <% end %>
-            <% else %>
-              <td><%= number_with_precision(entry.mean_temp, precision: 2) %></td>
-              <td><%= number_with_precision(entry.high_temp, precision: 2) %></td>
-              <td><%= entry.high_temp_time || 'N/A' %></td>
-              <td><%= number_with_precision(entry.low_temp, precision: 2) %></td>
-              <td><%= entry.low_temp_time || 'N/A' %></td>
-              <td><%= number_with_precision(entry.heat_degree_days, precision: 2) %></td>
-              <td><%= number_with_precision(entry.cool_degree_days, precision: 2) %></td>
-              <td><%= number_with_precision(entry.rain, precision: 2) %></td>
-              <td><%= number_with_precision(entry.avg_wind_speed, precision: 2) %></td>
-              <td><%= number_with_precision(entry.high_wind_speed, precision: 2) %></td>
-              <td><%= entry.high_wind_time || 'N/A' %></td>
-              <td><%= entry.formatted_wind_dir %><%= '*' if entry.partial_day %></td>
-            <% end %>
+    <div class="report-table-wrapper">
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th scope="col">Day</th>
+            <th scope="col">Mean<br>Temp</th>
+            <th scope="col">High</th>
+            <th scope="col">Time</th>
+            <th scope="col">Low</th>
+            <th scope="col">Time</th>
+            <th scope="col">Heat<br>Deg Days</th>
+            <th scope="col">Cool<br>Deg Days</th>
+            <th scope="col">Rain</th>
+            <th scope="col">Avg<br>Wind Speed</th>
+            <th scope="col">High<br>Wind</th>
+            <th scope="col">Time</th>
+            <th scope="col">Dom<br>Dir</th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% entries = @report.entries.ordered %>
+          <% (1..@report.days_in_month).each do |day| %>
+            <% entry = entries.find { |e| e.day == day } %>
+            <tr<%= ' class="partial-day"' if entry&.partial_day %>>
+              <td><%= day %></td>
+              <% if entry.nil? || !entry.has_data? %>
+                <% if day > Date.today.day && @report.year == Date.today.year && @report.month == Date.today.month %>
+                  <td colspan="12" class="future-day"></td>
+                <% else %>
+                  <td colspan="12" class="no-data">N/A</td>
+                <% end %>
+              <% else %>
+                <td><%= number_with_precision(entry.mean_temp.to_fahrenheit, precision: 2) %></td>
+                <td><%= number_with_precision(entry.high_temp.to_fahrenheit, precision: 2) %></td>
+                <td><%= entry.high_temp_time || 'N/A' %></td>
+                <td><%= number_with_precision(entry.low_temp.to_fahrenheit, precision: 2) %></td>
+                <td><%= entry.low_temp_time || 'N/A' %></td>
+                <td><%= number_with_precision(entry.heat_degree_days, precision: 2) %></td>
+                <td><%= number_with_precision(entry.cool_degree_days, precision: 2) %></td>
+                <td><%= number_with_precision(entry.rain, precision: 2) %></td>
+                <td><%= number_with_precision(entry.avg_wind_speed, precision: 2) %></td>
+                <td><%= number_with_precision(entry.high_wind_speed, precision: 2) %></td>
+                <td><%= entry.high_wind_time || 'N/A' %></td>
+                <td><%= entry.formatted_wind_dir %><%= '*' if entry.partial_day %></td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div class="notes">
-    <h4>Notes:</h4>
+    <h3>Notes:</h3>
     <ul>
-      <li>Times shown in 24-hour format (HH:MM) America/Los_Angeles timezone</li>
+      <li>Times shown in 24-hour format (HH:MM) in the <code>America/Los_Angeles</code> timezone</li>
       <li>Days with no data shown as "N/A"</li>
       <% if has_partial_days?(@report) %>
-        <li>* Indicates partial day (incomplete measurements)</li>
-      <% end %>
-      <% if @generation_time %>
-        <li>Report generated in <%= @generation_time %> seconds</li>
+        <li>An <code>*</code> Indicates partial day (incomplete measurements)</li>
       <% end %>
     </ul>
   </div>
+  <p class="text-center text-xs">Report generated in <%= @generation_time %> seconds</p>
 </div>
