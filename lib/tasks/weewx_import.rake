@@ -252,23 +252,26 @@ namespace :weewx do
   end
 
   def import_batch(batch, update_records = false, overwrite = false)
+    # Remove epoch field (used for display only, not a database column)
+    db_batch = batch.map { |r| r.except(:epoch) }
+
     if overwrite
       # Overwrite mode: delete existing and insert all records
-      timestamps = batch.map { |r| r[:reading_date_time] }
+      timestamps = db_batch.map { |r| r[:reading_date_time] }
       deleted_count = WeatherMeasurement.where(reading_date_time: timestamps).delete_all
 
       # Insert all records
-      WeatherMeasurement.insert_all!(batch, record_timestamps: true) if batch.any?
+      WeatherMeasurement.insert_all!(db_batch, record_timestamps: true) if db_batch.any?
       puts "  (#{batch.size} inserted, #{deleted_count} deleted)" if deleted_count > 0
     elsif update_records
       # Update existing records and insert new ones
-      timestamps = batch.map { |r| r[:reading_date_time] }
+      timestamps = db_batch.map { |r| r[:reading_date_time] }
       existing_records = WeatherMeasurement.where(reading_date_time: timestamps)
                                            .index_by(&:reading_date_time)
       new_records = []
       updated_count = 0
 
-      batch.each do |record|
+      db_batch.each do |record|
         if existing = existing_records[record[:reading_date_time]]
           # Update existing record
           existing.update!(record)
@@ -284,8 +287,11 @@ namespace :weewx do
       puts "  (#{new_records.size} created, #{updated_count} updated)" if updated_count > 0
     else
       # Filter out duplicates
+      timestamps = db_batch.map { |r| r[:reading_date_time] }
+      existing_records = WeatherMeasurement.where(reading_date_time: timestamps)
+                                           .index_by(&:reading_date_time)
       existing_timestamps = existing_records.keys.to_set
-      new_records = batch.reject do |record|
+      new_records = db_batch.reject do |record|
         if existing_timestamps.include?(record[:reading_date_time])
           Rails.logger.info("Skipping duplicate measurement at #{record[:reading_date_time]}")
           true
