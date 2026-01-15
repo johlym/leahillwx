@@ -28,7 +28,7 @@ namespace :reports do
         aggregator = WeatherData::DailyAggregator.new(date)
         entry = aggregator.aggregate
 
-        status = entry.partial_day ? "✓ (partial)" : "✓"
+        status = entry.partial_period ? "✓ (partial)" : "✓"
         puts status
         processed += 1
       rescue StandardError => e
@@ -150,7 +150,7 @@ namespace :reports do
         aggregator = WeatherData::DailyAggregator.new(date)
         entry = aggregator.aggregate
 
-        status = entry.partial_day ? "✓ (partial)" : "✓"
+        status = entry.partial_period ? "✓ (partial)" : "✓"
         puts status
         processed += 1
       rescue StandardError => e

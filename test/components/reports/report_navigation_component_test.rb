@@ -43,20 +43,20 @@ class Reports::ReportNavigationComponentTest < ViewComponent::TestCase
   test "renders download link when current_year and current_month are provided" do
     render_inline(Reports::ReportNavigationComponent.new(current_year: 2024, current_month: 1))
 
-    assert_selector "a.secondary-button", text: "Download Text Version"
+    assert_selector "a.download-button", text: "Download Text Version"
     assert_selector "a[href='#{report_path(2024, "january")}.txt']"
   end
 
   test "does not render download link when current_year is nil" do
     render_inline(Reports::ReportNavigationComponent.new(current_year: nil, current_month: 1))
 
-    assert_no_selector "a.secondary-button", text: "Download Text Version"
+    assert_no_selector "a.download-button", text: "Download Text Version"
   end
 
   test "does not render download link when current_month is nil" do
     render_inline(Reports::ReportNavigationComponent.new(current_year: 2024, current_month: nil))
 
-    assert_no_selector "a.secondary-button", text: "Download Text Version"
+    assert_no_selector "a.download-button", text: "Download Text Version"
   end
 
   test "renders navigation message container" do
