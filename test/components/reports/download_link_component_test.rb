@@ -3,10 +3,33 @@
 require "test_helper"
 
 class Reports::DownloadLinkComponentTest < ViewComponent::TestCase
-  def test_component_renders_something_useful
-    # assert_equal(
-    #   %(<span>Hello, components!</span>),
-    #   render_inline(Reports::DownloadLinkComponent.new(message: "Hello, components!")).css("span").to_html
-    # )
+  test "renders download link with correct text" do
+    render_inline(Reports::DownloadLinkComponent.new(path: "/reports/2024/january"))
+
+    assert_selector "a", text: "Download Text Version"
+  end
+
+  test "renders download link with correct CSS class" do
+    render_inline(Reports::DownloadLinkComponent.new(path: "/reports/2024/january"))
+
+    assert_selector "a.download-button"
+  end
+
+  test "appends .txt extension to path" do
+    render_inline(Reports::DownloadLinkComponent.new(path: "/reports/2024/january"))
+
+    assert_selector "a[href='/reports/2024/january.txt']"
+  end
+
+  test "works with different paths" do
+    render_inline(Reports::DownloadLinkComponent.new(path: "/reports/2023/december"))
+
+    assert_selector "a[href='/reports/2023/december.txt']"
+  end
+
+  test "handles paths without leading slash" do
+    render_inline(Reports::DownloadLinkComponent.new(path: "reports/2024/march"))
+
+    assert_selector "a[href='reports/2024/march.txt']"
   end
 end
