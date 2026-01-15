@@ -1,3 +1,25 @@
+# == Schema Information
+#
+# Table name: almanac_positions
+#
+#  id                :bigint           not null, primary key
+#  date              :date             not null
+#  hour              :integer          not null
+#  moon_altitude_deg :float
+#  moon_azimuth_deg  :float
+#  moon_dec_deg      :float
+#  moon_ra_deg       :float
+#  sun_altitude_deg  :float
+#  sun_azimuth_deg   :float
+#  sun_dec_deg       :float
+#  sun_ra_deg        :float
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#
+# Indexes
+#
+#  index_almanac_positions_on_date_and_hour  (date,hour) UNIQUE
+#
 class AlmanacPosition < ApplicationRecord
   validates :date, presence: true
   validates :hour, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 23 }
