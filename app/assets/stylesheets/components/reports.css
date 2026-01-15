@@ -103,7 +103,8 @@
   }
 
   .daily-data,
-  .hourly-data {
+  .hourly-data,
+  .records-section {
     @apply mb-4;
 
     .subtitle {

@@ -1,5 +1,5 @@
-<div class="records-page">
-  <div class="year-selector">
+<div class="primary-container report-container">
+  <div class="report-navigation">
     <form action="<%= records_path %>" method="get">
       <label for="year">Year:</label>
       <select name="year" id="year" onchange="this.form.submit()">
@@ -13,7 +13,7 @@
   </div>
 
   <% if @selected_year_record || @current_year_record || @all_time_record %>
-    <%= render Records::RecordsTableComponent.new(
+    <%= render Records::RecordsComponent.new(
       selected_year_record: @selected_year_record,
       current_year_record: @current_year_record,
       all_time_record: @all_time_record,

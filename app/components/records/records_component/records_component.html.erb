@@ -1,0 +1,70 @@
+<div class="records-page-content">
+  <h1>Weather Records</h1>
+  <p class="subtitle">Temperature (°F), Rain (in), Wind Speed (mph), Pressure (hPa)</p>
+
+  <%= render Records::SectionComponent.new(
+    title: "Temperature Records",
+    rows: temperature_rows,
+    year_record: year_record,
+    current_year_record: current_year_record,
+    all_time_record: all_time_record,
+    year_label: year_label,
+    current_year_label: current_year_label,
+    show_three_columns: show_three_columns?
+  ) %>
+
+  <%= render Records::SectionComponent.new(
+    title: "Wind Records",
+    rows: wind_rows,
+    year_record: year_record,
+    current_year_record: current_year_record,
+    all_time_record: all_time_record,
+    year_label: year_label,
+    current_year_label: current_year_label,
+    show_three_columns: show_three_columns?
+  ) %>
+
+  <%= render Records::SectionComponent.new(
+    title: "Rain Records",
+    rows: rain_rows,
+    year_record: year_record,
+    current_year_record: current_year_record,
+    all_time_record: all_time_record,
+    year_label: year_label,
+    current_year_label: current_year_label,
+    show_three_columns: show_three_columns?
+  ) %>
+
+  <%= render Records::SectionComponent.new(
+    title: "Humidity Records",
+    rows: humidity_rows,
+    year_record: year_record,
+    current_year_record: current_year_record,
+    all_time_record: all_time_record,
+    year_label: year_label,
+    current_year_label: current_year_label,
+    show_three_columns: show_three_columns?
+  ) %>
+
+  <%= render Records::SectionComponent.new(
+    title: "Barometer Records",
+    rows: barometer_rows,
+    year_record: year_record,
+    current_year_record: current_year_record,
+    all_time_record: all_time_record,
+    year_label: year_label,
+    current_year_label: current_year_label,
+    show_three_columns: show_three_columns?
+  ) %>
+
+  <%= render Records::SectionComponent.new(
+    title: "Sun Records",
+    rows: sun_rows,
+    year_record: year_record,
+    current_year_record: current_year_record,
+    all_time_record: all_time_record,
+    year_label: year_label,
+    current_year_label: current_year_label,
+    show_three_columns: show_three_columns?
+  ) %>
+</div>
