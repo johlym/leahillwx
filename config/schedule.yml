@@ -27,3 +27,8 @@ generate_hourly_report_job:
   cron: "1 * * * * America/Los_Angeles"
   class: "GenerateHourlyReportJob"
   description: "Generate hourly climatological report entry at 1 minute past each hour"
+
+generate_weather_records_job:
+  cron: "every 12:02 AM in America/Los_Angeles"
+  class: "GenerateWeatherRecordsJob"
+  description: "Calculate and update weather records for current year and all-time at 12:02 AM"
