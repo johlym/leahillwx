@@ -12,7 +12,7 @@ class RootController < ApplicationController
     end
 
     @forecast = ForecastParserService.new(forecast_record).parse
-    @earthquakes = Earthquake.last(5)
+    @earthquakes = Earthquake.last(5).reverse
   end
 
   def about
