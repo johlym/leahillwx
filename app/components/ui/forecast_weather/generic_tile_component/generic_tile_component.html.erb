@@ -3,6 +3,9 @@
     <h2 class="weather-tile-heading"><%= heading %></h2>
   <% end %>
   <div class="weather-tile-content">
+    <% if subtitle.present? %>
+      <p class="tile-subtitle"><%= subtitle %></p>
+    <% end %>
     <%= content %>
   </div>
 </div>

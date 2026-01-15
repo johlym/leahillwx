@@ -1,4 +1,4 @@
-.forecast-timestamp {
+.tile-subtitle {
   @apply text-xs text-gray-500 text-center py-1 bg-gray-50 border-b border-gray-200;
 }
 

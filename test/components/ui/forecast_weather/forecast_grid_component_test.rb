@@ -29,7 +29,7 @@ class Ui::ForecastWeather::ForecastGridComponentTest < ViewComponent::TestCase
 
     render_inline(component)
 
-    assert_selector "p.forecast-timestamp"
+    assert_selector "p.tile-subtitle"
     assert_text "as of"
   end
 

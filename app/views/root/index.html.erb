@@ -10,14 +10,16 @@
   <div class="forecast-section">
     <div class="forecast-column">
       <%= render Ui::ForecastWeather::ForecastGridComponent.new(forecast: @forecast) %>
-      <%= render Ui::ForecastWeather::GenericTileComponent.new(heading: "Earthquakes") do %>
-        COMING SOON
+      <%= render Ui::ForecastWeather::GenericTileComponent.new(heading: "Earthquakes", subtitle: "The last 5 earthquakes nearest to this location.") do %>
+        <div class="overflow-x-auto">
+          <%= render Ui::EarthquakeTableComponent.new(earthquakes: @earthquakes) %>
+        </div>
       <% end %>
     </div>
     <div class="sidebar-column">
       <%= render Ui::ForecastWeather::GenericTileComponent.new(heading: "NWS Radar") do %>
         <div data-controller="image-refresh" data-image-refresh-interval-value="300000">
-          <p class="forecast-timestamp">
+          <p class="tile-subtitle">
             Next refresh in <span data-image-refresh-target="countdown" class="font-mono">300</span> seconds.
           </p>
           <p class="p-2">
@@ -27,7 +29,7 @@
       <% end %>
       <%= render Ui::ForecastWeather::GenericTileComponent.new(heading: "Auburn Traffic Cameras") do %>
         <div data-controller="image-refresh">
-          <p class="forecast-timestamp">
+          <p class="tile-subtitle">
             Next refresh in <span data-image-refresh-target="countdown" class="font-mono">60</span> seconds.
           </p>
           <div class="grid grid-cols-2 gap-2 p-2" id="traffic_cameras">

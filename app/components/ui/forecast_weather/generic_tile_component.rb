@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 class Ui::ForecastWeather::GenericTileComponent < ViewComponent::Base
-  attr_reader :heading
+  attr_reader :heading, :subtitle
 
-  def initialize(heading: nil)
+  def initialize(heading: nil, subtitle: nil)
     @heading = heading
+    @subtitle = subtitle
   end
 end
