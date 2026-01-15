@@ -145,7 +145,7 @@
           @apply divide-y divide-slate-300 bg-white;
 
           tr {
-            @apply odd:bg-slate-50;
+            @apply odd:bg-white even:bg-gray-50;
             &.partial-day {
               @apply bg-yellow-50;
 
