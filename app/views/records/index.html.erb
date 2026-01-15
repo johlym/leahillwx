@@ -1,0 +1,28 @@
+<div class="records-page">
+  <div class="year-selector">
+    <form action="<%= records_path %>" method="get">
+      <label for="year">Year:</label>
+      <select name="year" id="year" onchange="this.form.submit()">
+        <% @available_years.each do |available_year| %>
+          <option value="<%= available_year %>" <%= 'selected' if available_year == @selected_year %>>
+            <%= available_year %>
+          </option>
+        <% end %>
+      </select>
+    </form>
+  </div>
+
+  <% if @selected_year_record || @current_year_record || @all_time_record %>
+    <%= render Records::RecordsTableComponent.new(
+      selected_year_record: @selected_year_record,
+      current_year_record: @current_year_record,
+      all_time_record: @all_time_record,
+      selected_year: @selected_year,
+      current_year: @current_year
+    ) %>
+  <% else %>
+    <p class="no-records-message">
+      No records available yet. Records will be calculated nightly starting at 12:02 AM, or you can run the rake task manually.
+    </p>
+  <% end %>
+</div>
