@@ -148,46 +148,6 @@ class RecordCalculator
       @record.highest_wind_run = highest_run.wind_run_miles
       @record.highest_wind_run_date = highest_run.date
     end
-
-    calm_periods = find_longest_calm_period
-    if calm_periods
-      @record.longest_calm_hours = calm_periods[:hours]
-      @record.longest_calm_start_at = calm_periods[:start_at]
-    end
-  end
-
-  def find_longest_calm_period
-    # Use pluck for memory efficiency instead of loading objects
-    longest = { hours: 0, start_at: nil }
-    current = { start_at: nil, count: 0 }
-
-    calm_times = measurements
-      .where(wind_speed: 0)
-      .order(:reading_date_time)
-      .pluck(:reading_date_time)
-
-    calm_times.each do |reading_time|
-      if current[:start_at].nil?
-        current[:start_at] = reading_time
-        current[:count] = 1
-      elsif (reading_time - current[:start_at]) / 1.hour <= current[:count] * 1.2
-        current[:count] += 1
-      else
-        if current[:count] > longest[:hours]
-          longest[:hours] = current[:count]
-          longest[:start_at] = current[:start_at]
-        end
-        current[:start_at] = reading_time
-        current[:count] = 1
-      end
-    end
-
-    if current[:count] > longest[:hours]
-      longest[:hours] = current[:count]
-      longest[:start_at] = current[:start_at]
-    end
-
-    longest[:hours] > 0 ? longest : nil
   end
 
   def calculate_rain_records

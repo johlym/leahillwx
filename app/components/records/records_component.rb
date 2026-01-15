@@ -50,8 +50,7 @@ module Records
     def wind_rows
       [
         { label: "Strongest Gust", field: :strongest_gust, type: :speed, timestamp_field: :strongest_gust_at, timestamp_type: :datetime },
-        { label: "Highest Daily Wind Run", field: :highest_wind_run, type: :wind_run, timestamp_field: :highest_wind_run_date, timestamp_type: :date },
-        { label: "Longest Stretch of 0 mph Wind", field: :longest_calm_hours, type: :hours, timestamp_field: :longest_calm_start_at, timestamp_type: :datetime }
+        { label: "Highest Daily Wind Run", field: :highest_wind_run, type: :wind_run, timestamp_field: :highest_wind_run_date, timestamp_type: :date }
       ]
     end
 
