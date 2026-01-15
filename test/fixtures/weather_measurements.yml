@@ -23,7 +23,15 @@
 #
 # Indexes
 #
+#  index_weather_measurements_on_barometer_rel      (barometer_rel)
+#  index_weather_measurements_on_gust_speed         (gust_speed)
+#  index_weather_measurements_on_humidity           (humidity)
+#  index_weather_measurements_on_light              (light)
+#  index_weather_measurements_on_rain_day           (rain_day)
+#  index_weather_measurements_on_rain_rate          (rain_rate)
 #  index_weather_measurements_on_reading_date_time  (reading_date_time)
+#  index_weather_measurements_on_temperature        (temperature)
+#  index_weather_measurements_on_wind_speed         (wind_speed)
 #
 one:
   barometer_abs: 1.5
