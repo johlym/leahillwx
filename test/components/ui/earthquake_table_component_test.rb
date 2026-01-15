@@ -2,10 +2,10 @@
 
 require "test_helper"
 
-class Ui::EarthquakeTableComponentTest < ViewComponent::TestCase
+class Home::EarthquakeTableComponentTest < ViewComponent::TestCase
   test "renders table with correct structure" do
     earthquakes = [ earthquakes(:one) ]
-    render_inline(Ui::EarthquakeTableComponent.new(earthquakes: earthquakes))
+    render_inline(Home::EarthquakeTableComponent.new(earthquakes: earthquakes))
 
     assert_selector "table.earthquake-table"
     assert_selector "thead"
@@ -13,7 +13,7 @@ class Ui::EarthquakeTableComponentTest < ViewComponent::TestCase
   end
 
   test "renders table headers" do
-    render_inline(Ui::EarthquakeTableComponent.new(earthquakes: []))
+    render_inline(Home::EarthquakeTableComponent.new(earthquakes: []))
 
     assert_selector "th", text: "Mag"
     assert_selector "th", text: "Time"
@@ -24,7 +24,7 @@ class Ui::EarthquakeTableComponentTest < ViewComponent::TestCase
 
   test "renders earthquake data" do
     earthquake = earthquakes(:one)
-    render_inline(Ui::EarthquakeTableComponent.new(earthquakes: [ earthquake ]))
+    render_inline(Home::EarthquakeTableComponent.new(earthquakes: [ earthquake ]))
 
     assert_selector "td.eq-mag-cell", text: earthquake.magnitude.to_s
     assert_selector "td", text: earthquake.place
@@ -32,7 +32,7 @@ class Ui::EarthquakeTableComponentTest < ViewComponent::TestCase
 
   test "renders formatted time" do
     earthquake = earthquakes(:one)
-    render_inline(Ui::EarthquakeTableComponent.new(earthquakes: [ earthquake ]))
+    render_inline(Home::EarthquakeTableComponent.new(earthquakes: [ earthquake ]))
 
     expected_date = earthquake.eventtime.in_time_zone("America/Los_Angeles").strftime("%B %d, %Y")
     expected_time = earthquake.eventtime.in_time_zone("America/Los_Angeles").strftime("%I:%M %p")
@@ -43,21 +43,21 @@ class Ui::EarthquakeTableComponentTest < ViewComponent::TestCase
 
   test "renders distance with precision" do
     earthquake = earthquakes(:one)
-    render_inline(Ui::EarthquakeTableComponent.new(earthquakes: [ earthquake ]))
+    render_inline(Home::EarthquakeTableComponent.new(earthquakes: [ earthquake ]))
 
     assert_selector "td", text: /999\.99 mi/
   end
 
   test "renders depth with precision" do
     earthquake = earthquakes(:one)
-    render_inline(Ui::EarthquakeTableComponent.new(earthquakes: [ earthquake ]))
+    render_inline(Home::EarthquakeTableComponent.new(earthquakes: [ earthquake ]))
 
     assert_selector "td", text: /100\.00 mi/
   end
 
   test "renders USGS link" do
     earthquake = earthquakes(:one)
-    render_inline(Ui::EarthquakeTableComponent.new(earthquakes: [ earthquake ]))
+    render_inline(Home::EarthquakeTableComponent.new(earthquakes: [ earthquake ]))
 
     assert_selector "a[href='#{earthquake.url}'][target='blank']", text: /View at.*USGS/m
   end
@@ -75,13 +75,13 @@ class Ui::EarthquakeTableComponentTest < ViewComponent::TestCase
       url: "https://example.com/2"
     )
 
-    render_inline(Ui::EarthquakeTableComponent.new(earthquakes: [ earthquake1, earthquake2 ]))
+    render_inline(Home::EarthquakeTableComponent.new(earthquakes: [ earthquake1, earthquake2 ]))
 
     assert_selector "tbody tr", count: 2
   end
 
   test "renders empty table when no earthquakes" do
-    render_inline(Ui::EarthquakeTableComponent.new(earthquakes: []))
+    render_inline(Home::EarthquakeTableComponent.new(earthquakes: []))
 
     assert_selector "table.earthquake-table"
     assert_selector "tbody tr", count: 0

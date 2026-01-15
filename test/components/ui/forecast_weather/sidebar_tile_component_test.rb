@@ -2,9 +2,9 @@
 
 require "test_helper"
 
-class Ui::ForecastWeather::GenericTileComponentTest < ViewComponent::TestCase
+class Home::GenericTileComponentTest < ViewComponent::TestCase
   def test_renders_generic_tile_container
-    component = Ui::ForecastWeather::GenericTileComponent.new
+    component = Home::GenericTileComponent.new
 
     render_inline(component) { "Test content" }
 
@@ -12,7 +12,7 @@ class Ui::ForecastWeather::GenericTileComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_with_heading
-    component = Ui::ForecastWeather::GenericTileComponent.new(heading: "Test Heading")
+    component = Home::GenericTileComponent.new(heading: "Test Heading")
 
     render_inline(component) { "Test content" }
 
@@ -20,7 +20,7 @@ class Ui::ForecastWeather::GenericTileComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_without_heading_when_nil
-    component = Ui::ForecastWeather::GenericTileComponent.new(heading: nil)
+    component = Home::GenericTileComponent.new(heading: nil)
 
     render_inline(component) { "Test content" }
 
@@ -28,7 +28,7 @@ class Ui::ForecastWeather::GenericTileComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_without_heading_when_omitted
-    component = Ui::ForecastWeather::GenericTileComponent.new
+    component = Home::GenericTileComponent.new
 
     render_inline(component) { "Test content" }
 
@@ -36,7 +36,7 @@ class Ui::ForecastWeather::GenericTileComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_without_heading_when_blank
-    component = Ui::ForecastWeather::GenericTileComponent.new(heading: "")
+    component = Home::GenericTileComponent.new(heading: "")
 
     render_inline(component) { "Test content" }
 
@@ -44,7 +44,7 @@ class Ui::ForecastWeather::GenericTileComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_content_area
-    component = Ui::ForecastWeather::GenericTileComponent.new
+    component = Home::GenericTileComponent.new
 
     render_inline(component) { "Test content" }
 
@@ -52,7 +52,7 @@ class Ui::ForecastWeather::GenericTileComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_provided_content
-    component = Ui::ForecastWeather::GenericTileComponent.new
+    component = Home::GenericTileComponent.new
 
     render_inline(component) { "Custom content here" }
 
@@ -60,7 +60,7 @@ class Ui::ForecastWeather::GenericTileComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_html_content
-    component = Ui::ForecastWeather::GenericTileComponent.new(heading: "HTML Test")
+    component = Home::GenericTileComponent.new(heading: "HTML Test")
 
     render_inline(component) do
       '<div class="custom-content"><p>Paragraph 1</p><p>Paragraph 2</p></div>'.html_safe
@@ -72,20 +72,20 @@ class Ui::ForecastWeather::GenericTileComponentTest < ViewComponent::TestCase
   end
 
   def test_heading_attribute_reader
-    component = Ui::ForecastWeather::GenericTileComponent.new(heading: "My Heading")
+    component = Home::GenericTileComponent.new(heading: "My Heading")
 
     assert_equal "My Heading", component.heading
   end
 
   def test_heading_attribute_reader_when_nil
-    component = Ui::ForecastWeather::GenericTileComponent.new
+    component = Home::GenericTileComponent.new
 
     assert_nil component.heading
   end
 
   def test_multiple_tiles_render_independently
-    component1 = Ui::ForecastWeather::GenericTileComponent.new(heading: "Tile 1")
-    component2 = Ui::ForecastWeather::GenericTileComponent.new(heading: "Tile 2")
+    component1 = Home::GenericTileComponent.new(heading: "Tile 1")
+    component2 = Home::GenericTileComponent.new(heading: "Tile 2")
 
     result1 = render_inline(component1) { "Content 1" }
     result2 = render_inline(component2) { "Content 2" }

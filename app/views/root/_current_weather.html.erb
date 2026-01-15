@@ -1,22 +1,22 @@
-<%= render Ui::CurrentWeather::WeatherTileComponent.new(tile_type: "current-temperature", heading: "Current Temperature", measurement: current, counter: current.total_count) %>
-<%= render Ui::CurrentWeather::WeatherTileComponent.new(tile_type: "current-dew-point", heading: "Dew Point") do |c| %>
+<%= render Home::CurrentWeather::WeatherTileComponent.new(tile_type: "current-temperature", heading: "Current Temperature", measurement: current, counter: current.total_count) %>
+<%= render Home::CurrentWeather::WeatherTileComponent.new(tile_type: "current-dew-point", heading: "Dew Point") do |c| %>
   <% c.with_primary_value { "#{number_with_precision(current.dew_point.to_fahrenheit, precision: 2, strip_insignificant_zeros: true)}° F" } %>
 <% end %>
-<%= render Ui::CurrentWeather::WeatherTileComponent.new(tile_type: "current-wind", heading: "Current Wind") do |c| %>
+<%= render Home::CurrentWeather::WeatherTileComponent.new(tile_type: "current-wind", heading: "Current Wind") do |c| %>
   <% c.with_primary_value { "#{number_with_precision(current.wind_speed_mph, precision: 2, strip_insignificant_zeros: true)} mph #{current.heading_compass}" } %>
   <% c.with_secondary_value { "Gusting to #{number_with_precision(current.gust_speed_mph, precision: 2, strip_insignificant_zeros: true)} mph" } %>
 <% end %>
-<%= render Ui::CurrentWeather::WeatherTileComponent.new(tile_type: "current-humidity", heading: "Current Humidity") do |c| %>
+<%= render Home::CurrentWeather::WeatherTileComponent.new(tile_type: "current-humidity", heading: "Current Humidity") do |c| %>
   <% c.with_primary_value { "#{current.humidity} %" } %>
 <% end %>
-<%= render Ui::CurrentWeather::WeatherTileComponent.new(tile_type: "current-rain", heading: "Current Rain") do |c| %>
+<%= render Home::CurrentWeather::WeatherTileComponent.new(tile_type: "current-rain", heading: "Current Rain") do |c| %>
   <% c.with_primary_value { "#{number_with_precision(current.rain_day_in, precision: 2, strip_insignificant_zeros: true)} in" } %>
   <% c.with_secondary_value { "(#{number_with_precision(current.rain_rate_in, precision: 2, strip_insignificant_zeros: true)} in/hr)" } %>
 <% end %>
-<%= render Ui::CurrentWeather::WeatherTileComponent.new(tile_type: "current-pressure", heading: "Current Pressure") do |c| %>
+<%= render Home::CurrentWeather::WeatherTileComponent.new(tile_type: "current-pressure", heading: "Current Pressure") do |c| %>
   <% c.with_primary_value { "#{number_with_precision(current.barometer_abs, precision: 2, strip_insignificant_zeros: true)} mb" } %>
 <% end %>
-<%= render Ui::CurrentWeather::WeatherTileComponent.new(tile_type: "current-solar", heading: "Solar Irradiance") do |c| %>
+<%= render Home::CurrentWeather::WeatherTileComponent.new(tile_type: "current-solar", heading: "Solar Irradiance") do |c| %>
   <% c.with_primary_value { "#{number_with_precision(current.uv, precision: 2, strip_insignificant_zeros: true)} W/m2" } %>
   <% c.with_secondary_value { "#{number_with_delimiter(number_with_precision(current.light, precision: 2, strip_insignificant_zeros: true))} lux" } %>
 <% end %>

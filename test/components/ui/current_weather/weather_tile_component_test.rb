@@ -2,10 +2,10 @@
 
 require "test_helper"
 
-class Ui::CurrentWeather::WeatherTileComponentTest < ViewComponent::TestCase
+class Home::CurrentWeather::WeatherTileComponentTest < ViewComponent::TestCase
   def test_renders_temperature_tile_with_heading
     measurement = weather_measurements(:one)
-    component = Ui::CurrentWeather::WeatherTileComponent.new(
+    component = Home::CurrentWeather::WeatherTileComponent.new(
       tile_type: "current-temperature",
       heading: "Current Temperature",
       measurement: measurement,
@@ -23,7 +23,7 @@ class Ui::CurrentWeather::WeatherTileComponentTest < ViewComponent::TestCase
 
   def test_renders_temperature_tile_without_heading
     measurement = weather_measurements(:one)
-    component = Ui::CurrentWeather::WeatherTileComponent.new(
+    component = Home::CurrentWeather::WeatherTileComponent.new(
       tile_type: "current-temperature",
       measurement: measurement,
       counter: 100
@@ -38,7 +38,7 @@ class Ui::CurrentWeather::WeatherTileComponentTest < ViewComponent::TestCase
 
   def test_formats_temperature_correctly
     measurement = weather_measurements(:one)
-    component = Ui::CurrentWeather::WeatherTileComponent.new(
+    component = Home::CurrentWeather::WeatherTileComponent.new(
       tile_type: "current-temperature",
       measurement: measurement,
       counter: 1
@@ -52,7 +52,7 @@ class Ui::CurrentWeather::WeatherTileComponentTest < ViewComponent::TestCase
 
   def test_formats_feels_like_correctly
     measurement = weather_measurements(:one)
-    component = Ui::CurrentWeather::WeatherTileComponent.new(
+    component = Home::CurrentWeather::WeatherTileComponent.new(
       tile_type: "current-temperature",
       measurement: measurement,
       counter: 1
@@ -65,7 +65,7 @@ class Ui::CurrentWeather::WeatherTileComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_generic_tile_with_primary_value_only
-    component = Ui::CurrentWeather::WeatherTileComponent.new(
+    component = Home::CurrentWeather::WeatherTileComponent.new(
       tile_type: "humidity",
       heading: "Humidity"
     )
@@ -81,7 +81,7 @@ class Ui::CurrentWeather::WeatherTileComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_generic_tile_with_primary_and_secondary_values
-    component = Ui::CurrentWeather::WeatherTileComponent.new(
+    component = Home::CurrentWeather::WeatherTileComponent.new(
       tile_type: "wind",
       heading: "Wind Speed"
     )
@@ -98,7 +98,7 @@ class Ui::CurrentWeather::WeatherTileComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_generic_tile_without_heading
-    component = Ui::CurrentWeather::WeatherTileComponent.new(
+    component = Home::CurrentWeather::WeatherTileComponent.new(
       tile_type: "pressure"
     )
 
@@ -113,7 +113,7 @@ class Ui::CurrentWeather::WeatherTileComponentTest < ViewComponent::TestCase
 
   def test_counter_formatted_with_delimiter
     measurement = weather_measurements(:one)
-    component = Ui::CurrentWeather::WeatherTileComponent.new(
+    component = Home::CurrentWeather::WeatherTileComponent.new(
       tile_type: "current-temperature",
       measurement: measurement,
       counter: 1234567
@@ -125,7 +125,7 @@ class Ui::CurrentWeather::WeatherTileComponentTest < ViewComponent::TestCase
   end
 
   def test_heading_predicate_returns_true_when_heading_present
-    component = Ui::CurrentWeather::WeatherTileComponent.new(
+    component = Home::CurrentWeather::WeatherTileComponent.new(
       tile_type: "test",
       heading: "Test Heading"
     )
@@ -134,7 +134,7 @@ class Ui::CurrentWeather::WeatherTileComponentTest < ViewComponent::TestCase
   end
 
   def test_heading_predicate_returns_false_when_heading_blank
-    component = Ui::CurrentWeather::WeatherTileComponent.new(
+    component = Home::CurrentWeather::WeatherTileComponent.new(
       tile_type: "test"
     )
 
@@ -142,7 +142,7 @@ class Ui::CurrentWeather::WeatherTileComponentTest < ViewComponent::TestCase
   end
 
   def test_temperature_predicate_returns_true_for_current_temperature_type
-    component = Ui::CurrentWeather::WeatherTileComponent.new(
+    component = Home::CurrentWeather::WeatherTileComponent.new(
       tile_type: "current-temperature"
     )
 
@@ -150,7 +150,7 @@ class Ui::CurrentWeather::WeatherTileComponentTest < ViewComponent::TestCase
   end
 
   def test_temperature_predicate_returns_false_for_other_types
-    component = Ui::CurrentWeather::WeatherTileComponent.new(
+    component = Home::CurrentWeather::WeatherTileComponent.new(
       tile_type: "humidity"
     )
 

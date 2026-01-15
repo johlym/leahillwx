@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Ui::CurrentWeather::WeatherTileComponent < ViewComponent::Base
+class Home::CurrentWeather::WeatherTileComponent < ViewComponent::Base
   include ActionView::Helpers::NumberHelper
 
   attr_reader :tile_type, :heading, :measurement, :counter

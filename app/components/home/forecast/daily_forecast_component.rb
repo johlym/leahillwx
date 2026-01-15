@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Ui::ForecastWeather::ForecastGridComponent < ViewComponent::Base
+class Home::Forecast::DailyForecastComponent < ViewComponent::Base
   attr_reader :forecast
 
   def initialize(forecast:)
