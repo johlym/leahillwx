@@ -42,7 +42,7 @@ module WeatherData
         entry.assign_attributes(no_data_attributes)
       else
         entry.assign_attributes(calculate_daily_stats)
-        entry.partial_period = is_partial_day?
+        entry.partial_period = partial_day?
       end
 
       entry.save!
@@ -64,7 +64,7 @@ module WeatherData
         high_wind_time: nil,
         wind_dir: nil,
         wind_dir_compass: nil,
-        partial_day: false
+        partial_period: false
       }
     end
 

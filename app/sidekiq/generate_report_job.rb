@@ -18,7 +18,7 @@ class GenerateReportJob
       Rails.logger.info "GenerateReportJob: Successfully created/updated entry for #{target_date}"
       Rails.logger.info "  - Day: #{entry.day}"
       Rails.logger.info "  - Mean temp: #{entry.mean_temp&.round(2)}°F"
-      Rails.logger.info "  - Partial day: #{entry.partial_day}"
+      Rails.logger.info "  - Partial day: #{entry.partial_period}"
       Rails.logger.info "  - Processing time: #{processing_time} seconds"
 
       # On the 1st of the month, also finalize previous month if missing last day
