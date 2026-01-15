@@ -1,0 +1,67 @@
+Astronomical Almanac
+<%= "=" * 80 %>
+Date: <%= date.strftime("%A, %B %d, %Y") %>
+Timezone: <%= almanac_entry.timezone %>
+<%= "=" * 80 %>
+
+SUN
+<%= "-" * 80 %>
+  Civil Dawn:    <%= format_time(almanac_entry.civil_dawn_at) %>
+  Sunrise:       <%= format_time(almanac_entry.sunrise_at) %>
+  Solar Noon:    <%= format_time(almanac_entry.solar_noon_at) %>
+  Sunset:        <%= format_time(almanac_entry.sunset_at) %>
+  Civil Dusk:    <%= format_time(almanac_entry.civil_dusk_at) %>
+
+  Daylight:      <%= almanac_entry.formatted_daylight %>
+<% if almanac_entry.formatted_daylight_delta %>
+  Change:        <%= almanac_entry.formatted_daylight_delta %>
+<% end %>
+<% if dynamic_positions && dynamic_positions[:sun] %>
+
+  Current Position (as of <%= Time.current.strftime("%I:%M %p %Z") %>):
+    Azimuth:          <%= format_degrees(dynamic_positions[:sun][:azimuth]) %>
+    Altitude:         <%= format_degrees(dynamic_positions[:sun][:altitude]) %>
+    Right Ascension:  <%= format_degrees(dynamic_positions[:sun][:right_ascension]) %>
+    Declination:      <%= format_degrees(dynamic_positions[:sun][:declination]) %>
+<% end %>
+
+MOON
+<%= "-" * 80 %>
+  Moonrise:      <%= format_time(almanac_entry.moonrise_at) %>
+  Transit:       <%= format_time(almanac_entry.moon_transit_at) %>
+  Moonset:       <%= format_time(almanac_entry.moonset_at) %>
+
+  Phase:         <%= almanac_entry.moon_phase&.capitalize %>
+  Illumination:  <%= almanac_entry.moon_illumination_pct&.round(1) %>%
+<% if dynamic_positions && dynamic_positions[:moon] %>
+
+  Current Position (as of <%= Time.current.strftime("%I:%M %p %Z") %>):
+    Azimuth:          <%= format_degrees(dynamic_positions[:moon][:azimuth]) %>
+    Altitude:         <%= format_degrees(dynamic_positions[:moon][:altitude]) %>
+    Right Ascension:  <%= format_degrees(dynamic_positions[:moon][:right_ascension]) %>
+    Declination:      <%= format_degrees(dynamic_positions[:moon][:declination]) %>
+<% end %>
+<% if almanac_entry.next_new_moon_at || almanac_entry.next_full_moon_at || almanac_entry.next_equinox_at || almanac_entry.next_solstice_at %>
+
+ASTRONOMICAL EVENTS
+<%= "-" * 80 %>
+<% if almanac_entry.next_new_moon_at %>
+  Next New Moon:     <%= format_datetime(almanac_entry.next_new_moon_at) %>
+<% end %>
+<% if almanac_entry.next_full_moon_at %>
+  Next Full Moon:    <%= format_datetime(almanac_entry.next_full_moon_at) %>
+<% end %>
+<% if almanac_entry.next_equinox_at %>
+  Next Equinox:      <%= format_datetime(almanac_entry.next_equinox_at) %>
+<% end %>
+<% if almanac_entry.next_solstice_at %>
+  Next Solstice:     <%= format_datetime(almanac_entry.next_solstice_at) %>
+<% end %>
+<% end %>
+
+<%= "=" * 80 %>
+<% if dynamic_positions %>
+Note: Current positions calculated using approximate algorithms.
+<% end %>
+Generation time: <%= generation_time %> seconds
+<%= "=" * 80 %>

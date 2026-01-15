@@ -10,9 +10,49 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_15_014218) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_15_060459) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "almanac_entries", force: :cascade do |t|
+    t.datetime "civil_dawn_at"
+    t.datetime "civil_dusk_at"
+    t.datetime "created_at", null: false
+    t.date "date", null: false
+    t.integer "daylight_delta_seconds"
+    t.integer "daylight_seconds"
+    t.float "moon_illumination_pct"
+    t.string "moon_phase"
+    t.datetime "moon_transit_at"
+    t.datetime "moonrise_at"
+    t.datetime "moonset_at"
+    t.datetime "next_equinox_at"
+    t.datetime "next_full_moon_at"
+    t.datetime "next_new_moon_at"
+    t.datetime "next_solstice_at"
+    t.datetime "solar_noon_at"
+    t.datetime "sunrise_at"
+    t.datetime "sunset_at"
+    t.string "timezone", default: "America/Los_Angeles", null: false
+    t.datetime "updated_at", null: false
+    t.index ["date"], name: "index_almanac_entries_on_date", unique: true
+  end
+
+  create_table "almanac_positions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "date", null: false
+    t.integer "hour", null: false
+    t.float "moon_altitude_deg"
+    t.float "moon_azimuth_deg"
+    t.float "moon_dec_deg"
+    t.float "moon_ra_deg"
+    t.float "sun_altitude_deg"
+    t.float "sun_azimuth_deg"
+    t.float "sun_dec_deg"
+    t.float "sun_ra_deg"
+    t.datetime "updated_at", null: false
+    t.index ["date", "hour"], name: "index_almanac_positions_on_date_and_hour", unique: true
+  end
 
   create_table "aqis", force: :cascade do |t|
     t.float "co"

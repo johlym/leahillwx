@@ -33,5 +33,10 @@ Rails.application.routes.draw do
   get "records", to: "records#index", as: :records
   get "records/:year", to: "records#index", as: :records_year
 
+  # Almanac routes
+  get "almanac", to: "almanac#index", as: :almanac
+  get "almanac/available", to: "almanac#available", as: :available_almanac
+  get "almanac/:year/:month_name/:day", to: "almanac#show", as: :almanac_day
+
   get "up" => "rails/health#show", as: :rails_health_check
 end

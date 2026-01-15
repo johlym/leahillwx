@@ -7,12 +7,12 @@ import { application } from "./application"
 import HelloController from "./hello_controller"
 import ConnectionStatusController from "./connection_status_controller"
 import MobileMenuController from "./mobile_menu_controller"
-import ReportNavigationController from "./report_navigation_controller"
 import ImageRefreshController from "./image_refresh_controller"
+import DateNavigationController from "./date_navigation_controller"
 
 application.register("hello", HelloController)
 application.register("connection-status", ConnectionStatusController)
 application.register("mobile-menu", MobileMenuController)
-application.register("report-navigation", ReportNavigationController)
 application.register("image-refresh", ImageRefreshController)
 application.register("traffic-cameras", ImageRefreshController)
+application.register("date-navigation", DateNavigationController)

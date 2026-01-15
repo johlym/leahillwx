@@ -4,6 +4,7 @@ gem "barnes", "~> 0.0.9"
 gem "bootsnap", "~> 1.20", require: false
 gem "cssbundling-rails", "~> 1.4"
 gem "dotenv", "~> 3.2"
+gem "ephem", "~> 0.4.1"
 gem "httparty", "~> 0.24.0"
 gem "jbuilder", "~> 2.14"
 gem "jsbundling-rails", "~> 1.3"

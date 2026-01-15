@@ -1,0 +1,60 @@
+<div class="report-navigation" data-controller="date-navigation" data-base-path="<%= @base_path %>" data-day-required="<%= @day_required %>">
+  <form method="get" data-date-navigation-target="form">
+    <div class="navigation-controls">
+      <div class="control-group">
+        <label for="year-select" class="sr-only">Year:</label>
+        <select id="year-select" 
+                name="year"
+                data-date-navigation-target="yearSelect"
+                data-action="change->date-navigation#updateMonths"
+                data-current-year="<%= @current_year %>"
+                data-current-month="<%= @current_month %>">
+          <option value="">Select a Year</option>
+        </select>
+      </div>
+      
+      <div class="control-group">
+        <label for="month-select" class="sr-only">Month:</label>
+        <select id="month-select" 
+                name="month"
+                data-date-navigation-target="monthSelect"
+                data-action="change->date-navigation#updateDays"
+                disabled>
+          <option value="">Select a Month</option>
+        </select>
+      </div>
+      
+      <div class="control-group">
+        <label for="day-select" class="sr-only"><%= day_label %></label>
+        <select id="day-select" 
+                name="day"
+                data-date-navigation-target="daySelect"
+                data-action="change->date-navigation#enableGoButton"
+                data-current-day="<%= @current_day %>"
+                disabled>
+          <option value=""><%= @day_required ? "Select a Day" : "Day (optional)" %></option>
+        </select>
+      </div>
+      
+      <div class="control-group">
+        <button type="button" 
+                data-action="click->date-navigation#navigateToDate"
+                data-date-navigation-target="goButton"
+                disabled>
+          GO
+        </button>
+      </div>
+      <% if @jump_button %>
+        <div class="control-group">
+          <button type="button" 
+                  data-action="click->date-navigation#jumpToToday"
+                  data-date-navigation-target="jumpButton">
+            Jump to Today
+          </button>
+        </div>
+      <% end %>
+    </div>
+  </form>
+  
+  <div class="navigation-message" data-date-navigation-target="message"></div>
+</div>

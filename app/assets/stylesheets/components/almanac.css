@@ -1,0 +1,31 @@
+.almanac-data {
+  @apply flex flex-col md:flex-row gap-3 mb-2;
+}
+
+.almanac-section {
+  @apply flex-1;
+
+  h2 {
+    @apply text-lg font-bold mb-2 text-text-primary;
+  }
+
+  .almanac-list {
+    @apply grid grid-cols-[auto_1fr] gap-0.5rem_2rem leading-1.6;
+
+    dt {
+      @apply font-normal text-text-secondary;
+
+      &.indented {
+        @apply invisible;
+      }
+    }
+
+    dd {
+      @apply margin-0 color-text-primary text-right;
+
+      &.capitalize {
+        @apply text-transform-capitalize;
+      }
+    }
+  }
+}

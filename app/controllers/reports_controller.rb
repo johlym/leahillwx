@@ -13,7 +13,11 @@ class ReportsController < ApplicationController
     reports_data = Report.ordered.group_by(&:year)
 
     result = reports_data.transform_values do |reports|
-      reports.map { |r| r.month_name.downcase }.sort_by { |name| Date::MONTHNAMES.index(name.capitalize) }
+      # Group by month and get available days for each
+      reports.group_by { |r| r.month_name.downcase }.transform_values do |month_reports|
+        # Get all days that have entries for this month
+        month_reports.first.entries.daily.pluck(:day).uniq.sort.map { |d| { day: d } }
+      end
     end
 
     render json: result
