@@ -63,7 +63,7 @@ class RecordCalculator
     @record.lowest_temp_at = lowest&.reading_date_time
 
     highest_apparent = measurements
-      .select(:temperature, :humidity, :reading_date_time)
+      .select(:temperature, :humidity, :wind_speed, :reading_date_time)
       .order(Arel.sql("temperature - ((100 - humidity) / 5.0)"))
       .reverse_order
       .limit(1)
@@ -74,7 +74,7 @@ class RecordCalculator
     end
 
     lowest_apparent = measurements
-      .select(:temperature, :humidity, :reading_date_time)
+      .select(:temperature, :humidity, :wind_speed, :reading_date_time)
       .order(Arel.sql("temperature - ((100 - humidity) / 5.0)"))
       .limit(1)
       .first
@@ -84,7 +84,7 @@ class RecordCalculator
     end
 
     highest_heat_index = measurements
-      .select(:temperature, :humidity, :reading_date_time)
+      .select(:temperature, :humidity, :wind_speed, :reading_date_time)
       .where("temperature > 27")
       .where("humidity >= 40")
       .order(Arel.sql("temperature - ((100 - humidity) / 5.0)"))
