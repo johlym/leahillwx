@@ -31,6 +31,7 @@ Rails.application.routes.draw do
 
   # Records routes
   get "records", to: "records#index", as: :records
+  get "records/:year", to: "records#index", as: :records_year
 
   get "up" => "rails/health#show", as: :rails_health_check
 end

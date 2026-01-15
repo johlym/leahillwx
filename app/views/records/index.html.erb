@@ -1,15 +1,19 @@
 <div class="primary-container report-container">
   <div class="report-navigation">
-    <form action="<%= records_path %>" method="get">
-      <label for="year">Year:</label>
-      <select name="year" id="year" onchange="this.form.submit()">
-        <% @available_years.each do |available_year| %>
-          <option value="<%= available_year %>" <%= 'selected' if available_year == @selected_year %>>
-            <%= available_year %>
-          </option>
-        <% end %>
-      </select>
-    </form>
+    <div class="navigation-controls">
+      <div class="control-group">
+        <label for="year-select" class="sr-only">Year:</label>
+        <select id="year-select" 
+                name="year"
+                onchange="window.location.href = '<%= records_path %>/' + this.value">
+          <% @available_years.each do |available_year| %>
+            <option value="<%= available_year %>" <%= 'selected' if available_year == @selected_year %>>
+              <%= available_year %>
+            </option>
+          <% end %>
+        </select>
+      </div>
+    </div>
   </div>
 
   <% if @selected_year_record || @current_year_record || @all_time_record %>
