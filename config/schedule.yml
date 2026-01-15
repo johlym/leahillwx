@@ -24,7 +24,7 @@ generate_report_job:
   description: "Generate daily climatological report entry at 12:01 AM"
 
 generate_hourly_report_job:
-  cron: "1 * * * * America/Los_Angeles"
+  cron: "every hour in America/Los_Angeles"
   class: "GenerateHourlyReportJob"
   description: "Generate hourly climatological report entry at 1 minute past each hour"
 
