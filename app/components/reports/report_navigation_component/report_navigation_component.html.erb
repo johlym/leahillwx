@@ -47,5 +47,9 @@
     </div>
   </form>
   
+  <% if show_download_link? %>
+    <%= link_to "Download Text Version", "#{report_path(@current_year, month_name)}.txt", class: "download-button" %>
+  <% end %>
+  
   <div class="navigation-message" data-report-navigation-target="message"></div>
 </div>
