@@ -13,7 +13,7 @@ class UsgsEarthquakeApiService
     {
       magnitude: p["mag"],
       place: p["place"],
-      eventtime: Time.at(p["time"]),
+      eventtime: Time.at(p["time"] / 1000),
       url: p["url"],
       lat: g["coordinates"][1],
       lon: g["coordinates"][0],
