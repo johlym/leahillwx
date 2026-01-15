@@ -1,35 +1,35 @@
-<table class="min-w-full divide-y divide-gray-200">
-  <thead class="bg-gray-50">
+<table class="earthquake-table">
+  <thead>
     <tr>
-      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mag</th>
-      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Distance</th>
-      <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Depth</th>
+      <th scope="col">Mag</th>
+      <th scope="col">Time</th>
+      <th scope="col">Location</th>
+      <th scope="col">Distance</th>
+      <th scope="col">Depth</th>
       <th></th>
     </tr>
   </thead>
-  <tbody class="bg-white divide-y divide-gray-200">
+  <tbody>
     <% @earthquakes.each_with_index do |earthquake, index| %>
-    <tr class="<%= index.even? ? 'bg-white' : 'bg-gray-50' %> hover:bg-gray-100 transition-colors">
-      <td class="px-4 py-3 whitespace-nowrap text-center">
-        <span class="text-2xl font-bold text-gray-900 font-stretch-50%"><%= earthquake.magnitude %></span>
+    <tr>
+      <td class="eq-cell eq-mag-cell">
+        <%= earthquake.magnitude %>
       </td>
-      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700 ">
+      <td class="eq-cell">
         <%= earthquake.eventtime.in_time_zone("America/Los_Angeles").strftime("%B %d, %Y") %><br />
         at <%= earthquake.eventtime.in_time_zone("America/Los_Angeles").strftime("%I:%M %p") %>
       </td>
-      <td class="px-4 py-3 text-sm text-gray-900">
+      <td class="eq-cell">
         <%= earthquake.place %> 
       </td>
       
-      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+      <td class="eq-cell">
         <%= number_with_precision(earthquake.distance, precision: 2) %> mi
       </td>
-      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+      <td class="eq-cell">
         <%= number_with_precision(earthquake.depth, precision: 2) %> mi
       </td>
-      <td class="px-4 py-3 whitespace-nowrap text-center">
+      <td class="eq-cell link-cell">
         <%= link_to earthquake.url, target: :blank, class: "text-sm" do %>
           View at<br />USGS
         <% end %>
