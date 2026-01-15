@@ -38,7 +38,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     json = JSON.parse(response.body)
-    assert_equal({ "2024" => [ "january" ] }, json)
+    assert_equal({ "2024" => { "january" => [ { "day" => 15 } ] } }, json)
   end
 
   test "should show report" do
