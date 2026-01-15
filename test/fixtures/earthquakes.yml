@@ -20,8 +20,15 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
-one: {}
-# column: value
-#
-two: {}
-# column: value
+one:
+  {
+    id: 1,
+    depth: 100.0,
+    distance: 999.99,
+    eventtime: "2024-01-01 00:00:00",
+    lat: 34.0522,
+    lon: -118.2437,
+    magnitude: 1.0,
+    place: "Test Earthquake",
+    url: "https://example.com",
+  }
