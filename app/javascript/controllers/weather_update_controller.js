@@ -17,7 +17,6 @@ export default class extends Controller {
   ]
 
   connect() {
-    console.log("Weather update controller connected", this.element)
     this.element.addEventListener("weather:update", this.handleUpdate.bind(this))
   }
 
@@ -26,12 +25,10 @@ export default class extends Controller {
   }
 
   handleUpdate(event) {
-    console.log("Weather update event received:", event.detail)
     this.updateWeatherData(event.detail)
   }
 
   updateWeatherData(data) {
-    console.log("Updating weather data with:", data)
     if (this.hasTemperatureTarget) {
       this.temperatureTarget.textContent = `${data.temperature_f}° F`
     }
