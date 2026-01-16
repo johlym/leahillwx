@@ -11,7 +11,7 @@
   </thead>
   <tbody>
     <% @earthquakes.each_with_index do |earthquake, index| %>
-    <tr>
+    <tr class="mag-<%= earthquake.magnitude.to_i %>">
       <td class="eq-cell eq-mag-cell">
         <%= earthquake.magnitude %>
       </td>

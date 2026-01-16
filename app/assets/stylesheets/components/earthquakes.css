@@ -15,6 +15,33 @@
     > tr {
       @apply odd:bg-white even:bg-gray-50 hover:bg-gray-100 transition-colors;
 
+      &.mag-4 {
+        @apply bg-yellow-50 hover:bg-yellow-100 border border-yellow-200;
+
+        td.eq-mag-cell {
+          @apply text-yellow-700;
+        }
+      }
+
+      &.mag-5,
+      &.mag-6 {
+        @apply bg-orange-50 hover:bg-orange-100 border border-orange-200;
+
+        td.eq-mag-cell {
+          @apply text-orange-700;
+        }
+      }
+
+      &.mag-7,
+      &.mag-8,
+      &.mag-9 {
+        @apply bg-red-50 hover:bg-red-100 border border-red-200;
+
+        td.eq-mag-cell {
+          @apply text-red-700;
+        }
+      }
+
       td.eq-cell {
         @apply px-4 py-3 whitespace-nowrap text-sm text-gray-700;
       }
