@@ -9,17 +9,17 @@
   </div>
   <div class="forecast-16h forecastHidden" data-forecast-toggle-target="forecast16h">
     <% forecast.hours.first(16).each do |hour| %>
-    <%= render Home::Forecast::Hourly::TileComponent.new(hour: hour, icon_size: "3x", night: hour.dt < @almanac.sunrise_at.to_i || hour.dt > @almanac.sunset_at.to_i) %>
+    <%= render Home::Forecast::Hourly::TileComponent.new(hour: hour, icon_size: "3x", night: night?(hour)) %>
     <% end %>
   </div>
   <div class="forecast-12h forecastHidden" data-forecast-toggle-target="forecast12h">
     <% forecast.hours.first(12).each do |hour| %>
-    <%= render Home::Forecast::Hourly::TileComponent.new(hour: hour, icon_size: "3x", night: hour.dt < @almanac.sunrise_at.to_i || hour.dt > @almanac.sunset_at.to_i) %>
+    <%= render Home::Forecast::Hourly::TileComponent.new(hour: hour, icon_size: "3x", night: night?(hour)) %>
     <% end %>
   </div>
   <div class="forecast-8h" data-forecast-toggle-target="forecast8h">
     <% forecast.hours.first(8).each do |hour| %>
-    <%= render Home::Forecast::Hourly::TileComponent.new(hour: hour, icon_size: "3x", night: hour.dt < @almanac.sunrise_at.to_i || hour.dt > @almanac.sunset_at.to_i) %>
+    <%= render Home::Forecast::Hourly::TileComponent.new(hour: hour, icon_size: "3x", night: night?(hour)) %>
     <% end %>
   </div>
 </div>
