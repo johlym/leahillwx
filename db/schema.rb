@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_15_163411) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_16_044356) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -72,12 +72,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_15_163411) do
     t.float "depth"
     t.float "distance"
     t.datetime "eventtime"
+    t.datetime "last_updated"
     t.float "lat"
     t.float "lon"
     t.float "magnitude"
     t.string "place"
+    t.boolean "revised", default: false
     t.datetime "updated_at", null: false
     t.string "url"
+    t.string "usgs_id"
   end
 
   create_table "forecasts", force: :cascade do |t|

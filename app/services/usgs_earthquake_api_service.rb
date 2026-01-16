@@ -8,16 +8,19 @@ class UsgsEarthquakeApiService
   def get_latest_earthquake
     response = HTTParty.get(@url)
     data = JSON.parse(response.body)
-    p = data["features"][0]["properties"]
-    g = data["features"][0]["geometry"]
+    d = data["features"][0]
+    p = d["properties"]
+    g = d["geometry"]
     {
       magnitude: p["mag"],
       place: p["place"],
       eventtime: Time.at(p["time"] / 1000),
+      last_updated: Time.at(p["updated"] / 1000),
       url: p["url"],
       lat: g["coordinates"][1],
       lon: g["coordinates"][0],
-      depth: g["coordinates"][2]
+      depth: g["coordinates"][2],
+      usgs_id: d["id"]
     }
   end
 end
