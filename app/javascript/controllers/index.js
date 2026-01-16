@@ -10,6 +10,8 @@ import MobileMenuController from "./mobile_menu_controller"
 import ImageRefreshController from "./image_refresh_controller"
 import DateNavigationController from "./date_navigation_controller"
 import ForecastToggleController from "./forecast_toggle_controller"
+import RadarMapController from "./radar_map_controller"
+import WeatherUpdateController from "./weather_update_controller"
 
 application.register("hello", HelloController)
 application.register("connection-status", ConnectionStatusController)
@@ -18,3 +20,5 @@ application.register("image-refresh", ImageRefreshController)
 application.register("traffic-cameras", ImageRefreshController)
 application.register("date-navigation", DateNavigationController)
 application.register("forecast-toggle", ForecastToggleController)
+application.register("radar-map", RadarMapController)
+application.register("weather-update", WeatherUpdateController)

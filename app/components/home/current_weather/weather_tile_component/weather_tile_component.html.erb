@@ -4,13 +4,13 @@
   <% end %>
   <div class="weather-tile-content">
     <% if temperature? %>
-      <span class="current-temperature-f"><%= formatted_temperature %>° F</span>
-      <span class="current-temperature-c">(feels like <%= formatted_feels_like %>° F)</span>
-      <span class="measurement-id" data-controller="connection-status">No. <%= counter %> <span class="live hidden" data-connection-status-target="badge">LIVE</span></span>
+      <span class="current-temperature-f" data-weather-update-target="temperature"><%= formatted_temperature %>° F</span>
+      <span class="current-temperature-c" data-weather-update-target="feelsLike">(feels like <%= formatted_feels_like %>° F)</span>
+      <span class="measurement-id" data-controller="connection-status"><span data-weather-update-target="counter">No. <%= counter %> </span><span class="live hidden" data-connection-status-target="badge">LIVE</span></span>
     <% else %>
-      <span class="weather-tile-big"><%= primary_value %></span>
+      <span class="weather-tile-big" <%= "data-weather-update-target=\"#{primary_target}\"" if primary_target %>><%= primary_value %></span>
       <% if secondary_value? %>
-        <span class="weather-tile-small"><%= secondary_value %></span>
+        <span class="weather-tile-small" <%= "data-weather-update-target=\"#{secondary_target}\"" if secondary_target %>><%= secondary_value %></span>
       <% end %>
     <% end %>
   </div>

@@ -1,8 +1,8 @@
 .weather-grid {
-  @apply grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-10 gap-3 mb-3 lg:mb-0;
+  @apply grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-10 gap-3 mb-3;
 
   @media (min-width: 1024px) {
-    grid-template-rows: 150px 150px auto;
+    grid-template-rows: 150px 150px 150px;
   }
 }
 
@@ -47,16 +47,29 @@
     }
   }
 
-  &.current-dew-point {
-    @apply col-span-1 sm:col-span-2 lg:col-span-2 lg:col-start-5 lg:row-start-1;
-  }
-
   &.current-wind {
     @apply col-span-1 sm:col-span-2 lg:col-span-2 lg:col-start-7 lg:row-start-1;
   }
 
+  &.current-radar {
+    @apply col-span-1 row-span-3 sm:col-span-2 lg:col-span-4 lg:col-start-7 lg:row-start-1;
+
+    .weather-tile-content {
+      @apply p-0;
+
+      [data-controller="radar-map"] {
+        @apply h-full w-full;
+        min-height: 300px;
+      }
+    }
+  }
+
+  &.current-dew-point {
+    @apply col-span-1 sm:col-span-2 lg:col-span-2 lg:col-start-5 lg:row-start-1;
+  }
+
   &.current-humidity {
-    @apply col-span-1 sm:col-span-2 lg:col-span-2 lg:col-start-9 lg:row-start-1;
+    @apply col-span-1 sm:col-span-2 lg:col-span-2 lg:col-start-1 lg:row-start-3;
   }
 
   &.current-rain {
@@ -64,10 +77,10 @@
   }
 
   &.current-pressure {
-    @apply col-span-1 sm:col-span-2 lg:col-span-2 lg:col-start-7 lg:row-start-2;
+    @apply col-span-1 sm:col-span-2 lg:col-span-2 lg:col-start-3 lg:row-start-3;
   }
 
   &.current-solar {
-    @apply col-span-1 sm:col-span-2 lg:col-span-2 lg:col-start-9 lg:row-start-2;
+    @apply col-span-1 sm:col-span-2 lg:col-span-2 lg:col-start-5 lg:row-start-3;
   }
 }

@@ -2,7 +2,7 @@
 
 <div class="primary-container">
   <div class="weather-grid">
-    <div id="current_weather" class="contents">
+    <div id="current_weather" class="contents" data-controller="weather-update">
       <%= render partial: "current_weather", locals: { current: @current } %>
     </div>
   </div>
