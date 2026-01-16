@@ -6,10 +6,6 @@
   }
 }
 
-.hourly-forecast {
-  @apply col-span-2 sm:col-span-2 lg:col-span-10 lg:row-span-2 mb-3;
-}
-
 .weather-tile {
   @apply border border-gray-200 bg-white rounded-sm flex flex-col shadow-lg;
 

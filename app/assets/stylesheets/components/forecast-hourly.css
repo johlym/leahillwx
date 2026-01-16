@@ -1,5 +1,5 @@
 .hourly-forecast {
-  @apply rounded-b-sm;
+  @apply col-span-2 sm:col-span-2 lg:col-span-10 lg:row-span-2 mb-3 rounded-b-sm;
 
   .interval-selector {
     @apply flex justify-end gap-2 p-2;
