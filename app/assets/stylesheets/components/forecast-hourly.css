@@ -1,8 +1,8 @@
 .hourly-forecast {
-  @apply rounded-b-sm relative;
+  @apply rounded-b-sm;
 
   .interval-selector {
-    @apply flex justify-center gap-2 top-2 right-2 absolute;
+    @apply flex justify-end gap-2 p-2;
 
     > span,
     > button {
@@ -18,12 +18,14 @@
   .forecast-12h,
   .forecast-8h {
     @apply grid gap-px bg-gray-200 border-gray-200;
+
     .forecast-item {
       @apply col-span-1 p-2 bg-white hover:bg-gray-50 text-sm flex flex-col items-center min-h-44;
 
       &:first-child {
-        @apply rounded-bl-sm;
+        @apply lg:rounded-bl-sm;
       }
+
       &:last-child {
         @apply rounded-br-sm;
       }
@@ -56,7 +58,7 @@
   }
 
   .forecast-16h {
-    @apply grid-cols-16;
+    @apply grid-cols-4 md:grid-cols-16;
 
     .forecast-item {
       @apply p-1;
@@ -76,7 +78,7 @@
     }
   }
   .forecast-12h {
-    @apply grid-cols-12;
+    @apply grid-cols-2 sm:grid-cols-4 md:grid-cols-12;
 
     .gusts_mph {
       @apply hidden;
@@ -84,7 +86,19 @@
   }
 
   .forecast-8h {
-    @apply grid-cols-8;
+    @apply grid-cols-2 sm:grid-cols-4 md:grid-cols-8;
+
+    .forecast-item:nth-child(7) {
+      @apply rounded-bl-sm sm:rounded-none;
+    }
+
+    .forecast-item:nth-child(5) {
+      @apply rounded-none sm:rounded-bl-sm lg:rounded-none;
+    }
+
+    .forecast-item:nth-child(8) {
+      @apply rounded-br-sm;
+    }
   }
 
   .forecastHidden {

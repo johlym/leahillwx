@@ -1,12 +1,12 @@
 .tile-subtitle {
-  @apply text-xs text-gray-500 text-center py-1 bg-gray-50 border-b border-gray-200;
+  @apply text-xs text-gray-500 text-center p-1 bg-gray-50 border-b border-gray-200 text-wrap;
 }
 
 .forecast-entry {
   @apply border-b border-gray-200 px-5 py-3 flex flex-row flex-wrap sm:flex-nowrap items-center justify-center sm:justify-start odd:bg-white even:bg-gray-50 odd:hover:bg-gray-50 even:hover:bg-gray-100;
 
   &:last-child {
-    @apply border-b-0 rounded-b-sm;
+    @apply border-x-0 rounded-b-sm;
   }
 
   > .date-grid {

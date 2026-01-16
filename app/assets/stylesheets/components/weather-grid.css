@@ -1,5 +1,5 @@
 .weather-grid {
-  @apply grid grid-cols-2 lg:grid-cols-10 gap-3;
+  @apply grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-10 gap-3 mb-3 lg:mb-0;
 
   @media (min-width: 1024px) {
     grid-template-rows: 150px 150px auto;
@@ -7,25 +7,25 @@
 }
 
 .hourly-forecast {
-  @apply col-span-2 lg:col-span-10 lg:row-span-2 mb-4;
+  @apply col-span-2 sm:col-span-2 lg:col-span-10 lg:row-span-2 mb-3;
 }
 
 .weather-tile {
   @apply border border-gray-200 bg-white rounded-sm flex flex-col shadow-lg;
 
   .weather-tile-heading {
-    @apply text-center font-bold p-2 border-b rounded-t-sm border-gray-200 bg-gray-50 text-gray-dark;
+    @apply text-center font-bold text-sm sm:text-lg p-1 sm:p-2 border-b rounded-t-sm border-gray-200 bg-gray-50 text-gray-dark;
   }
 
   .weather-tile-content {
-    @apply flex flex-col flex-1 justify-center p-4;
+    @apply flex flex-col flex-1 justify-center p-2 sm:p-4;
 
     .weather-tile-big {
-      @apply text-center font-bold text-xl md:text-2xl lg:text-4xl text-gray-800;
+      @apply text-center font-bold text-lg sm:text-xl lg:text-4xl text-gray-800;
     }
 
     .weather-tile-small {
-      @apply text-center font-semibold text-sm md:text-lg lg:text-xl text-gray-500;
+      @apply text-center font-semibold text-xs sm:text-sm lg:text-xl text-gray-500;
     }
 
     .measurement-id {
@@ -38,40 +38,40 @@
   }
 
   &.current-temperature {
-    @apply col-span-2 lg:col-span-4 lg:row-span-2;
+    @apply col-span-2 lg:col-span-4 sm:row-span-2;
 
     .weather-tile-content {
       .current-temperature-f {
-        @apply text-5xl lg:text-8xl text-gray-800 font-bold text-center;
+        @apply text-3xl sm:text-5xl lg:text-8xl text-gray-800 font-bold text-center;
       }
 
       .current-temperature-c {
-        @apply text-2xl md:text-lg lg:text-2xl text-gray-500 text-center;
+        @apply text-xs sm:text-base lg:text-2xl text-gray-500 text-center;
       }
     }
   }
 
   &.current-dew-point {
-    @apply col-span-1 lg:col-span-2 lg:col-start-5 lg:row-start-1;
+    @apply col-span-1 sm:col-span-2 lg:col-span-2 lg:col-start-5 lg:row-start-1;
   }
 
   &.current-wind {
-    @apply col-span-1 lg:col-span-2 lg:col-start-7 lg:row-start-1;
+    @apply col-span-1 sm:col-span-2 lg:col-span-2 lg:col-start-7 lg:row-start-1;
   }
 
   &.current-humidity {
-    @apply col-span-1 lg:col-span-2 lg:col-start-9 lg:row-start-1;
+    @apply col-span-1 sm:col-span-2 lg:col-span-2 lg:col-start-9 lg:row-start-1;
   }
 
   &.current-rain {
-    @apply col-span-1 lg:col-span-2 lg:col-start-5 lg:row-start-2;
+    @apply col-span-1 sm:col-span-2 lg:col-span-2 lg:col-start-5 lg:row-start-2;
   }
 
   &.current-pressure {
-    @apply col-span-1 lg:col-span-2 lg:col-start-7 lg:row-start-2;
+    @apply col-span-1 sm:col-span-2 lg:col-span-2 lg:col-start-7 lg:row-start-2;
   }
 
   &.current-solar {
-    @apply col-span-1 lg:col-span-2 lg:col-start-9 lg:row-start-2;
+    @apply col-span-1 sm:col-span-2 lg:col-span-2 lg:col-start-9 lg:row-start-2;
   }
 }
