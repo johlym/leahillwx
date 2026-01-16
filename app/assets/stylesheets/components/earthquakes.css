@@ -1,5 +1,9 @@
+.earthquake-table-container {
+  @apply w-full overflow-x-auto;
+}
+
 .earthquake-table {
-  @apply w-full border-b border-gray-200;
+  @apply w-[723px] border-b border-gray-200;
 
   .eq-header {
     @apply flex bg-gray-50;
@@ -17,7 +21,7 @@
       }
 
       &.timestamp-header {
-        @apply shrink-0 w-[200px];
+        @apply shrink-0 w-[150px];
       }
 
       &.location-header {
@@ -158,7 +162,7 @@
         }
 
         &.eq-timestamp-cell {
-          @apply shrink-0 whitespace-nowrap w-[200px];
+          @apply shrink-0 whitespace-nowrap w-[150px];
         }
 
         &.eq-location-cell {
