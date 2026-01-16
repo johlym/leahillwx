@@ -17,7 +17,7 @@
   .forecast-16h,
   .forecast-12h,
   .forecast-8h {
-    @apply grid gap-px bg-gray-200 border-gray-200;
+    @apply grid gap-px bg-gray-200 border-gray-200 border-t;
 
     .forecast-item {
       @apply col-span-1 p-2 bg-white hover:bg-gray-50 text-sm flex flex-col items-center min-h-44;
