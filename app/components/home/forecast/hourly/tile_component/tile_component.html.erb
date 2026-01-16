@@ -1,0 +1,7 @@
+<div class="forecast-item">
+  <p class="interval"><%= Time.at(hour.dt).strftime("%-I %p") %></p>
+  <p class="icon"><%= render "root/shared/weather_icon", icon: hour.weather_icon, size: icon_size, night: night %></p>
+  <p class="temperature"><%= number_with_precision(hour.temp, precision: 0) %>°</p>
+  <p class="wind"><i class="far fa-wind"></i><%= number_with_precision(hour.wind_speed, precision: 0) %><span class="gusts"> | <%= number_with_precision(hour.wind_gust, precision: 0) %><span class="gusts_mph"> mph</span></span></p> 
+  <p class="pop"><i class="far fa-cloud-showers"></i><%= hour.pop * 100 %>%</p>
+</div>

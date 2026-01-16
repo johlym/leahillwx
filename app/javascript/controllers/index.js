@@ -9,6 +9,7 @@ import ConnectionStatusController from "./connection_status_controller"
 import MobileMenuController from "./mobile_menu_controller"
 import ImageRefreshController from "./image_refresh_controller"
 import DateNavigationController from "./date_navigation_controller"
+import ForecastToggleController from "./forecast_toggle_controller"
 
 application.register("hello", HelloController)
 application.register("connection-status", ConnectionStatusController)
@@ -16,3 +17,4 @@ application.register("mobile-menu", MobileMenuController)
 application.register("image-refresh", ImageRefreshController)
 application.register("traffic-cameras", ImageRefreshController)
 application.register("date-navigation", DateNavigationController)
+application.register("forecast-toggle", ForecastToggleController)

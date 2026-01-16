@@ -1,0 +1,93 @@
+.hourly-forecast {
+  @apply rounded-b-sm relative;
+
+  .interval-selector {
+    @apply flex justify-center gap-2 top-2 right-2 absolute;
+
+    > span,
+    > button {
+      @apply px-1 py-0.5 rounded-sm cursor-pointer text-sm;
+    }
+
+    > button {
+      @apply border bg-gray-100 border-gray-300 hover:bg-gray-200 hover:border-gray-400;
+    }
+  }
+
+  .forecast-16h,
+  .forecast-12h,
+  .forecast-8h {
+    @apply grid gap-px bg-gray-200 border-gray-200;
+    .forecast-item {
+      @apply col-span-1 p-2 bg-white hover:bg-gray-50 text-sm flex flex-col items-center min-h-44;
+
+      &:first-child {
+        @apply rounded-bl-sm;
+      }
+      &:last-child {
+        @apply rounded-br-sm;
+      }
+
+      .interval {
+        @apply font-bold text-lg font-stretch-50%;
+      }
+
+      .icon {
+        @apply mb-2;
+      }
+
+      .temperature {
+        @apply text-xl font-bold;
+      }
+
+      .wind > svg,
+      .pop > svg {
+        @apply mr-1;
+      }
+
+      .wind {
+        @apply font-semibold;
+      }
+
+      .wind_gust {
+        @apply italic text-xs;
+      }
+    }
+  }
+
+  .forecast-16h {
+    @apply grid-cols-16;
+
+    .forecast-item {
+      @apply p-1;
+
+      .gusts {
+        @apply hidden;
+      }
+
+      .icon {
+        @apply mr-0.5;
+      }
+
+      .wind > svg,
+      .pop > svg {
+        @apply mr-0.5;
+      }
+    }
+  }
+  .forecast-12h {
+    @apply grid-cols-12;
+
+    .gusts_mph {
+      @apply hidden;
+    }
+  }
+
+  .forecast-8h {
+    @apply grid-cols-8;
+  }
+
+  .forecastHidden {
+    @apply hidden;
+  }
+}

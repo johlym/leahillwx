@@ -5,6 +5,8 @@ class RootController < ApplicationController
       .order(reading_date_time: :desc)
       .first
 
+    @almanac = AlmanacEntry.for_date(Date.today)
+
     forecast_record = Forecast.where(interval: "daily").last
     if forecast_record.nil?
       ow_forecast = OpenWeatherApiService.new.retrieve_forecast

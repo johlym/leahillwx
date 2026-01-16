@@ -27,8 +27,10 @@ class ForecastParserService
       @lon = @data[:lon]
       @timezone = @data[:timezone]
       @timezone_offset = @data[:timezone_offset]
-      @alerts = @data[:alerts] || []
+      @alerts = (@data[:alerts] || []).map { |alert_data| ForecastAlert.new(alert_data) }
       @days = (@data[:daily] || []).map { |day_data| ForecastDay.new(day_data) }
+      @hours = (@data[:hourly] || []).map { |hour_data| ForecastHour.new(hour_data) }
+      @minutes = (@data[:minutely] || []).map { |minute_data| ForecastMinute.new(minute_data) }
     end
 
     def today
@@ -45,6 +47,14 @@ class ForecastParserService
 
     def days
       @days
+    end
+
+    def hours
+      @hours
+    end
+
+    def minutes
+      @minutes
     end
 
     # Dynamic day accessors: day_0 through day_7
@@ -171,6 +181,139 @@ class ForecastParserService
     def ms_to_mph(ms)
       return nil if ms.nil?
       ms * 2.23694
+    end
+  end
+
+  class ForecastHour
+    DIRECT_ATTRS = %i[
+      dt pressure humidity dew_point wind_deg
+      clouds visibility pop uvi
+    ].freeze
+
+    def initialize(data)
+      @data = data.deep_symbolize_keys
+    end
+
+    DIRECT_ATTRS.each do |attr|
+      define_method(attr) { @data[attr] }
+    end
+
+    # Temperature accessor (single value for hourly)
+    def temp
+      celsius_to_fahrenheit(@data[:temp])
+    end
+
+    # Feels like accessor (single value for hourly)
+    def feels_like
+      celsius_to_fahrenheit(@data[:feels_like])
+    end
+
+    # Wind accessors (converted to mph)
+    def wind_speed
+      ms_to_mph(@data[:wind_speed])
+    end
+
+    def wind_gust
+      ms_to_mph(@data[:wind_gust])
+    end
+
+    # Weather condition accessors
+    def weather
+      @data[:weather]&.first
+    end
+
+    def weather_id
+      weather&.dig(:id)
+    end
+
+    def weather_main
+      weather&.dig(:main)
+    end
+
+    def weather_description
+      weather&.dig(:description)
+    end
+
+    def weather_icon
+      weather&.dig(:icon)
+    end
+
+    # Time helpers
+    def time
+      Time.at(dt) if dt
+    end
+
+    def hour
+      time&.hour
+    end
+
+    private
+
+    def celsius_to_fahrenheit(celsius)
+      return nil if celsius.nil?
+      (celsius * 9.0 / 5.0) + 32
+    end
+
+    def ms_to_mph(ms)
+      return nil if ms.nil?
+      ms * 2.23694
+    end
+  end
+
+  class ForecastMinute
+    attr_reader :dt, :precipitation
+
+    def initialize(data)
+      @data = data.deep_symbolize_keys
+      @dt = @data[:dt]
+      @precipitation = @data[:precipitation]
+    end
+
+    # Time helpers
+    def time
+      Time.at(dt) if dt
+    end
+
+    def minute
+      time&.min
+    end
+
+    def hour
+      time&.hour
+    end
+  end
+
+  class ForecastAlert
+    attr_reader :sender_name, :event, :start, :end, :description, :tags
+
+    def initialize(data)
+      @data = data.deep_symbolize_keys
+      @sender_name = @data[:sender_name]
+      @event = @data[:event]
+      @start = @data[:start]
+      @end = @data[:end]
+      @description = @data[:description]
+      @tags = @data[:tags] || []
+    end
+
+    # Time helpers
+    def start_time
+      Time.at(start) if start
+    end
+
+    def end_time
+      Time.at(self.end) if self.end
+    end
+
+    def active?
+      return false unless start && self.end
+      now = Time.current.to_i
+      now >= start && now <= self.end
+    end
+
+    def duration_hours
+      return nil unless start && self.end
+      (self.end - start) / 3600.0
     end
   end
 end

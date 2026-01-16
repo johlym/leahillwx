@@ -7,6 +7,10 @@
     </div>
   </div>
 
+  <div class="hourly-forecast">
+    <%= render Home::Forecast::HourlyForecastComponent.new(forecast: @forecast, almanac: @almanac) %>
+  </div>
+
   <div class="forecast-section">
     <div class="forecast-column">
       <%= render Home::Forecast::DailyForecastComponent.new(forecast: @forecast) %>

@@ -1,1 +1,25 @@
-<div>Add Home::Forecast::HourlyForecast template here</div>
+<div class="weather-tile hourly-forecast" data-controller="forecast-toggle" data-forecast-toggle-forecast-hidden-class="forecastHidden">
+  <h2 class="weather-tile-heading">Hourly Forecast</h2>
+  <div class="interval-selector">
+    <span>Hours: </span>
+    <button data-action="click->forecast-toggle#toggle" data-view="8h">8h</button>
+    <button data-action="click->forecast-toggle#toggle" data-view="12h">12h</button>
+    <button data-action="click->forecast-toggle#toggle" data-view="16h">16h</button>
+  </div>
+  <p class="tile-subtitle">as of <%= formatted_timestamp %>. Forecast data via <%= link_to "OpenWeatherMap", "https://openweathermap.org/?utm_source=leahillwx.org&utm_medium=referral", target: "_blank", class: "underline" %>.</p>
+  <div class="forecast-16h forecastHidden" data-forecast-toggle-target="forecast16h">
+    <% forecast.hours.first(16).each do |hour| %>
+    <%= render Home::Forecast::Hourly::TileComponent.new(hour: hour, icon_size: "1x", night: hour.dt < @almanac.sunrise_at.to_i || hour.dt > @almanac.sunset_at.to_i) %>
+    <% end %>
+  </div>
+  <div class="forecast-12h forecastHidden" data-forecast-toggle-target="forecast12h">
+    <% forecast.hours.first(12).each do |hour| %>
+    <%= render Home::Forecast::Hourly::TileComponent.new(hour: hour, icon_size: "2x", night: hour.dt < @almanac.sunrise_at.to_i || hour.dt > @almanac.sunset_at.to_i) %>
+    <% end %>
+  </div>
+  <div class="forecast-8h" data-forecast-toggle-target="forecast8h">
+    <% forecast.hours.first(8).each do |hour| %>
+    <%= render Home::Forecast::Hourly::TileComponent.new(hour: hour, icon_size: "3x", night: hour.dt < @almanac.sunrise_at.to_i || hour.dt > @almanac.sunset_at.to_i) %>
+    <% end %>
+  </div>
+</div>

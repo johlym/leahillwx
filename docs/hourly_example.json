@@ -1,0 +1,23 @@
+{
+  "dt": 1768521600,
+  "temp": 8.76,
+  "feels_like": 6.89,
+  "pressure": 1029,
+  "humidity": 85,
+  "dew_point": 6.38,
+  "uvi": 0,
+  "clouds": 75,
+  "visibility": 10000,
+  "wind_speed": 3.23,
+  "wind_deg": 2,
+  "wind_gust": 6.57,
+  "weather": [
+    {
+      "id": 803,
+      "main": "Clouds",
+      "description": "broken clouds",
+      "icon": "04d"
+    }
+  ],
+  "pop": 0
+}

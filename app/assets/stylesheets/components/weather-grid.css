@@ -6,26 +6,30 @@
   }
 }
 
+.hourly-forecast {
+  @apply col-span-2 lg:col-span-10 lg:row-span-2 mb-4;
+}
+
 .weather-tile {
-  @apply border border-slate-200 bg-white rounded-sm flex flex-col shadow-lg;
+  @apply border border-gray-200 bg-white rounded-sm flex flex-col shadow-lg;
 
   .weather-tile-heading {
-    @apply text-center font-bold p-2 border-b rounded-t-sm border-slate-200 bg-slate-50 text-slate-dark;
+    @apply text-center font-bold p-2 border-b rounded-t-sm border-gray-200 bg-gray-50 text-gray-dark;
   }
 
   .weather-tile-content {
     @apply flex flex-col flex-1 justify-center p-4;
 
     .weather-tile-big {
-      @apply text-center font-bold text-xl md:text-2xl lg:text-4xl text-slate-800;
+      @apply text-center font-bold text-xl md:text-2xl lg:text-4xl text-gray-800;
     }
 
     .weather-tile-small {
-      @apply text-center font-semibold text-sm md:text-lg lg:text-xl text-slate-500;
+      @apply text-center font-semibold text-sm md:text-lg lg:text-xl text-gray-500;
     }
 
     .measurement-id {
-      @apply text-xs text-slate-400 text-center font-mono;
+      @apply text-xs text-gray-400 text-center font-mono;
 
       .live {
         @apply text-xs text-white bg-red-600 px-1 py-0.5 rounded-sm;
@@ -38,11 +42,11 @@
 
     .weather-tile-content {
       .current-temperature-f {
-        @apply text-5xl lg:text-8xl text-slate-800 font-bold text-center;
+        @apply text-5xl lg:text-8xl text-gray-800 font-bold text-center;
       }
 
       .current-temperature-c {
-        @apply text-2xl md:text-lg lg:text-2xl text-slate-500 text-center;
+        @apply text-2xl md:text-lg lg:text-2xl text-gray-500 text-center;
       }
     }
   }

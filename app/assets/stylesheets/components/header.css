@@ -24,7 +24,7 @@
       @apply flex lg:hidden;
 
       .mobile-toggle {
-        @apply -m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-slate-700;
+        @apply -m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700;
 
         .icon {
           @apply text-xl;
