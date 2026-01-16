@@ -38,7 +38,7 @@ class Home::Forecast::DailyForecastComponentTest < ViewComponent::TestCase
 
     render_inline(component)
 
-    assert_selector "a[href='https://openweathermap.org/?utm_source=leahillwx.org&utm_medium=referral'][target='_blank']", text: "OpenWeatherMap"
+    assert_selector "a[href='https://openweathermap.org/?utm_source=lhwx.org&utm_medium=referral'][target='_blank']", text: "OpenWeatherMap"
   end
 
   def test_formatted_timestamp_includes_date_and_time

@@ -60,14 +60,14 @@ Rails.application.configure do
   config.action_cable.allowed_request_origins = [
     "https://lhwx-e1aba94eba7d.herokuapp.com",
     "https://two.leahillwx.org",
-    /https:\/\/.*\.leahillwx\.org/
+    /https:\/\/.*\.lhwx\.org/
   ]
 
   # Enable DNS rebinding protection and other `Host` header attacks.
   config.hosts = [
     "lhwx-e1aba94eba7d.herokuapp.com",
-    "leahillwx.org",     # Allow requests from leahillwx.org
-    /.*\.leahillwx\.org/ # Allow requests from subdomains like `www.leahillwx.org`
+    "lhwx.org",     # Allow requests from lhwx.org
+    /.*\.lhwx\.org/ # Allow requests from subdomains like `www.lhwx.org`
   ]
   #
   # Skip DNS rebinding protection for the default health check endpoint.

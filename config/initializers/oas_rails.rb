@@ -4,11 +4,11 @@ OasRails.configure do |config|
   config.source_oas_path = "lib/assets/oas.json"
 
   # Basic Information about the API
-  config.info.title = "leahillwx.org API documentation"
+  config.info.title = "lhwx.org API documentation"
   config.info.version = "1.0.0"
-  config.info.summary = "leahillwx.org API documentation"
+  config.info.summary = "lhwx.org API documentation"
   config.info.description = <<~HEREDOC
-    The leahillwx.org API is designed to provide weather measurement input to the site. This API is largely private (except where noted), requires authentication, and is subject to change. This documentation portal is provided for reference, testing purposes, and proof of concept.
+    The lhwx.org API is designed to provide weather measurement input to the site. This API is largely private (except where noted), requires authentication, and is subject to change. This documentation portal is provided for reference, testing purposes, and proof of concept.
   HEREDOC
   config.info.contact.name = "Johnathan Lyman"
   config.info.contact.email = "email@johnathan.org"

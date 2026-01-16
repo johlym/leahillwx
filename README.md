@@ -1,3 +1,3 @@
-# leahillwx.org
+# lhwx.org
 
-This is the source code for the Leahillwx.org website.
+This is the source code for the lhwx.org website.
