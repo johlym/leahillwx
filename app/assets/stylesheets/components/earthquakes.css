@@ -1,5 +1,5 @@
 .earthquake-table {
-  @apply min-w-full divide-y divide-gray-200;
+  @apply min-w-full divide-y divide-gray-200 border-b border-gray-200;
 
   thead {
     @apply bg-gray-50;
@@ -54,5 +54,13 @@
         @apply text-center;
       }
     }
+  }
+}
+
+.usgs-logo {
+  @apply flex justify-end items-center p-2;
+
+  p {
+    @apply text-xs text-gray-500 mr-2;
   }
 }
