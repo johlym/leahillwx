@@ -41,7 +41,7 @@
       @apply flex odd:bg-white even:bg-gray-50 hover:bg-gray-100 transition-colors;
 
       &.mag-4 {
-        @apply bg-yellow-50 hover:bg-yellow-100 border border-yellow-200;
+        @apply bg-yellow-50 hover:bg-yellow-100 ring ring-yellow-200;
 
         .eq-cell {
           &.revised-cell {
@@ -73,7 +73,7 @@
 
       &.mag-5,
       &.mag-6 {
-        @apply bg-orange-50 hover:bg-orange-100 border border-orange-200;
+        @apply bg-orange-50 hover:bg-orange-100 ring ring-orange-200;
 
         .eq-cell {
           &.revised-cell {
@@ -106,7 +106,7 @@
       &.mag-7,
       &.mag-8,
       &.mag-9 {
-        @apply bg-red-50 hover:bg-red-100 border border-red-200;
+        @apply bg-red-50 hover:bg-red-100 ring ring-red-200;
 
         .eq-cell {
           &.revised-cell {
