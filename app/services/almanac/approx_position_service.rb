@@ -1,6 +1,7 @@
 module Almanac
   # Approximate position calculations for real-time "now" positions
-  # Based on weewx almanac approximation algorithms
+  # Based on weewx almanac approximation algorithms via the excellent folks at weewx.com
+  # https://github.com/weewx/weewx/blob/master/src/weewx/almanac.py
   class ApproxPositionService
     def initialize(datetime: Time.current, lat:, lon:)
       @datetime = datetime
