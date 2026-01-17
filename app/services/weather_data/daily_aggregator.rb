@@ -36,7 +36,7 @@ module WeatherData
     end
 
     def create_or_update_entry(report)
-      entry = report.entries.find_or_initialize_by(day: @date.day)
+      entry = report.entries.find_or_initialize_by(day: @date.day, hour: nil)
 
       if measurements.empty?
         entry.assign_attributes(no_data_attributes)

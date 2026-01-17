@@ -15,8 +15,8 @@ class ReportsController < ApplicationController
     result = reports_data.transform_values do |reports|
       # Group by month and get available days for each
       reports.group_by { |r| r.month_name.downcase }.transform_values do |month_reports|
-        # Get all days that have entries for this month
-        month_reports.first.entries.daily.pluck(:day).uniq.sort.map { |d| { day: d } }
+        # Get all days that have any entries for this month (daily or hourly)
+        month_reports.first.entries.pluck(:day).uniq.sort.map { |d| { day: d } }
       end
     end
 
