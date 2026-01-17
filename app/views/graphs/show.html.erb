@@ -14,7 +14,9 @@
     <div class="graph-section">
       <%= render Graphs::LineGraphComponent.new(
         data: @temperature_data,
-        title: @graph_title
+        year: @current_year,
+        month: @current_month,
+        day: @current_day
       ) %>
     </div>
   <% else %>

@@ -50,15 +50,9 @@ class GraphsController < ApplicationController
     report = Report.includes(:entries).find_by(year: year, month: month)
     return unless report
 
-    if day
-      @entries = report.entries.hourly.where(day: day).ordered
-      @graph_title = "Hourly Temperature Data - #{Date::MONTHNAMES[month]} #{day}, #{year}"
-    else
-      @entries = report.entries.daily.ordered
-      @graph_title = "Daily Temperature Data - #{Date::MONTHNAMES[month]} #{year}"
-    end
+    entries = day ? report.entries.hourly.where(day: day).ordered : report.entries.daily.ordered
 
-    @temperature_data = @entries.with_data.map do |entry|
+    @temperature_data = entries.with_data.map do |entry|
       {
         date: entry.hourly? ? format("%02d:00", entry.hour) : entry.day.to_s,
         high: entry.high_temp ? celsius_to_fahrenheit(entry.high_temp).round(2) : nil,
