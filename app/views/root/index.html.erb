@@ -46,6 +46,31 @@
           </div>
         </div>
       <% end %>
+      <%= render Home::GenericTileComponent.new(heading: "Auburn Muni (S50)") do %>
+        <div data-controller="image-refresh">
+          <p class="tile-subtitle">
+            Next refresh in <span data-image-refresh-target="countdown" class="font-mono">60</span> seconds.
+          </p>
+          <div class="grid grid-cols-2 gap-2 p-2" id="airport_cameras">
+            <div>
+              <h3 class="text-sm text-center font-bold">North</h3>
+              <%= image_tag "https://images.wsdot.wa.gov/airports/auburn2.jpg" %>
+            </div>
+            <div>
+              <h3 class="text-sm text-center font-bold">East</h3>
+              <%= image_tag "https://images.wsdot.wa.gov/airports/auburn4.jpg" %>
+            </div>
+            <div>
+              <h3 class="text-sm text-center font-bold">South</h3>
+              <%= image_tag "https://images.wsdot.wa.gov/airports/auburn3.jpg" %>
+            </div>
+            <div>
+              <h3 class="text-sm text-center font-bold">West</h3>
+              <%= image_tag "https://images.wsdot.wa.gov/airports/auburn1.jpg" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
     </div>
   </div>
 </div>
