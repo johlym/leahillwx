@@ -10,7 +10,9 @@
 @import "./components/forecast-grid";
 @import "./components/forecast-section";
 @import "./components/earthquakes";
+@import "./components/date-navigation";
 @import "./components/reports";
+@import "./components/graphs";
 @import "./components/almanac";
 @import "./components/footer";
 

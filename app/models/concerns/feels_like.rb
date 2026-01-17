@@ -34,7 +34,7 @@ module FeelsLike
   # Heat Index
   # --------------------
   def hot_enough_for_heat_index?(temp_c, humidity)
-    temp_c >= 27 && humidity >= 40
+    temp_c >= 26.67 && humidity >= 40
   end
 
   def heat_index_c(temp_c, humidity)

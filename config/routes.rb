@@ -35,6 +35,9 @@ Rails.application.routes.draw do
 
   # Graphs routes
   get "graphs", to: "graphs#index", as: :graphs
+  get "graphs/available", to: "graphs#available", as: :available_graphs
+  get "graphs/:year/:month_name", to: "graphs#show", as: :graph
+  get "graphs/:year/:month_name/:day", to: "graphs#show", as: :graph_day
 
   # Almanac routes
   get "almanac", to: "almanac#index", as: :almanac

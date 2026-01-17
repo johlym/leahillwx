@@ -11,6 +11,7 @@ import ImageRefreshController from "./image_refresh_controller"
 import DateNavigationController from "./date_navigation_controller"
 import ForecastToggleController from "./forecast_toggle_controller"
 import WeatherUpdateController from "./weather_update_controller"
+import LineGraphController from "./line_graph_controller"
 
 application.register("hello", HelloController)
 application.register("connection-status", ConnectionStatusController)
@@ -20,3 +21,4 @@ application.register("traffic-cameras", ImageRefreshController)
 application.register("date-navigation", DateNavigationController)
 application.register("forecast-toggle", ForecastToggleController)
 application.register("weather-update", WeatherUpdateController)
+application.register("line-graph", LineGraphController)

@@ -129,6 +129,7 @@ export default class extends Controller {
     
     this.daySelectTarget.disabled = false
     this.clearMessage()
+    this.enableGoButton()
   }
   
   enableGoButton() {
