@@ -33,6 +33,9 @@ Rails.application.routes.draw do
   get "records", to: "records#index", as: :records
   get "records/:year", to: "records#index", as: :records_year
 
+  # Graphs routes
+  get "graphs", to: "graphs#index", as: :graphs
+
   # Almanac routes
   get "almanac", to: "almanac#index", as: :almanac
   get "almanac/available", to: "almanac#available", as: :available_almanac
