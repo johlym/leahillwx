@@ -22,8 +22,8 @@ module WeatherData
     private
 
     def fetch_measurements
-      start_time = @datetime.in_time_zone("America/Los_Angeles").beginning_of_hour
-      end_time = @datetime.in_time_zone("America/Los_Angeles").end_of_hour
+      start_time = @datetime.beginning_of_hour
+      end_time = @datetime.end_of_hour
 
       WeatherMeasurement.where(reading_date_time: start_time..end_time)
                        .order(:reading_date_time)
@@ -110,7 +110,7 @@ module WeatherData
 
     def format_time(datetime)
       return nil if datetime.nil?
-      datetime.in_time_zone("America/Los_Angeles").strftime("%H:%M")
+      datetime.strftime("%H:%M")
     end
   end
 end

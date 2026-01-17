@@ -2,8 +2,12 @@ class GenerateHourlyReportJob
   include Sidekiq::Worker
 
   def perform(datetime = nil)
-    # Default to the previous hour if no datetime provided
-    target_datetime = datetime ? Time.parse(datetime.to_s) : 1.hour.ago
+    # Default to the previous hour if no datetime provided, in Pacific time
+    target_datetime = if datetime
+      Time.parse(datetime.to_s).in_time_zone("America/Los_Angeles")
+    else
+      1.hour.ago.in_time_zone("America/Los_Angeles")
+    end
 
     Rails.logger.info "GenerateHourlyReportJob: Processing datetime #{target_datetime}"
 
