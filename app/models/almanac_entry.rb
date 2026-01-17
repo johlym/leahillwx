@@ -33,7 +33,10 @@ class AlmanacEntry < ApplicationRecord
   validates :timezone, presence: true
 
   scope :ordered, -> { order(date: :desc) }
-  scope :for_date, ->(date) { find_by(date: date) }
+
+  def self.for_date(date)
+    find_by(date: date)
+  end
 
   def self.for_date_range(start_date, end_date)
     where(date: start_date..end_date).ordered
