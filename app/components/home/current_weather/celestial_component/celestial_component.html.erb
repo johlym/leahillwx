@@ -1,0 +1,35 @@
+<div class="weather-tile current-celestial">
+  <h2 class="weather-tile-heading">Celestial</h2>
+  <div class="weather-tile-content">
+    <% if almanac_today %>
+      <div class="celestial-section">
+        <div class="celestial-icon"><i class="fa-regular fa-sun"></i></div>
+        <div class="celestial-times">
+          <div class="celestial-event">
+            <span class="celestial-label"><%= sun_events.dig(:first, :label) %></span>
+            <span class="celestial-time"><%= format_time(sun_events.dig(:first, :time)) %></span>
+          </div>
+          <div class="celestial-event">
+            <span class="celestial-label"><%= sun_events.dig(:second, :label) %></span>
+            <span class="celestial-time"><%= format_time(sun_events.dig(:second, :time)) %></span>
+          </div>
+        </div>
+      </div>
+      <div class="celestial-section">
+        <div class="celestial-icon"><i class="fa-regular fa-moon"></i></div>
+        <div class="celestial-times">
+          <div class="celestial-event">
+            <span class="celestial-label"><%= moon_events.dig(:first, :label) %></span>
+            <span class="celestial-time"><%= format_time(moon_events.dig(:first, :time)) %></span>
+          </div>
+          <div class="celestial-event">
+            <span class="celestial-label"><%= moon_events.dig(:second, :label) %></span>
+            <span class="celestial-time"><%= format_time(moon_events.dig(:second, :time)) %></span>
+          </div>
+        </div>
+      </div>
+    <% else %>
+      <span class="weather-tile-big">No Data</span>
+    <% end %>
+  </div>
+</div>

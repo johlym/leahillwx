@@ -21,3 +21,4 @@
   <% c.with_primary_value { "#{number_with_precision(current.uv, precision: 2, strip_insignificant_zeros: true)} W/m2" } %>
   <% c.with_secondary_value { "#{number_with_delimiter(number_with_precision(current.light, precision: 2, strip_insignificant_zeros: true))} lux" } %>
 <% end %>
+<%= render Home::CurrentWeather::CelestialComponent.new(almanac_today: @almanac, almanac_tomorrow: AlmanacEntry.for_date(Date.tomorrow)) %>
