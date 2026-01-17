@@ -3,10 +3,7 @@ class GraphsController < ApplicationController
     latest_report = Report.ordered.first
 
     if latest_report
-      @current_year = latest_report.year
-      @current_month = latest_report.month
-      @current_day = nil
-      load_temperature_data(@current_year, @current_month, @current_day)
+      redirect_to graph_path(latest_report.year, latest_report.month_name.downcase)
     else
       @message = "No data available yet. Graphs will be generated as weather data is collected."
     end
