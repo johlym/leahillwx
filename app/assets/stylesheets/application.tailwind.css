@@ -13,3 +13,5 @@
 @import "./components/reports";
 @import "./components/almanac";
 @import "./components/footer";
+
+@import "./vendor/leaflet";

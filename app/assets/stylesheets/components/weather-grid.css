@@ -57,9 +57,8 @@
     .weather-tile-content {
       @apply p-0;
 
-      [data-controller="radar-map"] {
-        @apply h-full w-full;
-        min-height: 300px;
+      iframe {
+        @apply w-full h-full rounded-b-sm;
       }
     }
   }
