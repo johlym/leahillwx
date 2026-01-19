@@ -1,5 +1,5 @@
 download_open_weather_forecast_job:
-  cron: "every 10 minutes"
+  cron: "every 2 minutes"
   class: "DownloadOpenWeatherForecastJob"
 
 download_open_weather_aqi_job:
