@@ -80,7 +80,28 @@ class WeatherMeasurement < ApplicationRecord
   end
 
   def feels_like
-    feels_like_c(temp_c: temperature, humidity: humidity, wind_speed_mps: wind_speed)
+    feels_like_c(
+      temp_c: temperature,
+      humidity: humidity,
+      wind_speed_mps: wind_speed,
+      cloud_pct: current_cloud_cover,
+      is_daytime: daytime?
+    )
+  end
+
+  def current_cloud_cover
+    current_forecast = Forecast.where(interval: "current").order(created_at: :desc).first
+    return 50.0 unless current_forecast
+
+    forecast_data = current_forecast.forecast.deep_symbolize_keys
+    forecast_data.dig(:current, :clouds) || 50.0
+  end
+
+  def daytime?
+    almanac = AlmanacEntry.find_by(date: reading_date_time.to_date)
+    return false unless almanac&.sunrise_at && almanac&.sunset_at
+
+    reading_date_time.between?(almanac.sunrise_at, almanac.sunset_at)
   end
 
   def heading_compass
