@@ -284,19 +284,62 @@ module Almanac
     end
 
     def moon_rise_set(year, month, day, lon, lat)
-      # Simplified moon calculations - these are approximations
-      # In production, these would use the BSP data more accurately
-      sunrise, sunset = sun_rise_set(year, month, day, lon, lat)
-      return [ nil, nil ] unless sunrise && sunset
+      # Find moon rise/set by detecting horizon crossings
+      # Using similar approach to weewx Sun.py but adapted for the moon
 
-      # Moon rises/sets roughly 50 minutes later each day
-      day_of_cycle = ((Time.utc(year, month, day) - Time.utc(2018, 1, 17)) / 86400.0) % 29.530588
-      offset = (day_of_cycle / 29.530588) * 24.0
+      # Horizon correction for moon rise/set:
+      # - Atmospheric refraction: ~34 arcminutes = 34/60 degrees
+      # - Moon's average apparent radius: ~15 arcminutes = 15/60 degrees
+      # - Total correction for upper limb: -(34+15)/60 = -49/60 = -0.817 degrees
+      # (negative because we want to detect when upper limb crosses horizon)
+      horizon_alt = -49.0 / 60.0
 
-      moonrise = (sunrise + offset) % 24.0
-      moonset = (sunset + offset + 12.0) % 24.0
+      moonrise_utc = nil
+      moonset_utc = nil
 
-      [ moonrise, moonset ]
+      # Sample every 5 minutes throughout the day for better precision
+      prev_alt = nil
+      prev_hour = nil
+
+      (0..287).each do |i|  # 288 samples = every 5 minutes for 24 hours
+        hour_decimal = i / 12.0  # Convert to hours (12 samples per hour)
+
+        # Create datetime for this sample
+        datetime = Time.utc(year, month, day, 0, 0, 0) + (hour_decimal * 3600)
+        jd = datetime_to_julian_date(datetime)
+
+        # Get moon position at this time
+        moon_pos = calculate_moon_position_bsp(jd)
+        current_alt = moon_pos[:altitude]
+
+        # Check for horizon crossing relative to corrected horizon
+        if prev_alt && prev_hour
+          # Rising: altitude goes from below to above the corrected horizon
+          if prev_alt < horizon_alt && current_alt >= horizon_alt && moonrise_utc.nil?
+            # Interpolate to find more precise crossing time
+            fraction = (horizon_alt - prev_alt) / (current_alt - prev_alt)
+            moonrise_utc = prev_hour + fraction * (hour_decimal - prev_hour)
+          end
+
+          # Setting: altitude goes from above to below the corrected horizon
+          if prev_alt >= horizon_alt && current_alt < horizon_alt && moonset_utc.nil?
+            # Interpolate to find more precise crossing time
+            fraction = (prev_alt - horizon_alt) / (prev_alt - current_alt)
+            moonset_utc = prev_hour + fraction * (hour_decimal - prev_hour)
+          end
+        end
+
+        prev_alt = current_alt
+        prev_hour = hour_decimal
+
+        # Break early if we found both
+        break if moonrise_utc && moonset_utc
+      end
+
+      # Handle cases where moon doesn't rise or set on this day
+      # (e.g., circumpolar moon near poles, or moon always below/above horizon)
+
+      [ moonrise_utc, moonset_utc ]
     end
 
     def moon_phase(year, month, day)
