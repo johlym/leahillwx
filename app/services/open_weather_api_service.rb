@@ -21,6 +21,19 @@ class OpenWeatherApiService
     JSON.parse(response.body)
   end
 
+  def retrieve_current
+    endpoint_path = "/data/3.0/onecall"
+    params = {
+      "appid" => @appid,
+      "lat" => @lat,
+      "lon" => @lon,
+      "exclude" => "minutely,hourly,daily,alerts",
+      "units" => @units
+    }
+    response = HTTParty.get(@base_url + endpoint_path, query: params)
+    JSON.parse(response.body)
+  end
+
   def retrieve_aqi
     endpoint_path = "/data/2.5/air_pollution"
     params = {
