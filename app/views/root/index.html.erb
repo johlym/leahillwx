@@ -1,12 +1,7 @@
 <%= turbo_stream_from "weather_measurements" %>
 
+<%= render Home::CurrentWeather::ConditionsComponent.new(current: @current, almanac: @almanac) %>
 <div class="primary-container">
-  <div class="weather-grid">
-    <div id="current_weather" class="contents" data-controller="weather-update">
-      <%= render partial: "current_weather", locals: { current: @current } %>
-    </div>
-  </div>
-
   <div class="hourly-forecast">
     <%= render Home::Forecast::HourlyForecastComponent.new(forecast: @forecast, almanac: @almanac) %>
   </div>

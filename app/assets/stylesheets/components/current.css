@@ -1,0 +1,19 @@
+.current-conditions {
+  @apply grid grid-cols-1 md:grid-cols-2;
+
+  &.spring {
+    @apply bg-[url("/images/spring.jpg")] bg-cover bg-center;
+  }
+
+  &.summer {
+    @apply bg-[url("/images/summer.jpg")] bg-cover bg-center;
+  }
+
+  &.fall {
+    @apply bg-[url("/images/fall.jpg")] bg-cover bg-center;
+  }
+
+  &.winter {
+    @apply bg-[url("/images/winter.jpg")] bg-cover bg-center;
+  }
+}
