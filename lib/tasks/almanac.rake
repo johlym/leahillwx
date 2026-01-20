@@ -77,8 +77,11 @@ namespace :almanac do
     errors = 0
     batch_size = 1000
     entries = []
+    total_days = (end_date - start_date).to_i + 1
+    current_day = 0
 
     (start_date..end_date).each do |date|
+      current_day += 1
       begin
         entry_data = generator.generate_daily_entry(date)
         entries << entry_data
@@ -86,10 +89,13 @@ namespace :almanac do
         # Batch insert every 1000 entries
         if entries.size >= batch_size
           AlmanacEntry.upsert_all(entries, unique_by: :date)
-          print "."
           processed += entries.size
           entries = []
         end
+
+        # Update progress on every iteration
+        percentage = (current_day.to_f / total_days * 100).round(1)
+        print "\rProgress: #{current_day}/#{total_days} - #{percentage}%"
       rescue StandardError => e
         puts "\n✗ ERROR on #{date}: #{e.message}"
         errors += 1
@@ -151,8 +157,11 @@ namespace :almanac do
     errors = 0
     batch_size = 500
     positions = []
+    total_days = (end_date - start_date).to_i + 1
+    current_day = 0
 
     (start_date..end_date).each do |date|
+      current_day += 1
       begin
         hourly_positions = generator.generate_hourly_positions(date)
         positions.concat(hourly_positions)
@@ -160,10 +169,13 @@ namespace :almanac do
         # Batch insert every 500 days (12,000 rows)
         if positions.size >= batch_size * 24
           AlmanacPosition.upsert_all(positions, unique_by: [ :date, :hour ])
-          print "."
           processed += positions.size
           positions = []
         end
+
+        # Update progress on every iteration
+        percentage = (current_day.to_f / total_days * 100).round(1)
+        print "\rProgress: #{current_day}/#{total_days} - #{percentage}%"
       rescue StandardError => e
         puts "\n✗ ERROR on #{date}: #{e.message}"
         errors += 1
