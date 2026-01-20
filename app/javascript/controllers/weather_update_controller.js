@@ -30,15 +30,16 @@ export default class extends Controller {
 
   updateWeatherData(data) {
     if (this.hasTemperatureTarget) {
-      this.temperatureTarget.textContent = `${data.temperature_f}° F`
+      this.temperatureTarget.textContent = `${parseFloat(data.temperature_f).toFixed(1)}° F`
     }
     
     if (this.hasFeelsLikeTarget) {
-      this.feelsLikeTarget.textContent = `(feels like ${data.feels_like_f}° F)`
+      this.feelsLikeTarget.textContent = `(feels like ${parseFloat(data.feels_like_f).toFixed(1)}° F)`
     }
     
     if (this.hasCounterTarget) {
       this.counterTarget.textContent = `No. ${data.counter.toLocaleString()} `
+      this.flashCounter()
     }
     
     if (this.hasWindSpeedTarget) {
@@ -58,7 +59,7 @@ export default class extends Controller {
     }
     
     if (this.hasDewPointTarget) {
-      this.dewPointTarget.textContent = `${data.dew_point_f}° F`
+      this.dewPointTarget.textContent = `${parseFloat(data.dew_point_f).toFixed(1)}° F`
     }
     
     if (this.hasHumidityTarget) {
@@ -76,5 +77,11 @@ export default class extends Controller {
     if (this.hasLightTarget) {
       this.lightTarget.textContent = `${data.light_lux} lux`
     }
+  }
+
+  flashCounter() {
+    this.counterTarget.classList.add('counter-flash')
+    void this.counterTarget.offsetWidth
+    this.counterTarget.classList.remove('counter-flash')
   }
 }

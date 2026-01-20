@@ -1,10 +1,11 @@
 <header class="site-header" data-controller="mobile-menu">
   <nav aria-label="Global" class="nav">
-    <div class="logo-container">
+    <div class="logo-container" data-controller="connection-status">
       <a href="/" class="logo">
         <%= image_tag "logo.png", alt: "Lea Hill Weather", class: "logo-image" %>
         <span class="logo-text">Lea Hill Weather</span>
       </a>
+      <span class="live hidden" data-connection-status-target="badge">LIVE</span>
     </div>
     <div class="mobile-toggle-container">
       <button type="button" class="mobile-toggle" data-mobile-menu-target="button" data-action="click->mobile-menu#toggle" aria-expanded="false">

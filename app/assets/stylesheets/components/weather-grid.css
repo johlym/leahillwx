@@ -38,6 +38,15 @@
       .live {
         @apply text-xs text-white bg-red-600 px-1 py-0.5 rounded-sm;
       }
+
+      [data-weather-update-target="counter"] {
+        transition: color 1s ease-out;
+      }
+
+      [data-weather-update-target="counter"].counter-flash {
+        @apply text-red-600;
+        transition: none;
+      }
     }
   }
 

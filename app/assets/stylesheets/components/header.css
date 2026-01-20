@@ -5,7 +5,7 @@
     @apply mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8;
 
     .logo-container {
-      @apply flex lg:flex-1;
+      @apply flex lg:flex-1 items-center gap-2;
 
       .logo {
         @apply -m-1.5 p-1.5 flex items-center gap-2 text-text no-underline;
@@ -16,6 +16,14 @@
 
         .logo-text {
           @apply text-lg font-bold;
+        }
+      }
+
+      .live {
+        @apply text-xs font-mono text-white bg-red-600 px-1 py-0.5 rounded-sm;
+
+        &.hidden {
+          @apply hidden;
         }
       }
     }
