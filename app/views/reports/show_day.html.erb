@@ -1,4 +1,6 @@
 <div class="primary-container report-container">
+  <h1>Climatological Summary <small>for <%= @report.month_name %> <%= @day %>, <%= @report.year %></small></h1>
+
   <%= render Shared::DateNavigationComponent.new(
     current_year: @report.year,
     current_month: @report.month,
@@ -6,8 +8,6 @@
     base_path: "/reports",
     day_required: false
   ) %>
-  
-  <h1>Climatological Summary <small>for <%= @report.month_name %> <%= @day %>, <%= @report.year %></small></h1>
 
   <%= render Reports::DownloadLinkComponent.new(path: report_day_path(@report.year, Date::MONTHNAMES[@report.month].downcase, @day)) %>
 
