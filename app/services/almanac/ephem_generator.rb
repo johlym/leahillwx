@@ -109,7 +109,13 @@ module Almanac
 
       # Calculate moon rise/set using similar algorithms to sun
       moonrise_utc, moonset_utc = moon_rise_set(year, month, day, @lon, @lat)
-      moon_transit_utc = (moonrise_utc + moonset_utc) / 2.0
+
+      # Calculate moon transit - only if both rise and set are available
+      moon_transit_utc = if moonrise_utc && moonset_utc
+        (moonrise_utc + moonset_utc) / 2.0
+      else
+        nil
+      end
 
       # Calculate moon phase
       phase_data = moon_phase(year, month, day)
