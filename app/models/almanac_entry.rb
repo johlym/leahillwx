@@ -73,4 +73,46 @@ class AlmanacEntry < ApplicationRecord
     sign = daylight_delta_seconds.positive? ? "more" : "less"
     "#{minutes} minute#{'s' if minutes != 1}, #{seconds} second#{'s' if seconds != 1} #{sign} than yesterday"
   end
+
+  def season
+    return nil unless sun_ecliptic_longitude_deg
+
+    case sun_ecliptic_longitude_deg
+    when 0...90 then :spring
+    when 90...180 then :summer
+    when 180...270 then :fall
+    else :winter
+    end
+  end
+
+  def next_season
+    return nil unless sun_ecliptic_longitude_deg
+
+    generator = Almanac::EphemGenerator.new
+    seasons = generator.astronomical_seasons_for_year(date.year)
+
+    current_time = Time.utc(date.year, date.month, date.day, 12, 0, 0)
+
+    season_order = [
+      { name: :spring, event: :spring_equinox, time: seasons[:spring_equinox] },
+      { name: :summer, event: :summer_solstice, time: seasons[:summer_solstice] },
+      { name: :fall, event: :autumn_equinox, time: seasons[:autumn_equinox] },
+      { name: :winter, event: :winter_solstice, time: seasons[:winter_solstice] }
+    ]
+
+    next_season_data = season_order.find { |s| s[:time] && s[:time] > current_time }
+
+    if next_season_data
+      {
+        season: next_season_data[:name],
+        starts_at: next_season_data[:time]
+      }
+    else
+      next_year_seasons = generator.astronomical_seasons_for_year(date.year + 1)
+      {
+        season: :spring,
+        starts_at: next_year_seasons[:spring_equinox]
+      }
+    end
+  end
 end
