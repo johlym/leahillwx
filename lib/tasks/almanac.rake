@@ -40,8 +40,9 @@ namespace :almanac do
   end
 
   desc "Generate daily almanac entries from BSP ephemeris data"
-  task :generate_daily, [ :start_date, :end_date ] => :environment do |_t, args|
+  task :generate_daily, [ :start_date, :end_date, :mode ] => :environment do |_t, args|
     generator = Almanac::EphemGenerator.new
+    mode = args[:mode] || "incremental"  # Default to incremental
 
     # Determine date range
     if args[:start_date] && args[:end_date]
@@ -62,6 +63,7 @@ namespace :almanac do
     puts "=" * 80
     puts "Generating Daily Almanac Entries"
     puts "=" * 80
+    puts "Mode:       #{mode}"
     puts "Start date: #{start_date}"
     puts "End date:   #{end_date}"
     puts "Total days: #{(end_date - start_date).to_i + 1}"
@@ -73,14 +75,49 @@ namespace :almanac do
       exit 1
     end
 
+    # Determine which dates need processing
+    dates_to_process = if mode == "incremental"
+      # Find missing dates
+      all_dates = (start_date..end_date).to_a
+      existing_dates = AlmanacEntry.where(date: start_date..end_date).pluck(:date)
+      missing_dates = all_dates - existing_dates
+
+      # Find entries with NULL fields (incomplete entries)
+      incomplete_entries = AlmanacEntry.where(date: start_date..end_date)
+        .where("sunrise_at IS NULL OR sunset_at IS NULL OR civil_dawn_at IS NULL OR " \
+               "civil_dusk_at IS NULL OR solar_noon_at IS NULL OR moonrise_at IS NULL OR " \
+               "moonset_at IS NULL OR moon_phase IS NULL OR moon_illumination_pct IS NULL OR " \
+               "daylight_seconds IS NULL OR sun_ecliptic_longitude_deg IS NULL")
+        .pluck(:date)
+
+      dates_needing_update = (missing_dates + incomplete_entries).uniq.sort
+
+      puts "Analysis:"
+      puts "  Missing entries:    #{missing_dates.size}"
+      puts "  Incomplete entries: #{incomplete_entries.size}"
+      puts "  Total to process:   #{dates_needing_update.size}"
+      puts
+
+      if dates_needing_update.empty?
+        puts "✓ All entries are complete. Nothing to update."
+        puts "  Use mode=full to force regeneration."
+        exit 0
+      end
+
+      dates_needing_update
+    else
+      # Full mode: process all dates
+      (start_date..end_date).to_a
+    end
+
     processed = 0
     errors = 0
     batch_size = 1000
     entries = []
-    total_days = (end_date - start_date).to_i + 1
+    total_days = dates_to_process.size
     current_day = 0
 
-    (start_date..end_date).each do |date|
+    dates_to_process.each do |date|
       current_day += 1
       begin
         entry_data = generator.generate_daily_entry(date)
@@ -115,12 +152,14 @@ namespace :almanac do
     puts "=" * 80
     puts "Processed: #{processed} days"
     puts "Errors:    #{errors} days"
+    puts "Skipped:   #{(end_date - start_date).to_i + 1 - total_days} days (already complete)" if mode == "incremental"
     puts "=" * 80
   end
 
   desc "Generate hourly position data from BSP ephemeris"
-  task :generate_hourly, [ :start_date, :end_date ] => :environment do |_t, args|
+  task :generate_hourly, [ :start_date, :end_date, :mode ] => :environment do |_t, args|
     generator = Almanac::EphemGenerator.new
+    mode = args[:mode] || "incremental"  # Default to incremental
 
     # Determine date range
     if args[:start_date] && args[:end_date]
@@ -141,9 +180,10 @@ namespace :almanac do
     puts "=" * 80
     puts "Generating Hourly Almanac Positions"
     puts "=" * 80
-    puts "Start date: #{start_date}"
-    puts "End date:   #{end_date}"
-    puts "Total days: #{(end_date - start_date).to_i + 1}"
+    puts "Mode:        #{mode}"
+    puts "Start date:  #{start_date}"
+    puts "End date:    #{end_date}"
+    puts "Total days:  #{(end_date - start_date).to_i + 1}"
     puts "Total hours: #{((end_date - start_date).to_i + 1) * 24}"
     puts "=" * 80
     puts
@@ -153,14 +193,49 @@ namespace :almanac do
       exit 1
     end
 
+    # Determine which dates need processing
+    dates_to_process = if mode == "incremental"
+      # Find dates with missing hours (should have 24 positions per date)
+      all_dates = (start_date..end_date).to_a
+
+      # Get dates that have all 24 hours with no NULL fields
+      complete_dates = AlmanacPosition
+        .where(date: start_date..end_date)
+        .where("sun_azimuth_deg IS NOT NULL AND sun_altitude_deg IS NOT NULL AND " \
+               "sun_ra_deg IS NOT NULL AND sun_dec_deg IS NOT NULL AND " \
+               "moon_azimuth_deg IS NOT NULL AND moon_altitude_deg IS NOT NULL AND " \
+               "moon_ra_deg IS NOT NULL AND moon_dec_deg IS NOT NULL")
+        .group(:date)
+        .having("COUNT(*) = 24")
+        .pluck(:date)
+
+      dates_needing_update = all_dates - complete_dates
+
+      puts "Analysis:"
+      puts "  Complete dates:     #{complete_dates.size}"
+      puts "  Dates to process:   #{dates_needing_update.size}"
+      puts
+
+      if dates_needing_update.empty?
+        puts "✓ All hourly positions are complete. Nothing to update."
+        puts "  Use mode=full to force regeneration."
+        exit 0
+      end
+
+      dates_needing_update
+    else
+      # Full mode: process all dates
+      (start_date..end_date).to_a
+    end
+
     processed = 0
     errors = 0
     batch_size = 500
     positions = []
-    total_days = (end_date - start_date).to_i + 1
+    total_days = dates_to_process.size
     current_day = 0
 
-    (start_date..end_date).each do |date|
+    dates_to_process.each do |date|
       current_day += 1
       begin
         hourly_positions = generator.generate_hourly_positions(date)
@@ -195,23 +270,28 @@ namespace :almanac do
     puts "=" * 80
     puts "Processed: #{processed} hours"
     puts "Errors:    #{errors} hours"
+    puts "Skipped:   #{((end_date - start_date).to_i + 1 - total_days) * 24} hours (already complete)" if mode == "incremental"
     puts "=" * 80
   end
 
   desc "Generate all almanac data (daily entries + hourly positions)"
-  task :generate_all, [ :start_date, :end_date ] => :environment do |_t, args|
+  task :generate_all, [ :start_date, :end_date, :mode ] => :environment do |_t, args|
+    mode = args[:mode] || "incremental"  # Default to incremental
+
     puts "=" * 80
     puts "Generating Complete Almanac Dataset"
     puts "=" * 80
+    puts "Mode: #{mode}"
+    puts "=" * 80
     puts
 
-    # Invoke both tasks with the same date range
+    # Invoke both tasks with the same date range and mode
     if args[:start_date] && args[:end_date]
-      Rake::Task["almanac:generate_daily"].invoke(args[:start_date], args[:end_date])
-      Rake::Task["almanac:generate_hourly"].invoke(args[:start_date], args[:end_date])
+      Rake::Task["almanac:generate_daily"].invoke(args[:start_date], args[:end_date], mode)
+      Rake::Task["almanac:generate_hourly"].invoke(args[:start_date], args[:end_date], mode)
     else
-      Rake::Task["almanac:generate_daily"].invoke
-      Rake::Task["almanac:generate_hourly"].invoke
+      Rake::Task["almanac:generate_daily"].invoke(nil, nil, mode)
+      Rake::Task["almanac:generate_hourly"].invoke(nil, nil, mode)
     end
 
     puts

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_16_044356) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_20_151438) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -31,6 +31,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_16_044356) do
     t.datetime "next_new_moon_at"
     t.datetime "next_solstice_at"
     t.datetime "solar_noon_at"
+    t.float "sun_ecliptic_longitude_deg"
     t.datetime "sunrise_at"
     t.datetime "sunset_at"
     t.string "timezone", default: "America/Los_Angeles", null: false
