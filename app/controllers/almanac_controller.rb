@@ -86,7 +86,7 @@ class AlmanacController < ApplicationController
     lat = ENV.fetch("LOCATION_LAT").to_f
     lon = ENV.fetch("LOCATION_LON").to_f
 
-    service = Almanac::ApproxPositionService.new(
+    service = Almanac::ApproximateCelestialPosition.new(
       datetime: Time.current,
       lat: lat,
       lon: lon
