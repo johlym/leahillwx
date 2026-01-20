@@ -26,10 +26,10 @@ class Home::CurrentWeather::WeatherTileComponent < ViewComponent::Base
   end
 
   def formatted_temperature
-    number_with_precision(measurement.temperature.to_fahrenheit, precision: 2, strip_insignificant_zeros: true)
+    number_with_precision(measurement.temperature.to_fahrenheit, precision: 1, strip_insignificant_zeros: true)
   end
 
   def formatted_feels_like
-    number_with_precision(measurement.feels_like.to_fahrenheit, precision: 2, strip_insignificant_zeros: true)
+    number_with_precision(measurement.feels_like.to_fahrenheit, precision: 1, strip_insignificant_zeros: true)
   end
 end
