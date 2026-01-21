@@ -45,7 +45,7 @@
     @apply w-full sm:w-auto sm:flex-1 mt-2 sm:mt-0 order-last sm:order-0;
 
     > .forecast-description {
-      @apply font-semibold;
+      @apply font-medium;
     }
 
     > .forecast-summary {
