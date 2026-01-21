@@ -1,6 +1,6 @@
 <%= turbo_stream_from "weather_measurements" %>
 
-<%= render Home::CurrentWeather::ConditionsComponent.new(current: @current, almanac: @almanac) %>
+<%= render Home::CurrentWeather::ConditionsComponent.new(current: @current, hourly: @hourly_forecast, almanac: @almanac) %>
 <div class="primary-container">
   <div class="hourly-forecast">
     <%= render Home::Forecast::HourlyForecastComponent.new(forecast: @forecast, almanac: @almanac) %>

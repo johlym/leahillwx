@@ -1,2 +1,22 @@
-<div class="current-conditions grid grid-cols-1 md:grid-cols-2">
+<div class="current-conditions <%= season %>">
+  <div class="conditions-container">
+    <div class="conditions-card temperature-card">
+      <div class="timestamp">
+        <p><%= @current.reading_date_time.in_time_zone('America/Los_Angeles').then { |t| t.strftime("%B #{t.day.ordinalize}") } %><br />
+        <%= @current.reading_date_time.in_time_zone('America/Los_Angeles').then { |t| t.strftime("%I:%M %p") } %></p>
+      </div>
+      <div class="temperature">
+        <h2><%= current_temperature %>°</h2>
+      </div>
+      <div class="conditions">
+        <p>Feels Like: <%= current_feels_like %>°</p>
+        <p>Wind: <%= current_wind_speed %> mph</p>
+        <p>Humidity: <%= current_humidity %> %</p>
+      </div>
+    </div>
+    <div class="conditions-card hourly-card">
+      
+      
+    </div>
+  </div>
 </div>
