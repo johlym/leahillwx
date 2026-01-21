@@ -14,7 +14,7 @@
         thead {
           tr {
             th {
-              @apply py-3.5 px-3 text-center text-sm font-semibold text-gray-900 whitespace-nowrap;
+              @apply py-3.5 px-3 text-center text-sm font-medium text-gray-900 whitespace-nowrap;
 
               &:first-child {
                 @apply pl-4 sm:pl-6 lg:pl-8;
@@ -79,7 +79,7 @@
 
           tr {
             th {
-              @apply py-3.5 px-3 text-xs text-center font-semibold text-gray-900 whitespace-nowrap;
+              @apply py-3.5 px-3 text-xs text-center font-medium text-gray-900 whitespace-nowrap;
 
               &:first-child {
                 @apply pl-4 sm:pl-6 lg:pl-8;
@@ -109,7 +109,7 @@
               @apply py-3 px-2 text-xs text-center whitespace-nowrap text-gray-900;
 
               &:first-child {
-                @apply pl-4 font-semibold sm:pl-6 lg:pl-8;
+                @apply pl-4 font-medium sm:pl-6 lg:pl-8;
               }
 
               &:last-child {
