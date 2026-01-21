@@ -29,7 +29,7 @@
     }
 
     .weather-tile-small {
-      @apply text-center font-semibold text-sm lg:text-xl text-gray-500;
+      @apply text-center font-medium text-sm lg:text-xl text-gray-500;
     }
 
     .measurement-id {
@@ -120,7 +120,7 @@
             @apply flex justify-between items-center;
 
             .celestial-label {
-              @apply text-text font-semibold;
+              @apply text-text font-medium;
             }
 
             .celestial-time {
