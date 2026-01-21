@@ -48,7 +48,7 @@
       }
 
       .wind {
-        @apply font-semibold;
+        @apply font-medium;
       }
 
       .wind_gust {
