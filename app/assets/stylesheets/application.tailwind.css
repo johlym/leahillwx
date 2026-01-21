@@ -4,6 +4,7 @@
 @import "./components/fonts";
 @import "./components/variables";
 @import "./components/primary";
+@import "./components/seasons";
 @import "./components/header";
 @import "./components/current";
 @import "./components/weather-grid";

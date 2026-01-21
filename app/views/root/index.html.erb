@@ -1,3 +1,4 @@
+<% content_for :body_class, @almanac.season %>
 <%= turbo_stream_from "weather_measurements" %>
 
 <%= render Home::CurrentWeather::ConditionsComponent.new(current: @current, hourly: @hourly_forecast, almanac: @almanac) %>

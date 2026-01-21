@@ -1,51 +1,9 @@
 .current-conditions {
-  @apply relative bg-cover bg-center;
-
-  &::before {
-    content: "";
-    @apply absolute inset-0;
-    background: rgba(0, 0, 0, 0.35);
-    z-index: 0;
-  }
-
-  &::after {
-    content: "";
-    @apply absolute inset-0;
-    background: linear-gradient(
-      to bottom,
-      transparent 0%,
-      transparent 50%,
-      white 100%
-    );
-    z-index: 1;
-  }
-
-  & > * {
-    position: relative;
-    z-index: 2;
-  }
-
-  &.spring {
-    @apply bg-[url('/condition_bg/spring.jpg')];
-  }
-
-  &.summer {
-    @apply bg-[url('/condition_bg/summer.jpg')];
-  }
-
-  &.fall {
-    @apply bg-[url('/condition_bg/fall.jpg')];
-  }
-
-  &.winter {
-    @apply bg-[url('/condition_bg/winter.jpg')];
-  }
-
   .conditions-container {
-    @apply min-h-[calc(80vh)] container mx-auto max-w-7xl pb-32 px-2 pt-2 sm:px-6 sm:pt-6 lg:px-8 lg:pt-8 flex flex-row gap-4 h-auto;
+    @apply container mx-auto max-w-7xl mt-24 p-2 sm:p-6 lg:p-8 flex flex-row gap-4 h-auto;
 
     .conditions-card {
-      @apply bg-white/10 text-white backdrop-blur-sm rounded-lg p-8;
+      @apply bg-black/15 text-white backdrop-blur-sm rounded-lg p-8;
     }
 
     .temperature-card {

@@ -25,7 +25,8 @@
     <script src="https://kit.fontawesome.com/20b018c776.js" crossorigin="anonymous"></script>
   </head>
 
-  <body class="bg-white min-h-screen flex flex-col">
+  <body class="bg-white min-h-screen flex flex-col <%= yield(:body_class) %>">
+    <div class="absolute -z-10 inset-0 bg-linear-to-b from-transparent to-white"></div>
     <%= render "layouts/shared/header" %>
     <%= yield %>
     <%= render "layouts/shared/footer" %>
