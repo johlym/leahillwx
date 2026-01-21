@@ -5,6 +5,7 @@
 @import "./components/variables";
 @import "./components/primary";
 @import "./components/header";
+@import "./components/current";
 @import "./components/weather-grid";
 @import "./components/forecast-hourly";
 @import "./components/forecast-grid";
