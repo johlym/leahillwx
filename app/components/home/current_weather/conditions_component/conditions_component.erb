@@ -2,11 +2,10 @@
   <div class="conditions-container">
     <div class="conditions-card temperature-card">
       <div class="timestamp">
-        <p><%= @current.reading_date_time.in_time_zone('America/Los_Angeles').then { |t| t.strftime("%B #{t.day.ordinalize}") } %><br />
-        <%= @current.reading_date_time.in_time_zone('America/Los_Angeles').then { |t| t.strftime("%I:%M %p") } %></p>
+        <p><%= @current.reading_date_time.in_time_zone('America/Los_Angeles').then { |t| t.strftime("%B #{t.day.ordinalize}") } %> at <%= @current.reading_date_time.in_time_zone('America/Los_Angeles').then { |t| t.strftime("%I:%M %p") } %></p>
       </div>
       <div class="temperature">
-        <h2><%= current_temperature %>°</h2>
+        <%= current_temperature %>°
       </div>
       <div class="conditions">
         <p>Feels Like: <%= current_feels_like %>°</p>

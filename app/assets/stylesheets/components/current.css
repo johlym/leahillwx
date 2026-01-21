@@ -7,23 +7,23 @@
     }
 
     .temperature-card {
-      @apply self-end flex flex-col grow-2;
+      @apply flex-5/12 self-end grid grid-cols-3 gap-4;
 
       .timestamp {
-        @apply text-sm font-normal font-stretch-70% uppercase;
+        @apply col-span-3 text-sm font-normal font-stretch-70% uppercase;
       }
 
       .temperature {
-        @apply text-7xl font-extralight mb-10;
+        @apply col-span-2 text-7xl/14 font-extralight;
       }
 
       .conditions {
-        @apply text-sm font-normal;
+        @apply col-span-1 flex flex-col align-middle text-sm font-normal;
       }
     }
 
     .hourly-card {
-      @apply self-end flex flex-col grow-3;
+      @apply flex-7/12 self-end flex flex-col grow-3;
     }
   }
 }
