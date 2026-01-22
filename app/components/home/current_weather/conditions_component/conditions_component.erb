@@ -1,21 +1,67 @@
-<div class="current-conditions">
+<section class="current-conditions">
   <div class="conditions-container">
-    <div class="conditions-card temperature-card">
-      <div class="timestamp">
-        <p><%= @current.reading_date_time.in_time_zone('America/Los_Angeles').then { |t| t.strftime("%B #{t.day.ordinalize}") } %> at <%= @current.reading_date_time.in_time_zone('America/Los_Angeles').then { |t| t.strftime("%I:%M %p") } %></p>
+    <div class="conditions-grid">
+      <div class="current-conditions">
+        <p class="timestamp"><%= Time.now.strftime("%B %d, %Y • %I:%M %p") %></p>
+        <div class="current-temperature">
+          <span class="temperature"><%= current_temperature %>°</span>
+          <div class="text-left">
+            <i class="fa-regular fa-sun condition-icon"></i>
+            <p class="condition-text">Sunny</p>
+          </div>
+        </div>
+        <p class="feels-like">Feels like <%= current_feels_like %>° • High 78° / Low 58°</p>
       </div>
-      <div class="temperature">
-        <%= current_temperature %>°
+      <div class="current-conditions-tiles">
+        <div class="condition-tile">
+          <div class="tile-icon-wrapper">
+            <i class="fa-regular fa-wind"></i>
+            <span class="tile-title">Wind</span>
+          </div>
+          <p class="tile-value"><%= current_wind_speed %> mph</p>
+          <p class="tile-secondary"><%= current_wind_direction %></p>
+        </div>
+        <div class="condition-tile">
+          <div class="tile-icon-wrapper">
+            <i class="fa-regular fa-hand-holding-droplet"></i>
+            <span class="tile-title">Humidity</span>
+          </div>
+          <p class="tile-value"><%= current_humidity %>%</p>
+          <p class="tile-secondary">&nbsp;</p>
+        </div>
+        <div class="condition-tile">
+          <div class="tile-icon-wrapper">
+            <i class="fa-kit fa-regular-sun-circle-exclamation"></i>
+            <span class="tile-title">UV Index</span>
+          </div>
+          <p class="tile-value"><%= current_uvi %></p>
+          <p class="tile-secondary"><%= current_uv_index_category %></p>
+        </div>
+        <div class="condition-tile">
+          <div class="tile-icon-wrapper">
+            <i class="fa-regular fa-sunrise"></i>
+            <span class="tile-title">Sunrise/Sunset</span>
+          </div>
+          <p class="tile-value"><%= current_sunrise %></p>
+          <p class="tile-secondary"><%= current_sunset %></p>
+        </div>
+        <div class="condition-tile">
+          <div class="tile-icon-wrapper">
+            <i class="fa-regular fa-cloud-rain"></i>
+            <span class="tile-title">Rain</span>
+          </div>
+          <p class="tile-value"><%= current_rain_day %> in.</p>
+          <p class="tile-secondary"><%= current_rain_hour %> in./hr</p>
+        </div>
+        <div class="condition-tile">
+          <div class="tile-icon-wrapper">
+            <i class="fa-regular fa-droplet-degree"></i>
+            <span class="tile-title">Dew Point</span>
+          </div>
+          <p class="tile-value"><%= current_dew_point %>°</p>
+          <p class="tile-secondary">&nbsp;</p>
+        </div>
       </div>
-      <div class="conditions">
-        <p>Feels Like: <%= current_feels_like %>°</p>
-        <p>Wind: <%= current_wind_speed %> mph</p>
-        <p>Humidity: <%= current_humidity %> %</p>
-      </div>
-    </div>
-    <div class="conditions-card hourly-card">
-      
-      
     </div>
   </div>
-</div>
+</section>

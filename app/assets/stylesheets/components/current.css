@@ -1,29 +1,63 @@
 .current-conditions {
+  @apply text-text min-h-[75vh] flex flex-col justify-end;
+
   .conditions-container {
-    @apply container mx-auto max-w-7xl mt-24 p-2 sm:p-6 lg:p-8 flex flex-row gap-4 h-auto;
+    @apply max-w-7xl container mx-auto px-8 py-16;
 
-    .conditions-card {
-      @apply bg-black/15 text-white backdrop-blur-sm rounded-lg p-8;
-    }
+    .conditions-grid {
+      @apply grid md:grid-cols-2 gap-12 items-end;
 
-    .temperature-card {
-      @apply flex-5/12 self-end grid grid-cols-3 gap-4;
+      .current-conditions {
+        @apply text-center md:text-left;
 
-      .timestamp {
-        @apply col-span-3 text-sm font-normal font-stretch-70% uppercase;
+        p.timestamp {
+          @apply text-text/70 text-lg font-stretch-50% uppercase tracking-wide mb-2;
+        }
+
+        .current-temperature {
+          @apply flex items-center justify-start md:justify-start gap-6;
+
+          .temperature {
+            @apply text-9xl font-light font-stretch-50%;
+          }
+
+          .condition-icon {
+            @apply text-5xl text-center;
+          }
+
+          .condition-text {
+            @apply text-3xl font-stretch-50% uppercase font-medium mt-1;
+          }
+        }
+
+        .feels-like {
+          @apply text-text mt-4 text-lg;
+        }
       }
 
-      .temperature {
-        @apply col-span-2 text-7xl/14 font-extralight;
-      }
+      .current-conditions-tiles {
+        @apply grid grid-cols-3 gap-4 items-end;
 
-      .conditions {
-        @apply col-span-1 flex flex-col align-middle text-sm font-normal;
-      }
-    }
+        .condition-tile {
+          @apply bg-white/35 inset-1 border border-white/40 shadow-lg backdrop-blur-lg rounded-2xl p-5;
 
-    .hourly-card {
-      @apply flex-7/12 self-end flex flex-col grow-3;
+          .tile-icon-wrapper {
+            @apply flex items-center gap-3 mb-2;
+
+            .tile-title {
+              @apply text-text/70 text-sm;
+            }
+          }
+
+          .tile-value {
+            @apply text-2xl font-semibold;
+          }
+
+          .tile-secondary {
+            @apply text-text/70 text-sm;
+          }
+        }
+      }
     }
   }
 }
