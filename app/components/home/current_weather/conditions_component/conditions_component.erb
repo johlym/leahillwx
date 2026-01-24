@@ -10,7 +10,7 @@
             <p class="condition-text">Sunny</p>
           </div>
         </div>
-        <p class="feels-like">Feels like <%= current_feels_like %>° • High 78° / Low 58°</p>
+        <p class="feels-like">Feels like <%= current_feels_like %>°<% if today_high && today_low %> • High <%= today_high %>° / Low <%= today_low %>°<% end %></p>
       </div>
       <div class="current-conditions-tiles">
         <div class="condition-tile">

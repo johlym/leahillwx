@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
-  def initialize(current:, almanac:)
+  def initialize(current:, almanac:, today_forecast: nil)
     @current = current
     @almanac = almanac
+    @today_forecast = today_forecast
   end
 
   def season
@@ -54,7 +55,8 @@ class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
   end
 
   def current_uv_index_category
-    case @current.uv
+    uv_value = @current.uvi.to_i
+    case uv_value
     when 0..2
       "Low"
     when 3..5
@@ -86,5 +88,13 @@ class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
 
   def current_dew_point
     @current.dew_point.to_fahrenheit.round(0)
+  end
+
+  def today_high
+    @today_forecast&.temp_max&.round(0)
+  end
+
+  def today_low
+    @today_forecast&.temp_min&.round(0)
   end
 end
