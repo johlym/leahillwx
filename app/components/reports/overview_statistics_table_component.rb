@@ -1,5 +1,7 @@
 module Reports
   class OverviewStatisticsTableComponent < ViewComponent::Base
+    include UnitConversions
+
     def initialize(report:, type: :monthly, day: nil)
       @report = report
       @type = type

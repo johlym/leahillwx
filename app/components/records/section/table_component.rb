@@ -3,6 +3,8 @@
 module Records
   module Section
     class TableComponent < ViewComponent::Base
+      include UnitConversions
+
       def initialize(rows:, year_label:, current_year_label:, show_three_columns:)
         @rows = rows
         @year_label = year_label
@@ -20,7 +22,7 @@ module Records
 
       def format_temp(celsius)
         return "N/A" unless celsius
-        "#{(celsius * 9/5 + 32).round(1)}°F"
+        "#{temp_fahrenheit(celsius).round(1)}°F"
       end
 
       def format_datetime(datetime)
@@ -35,12 +37,12 @@ module Records
 
       def format_speed(mps)
         return "N/A" unless mps
-        "#{(mps * 2.23694).round(1)} mph"
+        "#{wind_speed_mph(mps).round(1)} mph"
       end
 
       def format_rain(mm)
         return "N/A" unless mm
-        "#{(mm / 25.4).round(2)} in"
+        "#{rain_in_inches(mm).round(2)} in"
       end
 
       def format_pressure(hpa)

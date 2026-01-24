@@ -2,6 +2,7 @@
 
 class Home::CurrentWeather::WeatherTileComponent < ViewComponent::Base
   include ActionView::Helpers::NumberHelper
+  include UnitConversions
 
   attr_reader :tile_type, :heading, :measurement, :counter, :primary_target, :secondary_target
 
@@ -26,10 +27,10 @@ class Home::CurrentWeather::WeatherTileComponent < ViewComponent::Base
   end
 
   def formatted_temperature
-    number_with_precision(measurement.temperature.to_fahrenheit, precision: 1, strip_insignificant_zeros: true)
+    number_with_precision(temp_fahrenheit(measurement.temperature), precision: 1, strip_insignificant_zeros: true)
   end
 
   def formatted_feels_like
-    number_with_precision(measurement.feels_like.to_fahrenheit, precision: 1, strip_insignificant_zeros: true)
+    number_with_precision(temp_fahrenheit(measurement.feels_like), precision: 1, strip_insignificant_zeros: true)
   end
 end
