@@ -54,15 +54,12 @@ class AlmanacController < ApplicationController
     respond_to do |format|
       format.html
       format.text do
-        render plain: render_to_string(
-          partial: "almanac/show_text",
-          locals: {
-            almanac_entry: @almanac_entry,
-            date: @date,
-            dynamic_positions: @dynamic_positions,
-            generation_time: @generation_time
-          }
-        )
+        render plain: Almanac::TextComponent.new(
+          date: @date,
+          almanac_entry: @almanac_entry,
+          dynamic_positions: @dynamic_positions,
+          generation_time: @generation_time
+        ).render_in(view_context)
       end
     end
   end

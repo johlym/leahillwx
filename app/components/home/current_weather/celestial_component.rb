@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Home::CurrentWeather::CelestialComponent < ViewComponent::Base
+  include DateTimeFormatting
   attr_reader :almanac_today, :almanac_tomorrow
 
   def initialize(almanac_today:, almanac_tomorrow:)
@@ -48,12 +49,6 @@ class Home::CurrentWeather::CelestialComponent < ViewComponent::Base
       # After moonset - show tomorrow's moonrise and moonset
       { first: { label: "Moonrise", time: moonrise_tomorrow }, second: { label: "Moonset", time: moonset_tomorrow } }
     end
-  end
-
-  def format_time(time)
-    return "N/A" unless time
-
-    time.in_time_zone(almanac_today&.timezone || "America/Los_Angeles").strftime("%-I:%M %p")
   end
 
   def upcoming_events

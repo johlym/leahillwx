@@ -4,6 +4,7 @@ module Records
   module Section
     class TableComponent < ViewComponent::Base
       include UnitConversions
+      include DateTimeFormatting
 
       def initialize(rows:, year_label:, current_year_label:, show_three_columns:)
         @rows = rows
@@ -23,16 +24,6 @@ module Records
       def format_temp(celsius)
         return "N/A" unless celsius
         "#{temp_fahrenheit(celsius).round(1)}°F"
-      end
-
-      def format_datetime(datetime)
-        return "N/A" unless datetime
-        datetime.in_time_zone("America/Los_Angeles").strftime("%b %d, %Y %I:%M %p")
-      end
-
-      def format_date(date)
-        return "N/A" unless date
-        date.strftime("%b %d, %Y")
       end
 
       def format_speed(mps)
