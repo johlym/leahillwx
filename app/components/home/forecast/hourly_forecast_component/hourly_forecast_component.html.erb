@@ -8,7 +8,7 @@
           <%= hour.time.in_time_zone("America/Los_Angeles").strftime("%-I") %> <span class="ampm"><%= hour.time.in_time_zone("America/Los_Angeles").strftime("%p") %></span>
         </p>
         <div class="icon-container">
-          <%= render "root/shared/weather_icon", icon: hour.weather_icon %>
+          <%= render "root/shared/weather_icon", icon: hour.weather_icon, night: night_time?(hour.time) %>
         </div>
         <div class="conditions">
           <p class="temperature">

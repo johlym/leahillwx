@@ -1,12 +1,12 @@
 .hourly-forecast {
-  @apply col-span-2 sm:col-span-2 lg:col-span-10 lg:row-span-2 mb-3 rounded-b-sm;
+  @apply col-span-2 sm:col-span-2 lg:col-span-10 lg:row-span-2 rounded-b-sm mb-8;
 
   p {
-    @apply text-right text-sm text-gray-600;
+    @apply text-right text-xs text-gray-500;
   }
 
   > .hourly-forecast-row {
-    @apply grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4 mb-8;
+    @apply grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4 mb-2;
 
     > .hourly-forecast-item {
       @apply bg-neutral-50/50 inset-1 border border-neutral-100 shadow-sm rounded-lg p-5 flex flex-col;
