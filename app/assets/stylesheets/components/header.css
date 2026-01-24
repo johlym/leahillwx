@@ -48,7 +48,7 @@
       @apply hidden lg:flex lg:gap-x-8;
 
       .nav-link {
-        @apply text-lg/6 font-medium text-black font-condensed uppercase no-underline hover:text-black hover:underline;
+        @apply text-sm/6 font-medium text-black no-underline hover:text-black hover:underline;
       }
     }
   }
