@@ -94,7 +94,66 @@ class UpdateThirdPartyWeatherPlatformService
   end
 
   def update_awekas(measurement)
-    # TODO: Implement update_awekas
+    # AWEKAS API uses semicolon-separated values
+    # Documentation: Based on weewx implementation at
+    # https://github.com/weewx/weewx/blob/master/src/weewx/restx.py#L1608
+
+    # Convert password to MD5 hash
+    require "digest"
+    password_hash = Digest::MD5.hexdigest(ENV["AWEKAS_USERNAME"])
+
+    # Format timestamp in UTC
+    time_utc = measurement.reading_date_time.utc
+    date_str = time_utc.strftime("%d.%m.%Y")
+    time_str = time_utc.strftime("%H:%M")
+
+    # Get values in metric units (AWEKAS expects metric)
+    temp_c = measurement.temperature
+    humidity = measurement.humidity
+    barometer_hpa = measurement.barometer_rel
+    daily_rain_mm = (measurement.rain_day * 10).round(1)  # mm * 10 as per AWEKAS spec
+    wind_speed_kmh = (measurement.wind_speed * 3.6).round(1)  # m/s to km/h
+    wind_dir = measurement.wind_dir
+    wind_gust_kmh = (measurement.gust_speed * 3.6).round(1)  # m/s to km/h
+    solar_radiation = measurement.light
+    uv_index = measurement.uvi
+    rain_rate_mmh = (measurement.rain_rate * 10).round(1)  # mm/h * 10 as per AWEKAS spec
+
+    # Assemble values array in AWEKAS order
+    values = [
+      ENV["AWEKAS_PASSWORD"],
+      password_hash,
+      date_str,
+      time_str,
+      temp_c,
+      humidity,
+      barometer_hpa,
+      daily_rain_mm,
+      wind_speed_kmh,
+      wind_dir,
+      "",  # weather condition
+      "",  # warning text
+      "",  # snow height
+      "en",  # language
+      "",  # tendency
+      wind_gust_kmh,
+      solar_radiation,
+      uv_index,
+      "",  # brightness in lux
+      "",  # sunshine hours
+      "",  # soil temperature
+      rain_rate_mmh,
+      "lhwx",  # software type
+      ENV["LOCATION_LON"],
+      ENV["LOCATION_LAT"]
+    ]
+
+    # Join with semicolons
+    val_string = values.join(";")
+
+    request_url = "https://data.awekas.at/get.php"
+    awekas_request = HTTParty.get(request_url, query: { val: val_string })
+    Rails.logger.info "AWEKAS response: #{awekas_request.body}"
   end
 
   def update_weathercloud(measurement)
