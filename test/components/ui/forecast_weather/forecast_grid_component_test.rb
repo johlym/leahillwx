@@ -9,7 +9,7 @@ class Home::Forecast::DailyForecastComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_forecast_grid_container
-    component = Home::Forecast::DailyForecastComponent.new(forecast: @parsed_forecast)
+    component = Home::Forecast::DailyForecastComponent.new(days: @parsed_forecast.days, timestamp: @forecast_record.created_at)
 
     render_inline(component)
 
@@ -17,7 +17,7 @@ class Home::Forecast::DailyForecastComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_heading
-    component = Home::Forecast::DailyForecastComponent.new(forecast: @parsed_forecast)
+    component = Home::Forecast::DailyForecastComponent.new(days: @parsed_forecast.days, timestamp: @forecast_record.created_at)
 
     render_inline(component)
 
@@ -25,7 +25,7 @@ class Home::Forecast::DailyForecastComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_forecast_timestamp
-    component = Home::Forecast::DailyForecastComponent.new(forecast: @parsed_forecast)
+    component = Home::Forecast::DailyForecastComponent.new(days: @parsed_forecast.days, timestamp: @forecast_record.created_at)
 
     render_inline(component)
 
@@ -34,7 +34,7 @@ class Home::Forecast::DailyForecastComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_openweathermap_link
-    component = Home::Forecast::DailyForecastComponent.new(forecast: @parsed_forecast)
+    component = Home::Forecast::DailyForecastComponent.new(days: @parsed_forecast.days, timestamp: @forecast_record.created_at)
 
     render_inline(component)
 
@@ -42,7 +42,7 @@ class Home::Forecast::DailyForecastComponentTest < ViewComponent::TestCase
   end
 
   def test_formatted_timestamp_includes_date_and_time
-    component = Home::Forecast::DailyForecastComponent.new(forecast: @parsed_forecast)
+    component = Home::Forecast::DailyForecastComponent.new(days: @parsed_forecast.days, timestamp: @forecast_record.created_at)
 
     timestamp = component.formatted_timestamp
 
@@ -50,7 +50,7 @@ class Home::Forecast::DailyForecastComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_forecast_entries_for_each_day
-    component = Home::Forecast::DailyForecastComponent.new(forecast: @parsed_forecast)
+    component = Home::Forecast::DailyForecastComponent.new(days: @parsed_forecast.days, timestamp: @forecast_record.created_at)
 
     render_inline(component)
 
@@ -58,7 +58,7 @@ class Home::Forecast::DailyForecastComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_day_name_and_date
-    component = Home::Forecast::DailyForecastComponent.new(forecast: @parsed_forecast)
+    component = Home::Forecast::DailyForecastComponent.new(days: @parsed_forecast.days, timestamp: @forecast_record.created_at)
 
     render_inline(component)
 
@@ -68,7 +68,7 @@ class Home::Forecast::DailyForecastComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_temperature_high_and_low
-    component = Home::Forecast::DailyForecastComponent.new(forecast: @parsed_forecast)
+    component = Home::Forecast::DailyForecastComponent.new(days: @parsed_forecast.days, timestamp: @forecast_record.created_at)
 
     render_inline(component)
 
@@ -78,7 +78,7 @@ class Home::Forecast::DailyForecastComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_weather_description
-    component = Home::Forecast::DailyForecastComponent.new(forecast: @parsed_forecast)
+    component = Home::Forecast::DailyForecastComponent.new(days: @parsed_forecast.days, timestamp: @forecast_record.created_at)
 
     render_inline(component)
 
@@ -87,7 +87,7 @@ class Home::Forecast::DailyForecastComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_forecast_summary
-    component = Home::Forecast::DailyForecastComponent.new(forecast: @parsed_forecast)
+    component = Home::Forecast::DailyForecastComponent.new(days: @parsed_forecast.days, timestamp: @forecast_record.created_at)
 
     render_inline(component)
 
@@ -96,7 +96,7 @@ class Home::Forecast::DailyForecastComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_wind_speed
-    component = Home::Forecast::DailyForecastComponent.new(forecast: @parsed_forecast)
+    component = Home::Forecast::DailyForecastComponent.new(days: @parsed_forecast.days, timestamp: @forecast_record.created_at)
 
     render_inline(component)
 
@@ -106,7 +106,7 @@ class Home::Forecast::DailyForecastComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_wind_direction_icon_with_rotation
-    component = Home::Forecast::DailyForecastComponent.new(forecast: @parsed_forecast)
+    component = Home::Forecast::DailyForecastComponent.new(days: @parsed_forecast.days, timestamp: @forecast_record.created_at)
 
     render_inline(component)
 
@@ -115,7 +115,7 @@ class Home::Forecast::DailyForecastComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_wind_gust_when_present
-    component = Home::Forecast::DailyForecastComponent.new(forecast: @parsed_forecast)
+    component = Home::Forecast::DailyForecastComponent.new(days: @parsed_forecast.days, timestamp: @forecast_record.created_at)
 
     render_inline(component)
 
@@ -128,7 +128,7 @@ class Home::Forecast::DailyForecastComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_date_grid_section
-    component = Home::Forecast::DailyForecastComponent.new(forecast: @parsed_forecast)
+    component = Home::Forecast::DailyForecastComponent.new(days: @parsed_forecast.days, timestamp: @forecast_record.created_at)
 
     render_inline(component)
 
@@ -136,7 +136,7 @@ class Home::Forecast::DailyForecastComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_conditions_section
-    component = Home::Forecast::DailyForecastComponent.new(forecast: @parsed_forecast)
+    component = Home::Forecast::DailyForecastComponent.new(days: @parsed_forecast.days, timestamp: @forecast_record.created_at)
 
     render_inline(component)
 
@@ -146,7 +146,7 @@ class Home::Forecast::DailyForecastComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_forecast_text_section
-    component = Home::Forecast::DailyForecastComponent.new(forecast: @parsed_forecast)
+    component = Home::Forecast::DailyForecastComponent.new(days: @parsed_forecast.days, timestamp: @forecast_record.created_at)
 
     render_inline(component)
 
@@ -154,7 +154,7 @@ class Home::Forecast::DailyForecastComponentTest < ViewComponent::TestCase
   end
 
   def test_renders_wind_section
-    component = Home::Forecast::DailyForecastComponent.new(forecast: @parsed_forecast)
+    component = Home::Forecast::DailyForecastComponent.new(days: @parsed_forecast.days, timestamp: @forecast_record.created_at)
 
     render_inline(component)
 

@@ -1,0 +1,20 @@
+one:
+  date: <%= Date.today %>
+  timezone: "America/Los_Angeles"
+  sunrise_at: <%= Time.current.beginning_of_day + 7.hours %>
+  sunset_at: <%= Time.current.beginning_of_day + 17.hours %>
+  solar_noon_at: <%= Time.current.beginning_of_day + 12.hours %>
+  civil_dawn_at: <%= Time.current.beginning_of_day + 6.hours + 30.minutes %>
+  civil_dusk_at: <%= Time.current.beginning_of_day + 17.hours + 30.minutes %>
+  moonrise_at: <%= Time.current.beginning_of_day + 19.hours %>
+  moonset_at: <%= Time.current.beginning_of_day + 8.hours %>
+  moon_transit_at: <%= Time.current.beginning_of_day + 13.hours %>
+  moon_phase: "Waxing Crescent"
+  moon_illumination_pct: 25.5
+  daylight_seconds: 36000
+  daylight_delta_seconds: 120
+  sun_ecliptic_longitude_deg: 90.0
+  next_solstice_at: <%= 6.months.from_now %>
+  next_equinox_at: <%= 3.months.from_now %>
+  next_new_moon_at: <%= 14.days.from_now %>
+  next_full_moon_at: <%= 28.days.from_now %>
