@@ -1,5 +1,5 @@
 .hourly-forecast {
-  @apply col-span-2 sm:col-span-2 lg:col-span-10 lg:row-span-2 rounded-b-sm mb-8;
+  @apply col-span-2 sm:col-span-2 lg:col-span-10 lg:row-span-2 rounded-b-lg mb-8;
 
   p {
     @apply text-right text-xs text-gray-500;

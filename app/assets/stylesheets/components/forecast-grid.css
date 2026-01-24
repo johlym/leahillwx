@@ -6,7 +6,7 @@
   @apply border-b border-gray-200 px-5 py-3 flex flex-row flex-wrap sm:flex-nowrap items-center justify-center sm:justify-start odd:bg-white even:bg-gray-50 odd:hover:bg-gray-50 even:hover:bg-gray-100;
 
   &:last-child {
-    @apply border-0 rounded-b-sm;
+    @apply border-0 rounded-b-lg;
   }
 
   > .date-grid {

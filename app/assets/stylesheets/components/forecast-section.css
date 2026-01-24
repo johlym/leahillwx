@@ -21,7 +21,7 @@
     }
 
     .weather-tile-heading {
-      @apply text-sm sm:text-lg p-1 sm:p-2 border-b rounded-t-sm border-gray-200 bg-gray-50 text-gray-dark;
+      @apply text-sm sm:text-lg p-1 sm:p-2 border-b rounded-t-lg border-gray-200 bg-gray-50 text-gray-dark;
     }
 
     .weather-tile-content {
