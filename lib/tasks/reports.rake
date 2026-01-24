@@ -206,4 +206,63 @@ namespace :reports do
       puts "Deletion cancelled."
     end
   end
+
+  desc "Regenerate all reports (purge and backfill in one command)"
+  task :regenerate_all, [ :start_date, :end_date ] => :environment do |_t, args|
+    start_date = args[:start_date] ? Date.parse(args[:start_date]) : Date.parse("2021-12-01")
+    end_date = args[:end_date] ? Date.parse(args[:end_date]) : Date.yesterday
+
+    total_reports = Report.count
+    total_entries = ReportEntry.count
+
+    puts "=" * 80
+    puts "Regenerating All Weather Reports"
+    puts "=" * 80
+    puts "This will delete #{total_reports} reports and #{total_entries} entries"
+    puts "Then regenerate from #{start_date} to #{end_date}"
+    puts "Total days: #{(end_date - start_date).to_i + 1}"
+    puts "=" * 80
+    puts
+
+    # Purge existing reports
+    if total_reports > 0
+      puts "Deleting existing reports..."
+      Report.destroy_all
+      puts "✓ All reports deleted"
+      puts
+    end
+
+    # Backfill
+    if start_date > end_date
+      puts "ERROR: Start date must be before or equal to end date"
+      exit 1
+    end
+
+    processed = 0
+    errors = 0
+
+    (start_date..end_date).each do |date|
+      print "Processing #{date}... "
+
+      begin
+        aggregator = WeatherData::DailyAggregator.new(date)
+        entry = aggregator.aggregate
+
+        status = entry.partial_period ? "✓ (partial)" : "✓"
+        puts status
+        processed += 1
+      rescue StandardError => e
+        puts "✗ ERROR: #{e.message}"
+        errors += 1
+      end
+    end
+
+    puts
+    puts "=" * 80
+    puts "Regeneration Complete"
+    puts "=" * 80
+    puts "Processed: #{processed} days"
+    puts "Errors:    #{errors} days"
+    puts "=" * 80
+  end
 end
