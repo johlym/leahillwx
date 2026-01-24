@@ -96,8 +96,8 @@ class ReportEntryTest < ActiveSupport::TestCase
   test "should handle all formatting methods" do
     entry = @report.entries.create!(
       day: 1,
-      rain: 0.123,
-      avg_wind_speed: 5.678,
+      rain: 3.048,  # mm (converts to ~0.12 inches)
+      avg_wind_speed: 2.54,  # m/s (converts to ~5.68 mph)
       heat_degree_days: 10.999
     )
 

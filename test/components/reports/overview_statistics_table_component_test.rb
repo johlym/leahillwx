@@ -14,9 +14,9 @@ class Reports::OverviewStatisticsTableComponentTest < ViewComponent::TestCase
       month_low_temp_day: 5,
       total_heat_degree_days: 450.0,
       total_cool_degree_days: 25.0,
-      total_rain: 3.5,
-      avg_wind_speed: 8.5,
-      month_high_wind_speed: 35.0,
+      total_rain: 88.9,  # mm (displays as ~3.50 inches)
+      avg_wind_speed: 3.8,  # m/s (displays as ~8.50 mph)
+      month_high_wind_speed: 15.645,  # m/s (displays as ~35.00 mph)
       month_high_wind_day: 20,
       dominant_wind_dir: 180,
       dominant_wind_dir_compass: "S"
