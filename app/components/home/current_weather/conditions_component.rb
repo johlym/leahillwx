@@ -55,6 +55,10 @@ class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
     @current.uvi.round
   end
 
+  def current_solar_irradiance
+    @current.uv.round
+  end
+
   def current_uv_index_category
     uv_value = @current.uvi.to_i
     case uv_value

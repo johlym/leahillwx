@@ -12,7 +12,8 @@ export default class extends Controller {
     "dewPoint",
     "humidity",
     "pressure",
-    "uv",
+    "uvi",
+    "solarIrradiance",
     "light"
   ]
 
@@ -30,11 +31,11 @@ export default class extends Controller {
 
   updateWeatherData(data) {
     if (this.hasTemperatureTarget) {
-      this.temperatureTarget.textContent = `${parseFloat(data.temperature_f).toFixed(1)}° F`
+      this.temperatureTarget.textContent = `${parseFloat(data.temperature_f).toFixed(0)}°`
     }
     
     if (this.hasFeelsLikeTarget) {
-      this.feelsLikeTarget.textContent = `(feels like ${parseFloat(data.feels_like_f).toFixed(1)}° F)`
+      this.feelsLikeTarget.textContent = `Feels like ${parseFloat(data.feels_like_f).toFixed(0)}°`
     }
     
     if (this.hasCounterTarget) {
@@ -43,39 +44,43 @@ export default class extends Controller {
     }
     
     if (this.hasWindSpeedTarget) {
-      this.windSpeedTarget.textContent = `${data.wind_speed_mph} mph ${data.wind_direction_compass}`
+      this.windSpeedTarget.textContent = `${Math.round(data.wind_speed_mph)} mph ${data.wind_direction_compass}`
     }
     
     if (this.hasGustSpeedTarget) {
-      this.gustSpeedTarget.textContent = `Gusting to ${data.gust_speed_mph} mph`
+      this.gustSpeedTarget.textContent = `Gusting to ${Math.round(data.gust_speed_mph)} mph`
     }
     
     if (this.hasRainDayTarget) {
-      this.rainDayTarget.textContent = `${data.rain_day_in} in`
+      this.rainDayTarget.textContent = `${Math.round(data.rain_day_in * 100) / 100} in.`
     }
     
     if (this.hasRainRateTarget) {
-      this.rainRateTarget.textContent = `(${data.rain_rate_in} in/hr)`
+      this.rainRateTarget.textContent = `${Math.round(data.rain_rate_in * 100) / 100} in./hr`
     }
     
     if (this.hasDewPointTarget) {
-      this.dewPointTarget.textContent = `${parseFloat(data.dew_point_f).toFixed(1)}° F`
+      this.dewPointTarget.textContent = `${parseFloat(data.dew_point_f).toFixed(0)}°`
     }
     
     if (this.hasHumidityTarget) {
-      this.humidityTarget.textContent = `${data.humidity} %`
+      this.humidityTarget.textContent = `${data.humidity}%`
     }
     
     if (this.hasPressureTarget) {
-      this.pressureTarget.textContent = `${data.barometer_abs_mb} mb`
+      this.pressureTarget.textContent = `${Math.round(data.barometer_abs_mb)}mb`
     }
     
-    if (this.hasUvTarget) {
-      this.uvTarget.textContent = `${data.uv} W/m2`
+    if (this.hasUviTarget) {
+      this.uviTarget.textContent = `${Math.round(data.uvi)}`
+    }
+    
+    if (this.hasSolarIrradianceTarget) {
+      this.solarIrradianceTarget.textContent = `${Math.round(data.uv)} W/m²`
     }
     
     if (this.hasLightTarget) {
-      this.lightTarget.textContent = `${data.light_lux} lux`
+      this.lightTarget.textContent = `${Math.round(data.light_lux)} lux`
     }
   }
 

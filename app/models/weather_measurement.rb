@@ -166,6 +166,9 @@ class WeatherMeasurement < ApplicationRecord
       uv: ActionController::Base.helpers.number_with_precision(
         measurement.uv, precision: 2, strip_insignificant_zeros: true
       ),
+      uvi: ActionController::Base.helpers.number_with_precision(
+        measurement.uvi, precision: 2, strip_insignificant_zeros: true
+      ),
       light_lux: ActionController::Base.helpers.number_with_delimiter(
         ActionController::Base.helpers.number_with_precision(
           measurement.light, precision: 2, strip_insignificant_zeros: true

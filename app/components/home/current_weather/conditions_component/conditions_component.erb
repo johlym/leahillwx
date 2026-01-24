@@ -1,10 +1,10 @@
-<section class="current-conditions">
+<section class="current-conditions" data-controller="weather-update">
   <div class="conditions-container">
     <div class="conditions-grid">
       <div class="current-conditions-wrapper">
         <p class="timestamp"><%= Time.now.strftime("%B %d, %Y • %I:%M %p") %></p>
         <div class="current-temperature">
-          <span class="temperature"><%= current_temperature %>°</span>
+          <span class="temperature" data-weather-update-target="temperature"><%= current_temperature %>°</span>
           <div class="text-left">
             <div class="condition-icon">
               <%= render "root/shared/weather_icon", icon: weather_icon, night: night_time?, blackout: true %>
@@ -12,7 +12,7 @@
             <p class="condition-text"><%= weather_description %></p>
           </div>
         </div>
-        <p class="feels-like">Feels like <%= current_feels_like %>°<% if today_high && today_low %> • High <%= today_high %>° / Low <%= today_low %>°<% end %></p>
+        <p class="feels-like"><span data-weather-update-target="feelsLike">Feels like <%= current_feels_like %>°</span><% if today_high && today_low %> • High <%= today_high %>° / Low <%= today_low %>°<% end %></p>
       </div>
       <div class="current-conditions-tiles">
         <div class="condition-tile">
@@ -20,15 +20,15 @@
             <i class="fa-regular fa-wind"></i>
             <span class="tile-title">Wind</span>
           </div>
-          <p class="tile-value"><%= current_wind_speed %> mph</p>
-          <p class="tile-secondary"><%= current_wind_direction %></p>
+          <p class="tile-value" data-weather-update-target="windSpeed"><%= current_wind_speed %> mph <%= current_wind_direction %></p>
+          <p class="tile-secondary" data-weather-update-target="gustSpeed">Gusting to 0 mph</p>
         </div>
         <div class="condition-tile">
           <div class="tile-icon-wrapper">
             <i class="fa-regular fa-hand-holding-droplet"></i>
             <span class="tile-title">Humidity</span>
           </div>
-          <p class="tile-value"><%= current_humidity %>%</p>
+          <p class="tile-value" data-weather-update-target="humidity"><%= current_humidity %>%</p>
           <p class="tile-secondary">&nbsp;</p>
         </div>
         <div class="condition-tile">
@@ -36,8 +36,8 @@
             <i class="fa-kit fa-regular-sun-circle-exclamation"></i>
             <span class="tile-title">UV Index</span>
           </div>
-          <p class="tile-value"><%= current_uvi %></p>
-          <p class="tile-secondary"><%= current_uv_index_category %></p>
+          <p class="tile-value" data-weather-update-target="uvi"><%= current_uvi %></p>
+          <p class="tile-secondary" data-weather-update-target="solarIrradiance"><%= current_solar_irradiance %> W/m²</p>
         </div>
         <div class="condition-tile">
           <div class="tile-icon-wrapper">
@@ -52,15 +52,15 @@
             <i class="fa-regular fa-cloud-rain"></i>
             <span class="tile-title">Rain</span>
           </div>
-          <p class="tile-value"><%= current_rain_day %> in.</p>
-          <p class="tile-secondary"><%= current_rain_hour %> in./hr</p>
+          <p class="tile-value" data-weather-update-target="rainDay"><%= current_rain_day %> in.</p>
+          <p class="tile-secondary" data-weather-update-target="rainRate"><%= current_rain_hour %> in./hr</p>
         </div>
         <div class="condition-tile">
           <div class="tile-icon-wrapper">
             <i class="fa-regular fa-droplet-degree"></i>
             <span class="tile-title">Dew Point</span>
           </div>
-          <p class="tile-value"><%= current_dew_point %>°</p>
+          <p class="tile-value" data-weather-update-target="dewPoint"><%= current_dew_point %>°</p>
           <p class="tile-secondary">&nbsp;</p>
         </div>
       </div>
