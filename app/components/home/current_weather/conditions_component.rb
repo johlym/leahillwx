@@ -64,7 +64,7 @@ class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
       "High"
     when 8..10
       "Very High"
-    when 11..
+    else
       "Extreme"
     end
   end
