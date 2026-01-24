@@ -22,9 +22,9 @@
           <td><%= number_with_precision(report.month_low_temp.to_fahrenheit, precision: 2) %>° F<br><span class="text-xs">(Day <%= report.month_low_temp_day || 'N/A' %>)</span></td>
           <td><%= number_with_precision(report.total_heat_degree_days, precision: 2) %></td>
           <td><%= number_with_precision(report.total_cool_degree_days, precision: 2) %></td>
-          <td><%= number_with_precision(report.total_rain, precision: 2) %> in.</td>
-          <td><%= number_with_precision(report.avg_wind_speed, precision: 2) %> mph</td>
-          <td><%= number_with_precision(report.month_high_wind_speed, precision: 2) %> mph<br><span class="text-xs">(Day <%= report.month_high_wind_day || 'N/A' %>)</span></td>
+          <td><%= number_with_precision(report.total_rain / 25.4, precision: 2) %> in.</td>
+          <td><%= number_with_precision(report.avg_wind_speed * 2.23694, precision: 2) %> mph</td>
+          <td><%= number_with_precision(report.month_high_wind_speed * 2.23694, precision: 2) %> mph<br><span class="text-xs">(Day <%= report.month_high_wind_day || 'N/A' %>)</span></td>
           <td><%= report.formatted_dominant_wind %> <%= render Elements::WindVaneComponent.new(direction: report.dominant_wind_dir) %></td>
         </tr>
       </tbody>

@@ -47,9 +47,9 @@
               <td class="<%= 'font-bold' if row.is_max_low_temp %>"><%= number_with_precision(row.entry.low_temp.to_fahrenheit, precision: 2) %>° F @ <%= row.entry.low_temp_time || 'N/A' %></td>
               <td class="<%= 'font-bold' if row.is_max_heat_dd %>"><%= number_with_precision(row.entry.heat_degree_days, precision: 2) %>°</td>
               <td class="<%= 'font-bold' if row.is_max_cool_dd %>"><%= number_with_precision(row.entry.cool_degree_days, precision: 2) %>°</td>
-              <td class="<%= 'font-bold' if row.is_max_rain %>"><%= number_with_precision(row.entry.rain, precision: 2) %> in.</td>
-              <td class="<%= 'font-bold' if row.is_max_avg_wind %>"><%= number_with_precision(row.entry.avg_wind_speed, precision: 2) %> mph</td>
-              <td class="<%= 'font-bold' if row.is_max_high_wind %>"><%= number_with_precision(row.entry.high_wind_speed, precision: 2) %> mph @ <%= row.entry.high_wind_time || 'N/A' %></td>
+              <td class="<%= 'font-bold' if row.is_max_rain %>"><%= number_with_precision(row.entry.rain / 25.4, precision: 2) %> in.</td>
+              <td class="<%= 'font-bold' if row.is_max_avg_wind %>"><%= number_with_precision(row.entry.avg_wind_speed * 2.23694, precision: 2) %> mph</td>
+              <td class="<%= 'font-bold' if row.is_max_high_wind %>"><%= number_with_precision(row.entry.high_wind_speed * 2.23694, precision: 2) %> mph @ <%= row.entry.high_wind_time || 'N/A' %></td>
               <td><%= row.entry.formatted_wind_dir %> <%= render Elements::WindVaneComponent.new(direction: row.entry.wind_dir) %></td>
             <% end %>
           </tr>

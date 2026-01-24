@@ -77,12 +77,11 @@ module WeatherData
       wind_dir_degrees = self.class.calculate_dominant_wind_direction(measurements)
       wind_dir_compass = degrees_to_compass(wind_dir_degrees)
 
-      wind_speeds_mph = measurements.map { |m| mps_to_mph(m.wind_speed) }
-      avg_wind_speed_mph = wind_speeds_mph.sum / wind_speeds_mph.size
+      wind_speeds_mps = measurements.map(&:wind_speed)
+      avg_wind_speed_mps = wind_speeds_mps.sum / wind_speeds_mps.size
 
       # Sum rain_day values since each measurement is incremental rain for that period
       total_rain_mm = measurements.sum(&:rain_day)
-      rain_inches = mm_to_inches(total_rain_mm)
 
       # Convert mean temp to Fahrenheit for degree day calculations
       mean_temp_f = celsius_to_fahrenheit(mean_temp_c)
@@ -95,9 +94,9 @@ module WeatherData
         low_temp_time: format_time(low_measurement.reading_date_time),
         heat_degree_days: calculate_heat_degree_days(mean_temp_f) / 24.0, # Proportional to hour
         cool_degree_days: calculate_cool_degree_days(mean_temp_f) / 24.0, # Proportional to hour
-        rain: rain_inches,
-        avg_wind_speed: avg_wind_speed_mph,
-        high_wind_speed: mps_to_mph(gust_measurement.gust_speed),
+        rain: total_rain_mm,
+        avg_wind_speed: avg_wind_speed_mps,
+        high_wind_speed: gust_measurement.gust_speed,
         high_wind_time: format_time(gust_measurement.reading_date_time),
         wind_dir: wind_dir_degrees,
         wind_dir_compass: wind_dir_compass
