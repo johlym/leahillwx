@@ -83,13 +83,13 @@ class Report < ApplicationRecord
     format("%.2f", dd)
   end
 
-  def formatted_rain(rain_val)
-    return "N/A" if rain_val.nil?
-    format("%.2f", rain_val)
+  def formatted_rain(rain_mm)
+    return "N/A" if rain_mm.nil?
+    format("%.2f", rain_mm / 25.4)
   end
 
-  def formatted_wind_speed(speed)
-    return "N/A" if speed.nil?
-    format("%.2f", speed)
+  def formatted_wind_speed(speed_mps)
+    return "N/A" if speed_mps.nil?
+    format("%.2f", speed_mps * 2.23694)
   end
 end

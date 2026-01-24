@@ -1,39 +1,44 @@
 download_open_weather_forecast_job:
-  cron: "every 2 minutes"
+  cron: "*/2 * * * *"
   class: "DownloadOpenWeatherForecastJob"
+  description: "Download forecast every 2 minutes"
 
 download_open_weather_aqi_job:
-  cron: "every 10 minutes"
+  cron: "*/10 * * * *"
   class: "DownloadOpenWeatherAqiJob"
+  description: "Download air quality every 10 minutes"
 
 download_latest_earthquake_job:
-  cron: "every 1 minute"
+  cron: "* * * * *"
   class: "DownloadLatestEarthquakeJob"
+  description: "Download earthquake data every minute"
 
 delete_old_forecasts_job:
-  cron: "every 1 day"
+  cron: "0 11 * * *"
   class: "DeleteOldForecastsJob"
+  description: "Delete old forecasts daily at 11:00 AM UTC (3:00 AM PST)"
 
 update_third_party_weather_platforms_job:
-  cron: "every 15 seconds"
+  cron: "*/15 * * * * *"
   class: "UpdateThirdPartyWeatherPlatformsJob"
+  description: "Update third-party platforms every 15 seconds"
 
 generate_report_job:
-  cron: "every 12:01 AM in America/Los_Angeles"
+  cron: "1 8 * * *"
   class: "GenerateReportJob"
-  description: "Generate daily climatological report entry at 12:01 AM"
+  description: "Generate daily report at 8:01 AM UTC (12:01 AM PST)"
 
 generate_hourly_report_job:
-  cron: "every hour in America/Los_Angeles"
+  cron: "1 * * * *"
   class: "GenerateHourlyReportJob"
-  description: "Generate hourly climatological report entry at 1 minute past each hour"
+  description: "Generate hourly report at 1 minute past each hour"
 
 generate_year_records_job:
-  cron: "every 12:02 AM in America/Los_Angeles"
+  cron: "2 8 * * *"
   class: "GenerateYearRecordsJob"
-  description: "Calculate and update records for current year at 12:02 AM"
+  description: "Calculate year records at 8:02 AM UTC (12:02 AM PST)"
 
 generate_all_time_records_job:
-  cron: "every 12:06 AM in America/Los_Angeles"
+  cron: "6 8 * * *"
   class: "GenerateAllTimeRecordsJob"
-  description: "Calculate and update all-time records at 12:06 AM"
+  description: "Calculate all-time records at 8:06 AM UTC (12:06 AM PST)"

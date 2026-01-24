@@ -1,5 +1,7 @@
 module Reports
   class StatisticsTableComponent < ViewComponent::Base
+    include UnitConversions
+
     def initialize(report:, day: nil, period_type: :daily, has_partial_periods: false)
       @report = report
       @day = day

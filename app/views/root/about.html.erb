@@ -2,13 +2,13 @@
 <article class="primary-container prose">
 <h1>About lhwx.org</h1>
 
-<p>Positioned on Lea Hill in Auburn, WA, this weather station is powered by an Ambient Weather WS-2902C. Data samples are taken every 5 seconds and published live to this site.</p>
+<p>Positioned on Lea Hill in Auburn, WA, this weather station is powered by an Ambient Weather WH65B. Data samples are taken every 16 seconds and published live to this site.</p>
 
 <p>This station tracks the following weather measurements:</p>
 
 <ul>
   <li>Temperature (ambient air temperature)</li>
-  <li>Feels like (wind chill or heat index)</li>
+  <li>Feels like (calculation using a combination of wind chill/humidity/heat index/solar)</li>
   <li>Humidity</li>
   <li>Barometric pressure</li>
   <li>Wind</li>
@@ -32,7 +32,7 @@
 </ul>
 
 <h2>Other Links</h2>
-<p>Local National Weather Service office</p>
+<p><%= link_to "Local National Weather Service office", "https://www.weather.gov/sew/", target: "_blank" %></p>
 
 <h2>Getting in Touch</h2>
 <p>Feel free to reach out to me through one of the following channels:</p>
@@ -43,12 +43,12 @@
 
 <h2>Technical details</h2>
 <ul>
-  <li>Weather station: Ambient Weather WS-2902C</li>
+  <li>Weather station: Ecowitt WH65B</li>
   <li>Data capture: Ecowitt GW11000</li>
   <li>Data is measured in metric units (Celsius, mm, etc.) and converted to imperial units (Fahrenheit, inches, etc.) for display. Pressure is captured in hPa/millibars and displayed the same.</li>
   <li>All timestamps are recorded in UTC and coverted to <code>America/Los_Angeles</code> for display.</li>
   <li>Forecasts: The <%= link_to "OpenWeatherMap API", "https://openweathermap.org/api?utm_source=lhwx.org&utm_medium=referral", target: "_blank", class: "underline" %>, retrieved every 30 minutes.</li>
-  <li>Backend: data is captured through a custom Rust application and forwarded to this site via an HTTP endpoint.</li>
+  <li>Backend: data is captured through a custom <%= link_to "Rust application", "https://github.com/johnathanhowell/lhwx-rust", target: "_blank", class: "underline" %> and forwarded to this site via an HTTP endpoint.</li>
   <li>Frontend: this site is built using Ruby on Rails. Data is stored in a PostgreSQL database.</li>
   <li>Hosting: <%= link_to "Heroku", "https://www.heroku.com?utm_source=lhwx.org&utm_medium=referral", target: "_blank", class: "underline" %></li>
 </ul>

@@ -60,8 +60,8 @@ class Home::CurrentWeather::WeatherTileComponentTest < ViewComponent::TestCase
 
     render_inline(component)
 
-    expected_feels_like = measurement.feels_like.to_fahrenheit
-    assert_selector "span.current-temperature-c", text: /feels like #{expected_feels_like}/
+    # Component formats with precision: 1 and adds degree symbol
+    assert_selector "span.current-temperature-c", text: /feels like 31\.9° F/
   end
 
   def test_renders_generic_tile_with_primary_value_only

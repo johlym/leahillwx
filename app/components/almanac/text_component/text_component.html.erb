@@ -46,16 +46,16 @@ MOON
 ASTRONOMICAL EVENTS
 <%= "-" * 80 %>
 <% if almanac_entry.next_new_moon_at %>
-  Next New Moon:     <%= format_datetime(almanac_entry.next_new_moon_at) %>
+  Next New Moon:     <%= format_datetime(almanac_entry.next_new_moon_at, style: :numeric) %>
 <% end %>
 <% if almanac_entry.next_full_moon_at %>
-  Next Full Moon:    <%= format_datetime(almanac_entry.next_full_moon_at) %>
+  Next Full Moon:    <%= format_datetime(almanac_entry.next_full_moon_at, style: :numeric) %>
 <% end %>
 <% if almanac_entry.next_equinox_at %>
-  Next Equinox:      <%= format_datetime(almanac_entry.next_equinox_at) %>
+  Next Equinox:      <%= format_datetime(almanac_entry.next_equinox_at, style: :numeric) %>
 <% end %>
 <% if almanac_entry.next_solstice_at %>
-  Next Solstice:     <%= format_datetime(almanac_entry.next_solstice_at) %>
+  Next Solstice:     <%= format_datetime(almanac_entry.next_solstice_at, style: :numeric) %>
 <% end %>
 <% end %>
 
