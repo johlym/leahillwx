@@ -59,7 +59,38 @@ class UpdateThirdPartyWeatherPlatformService
   end
 
   def update_pwsweather(measurement)
-    # TODO: Implement update_pwsweather
+    # PWSWeather uses the Weather Underground protocol
+    # Documentation: http://wiki.wunderground.com/index.php/PWS_-_Upload_Protocol
+
+    date_utc = measurement.reading_date_time.utc.strftime("%Y-%m-%d+%H:%M:%S")
+    wind_dir = measurement.wind_dir
+    wind_speed_mph = measurement.wind_speed_mph
+    wind_gust_mph = measurement.wind_gust_mph
+    temp_f = measurement.temperature_f
+    rain_in = measurement.rain_rate_in
+    barometer_in = measurement.barometer_abs_mmhg
+    humidity = measurement.humidity
+    dew_point_f = measurement.dew_point_f
+
+    request_url = "https://www.pwsweather.com/pwsupdate/pwsupdate.php"
+    request_params = {
+      ID: ENV["PWS_STATION_ID"],
+      PASSWORD: ENV["PWS_STATION_KEY"],
+      dateutc: date_utc,
+      winddir: wind_dir,
+      windspeedmph: wind_speed_mph,
+      windgustmph: wind_gust_mph,
+      tempf: temp_f,
+      rainin: rain_in,
+      baromin: barometer_in,
+      dewptf: dew_point_f,
+      humidity: humidity,
+      softwaretype: "lhwx",
+      action: "updateraw"
+    }
+
+    pws_request = HTTParty.post(request_url, query: request_params)
+    Rails.logger.info "PWSWeather response: #{pws_request.body}"
   end
 
   def update_awekas(measurement)
