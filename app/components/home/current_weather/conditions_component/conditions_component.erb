@@ -6,8 +6,10 @@
         <div class="current-temperature">
           <span class="temperature"><%= current_temperature %>°</span>
           <div class="text-left">
-            <i class="fa-regular fa-sun condition-icon"></i>
-            <p class="condition-text">Sunny</p>
+            <div class="condition-icon">
+              <%= render "root/shared/weather_icon", icon: weather_icon, night: night_time?, blackout: true %>
+            </div>
+            <p class="condition-text"><%= weather_description %></p>
           </div>
         </div>
         <p class="feels-like">Feels like <%= current_feels_like %>°<% if today_high && today_low %> • High <%= today_high %>° / Low <%= today_low %>°<% end %></p>

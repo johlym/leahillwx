@@ -8,6 +8,9 @@
 <% else %>
   <% sun_moon = "sun" %>
 <% end %>
+<% if local_assigns[:blackout] %>
+  <% prefix = "fa-fw fa-solid" %>
+<% end %>
 <% case base_icon %>
 <% when '01' %>
   <i class="<%= isize %> <%= prefix %> fa-<%= sun_moon %>" style="--fa-primary-color: var(--color-brand-800); --fa-secondary-color: var(--color-brand-800);"></i>

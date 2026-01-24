@@ -1,7 +1,7 @@
 <% content_for :body_class, @almanac.season %>
 <%= turbo_stream_from "weather_measurements" %>
 
-<%= render Home::CurrentWeather::ConditionsComponent.new(current: @current, almanac: @almanac, today_forecast: @forecast.days.first) %>
+<%= render Home::CurrentWeather::ConditionsComponent.new(current: @current, almanac: @almanac, today_forecast: @forecast.days.first, current_forecast: @forecast.current) %>
 <div class="primary-container">
   <div class="hourly-forecast">
     <%= render Home::Forecast::HourlyForecastComponent.new(hours: @forecast.hours.first(8), timestamp: @forecast.created_at) %>

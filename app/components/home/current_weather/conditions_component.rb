@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
-  def initialize(current:, almanac:, today_forecast: nil)
+  def initialize(current:, almanac:, today_forecast: nil, current_forecast: nil)
     @current = current
     @almanac = almanac
     @today_forecast = today_forecast
+    @current_forecast = current_forecast
   end
 
   def season
@@ -96,5 +97,19 @@ class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
 
   def today_low
     @today_forecast&.temp_min&.round(0)
+  end
+
+  def weather_icon
+    @current_forecast&.weather_icon || "01d"
+  end
+
+  def weather_description
+    @current_forecast&.weather_description&.titleize || "Clear"
+  end
+
+  def night_time?
+    return false unless @current&.reading_date_time && @almanac
+
+    !@current.reading_date_time.between?(@almanac.sunrise_at, @almanac.sunset_at)
   end
 end

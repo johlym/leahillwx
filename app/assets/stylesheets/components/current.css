@@ -26,11 +26,11 @@
           }
 
           .condition-icon {
-            @apply text-5xl text-center;
+            @apply text-3xl text-center text-black;
           }
 
           .condition-text {
-            @apply text-3xl font-condensed uppercase font-medium mt-1;
+            @apply text-3xl text-center font-condensed uppercase font-medium mt-1;
           }
         }
 
