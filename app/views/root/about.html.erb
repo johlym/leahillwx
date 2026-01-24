@@ -48,7 +48,7 @@
   <li>Data is measured in metric units (Celsius, mm, etc.) and converted to imperial units (Fahrenheit, inches, etc.) for display. Pressure is captured in hPa/millibars and displayed the same.</li>
   <li>All timestamps are recorded in UTC and coverted to <code>America/Los_Angeles</code> for display.</li>
   <li>Forecasts: The <%= link_to "OpenWeatherMap API", "https://openweathermap.org/api?utm_source=lhwx.org&utm_medium=referral", target: "_blank", class: "underline" %>, retrieved every 30 minutes.</li>
-  <li>Backend: data is captured through a custom <%= link_to "Rust application", "https://github.com/johnathanhowell/lhwx-rust", target: "_blank", class: "underline" %> and forwarded to this site via an HTTP endpoint.</li>
+  <li>Backend: data is captured through a custom <%= link_to "Rust application", "https://github.com/johlym/wxlistener", target: "_blank", class: "underline" %> and forwarded to this site via an HTTP endpoint.</li>
   <li>Frontend: this site is built using Ruby on Rails. Data is stored in a PostgreSQL database.</li>
   <li>Hosting: <%= link_to "Heroku", "https://www.heroku.com?utm_source=lhwx.org&utm_medium=referral", target: "_blank", class: "underline" %></li>
 </ul>
