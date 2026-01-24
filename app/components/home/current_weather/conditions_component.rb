@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
 class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
-  def initialize(current:, hourly:, almanac:)
+  def initialize(current:, almanac:)
     @current = current
-    @hourly = hourly
     @almanac = almanac
   end
 
@@ -87,9 +86,5 @@ class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
 
   def current_dew_point
     @current.dew_point.to_fahrenheit.round(0)
-  end
-
-  def hourly_forecast
-    @hourly
   end
 end

@@ -1,5 +1,5 @@
 .current-conditions {
-  @apply text-text min-h-[75vh] flex flex-col justify-end;
+  @apply text-text flex flex-col justify-end;
 
   .conditions-container {
     @apply max-w-7xl container mx-auto px-8 py-16;
@@ -7,18 +7,22 @@
     .conditions-grid {
       @apply grid md:grid-cols-2 gap-12 items-end;
 
-      .current-conditions {
+      .current-conditions-wrapper {
         @apply text-center md:text-left;
 
         p.timestamp {
-          @apply text-text/70 text-lg font-stretch-50% uppercase tracking-wide mb-2;
+          @apply text-text/70 text-lg font-condensed uppercase tracking-wide mb-2;
+        }
+
+        p.feels-like {
+          @apply text-text/70 capitalize font-condensed;
         }
 
         .current-temperature {
           @apply flex items-center justify-start md:justify-start gap-6;
 
           .temperature {
-            @apply text-9xl font-light font-stretch-50%;
+            @apply text-9xl font-light font-condensed;
           }
 
           .condition-icon {
@@ -26,7 +30,7 @@
           }
 
           .condition-text {
-            @apply text-3xl font-stretch-50% uppercase font-medium mt-1;
+            @apply text-3xl font-condensed uppercase font-medium mt-1;
           }
         }
 
@@ -39,7 +43,7 @@
         @apply grid grid-cols-3 gap-4 items-end;
 
         .condition-tile {
-          @apply bg-white/35 inset-1 border border-white/40 shadow-lg backdrop-blur-lg rounded-2xl p-5;
+          @apply bg-white/10 inset-1 border border-black/7 shadow-sm rounded-lg p-5;
 
           .tile-icon-wrapper {
             @apply flex items-center gap-3 mb-2;

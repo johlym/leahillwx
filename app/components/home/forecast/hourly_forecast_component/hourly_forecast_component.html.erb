@@ -1,68 +1,29 @@
 <div class="hourly-forecast">
   <h2 class="weather-tile-heading">Hourly Forecast</h2>
   
-  <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 mb-8">
-      <div class="bg-white rounded-xl p-4 border border-neutral-100 shadow-lg text-center">
-        <p class="text-sm font-medium text-neutral-700">Fri</p>
-        <p class="text-xs text-neutral-400">Jan 17</p>
-        <svg class="w-10 h-10 text-amber-400 mx-auto my-3" fill="currentColor" viewbox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></g></svg>
-        <p class="text-lg font-medium text-neutral-800">76°</p>
-        <p class="text-sm text-neutral-400">58°</p>
+  <div class="hourly-forecast-row">
+    <% hours.each do |hour| %>
+      <div class="hourly-forecast-item">
+        <p class="hour">
+          <%= hour.time.in_time_zone("America/Los_Angeles").strftime("%-I") %> <span class="ampm"><%= hour.time.in_time_zone("America/Los_Angeles").strftime("%p") %></span>
+        </p>
+        <div class="icon-container">
+          <%= render "root/shared/weather_icon", icon: hour.weather_icon %>
+        </div>
+        <div class="conditions">
+          <p class="temperature">
+            <%= hour.temp.round %>°
+          </p>
+          <p class="wind">
+            <i class="fa-regular fa-fw fa-wind"></i> <%= hour.wind_speed.round %> | <%= hour.wind_gust.round %>
+          </p>
+          <p class="precip">
+            <i class="fa-regular fa-fw fa-cloud-rain"></i> <%= (hour.pop * 100).round %>%
+          </p>
+        </div>
       </div>
-      <div class="bg-white rounded-xl p-4 border border-neutral-100 shadow-lg text-center">
-        <p class="text-sm font-medium text-neutral-700">Sat</p>
-        <p class="text-xs text-neutral-400">Jan 18</p>
-        <svg class="w-10 h-10 text-neutral-300 mx-auto my-3" fill="currentColor" viewbox="0 0 24 24">
-          <path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"></path>
-        </svg>
-        <p class="text-lg font-medium text-neutral-800">68°</p>
-        <p class="text-sm text-neutral-400">55°</p>
-      </div>
-      <div class="bg-white rounded-xl p-4 border border-neutral-100 shadow-lg text-center">
-        <p class="text-sm font-medium text-neutral-700">Sun</p>
-        <p class="text-xs text-neutral-400">Jan 19</p>
-        <svg class="w-10 h-10 text-sky-400 mx-auto my-3" fill="currentColor" viewbox="0 0 24 24">
-          <path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"></path>
-          <g fill="#60a5fa"><circle cx="8" cy="19" r="1"></circle><circle cx="12" cy="21" r="1"></circle><circle cx="16" cy="19" r="1"></circle><circle cx="10" cy="23" r="1"></circle><circle cx="14" cy="23" r="1"></circle></g>
-        </svg>
-        <p class="text-lg font-medium text-neutral-800">62°</p>
-        <p class="text-sm text-neutral-400">52°</p>
-      </div>
-      <div class="bg-white rounded-xl p-4 border border-neutral-100 shadow-lg text-center">
-        <p class="text-sm font-medium text-neutral-700">Mon</p>
-        <p class="text-xs text-neutral-400">Jan 20</p>
-        <svg class="w-10 h-10 text-sky-400 mx-auto my-3" fill="currentColor" viewbox="0 0 24 24">
-          <path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"></path>
-          <g fill="#60a5fa"><circle cx="8" cy="19" r="1"></circle><circle cx="12" cy="21" r="1"></circle><circle cx="16" cy="19" r="1"></circle><circle cx="10" cy="23" r="1"></circle><circle cx="14" cy="23" r="1"></circle></g>
-        </svg>
-        <p class="text-lg font-medium text-neutral-800">60°</p>
-        <p class="text-sm text-neutral-400">50°</p>
-      </div>
-      <div class="bg-white rounded-xl p-4 border border-neutral-100 shadow-lg text-center">
-        <p class="text-sm font-medium text-neutral-700">Tue</p>
-        <p class="text-xs text-neutral-400">Jan 21</p>
-        <svg class="w-10 h-10 text-amber-300 mx-auto my-3" fill="currentColor" viewbox="0 0 24 24">
-          <circle cx="6" cy="6" r="3" fill="#fbbf24"></circle>
-          <path d="M19.35 10.04A7.49 7.49 0 0012 4c-.35 0-.69.02-1.03.06A4.96 4.96 0 0112 8c0 2.76-2.24 5-5 5-.26 0-.52-.02-.77-.06A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z" fill="#cbd5e1"></path>
-        </svg>
-        <p class="text-lg font-medium text-neutral-800">65°</p>
-        <p class="text-sm text-neutral-400">53°</p>
-      </div>
-      <div class="bg-white rounded-xl p-4 border border-neutral-100 shadow-lg text-center">
-        <p class="text-sm font-medium text-neutral-700">Wed</p>
-        <p class="text-xs text-neutral-400">Jan 22</p>
-        <svg class="w-10 h-10 text-amber-400 mx-auto my-3" fill="currentColor" viewbox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></g></svg>
-        <p class="text-lg font-medium text-neutral-800">72°</p>
-        <p class="text-sm text-neutral-400">56°</p>
-      </div>
-      <div class="bg-white rounded-xl p-4 border border-neutral-100 shadow-lg text-center">
-        <p class="text-sm font-medium text-neutral-700">Thu</p>
-        <p class="text-xs text-neutral-400">Jan 23</p>
-        <svg class="w-10 h-10 text-amber-400 mx-auto my-3" fill="currentColor" viewbox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></g></svg>
-        <p class="text-lg font-medium text-neutral-800">75°</p>
-        <p class="text-sm text-neutral-400">57°</p>
-      </div>
-    </div>
+    <% end %>
+  </div>
 
   <p>as of <%= formatted_timestamp %>. Forecast data via <%= link_to "OpenWeatherMap", "https://openweathermap.org/?utm_source=lhwx.org&utm_medium=referral", target: "_blank", class: "underline" %>.</p>
 </div>

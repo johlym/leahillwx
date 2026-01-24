@@ -2,13 +2,13 @@
   @apply container mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 my-2;
 
   h1 {
-    @apply text-2xl font-bold my-4;
+    @apply text-5xl font-condensed uppercase my-4;
   }
   h2 {
-    @apply text-xl font-bold my-4;
+    @apply text-3xl font-condensed uppercase my-4;
   }
   h3 {
-    @apply text-lg font-bold my-4;
+    @apply text-xl font-condensed uppercase my-4;
   }
 }
 

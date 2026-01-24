@@ -4,4 +4,42 @@
   p {
     @apply text-right text-sm text-gray-600;
   }
+
+  > .hourly-forecast-row {
+    @apply grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4 mb-8;
+
+    > .hourly-forecast-item {
+      @apply bg-neutral-50/50 inset-1 border border-neutral-100 shadow-sm rounded-lg p-5 flex flex-col;
+
+      .hour {
+        @apply text-center text-4xl text-text font-condensed;
+
+        > .ampm {
+          @apply uppercase text-lg;
+        }
+      }
+
+      .icon-container {
+        @apply text-center py-2;
+
+        svg {
+          @apply text-3xl;
+        }
+      }
+      .conditions {
+        @apply flex flex-col gap-1;
+        .temperature {
+          @apply text-center text-4xl font-condensed text-text;
+        }
+
+        .wind {
+          @apply text-center text-sm text-text;
+        }
+
+        .precip {
+          @apply text-center text-sm text-text;
+        }
+      }
+    }
+  }
 }

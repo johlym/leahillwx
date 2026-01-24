@@ -23,4 +23,6 @@
   --color-brand-primary: var(--color-brand-800);
   --color-brand-dark: var(--color-brand-950);
   --color-brand-light: var(--color-brand-300);
+
+  --font-condensed: "Saira Extra Condensed", sans-serif;
 }

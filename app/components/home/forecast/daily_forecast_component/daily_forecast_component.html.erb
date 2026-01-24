@@ -1,7 +1,7 @@
 <div class="weather-tile weekly-forecast">
   <h2 class="weather-tile-heading">7-day Forecast</h2>
   <p class="tile-subtitle">as of <%= formatted_timestamp %>. Forecast data via <%= link_to "OpenWeatherMap", "https://openweathermap.org/?utm_source=lhwx.org&utm_medium=referral", target: "_blank", class: "underline" %>.</p>
-  <% forecast.days.each do |entry| %>
+  <% days.each do |entry| %>
   <div class="forecast-entry">
     <div class="date-grid">
       <p class="dayname"><%= entry.date.strftime("%a") %></p>

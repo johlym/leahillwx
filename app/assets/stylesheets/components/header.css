@@ -1,5 +1,5 @@
 .site-header {
-  @apply bg-zinc-800;
+  @apply bg-transparent;
 
   .nav {
     @apply mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8;
@@ -8,7 +8,7 @@
       @apply flex lg:flex-1 items-center gap-2;
 
       .logo {
-        @apply -m-1.5 p-1.5 flex items-center gap-2 text-white no-underline;
+        @apply -m-1.5 p-1.5 flex items-center gap-2 text-black no-underline;
 
         .logo-image {
           @apply h-8 w-auto;
@@ -20,7 +20,7 @@
       }
 
       .live {
-        @apply text-xs font-mono text-white bg-red-600 px-1 py-0.5 rounded-sm;
+        @apply text-xs font-mono text-white bg-red-600 px-1 py-0.5;
 
         &.hidden {
           @apply hidden;
@@ -32,7 +32,7 @@
       @apply flex lg:hidden;
 
       .mobile-toggle {
-        @apply -m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-white;
+        @apply -m-2.5 inline-flex items-center justify-center rounded-lg p-2.5 text-black;
 
         .icon {
           @apply text-xl;
@@ -48,7 +48,7 @@
       @apply hidden lg:flex lg:gap-x-8;
 
       .nav-link {
-        @apply text-sm/6 font-medium text-white no-underline hover:text-brand-200;
+        @apply text-lg/6 font-medium text-black font-condensed uppercase no-underline hover:text-black hover:underline;
       }
     }
   }
@@ -60,7 +60,7 @@
       @apply space-y-1 px-4 pb-4;
 
       .mobile-link {
-        @apply -mx-3 block rounded-lg px-3 py-2 text-base/7 font-medium text-white no-underline hover:text-brand-200;
+        @apply -mx-3 block rounded-lg px-3 py-2 text-base/7 font-medium text-black no-underline hover:text-black hover:underline;
       }
     }
   }

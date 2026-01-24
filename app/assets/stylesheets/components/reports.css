@@ -6,7 +6,7 @@
       @apply overflow-x-auto;
 
       .stats-table {
-        @apply w-full divide-y divide-gray-300 border border-gray-300 rounded-sm;
+        @apply w-full divide-y divide-gray-300 border border-gray-300 rounded-lg;
         border-collapse: separate;
         border-spacing: 0;
         overflow: hidden;
@@ -62,14 +62,14 @@
     }
 
     .partial-day-note {
-      @apply bg-yellow-50 p-4 mb-4 border border-yellow-500 rounded-sm text-yellow-800;
+      @apply bg-yellow-50 p-4 mb-4 border border-yellow-500 rounded-lg text-yellow-800;
     }
 
     .report-table-wrapper {
       @apply overflow-x-auto;
 
       .report-table {
-        @apply min-w-full divide-y divide-gray-300 border border-gray-300 rounded-sm;
+        @apply min-w-full divide-y divide-gray-300 border border-gray-300 rounded-lg;
         border-collapse: separate;
         border-spacing: 0;
         overflow: hidden;
@@ -131,7 +131,7 @@
   }
 
   .notes {
-    @apply bg-gray-100 p-4 mb-4 border rounded-sm border-gray-300;
+    @apply bg-gray-100 p-4 mb-4 border rounded-lg border-gray-300;
 
     h3 {
       @apply mt-0;

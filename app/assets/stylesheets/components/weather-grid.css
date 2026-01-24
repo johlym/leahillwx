@@ -11,17 +11,17 @@
 }
 
 .weather-tile {
-  @apply border border-gray-200 bg-white rounded-sm flex flex-col shadow-lg;
+  @apply border border-gray-200 bg-white rounded-lg flex flex-col shadow-lg;
 
   h2 {
     @apply m-0;
   }
 
-  .weather-tile-heading {
+  > .weather-tile-heading {
     @apply text-center font-bold text-sm sm:text-lg p-1 sm:p-2 border-b rounded-t-sm border-gray-200 bg-gray-50 text-gray-dark;
   }
 
-  .weather-tile-content {
+  > .weather-tile-content {
     @apply flex flex-col flex-1 justify-center p-2 sm:p-4;
 
     .weather-tile-big {
@@ -36,7 +36,7 @@
       @apply text-xs text-gray-400 text-center font-mono;
 
       .live {
-        @apply text-xs text-white bg-red-600 px-1 py-0.5 rounded-sm;
+        @apply text-xs text-white bg-red-600 px-1 py-0.5 rounded-lg;
       }
 
       [data-weather-update-target="counter"] {

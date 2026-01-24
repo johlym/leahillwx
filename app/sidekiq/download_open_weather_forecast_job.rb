@@ -5,11 +5,6 @@ class DownloadOpenWeatherForecastJob
     service = OpenWeatherApiService.new
 
     ow_forecast = service.retrieve_forecast
-    forecast = Forecast.new(forecast: ow_forecast)
-    forecast.save
-
-    ow_current = service.retrieve_current
-    current_forecast = Forecast.new(forecast: ow_current, interval: "current")
-    current_forecast.save
+    Forecast.create(forecast: ow_forecast)
   end
 end

@@ -1,15 +1,15 @@
 <% content_for :body_class, @almanac.season %>
 <%= turbo_stream_from "weather_measurements" %>
 
-<%= render Home::CurrentWeather::ConditionsComponent.new(current: @current, hourly: @hourly_forecast, almanac: @almanac) %>
+<%= render Home::CurrentWeather::ConditionsComponent.new(current: @current, almanac: @almanac) %>
 <div class="primary-container">
   <div class="hourly-forecast">
-    <%= render Home::Forecast::HourlyForecastComponent.new(forecast: @forecast, almanac: @almanac) %>
+    <%= render Home::Forecast::HourlyForecastComponent.new(hours: @forecast.hours.first(8), timestamp: @forecast.created_at) %>
   </div>
 
   <div class="forecast-section">
     <div class="forecast-column">
-      <%= render Home::Forecast::DailyForecastComponent.new(forecast: @forecast) %>
+      <%= render Home::Forecast::DailyForecastComponent.new(days: @forecast.days, timestamp: @forecast.created_at) %>
       <%= render Home::GenericTileComponent.new(heading: "Earthquakes", subtitle: "The last 5 earthquakes nearest to this location.") do %>
         <div class="overflow-x-auto">
           <%= render Home::EarthquakeTableComponent.new(earthquakes: @earthquakes) %>
