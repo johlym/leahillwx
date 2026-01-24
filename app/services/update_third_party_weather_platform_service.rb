@@ -157,7 +157,51 @@ class UpdateThirdPartyWeatherPlatformService
   end
 
   def update_weathercloud(measurement)
-    # TODO: Implement update_weathercloud
+    # WeatherCloud API v01
+    # Documentation: Based on weewx-wcloud implementation at
+    # https://github.com/matthewwall/weewx-wcloud
+    # Note: WeatherCloud expects values in metric with specific multipliers
+
+    # Base parameters (required)
+    request_url = "http://api.weathercloud.net/v01/set"
+    params = {
+      wid: ENV["WEATHERCLOUD_DEVICE_ID"],
+      key: ENV["WEATHERCLOUD_DEVICE_KEY"]
+    }
+
+    # Temperature and humidity (C * 10, percent)
+    params[:temp] = (measurement.temperature * 10).round(0) if measurement.temperature
+    params[:hum] = measurement.humidity.round(0) if measurement.humidity
+    params[:tempin] = (measurement.temperature * 10).round(0) if measurement.temperature  # indoor not available, using outdoor
+
+    # Wind (m/s * 10, degrees)
+    params[:wspd] = (measurement.wind_speed * 10).round(0) if measurement.wind_speed
+    params[:wdir] = measurement.wind_dir.round(0) if measurement.wind_dir
+    params[:wspdhi] = (measurement.gust_speed * 10).round(0) if measurement.gust_speed
+
+    # Barometric pressure (hPa * 10)
+    params[:bar] = (measurement.barometer_rel * 10).round(0) if measurement.barometer_rel
+
+    # Rain (mm * 10, mm/hr * 10)
+    params[:rain] = (measurement.rain_day * 10).round(0) if measurement.rain_day
+    params[:rainrate] = (measurement.rain_rate * 10).round(0) if measurement.rain_rate
+
+    # Solar and UV (W/m² * 10, index * 10)
+    params[:solarrad] = (measurement.light * 10).round(0) if measurement.light
+    params[:uvi] = (measurement.uvi * 10).round(0) if measurement.uvi
+
+    # Calculated values (C * 10)
+    if measurement.dew_point
+      params[:dew] = (measurement.dew_point * 10).round(0)
+    end
+
+    if measurement.feels_like
+      # WeatherCloud uses heat index for feels like
+      params[:heat] = (measurement.feels_like * 10).round(0)
+    end
+
+    wcloud_request = HTTParty.get(request_url, query: params)
+    Rails.logger.info "WeatherCloud response: #{wcloud_request.body}"
   end
 
   def cwop(measurement)
