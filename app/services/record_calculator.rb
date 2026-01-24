@@ -108,27 +108,47 @@ class RecordCalculator
       @record.lowest_wind_chill_at = lowest_wind_chill.reading_date_time
     end
 
-    daily_ranges = measurements
-      .select("DATE(reading_date_time) as date, MAX(temperature) - MIN(temperature) as temp_range")
-      .group("DATE(reading_date_time)")
-      .order("temp_range DESC")
-      .limit(1)
-
-    largest_range = daily_ranges.first
-    if largest_range
-      @record.largest_temp_range = largest_range.temp_range
-      @record.largest_temp_range_date = largest_range.date
+    # Use ReportEntry for daily temperature ranges
+    largest_range = if @scope == "yearly" && @year
+      ReportEntry.joins(:report)
+        .where(reports: { year: @year })
+        .where.not(high_temp: nil, low_temp: nil)
+        .select("report_entries.*, (high_temp - low_temp) as temp_range")
+        .order("temp_range DESC")
+        .limit(1)
+        .first
+    else
+      ReportEntry.where.not(high_temp: nil, low_temp: nil)
+        .select("report_entries.*, (high_temp - low_temp) as temp_range")
+        .order("temp_range DESC")
+        .limit(1)
+        .first
     end
 
-    smallest_range = measurements
-      .select("DATE(reading_date_time) as date, MAX(temperature) - MIN(temperature) as temp_range")
-      .group("DATE(reading_date_time)")
-      .order("temp_range ASC")
-      .limit(1)
-      .first
+    if largest_range
+      @record.largest_temp_range = largest_range.high_temp - largest_range.low_temp
+      @record.largest_temp_range_date = Date.new(largest_range.report.year, largest_range.report.month, largest_range.day)
+    end
+
+    smallest_range = if @scope == "yearly" && @year
+      ReportEntry.joins(:report)
+        .where(reports: { year: @year })
+        .where.not(high_temp: nil, low_temp: nil)
+        .select("report_entries.*, (high_temp - low_temp) as temp_range")
+        .order("temp_range ASC")
+        .limit(1)
+        .first
+    else
+      ReportEntry.where.not(high_temp: nil, low_temp: nil)
+        .select("report_entries.*, (high_temp - low_temp) as temp_range")
+        .order("temp_range ASC")
+        .limit(1)
+        .first
+    end
+
     if smallest_range
-      @record.smallest_temp_range = smallest_range.temp_range
-      @record.smallest_temp_range_date = smallest_range.date
+      @record.smallest_temp_range = smallest_range.high_temp - smallest_range.low_temp
+      @record.smallest_temp_range_date = Date.new(smallest_range.report.year, smallest_range.report.month, smallest_range.day)
     end
   end
 
@@ -207,12 +227,19 @@ class RecordCalculator
     current_wet = { days: 0, start_date: nil }
     current_dry = { days: 0, start_date: nil }
 
-    # Use pluck to get minimal data from database
-    daily_data = measurements
-      .select("DATE(reading_date_time) as date, MAX(rain_day) as daily_total")
-      .group("DATE(reading_date_time)")
-      .order("date ASC")
-      .pluck(Arel.sql("DATE(reading_date_time)"), Arel.sql("MAX(rain_day)"))
+    # Use ReportEntry data for daily rain totals
+    daily_data = if @scope == "yearly" && @year
+      ReportEntry.joins(:report)
+        .where(reports: { year: @year })
+        .where.not(day: nil)
+        .order("reports.year ASC, reports.month ASC, report_entries.day ASC")
+        .pluck(Arel.sql("CAST(reports.year || '-' || LPAD(reports.month::text, 2, '0') || '-' || LPAD(report_entries.day::text, 2, '0') AS DATE)"), :rain)
+    else
+      ReportEntry.joins(:report)
+        .where.not(day: nil)
+        .order("reports.year ASC, reports.month ASC, report_entries.day ASC")
+        .pluck(Arel.sql("CAST(reports.year || '-' || LPAD(reports.month::text, 2, '0') || '-' || LPAD(report_entries.day::text, 2, '0') AS DATE)"), :rain)
+    end
 
     daily_data.each do |date, daily_total|
       if daily_total.to_f > 0
