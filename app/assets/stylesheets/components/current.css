@@ -5,10 +5,10 @@
     @apply max-w-7xl container mx-auto px-8 py-16;
 
     .conditions-grid {
-      @apply grid md:grid-cols-2 gap-12 items-end;
+      @apply grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-12 items-end;
 
       .current-conditions-wrapper {
-        @apply text-center md:text-left;
+        @apply text-center md:text-left col-span-1 md:col-span-2 lg:col-span-5 xl:col-span-6;
 
         p.timestamp {
           @apply text-text/70 text-lg font-condensed uppercase tracking-wide mb-2;
@@ -19,7 +19,7 @@
         }
 
         .current-temperature {
-          @apply flex items-center justify-start md:justify-start gap-6;
+          @apply flex flex-col md:flex-row items-center justify-start md:justify-start gap-6;
 
           .temperature {
             @apply text-9xl font-light font-condensed;
@@ -40,7 +40,7 @@
       }
 
       .current-conditions-tiles {
-        @apply grid grid-cols-3 gap-4 items-end;
+        @apply col-span-1 md:col-span-4 lg:col-span-7 xl:col-span-6 grid grid-cols-3 gap-4 items-end;
 
         .condition-tile {
           @apply bg-white/10 inset-1 border border-black/7 shadow-sm rounded-lg p-5;
