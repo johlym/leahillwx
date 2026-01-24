@@ -163,4 +163,8 @@ class UpdateThirdPartyWeatherPlatformService
   def cwop(measurement)
     # TODO: Implement cwop
   end
+
+  def openweathermap(measurement)
+    # TODO: Implement openweathermap
+  end
 end
