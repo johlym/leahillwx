@@ -151,16 +151,25 @@ class RecordCalculator
   end
 
   def calculate_rain_records
-    highest_daily = measurements
-      .select("DATE(reading_date_time) as date, MAX(rain_day) as daily_total")
-      .group("DATE(reading_date_time)")
-      .order("daily_total DESC")
-      .limit(1)
-      .first
+    # Use ReportEntry table for daily totals instead of raw measurements
+    highest_daily = if @scope == "yearly" && @year
+      ReportEntry.joins(:report)
+        .where(reports: { year: @year })
+        .where.not(rain: nil)
+        .order(rain: :desc)
+        .limit(1)
+        .first
+    else
+      ReportEntry.where.not(rain: nil)
+        .order(rain: :desc)
+        .limit(1)
+        .first
+    end
 
     if highest_daily
-      @record.highest_daily_rain = highest_daily.daily_total
-      @record.highest_daily_rain_date = highest_daily.date
+      @record.highest_daily_rain = highest_daily.rain
+      # Construct date from report's year/month and entry's day
+      @record.highest_daily_rain_date = Date.new(highest_daily.report.year, highest_daily.report.month, highest_daily.day)
     end
 
     highest_rate = measurements.select(:rain_rate, :reading_date_time).order(rain_rate: :desc).limit(1).first
