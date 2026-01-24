@@ -167,4 +167,8 @@ class UpdateThirdPartyWeatherPlatformService
   def openweathermap(measurement)
     # TODO: Implement openweathermap
   end
+
+  def metoffice(measurement)
+    # TODO: Implement metoffice
+  end
 end
