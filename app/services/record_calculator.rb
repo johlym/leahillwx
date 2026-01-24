@@ -167,17 +167,17 @@ class RecordCalculator
     @record.highest_rain_rate = highest_rate&.rain_rate
     @record.highest_rain_rate_at = highest_rate&.reading_date_time
 
-    wettest = measurements
-      .select("EXTRACT(YEAR FROM reading_date_time) as year, EXTRACT(MONTH FROM reading_date_time) as month, MAX(rain_day) as total")
-      .group("EXTRACT(YEAR FROM reading_date_time), EXTRACT(MONTH FROM reading_date_time)")
-      .order("total DESC")
-      .limit(1)
-      .first
+    # Use Report table for monthly totals instead of raw measurements
+    wettest = if @scope == "yearly" && @year
+      Report.where(year: @year).order(total_rain: :desc).limit(1).first
+    else
+      Report.order(total_rain: :desc).limit(1).first
+    end
 
-    if wettest
-      @record.wettest_month = wettest.month.to_i
-      @record.wettest_month_year = wettest.year.to_i
-      @record.wettest_month_total = wettest.total
+    if wettest && wettest.total_rain.present?
+      @record.wettest_month = wettest.month
+      @record.wettest_month_year = wettest.year
+      @record.wettest_month_total = wettest.total_rain
     end
 
     consecutive_rain = find_consecutive_rain_days
