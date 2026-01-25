@@ -39,7 +39,7 @@ export default class extends Controller {
     }
     
     if (this.hasCounterTarget) {
-      this.counterTarget.textContent = `No. ${data.counter.toLocaleString()} `
+      this.counterTarget.textContent = data.counter.toLocaleString()
       this.flashCounter()
     }
     

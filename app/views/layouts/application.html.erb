@@ -25,7 +25,7 @@
     <script src="https://kit.fontawesome.com/20b018c776.js" crossorigin="anonymous"></script>
   </head>
 
-  <body class="bg-linear-to-b from-sky-300 to-[50vh] to-white min-h-screen flex flex-col <%= yield(:body_class) %>">
+  <body class="bg-linear-to-b from-sky-300 to-[50vh] to-white min-h-screen flex flex-col <%= yield(:body_class) %>" data-controller="weather-update">
     <%= render "layouts/shared/header" %>
     <%= yield %>
     <%= render "layouts/shared/footer" %>
