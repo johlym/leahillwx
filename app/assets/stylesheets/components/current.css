@@ -40,10 +40,10 @@
       }
 
       .current-conditions-tiles {
-        @apply col-span-1 md:col-span-4 lg:col-span-7 xl:col-span-6 grid grid-cols-3 gap-4 items-end;
+        @apply col-span-1 md:col-span-4 lg:col-span-7 xl:col-span-6 grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-4 items-end;
 
         .condition-tile {
-          @apply bg-white/10 inset-1 border border-black/7 shadow-sm rounded-lg p-5;
+          @apply flex flex-col items-center xs:items-start bg-white/10 inset-1 border border-black/7 shadow-sm rounded-lg p-5;
 
           .tile-icon-wrapper {
             @apply flex items-center gap-3 mb-2;

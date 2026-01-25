@@ -25,4 +25,7 @@
   --color-brand-light: var(--color-brand-300);
 
   --font-condensed: "Saira Extra Condensed", sans-serif;
+
+  --breakpoint-xxs: 23rem;
+  --breakpoint-xs: 30rem;
 }
