@@ -84,11 +84,11 @@ class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
   end
 
   def current_rain_day
-    @current.rain_day_in
+    @current.rain_day_in.round(2)
   end
 
   def current_rain_hour
-    @current.rain_rate_in
+    @current.rain_rate_in.round(2)
   end
 
   def current_dew_point
