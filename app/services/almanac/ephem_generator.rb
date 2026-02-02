@@ -26,11 +26,11 @@ module Almanac
     end
 
     def bsp_coverage
-      # Using approximate algorithms, so we can support a wide date range
-      # Set practical limits for historical and future coverage
+      # Limit to ±50 years from current date for practical coverage
+      current_year = Date.current.year
       {
-        start_date: Date.new(1900, 1, 1),
-        end_date: Date.new(2099, 12, 31)
+        start_date: Date.new(current_year - 50, 1, 1),
+        end_date: Date.new(current_year + 50, 12, 31)
       }
     end
 
@@ -52,6 +52,10 @@ module Almanac
       # Calculate season information
       season_data = calculate_season_data(local_date)
 
+      # Calculate distances and 1-minute position data
+      distance_data = calculate_distances(local_date)
+      position_data = generate_1min_positions(local_date)
+
       {
         date: local_date,
         timezone: TIMEZONE,
@@ -59,81 +63,106 @@ module Almanac
         **daylight_data,
         **moon_data,
         **events_data,
-        **season_data
+        **season_data,
+        **distance_data,
+        **position_data
       }
     end
 
-    def generate_hourly_positions(date)
+    def generate_1min_positions(date)
+      # Generate position data every minute (1440 samples per day)
+      # Store as compact arrays for efficient storage
       local_date = date.is_a?(Date) ? date : Date.parse(date.to_s)
-      positions = []
+      tz = ActiveSupport::TimeZone[TIMEZONE]
+      day_start = tz.parse("#{local_date} 00:00:00")
 
-      (0..23).each do |hour|
-        datetime = Time.zone.parse("#{local_date} #{hour}:00:00")
+      sun_positions = []
+      moon_positions = []
+
+      # Sample every minute
+      (0...1440).each do |minute|
+        datetime = day_start + (minute * 60)
         jd = datetime_to_julian_date(datetime)
 
         sun_pos = calculate_sun_position_bsp(jd)
         moon_pos = calculate_moon_position_bsp(jd)
 
-        positions << {
-          date: local_date,
-          hour: hour,
-          sun_azimuth_deg: sun_pos[:azimuth],
-          sun_altitude_deg: sun_pos[:altitude],
-          sun_ra_deg: sun_pos[:ra],
-          sun_dec_deg: sun_pos[:dec],
-          moon_azimuth_deg: moon_pos[:azimuth],
-          moon_altitude_deg: moon_pos[:altitude],
-          moon_ra_deg: moon_pos[:ra],
-          moon_dec_deg: moon_pos[:dec]
+        # Store compact format: {m: minute, alt: altitude, az: azimuth}
+        sun_positions << {
+          m: minute,
+          alt: sun_pos[:altitude].round(2),
+          az: sun_pos[:azimuth].round(1)
+        }
+
+        moon_positions << {
+          m: minute,
+          alt: moon_pos[:altitude].round(2),
+          az: moon_pos[:azimuth].round(1)
         }
       end
 
-      positions
+      {
+        sun_positions_1min: sun_positions,
+        moon_positions_1min: moon_positions
+      }
     end
 
     private
 
     def calculate_sun_events(date)
-      # Use simple rise/set calculations
-      year, month, day = date.year, date.month, date.day
-
-      sunrise_utc, sunset_utc = sun_rise_set(year, month, day, @lon, @lat)
-      civil_dawn_utc, civil_dusk_utc = civil_twilight(year, month, day, @lon, @lat)
-      solar_noon_utc = (sunrise_utc + sunset_utc) / 2.0
-
+      # Calculate events for the LOCAL timezone day (midnight to midnight in TIMEZONE)
+      # not the UTC day, so events near timezone boundaries are correctly assigned
       tz = ActiveSupport::TimeZone[TIMEZONE]
 
+      # Define the local day boundaries
+      day_start = tz.parse("#{date} 00:00:00")
+      day_end = day_start + 1.day
+
+      sunrise_time = sun_rise_set_local(day_start, day_end)
+      sunset_time = sun_set_local(day_start, day_end)
+      civil_dawn_time = civil_dawn_local(day_start, day_end)
+      civil_dusk_time = civil_dusk_local(day_start, day_end)
+      nautical_dawn_time = nautical_dawn_local(day_start, day_end)
+      nautical_dusk_time = nautical_dusk_local(day_start, day_end)
+      astronomical_dawn_time = astronomical_dawn_local(day_start, day_end)
+      astronomical_dusk_time = astronomical_dusk_local(day_start, day_end)
+
+      # Solar noon is when sun reaches maximum altitude (transit)
+      solar_noon_time = sun_transit_local(day_start, day_end)
+
       {
-        sunrise_at: utc_hours_to_datetime(year, month, day, sunrise_utc, tz),
-        sunset_at: utc_hours_to_datetime(year, month, day, sunset_utc, tz),
-        civil_dawn_at: utc_hours_to_datetime(year, month, day, civil_dawn_utc, tz),
-        civil_dusk_at: utc_hours_to_datetime(year, month, day, civil_dusk_utc, tz),
-        solar_noon_at: utc_hours_to_datetime(year, month, day, solar_noon_utc, tz)
+        sunrise_at: sunrise_time,
+        sunset_at: sunset_time,
+        civil_dawn_at: civil_dawn_time,
+        civil_dusk_at: civil_dusk_time,
+        nautical_dawn_at: nautical_dawn_time,
+        nautical_dusk_at: nautical_dusk_time,
+        astronomical_dawn_at: astronomical_dawn_time,
+        astronomical_dusk_at: astronomical_dusk_time,
+        solar_noon_at: solar_noon_time
       }
     end
 
     def calculate_moon_events(date)
-      year, month, day = date.year, date.month, date.day
-
-      # Calculate moon rise/set using similar algorithms to sun
-      moonrise_utc, moonset_utc = moon_rise_set(year, month, day, @lon, @lat)
-
-      # Calculate moon transit - only if both rise and set are available
-      moon_transit_utc = if moonrise_utc && moonset_utc
-        (moonrise_utc + moonset_utc) / 2.0
-      else
-        nil
-      end
-
-      # Calculate moon phase
-      phase_data = moon_phase(year, month, day)
-
+      # Calculate events for the LOCAL timezone day (midnight to midnight in TIMEZONE)
       tz = ActiveSupport::TimeZone[TIMEZONE]
 
+      # Define the local day boundaries
+      day_start = tz.parse("#{date} 00:00:00")
+      day_end = day_start + 1.day
+
+      moonrise_time = moon_rise_local(day_start, day_end)
+      moonset_time = moon_set_local(day_start, day_end)
+      moon_transit_time = moon_transit_local(day_start, day_end)
+
+      # Calculate moon phase at noon local time
+      noon_time = day_start + 12.hours
+      phase_data = moon_phase_at_time(noon_time)
+
       {
-        moonrise_at: utc_hours_to_datetime(year, month, day, moonrise_utc, tz),
-        moonset_at: utc_hours_to_datetime(year, month, day, moonset_utc, tz),
-        moon_transit_at: utc_hours_to_datetime(year, month, day, moon_transit_utc, tz),
+        moonrise_at: moonrise_time,
+        moonset_at: moonset_time,
+        moon_transit_at: moon_transit_time,
         moon_phase: phase_data[:phase_name],
         moon_illumination_pct: phase_data[:illumination]
       }
@@ -180,6 +209,45 @@ module Almanac
 
       {
         sun_ecliptic_longitude_deg: solar_ecliptic_longitude(jd)
+      }
+    end
+
+    def calculate_distances(date)
+      # Calculate Earth-Moon and Earth-Sun distances at noon local time
+      tz = ActiveSupport::TimeZone[TIMEZONE]
+      noon_time = tz.parse("#{date} 12:00:00")
+      jd = datetime_to_julian_date(noon_time)
+
+      # Get Sun distance (in AU, convert to km)
+      sun_state = @spk[SOLAR_SYSTEM_BARYCENTER, SUN].state_at(jd)
+      emb_state = @spk[SOLAR_SYSTEM_BARYCENTER, EARTH_MOON_BARYCENTER].state_at(jd)
+      earth_offset = @spk[EARTH_MOON_BARYCENTER, EARTH].state_at(jd)
+
+      earth_pos = [
+        emb_state.position[0] + earth_offset.position[0],
+        emb_state.position[1] + earth_offset.position[1],
+        emb_state.position[2] + earth_offset.position[2]
+      ]
+
+      sun_rel_pos = [
+        sun_state.position[0] - earth_pos[0],
+        sun_state.position[1] - earth_pos[1],
+        sun_state.position[2] - earth_pos[2]
+      ]
+
+      sun_distance_km = Math.sqrt(
+        sun_rel_pos[0]**2 + sun_rel_pos[1]**2 + sun_rel_pos[2]**2
+      )
+
+      # Get Moon distance
+      moon_state = @spk[EARTH_MOON_BARYCENTER, MOON].state_at(jd)
+      moon_distance_km = Math.sqrt(
+        moon_state.position[0]**2 + moon_state.position[1]**2 + moon_state.position[2]**2
+      )
+
+      {
+        sun_distance_km: sun_distance_km,
+        moon_distance_km: moon_distance_km
       }
     end
 
@@ -266,6 +334,154 @@ module Almanac
       base_time + days_offset.days + hours.hours + minutes.minutes + seconds.seconds
     rescue ArgumentError
       nil
+    end
+
+    # Local timezone event search helpers
+    def sun_rise_set_local(day_start, day_end)
+      # Search for sunrise within the local timezone day
+      find_horizon_crossing(day_start, day_end, :sun, -35.0 / 60.0, :rising)
+    end
+
+    def sun_set_local(day_start, day_end)
+      # Search for sunset within the local timezone day
+      find_horizon_crossing(day_start, day_end, :sun, -35.0 / 60.0, :setting)
+    end
+
+    def civil_dawn_local(day_start, day_end)
+      # Search for civil dawn within the local timezone day
+      find_horizon_crossing(day_start, day_end, :sun, -6.0, :rising)
+    end
+
+    def civil_dusk_local(day_start, day_end)
+      # Search for civil dusk within the local timezone day
+      find_horizon_crossing(day_start, day_end, :sun, -6.0, :setting)
+    end
+
+    def nautical_dawn_local(day_start, day_end)
+      # Search for nautical dawn within the local timezone day (sun at -12°)
+      find_horizon_crossing(day_start, day_end, :sun, -12.0, :rising)
+    end
+
+    def nautical_dusk_local(day_start, day_end)
+      # Search for nautical dusk within the local timezone day (sun at -12°)
+      find_horizon_crossing(day_start, day_end, :sun, -12.0, :setting)
+    end
+
+    def astronomical_dawn_local(day_start, day_end)
+      # Search for astronomical dawn within the local timezone day (sun at -18°)
+      find_horizon_crossing(day_start, day_end, :sun, -18.0, :rising)
+    end
+
+    def astronomical_dusk_local(day_start, day_end)
+      # Search for astronomical dusk within the local timezone day (sun at -18°)
+      find_horizon_crossing(day_start, day_end, :sun, -18.0, :setting)
+    end
+
+    def moon_rise_local(day_start, day_end)
+      # Search for moonrise within the local timezone day
+      find_horizon_crossing(day_start, day_end, :moon, -49.0 / 60.0, :rising)
+    end
+
+    def moon_set_local(day_start, day_end)
+      # Search for moonset within the local timezone day
+      find_horizon_crossing(day_start, day_end, :moon, -49.0 / 60.0, :setting)
+    end
+
+    def sun_transit_local(day_start, day_end)
+      # Find sun transit (highest altitude) within the local timezone day
+      find_transit(day_start, day_end, :sun)
+    end
+
+    def moon_transit_local(day_start, day_end)
+      # Find moon transit (highest altitude) within the local timezone day
+      find_transit(day_start, day_end, :moon)
+    end
+
+    def find_horizon_crossing(day_start, day_end, body, horizon_alt, direction)
+      # Sample every 5 minutes to find horizon crossing
+      prev_alt = nil
+      prev_time = nil
+
+      samples = 288  # Every 5 minutes for 24 hours
+      interval = (day_end - day_start) / samples.to_f
+
+      (0..samples).each do |i|
+        current_time = day_start + (i * interval)
+        jd = datetime_to_julian_date(current_time)
+
+        pos = if body == :sun
+          calculate_sun_position_bsp(jd)
+        else
+          calculate_moon_position_bsp(jd)
+        end
+
+        current_alt = pos[:altitude]
+
+        if prev_alt && prev_time
+          # Check for horizon crossing
+          if direction == :rising && prev_alt < horizon_alt && current_alt >= horizon_alt
+            # Interpolate to find precise crossing time
+            fraction = (horizon_alt - prev_alt) / (current_alt - prev_alt)
+            crossing_time = prev_time + (fraction * (current_time - prev_time))
+            return crossing_time
+          elsif direction == :setting && prev_alt >= horizon_alt && current_alt < horizon_alt
+            # Interpolate to find precise crossing time
+            fraction = (prev_alt - horizon_alt) / (prev_alt - current_alt)
+            crossing_time = prev_time + (fraction * (current_time - prev_time))
+            return crossing_time
+          end
+        end
+
+        prev_alt = current_alt
+        prev_time = current_time
+      end
+
+      nil  # No crossing found
+    end
+
+    def find_transit(day_start, day_end, body)
+      # Find the time of maximum altitude within the local timezone day
+      max_altitude = -999.0
+      transit_time = nil
+
+      samples = 288  # Every 5 minutes for 24 hours
+      interval = (day_end - day_start) / samples.to_f
+
+      (0..samples).each do |i|
+        current_time = day_start + (i * interval)
+        jd = datetime_to_julian_date(current_time)
+
+        pos = if body == :sun
+          calculate_sun_position_bsp(jd)
+        else
+          calculate_moon_position_bsp(jd)
+        end
+
+        if pos[:altitude] > max_altitude
+          max_altitude = pos[:altitude]
+          transit_time = current_time
+        end
+      end
+
+      transit_time
+    end
+
+    def moon_phase_at_time(time)
+      # Reference new moon: 2018-01-17 02:17 UTC
+      new_moon_2018 = Time.utc(2018, 1, 17, 2, 17, 0).to_i
+      time_ts = time.to_i
+
+      delta_days = (time_ts - new_moon_2018) / 86400.0
+      lunations = delta_days / 29.530588
+      position = lunations % 1.0
+
+      illumination = ((1.0 - Math.cos(2.0 * Math::PI * position)) / 2.0 * 100.0).round(1)
+      index = ((position * 8) + 0.5).to_i & 7
+
+      phases = [ "new", "waxing crescent", "first quarter", "waxing gibbous",
+                "full", "waning gibbous", "last quarter", "waning crescent" ]
+
+      { phase_name: phases[index], illumination: illumination }
     end
 
     # Sun/Moon rise/set calculations (simplified algorithms)
@@ -365,6 +581,35 @@ module Almanac
       # (e.g., circumpolar moon near poles, or moon always below/above horizon)
 
       [ moonrise_utc, moonset_utc ]
+    end
+
+    def moon_transit(year, month, day, lon, lat)
+      # Find moon transit (highest altitude point) by sampling throughout the day
+      # This works even when moon doesn't rise or set on the given day
+
+      max_altitude = -999.0
+      transit_utc = nil
+
+      # Sample every 5 minutes throughout the day for precision
+      (0..287).each do |i|  # 288 samples = every 5 minutes for 24 hours
+        hour_decimal = i / 12.0  # Convert to hours (12 samples per hour)
+
+        # Create datetime for this sample
+        datetime = Time.utc(year, month, day, 0, 0, 0) + (hour_decimal * 3600)
+        jd = datetime_to_julian_date(datetime)
+
+        # Get moon position at this time
+        moon_pos = calculate_moon_position_bsp(jd)
+        current_alt = moon_pos[:altitude]
+
+        # Track maximum altitude
+        if current_alt > max_altitude
+          max_altitude = current_alt
+          transit_utc = hour_decimal
+        end
+      end
+
+      transit_utc
     end
 
     def moon_phase(year, month, day)
