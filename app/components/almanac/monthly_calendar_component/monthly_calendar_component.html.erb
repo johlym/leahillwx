@@ -1,0 +1,204 @@
+<div class="almanac-table" data-controller="almanac-table-toggle">
+  <!-- Toggle between Sun and Moon -->
+  <div class="toggle">
+    <button type="button" 
+            class="tab"
+            data-action="click->almanac-table-toggle#showSun"
+            data-almanac-table-toggle-target="sunBtn">
+      <i class="far fa-sun"></i> Sun
+    </button>
+    <button type="button" 
+            class="tab"
+            data-action="click->almanac-table-toggle#showMoon"
+            data-almanac-table-toggle-target="moonBtn">
+      <i class="far fa-moon"></i> Moon
+    </button>
+  </div>
+
+  <!-- Sun Table -->
+  <div class="table-container" data-almanac-table-toggle-target="sunTable" data-controller="almanac-calendar">
+    <table>
+      <thead>
+        <tr class="primary-header">
+          <th rowspan="2">Day</th>
+          <th colspan="2">Sunrise/Sunset</th>
+          <th colspan="2">Day Length</th>
+          <th colspan="2">Astronomical Twilight</th>
+          <th colspan="2">Nautical Twilight</th>
+          <th colspan="2">Civil Twilight</th>
+          <th colspan="2">Solar Noon</th>
+        </tr>
+        <tr class="secondary-header">
+          <th>Sunrise</th>
+          <th>Sunset</th>
+          <th>Length</th>
+          <th>Diff.</th>
+          <th>Start</th>
+          <th>End</th>
+          <th>Start</th>
+          <th>End</th>
+          <th>Start</th>
+          <th>End</th>
+          <th>Time</th>
+          <th>Mil. mi.</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% days_in_month.each do |date| %>
+          <% entry = entry_for_date(date) %>
+          <% if entry %>
+            <tr class="<%= 'today' if is_today?(date) %>"
+                data-action="click->almanac-calendar#toggleRow"
+                data-almanac-calendar-date-value="<%= date.iso8601 %>">
+              <td>
+                <div class="flex items-center gap-1 justify-center">
+                  <span><%= date.day %></span>
+                  <span class=" text-gray-500 font-mono" data-almanac-calendar-target="chevron">+</span>
+                </div>
+              </td>
+              <td>
+                <%= format_time(entry.sunrise_at, strip_leading_zero: true) %>
+                <% if az = sun_rise_azimuth(entry) %>
+                  <span class="text-xs text-gray-500">(<%=az.round(0)%>°)</span>
+                <% end %>
+              </td>
+              <td>
+                <%= format_time(entry.sunset_at, strip_leading_zero: true) %>
+                <% if az = sun_set_azimuth(entry) %>
+                  <span class="text-xs text-gray-500">(<%=az.round(0)%>°)</span>
+                <% end %>
+              </td>
+              <td><%= format_day_length(entry.daylight_seconds) %></td>
+              <td><%= format_day_length_diff(entry.daylight_delta_seconds) %></td>
+              <td><%= format_time(entry.astronomical_dawn_at, strip_leading_zero: true) %></td>
+              <td><%= format_time(entry.astronomical_dusk_at, strip_leading_zero: true) %></td>
+              <td><%= format_time(entry.nautical_dawn_at, strip_leading_zero: true) %></td>
+              <td><%= format_time(entry.nautical_dusk_at, strip_leading_zero: true) %></td>
+              <td><%= format_time(entry.civil_dawn_at, strip_leading_zero: true) %></td>
+              <td><%= format_time(entry.civil_dusk_at, strip_leading_zero: true) %></td>
+              <td>
+                <%= format_time(entry.solar_noon_at, strip_leading_zero: true) %>
+                <% if alt = sun_transit_altitude(entry) %>
+                  <span class="text-xs text-gray-500">(<%= alt.round(1) %>°)</span>
+                <% end %>
+              </td>
+              <td>
+                <%= distance_miles(entry.sun_distance_km, 1000000) %>
+              </td>
+            </tr>
+            <!-- Expandable row for sun altitude graph -->
+            <tr class="hidden" data-almanac-calendar-target="expandedRow" data-almanac-calendar-date="<%= date.iso8601 %>">
+              <td colspan="14" class="expanded-row">
+                <div class="expanded-container">
+                  <div class="expanded-inner">
+                    <div data-almanac-calendar-target="altitudeChart" 
+                         data-positions="<%= sample_positions(entry.sun_positions_1min).to_json %>"
+                         data-date="<%= date.strftime('%B %d, %Y') %>"
+                         data-body="sun">
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          <% else %>
+            <tr>
+              <td colspan="14">
+                <span>No data for <%= date.strftime("%B %d") %></span>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Moon Table -->
+  <div class="table-container" data-almanac-table-toggle-target="moonTable" class="hidden" data-controller="almanac-calendar">
+    <table>
+      <thead>
+        <tr>
+          <th rowspan="2">Day</th>
+          <th colspan="3">Moonrise/Moonset</th>
+          <th colspan="3">Meridian Passing</th>
+        </tr>
+        <tr class="secondary-header">
+          <th>Moonrise</th>
+          <th>Moonset</th>
+          <th>Moonrise</th>
+          <th>Time</th>
+          <th>Thou. mi.</th>
+          <th>Illumination</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% days_in_month.each do |date| %>
+          <% entry = entry_for_date(date) %>
+          <% if entry %>
+            <% moon_events = moon_events_for_day(entry) %>
+            <% offset = column_offset_for_date(date, entry) %>
+            <tr class="<%= 'today' if is_today?(date) %>" 
+                data-action="click->almanac-calendar#toggleRow"
+                data-almanac-calendar-date-value="<%= date.iso8601 %>">
+              <td>
+                <div class="flex items-center gap-1 justify-center">
+                  <span><%= date.day %></span>
+                  <span class="text-gray-500 font-mono" data-almanac-calendar-target="chevron">+</span>
+                </div>
+              </td>
+              <% 3.times do |col| %>
+                <td>
+                  <% event_index = col - offset %>
+                  <% if event_index >= 0 && moon_events[event_index] %>
+                    <% event = moon_events[event_index] %>
+                    <%= format_time(event[:time], strip_leading_zero: true) %>
+                    <% if event[:azimuth] %>
+                      <%= render Elements::WindVaneComponent.new(direction: event[:azimuth]) %>
+                    <% end %>
+                  <% else %>
+                    <span>-</span>
+                  <% end %>
+                </td>
+              <% end %>
+              <td>
+                <% if entry.moon_transit_at %>
+                  <%= format_time(entry.moon_transit_at, strip_leading_zero: true) %>
+                  <% if alt = moon_transit_altitude(entry) %>
+                    <span class="text-xs text-gray-500">(<%= alt.round(1) %>°)</span>
+                  <% end %>
+                <% else %>
+                  <span>-</span>
+                <% end %>
+              </td>
+              <td>
+                <%= number_with_delimiter(distance_miles(entry.moon_distance_km, 1000)) %>
+              </td>
+              <td>
+                <%= entry.moon_illumination_pct&.round %>%
+              </td>
+            </tr>
+            <!-- Expandable row for graph -->
+            <tr class="hidden" data-almanac-calendar-target="expandedRow" data-almanac-calendar-date="<%= date.iso8601 %>">
+              <td class="expanded-row" colspan="7">
+                <div class="expanded-container">
+                  <div class="expanded-inner">
+                    <div data-almanac-calendar-target="altitudeChart" 
+                         data-positions="<%= sample_positions(entry.moon_positions_1min).to_json %>"
+                         data-date="<%= date.strftime('%B %d, %Y') %>"
+                         data-body="moon">
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          <% else %>
+            <tr>
+              <td colspan="7">
+                <span>No data for <%= date.strftime("%B %d") %></span>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
