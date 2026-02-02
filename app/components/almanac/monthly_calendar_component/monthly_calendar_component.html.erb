@@ -92,7 +92,7 @@
                 <div class="expanded-container">
                   <div class="expanded-inner">
                     <div data-almanac-calendar-target="altitudeChart" 
-                         data-positions="<%= sample_positions(entry.sun_positions_1min).to_json %>"
+                         data-positions="<%= entry.sun_positions_hourly&.to_json %>"
                          data-date="<%= date.strftime('%B %d, %Y') %>"
                          data-body="sun">
                     </div>
@@ -182,7 +182,7 @@
                 <div class="expanded-container">
                   <div class="expanded-inner">
                     <div data-almanac-calendar-target="altitudeChart" 
-                         data-positions="<%= sample_positions(entry.moon_positions_1min).to_json %>"
+                         data-positions="<%= entry.moon_positions_hourly&.to_json %>"
                          data-date="<%= date.strftime('%B %d, %Y') %>"
                          data-body="moon">
                     </div>

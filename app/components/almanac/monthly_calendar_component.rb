@@ -51,7 +51,7 @@ class Almanac::MonthlyCalendarComponent < ViewComponent::Base
       events << {
         type: :rise,
         time: entry.moonrise_at,
-        azimuth: azimuth_at_time(entry.moon_positions_1min, entry.moonrise_at)
+        azimuth: azimuth_at_time(entry.moon_positions_hourly, entry.moonrise_at)
       }
     end
 
@@ -60,7 +60,7 @@ class Almanac::MonthlyCalendarComponent < ViewComponent::Base
       events << {
         type: :set,
         time: entry.moonset_at,
-        azimuth: azimuth_at_time(entry.moon_positions_1min, entry.moonset_at)
+        azimuth: azimuth_at_time(entry.moon_positions_hourly, entry.moonset_at)
       }
     end
 
@@ -93,27 +93,27 @@ class Almanac::MonthlyCalendarComponent < ViewComponent::Base
   end
 
   def moon_rise_azimuth(entry)
-    azimuth_at_time(entry.moon_positions_1min, entry.moonrise_at)
+    azimuth_at_time(entry.moon_positions_hourly, entry.moonrise_at)
   end
 
   def moon_set_azimuth(entry)
-    azimuth_at_time(entry.moon_positions_1min, entry.moonset_at)
+    azimuth_at_time(entry.moon_positions_hourly, entry.moonset_at)
   end
 
   def moon_transit_azimuth(entry)
-    azimuth_at_time(entry.moon_positions_1min, entry.moon_transit_at)
+    azimuth_at_time(entry.moon_positions_hourly, entry.moon_transit_at)
   end
 
   def sun_rise_azimuth(entry)
-    azimuth_at_time(entry.sun_positions_1min, entry.sunrise_at)
+    azimuth_at_time(entry.sun_positions_hourly, entry.sunrise_at)
   end
 
   def sun_set_azimuth(entry)
-    azimuth_at_time(entry.sun_positions_1min, entry.sunset_at)
+    azimuth_at_time(entry.sun_positions_hourly, entry.sunset_at)
   end
 
   def sun_transit_azimuth(entry)
-    azimuth_at_time(entry.sun_positions_1min, entry.solar_noon_at)
+    azimuth_at_time(entry.sun_positions_hourly, entry.solar_noon_at)
   end
 
   def format_day_length(seconds)
@@ -134,12 +134,8 @@ class Almanac::MonthlyCalendarComponent < ViewComponent::Base
   end
 
   def sun_transit_altitude(entry)
-    return nil unless entry.solar_noon_at && entry.sun_positions_1min.present?
-    # Convert to local timezone before calculating minute offset
-    local_time = entry.solar_noon_at.in_time_zone("America/Los_Angeles")
-    minute = local_time.hour * 60 + local_time.min
-    sample = entry.sun_positions_1min.find { |s| s["m"] == minute }
-    sample ? sample["alt"] : nil
+    return nil unless entry.solar_noon_at && entry.sun_positions_hourly.present?
+    altitude_at_time(entry.sun_positions_hourly, entry.solar_noon_at)
   end
 
   def heading_from_azimuth(azimuth)
@@ -160,16 +156,15 @@ class Almanac::MonthlyCalendarComponent < ViewComponent::Base
   end
 
   def moon_transit_altitude(entry)
-    return nil unless entry.moon_transit_at && entry.moon_positions_1min.present?
-    minute = entry.moon_transit_at.hour * 60 + entry.moon_transit_at.min
-    sample = entry.moon_positions_1min.find { |s| s["m"] == minute }
-    sample ? sample["alt"] : nil
+    return nil unless entry.moon_transit_at && entry.moon_positions_hourly.present?
+    altitude_at_time(entry.moon_positions_hourly, entry.moon_transit_at)
   end
 
-  def sample_positions(positions, interval: 60)
-    return [] unless positions.present?
-    positions.select.with_index { |_, i| i % interval == 0 || i == positions.length - 1 }
-             .map { |pos| { m: pos["m"], alt: pos["alt"] } }
+  def altitude_at_time(positions, time)
+    return nil unless positions.present? && time
+    hour = time.hour
+    sample = positions.find { |s| s["h"] == hour }
+    sample ? sample["alt"] : nil
   end
 
   def distance_miles(km, int)

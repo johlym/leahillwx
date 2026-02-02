@@ -57,9 +57,9 @@ export default class extends Controller {
     try {
       const positions = JSON.parse(positionsJson)
       
-      // Data is already sampled server-side
+      // Data is hourly (24 samples per day)
       const sampledData = positions.map(pos => ({
-        minute: pos.m,
+        minute: pos.h * 60,  // Convert hour to minute for x-axis scale
         altitude: pos.alt
       }))
 

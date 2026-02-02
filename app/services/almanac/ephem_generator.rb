@@ -72,9 +72,9 @@ module Almanac
       # Calculate season information
       season_data = calculate_season_data(local_date)
 
-      # Calculate distances and 1-minute position data
+      # Calculate distances and hourly position data
       distance_data = calculate_distances(local_date)
-      position_data = generate_1min_positions(local_date)
+      position_data = generate_hourly_positions(local_date)
 
       {
         date: local_date,
@@ -89,9 +89,9 @@ module Almanac
       }
     end
 
-    def generate_1min_positions(date)
-      # Generate position data every minute (1440 samples per day)
-      # Store as compact arrays for efficient storage
+    def generate_hourly_positions(date)
+      # Generate position data every hour (24 samples per day)
+      # Reduced from 1440 per-minute samples for 98% database size reduction
       local_date = date.is_a?(Date) ? date : Date.parse(date.to_s)
       tz = ActiveSupport::TimeZone[TIMEZONE]
       day_start = tz.parse("#{local_date} 00:00:00")
@@ -99,31 +99,31 @@ module Almanac
       sun_positions = []
       moon_positions = []
 
-      # Sample every minute
-      (0...1440).each do |minute|
-        datetime = day_start + (minute * 60)
+      # Sample every hour (0-23)
+      (0...24).each do |hour|
+        datetime = day_start + (hour * 3600)
         jd = datetime_to_julian_date(datetime)
 
         sun_pos = calculate_sun_position_bsp(jd)
         moon_pos = calculate_moon_position_bsp(jd)
 
-        # Store compact format: {m: minute, alt: altitude, az: azimuth}
+        # Store compact format: {h: hour, alt: altitude, az: azimuth}
         sun_positions << {
-          m: minute,
+          h: hour,
           alt: sun_pos[:altitude].round(2),
           az: sun_pos[:azimuth].round(1)
         }
 
         moon_positions << {
-          m: minute,
+          h: hour,
           alt: moon_pos[:altitude].round(2),
           az: moon_pos[:azimuth].round(1)
         }
       end
 
       {
-        sun_positions_1min: sun_positions,
-        moon_positions_1min: moon_positions
+        sun_positions_hourly: sun_positions,
+        moon_positions_hourly: moon_positions
       }
     end
 
