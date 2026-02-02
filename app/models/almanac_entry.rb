@@ -13,7 +13,7 @@
 #  moon_distance_km           :float
 #  moon_illumination_pct      :float
 #  moon_phase                 :string
-#  moon_positions_1min        :jsonb
+#  moon_positions_hourly      :jsonb
 #  moon_transit_at            :datetime
 #  moonrise_at                :datetime
 #  moonset_at                 :datetime
@@ -26,7 +26,7 @@
 #  solar_noon_at              :datetime
 #  sun_distance_km            :float
 #  sun_ecliptic_longitude_deg :float
-#  sun_positions_1min         :jsonb
+#  sun_positions_hourly       :jsonb
 #  sunrise_at                 :datetime
 #  sunset_at                  :datetime
 #  timezone                   :string           default("America/Los_Angeles"), not null

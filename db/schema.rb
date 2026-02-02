@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_02_021444) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_02_055800) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -26,7 +26,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_02_021444) do
     t.float "moon_distance_km"
     t.float "moon_illumination_pct"
     t.string "moon_phase"
-    t.jsonb "moon_positions_1min"
+    t.jsonb "moon_positions_hourly"
     t.datetime "moon_transit_at"
     t.datetime "moonrise_at"
     t.datetime "moonset_at"
@@ -39,7 +39,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_02_021444) do
     t.datetime "solar_noon_at"
     t.float "sun_distance_km"
     t.float "sun_ecliptic_longitude_deg"
-    t.jsonb "sun_positions_1min"
+    t.jsonb "sun_positions_hourly"
     t.datetime "sunrise_at"
     t.datetime "sunset_at"
     t.string "timezone", default: "America/Los_Angeles", null: false
