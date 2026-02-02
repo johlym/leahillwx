@@ -1,30 +1,72 @@
-.almanac-data {
-  @apply flex flex-col md:flex-row gap-3 mb-2;
-}
+.almanac-table {
+  .toggle {
+    @apply flex px-3 gap-3;
 
-.almanac-section {
-  @apply flex-1;
-
-  h2 {
-    @apply text-lg font-bold mb-2 text-text;
-  }
-
-  .almanac-list {
-    @apply grid grid-cols-[auto_1fr] gap-2;
-
-    dt {
-      @apply font-normal text-text;
-
-      &.indented {
-        @apply invisible;
-      }
+    .tab {
+      @apply flex-1 px-4 py-2 text-sm text-center font-semibold transition  rounded-b-none;
     }
 
-    dd {
-      @apply text-text text-right;
+    .active-tab {
+      @apply bg-brand-light text-brand-primary border border-brand-border border-b-0 hover:bg-brand-primary hover:text-white hover:border-brand-primary;
+    }
 
-      &.capitalize {
-        @apply capitalize;
+    .inactive-tab {
+      @apply bg-gray-100 text-gray-600 border border-gray-200 border-b-0 hover:bg-gray-200 hover:text-gray-800 hover:border-gray-300;
+    }
+  }
+
+  .table-container {
+    @apply overflow-x-auto;
+
+    > table {
+      @apply w-max min-w-full text-[13px] border border-gray-300;
+
+      > thead {
+        @apply bg-gray-100 border border-gray-300;
+
+        > tr {
+          @apply divide-x divide-gray-300 border-b border-gray-300;
+
+          > th {
+            @apply p-1 text-center font-semibold;
+          }
+        }
+
+        .primary-header {
+          @apply bg-gray-100;
+        }
+
+        .secondary-header {
+          @apply bg-gray-50 text-gray-600;
+        }
+      }
+
+      > tbody {
+        @apply divide-y divide-gray-300 border border-gray-300;
+
+        > tr {
+          @apply divide-x divide-gray-300 hover:bg-gray-100 cursor-pointer;
+
+          &.today {
+            @apply bg-blue-50 font-semibold;
+          }
+
+          > td {
+            @apply p-1 text-center;
+          }
+
+          > td.expanded-row {
+            @apply bg-gray-100 px-4 py-4;
+
+            > div.expanded-container {
+              @apply max-w-4xl mx-auto;
+
+              > div.expanded-inner {
+                @apply bg-white border border-gray-300 p-4;
+              }
+            }
+          }
+        }
       }
     }
   }
