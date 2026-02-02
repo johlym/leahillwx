@@ -68,32 +68,8 @@ class AlmanacController < ApplicationController
   private
 
   def calculate_dynamic_positions
-    lat = ENV.fetch("LOCATION_LAT").to_f
-    lon = ENV.fetch("LOCATION_LON").to_f
-
-    service = Almanac::ApproximateCelestialPosition.new(
-      datetime: Time.current,
-      lat: lat,
-      lon: lon
-    )
-
-    sun_pos = service.sun_position
-    moon_pos = service.moon_position
-
-    {
-      sun: {
-        azimuth: sun_pos[:azimuth_deg],
-        altitude: sun_pos[:altitude_deg],
-        right_ascension: sun_pos[:ra_deg],
-        declination: sun_pos[:dec_deg]
-      },
-      moon: {
-        azimuth: moon_pos[:azimuth_deg],
-        altitude: moon_pos[:altitude_deg],
-        right_ascension: moon_pos[:ra_deg],
-        declination: moon_pos[:dec_deg]
-      }
-    }
+    generator = Almanac::EphemGenerator.new
+    generator.calculate_live_positions(Time.current)
   rescue StandardError => e
     Rails.logger.error "Error calculating dynamic positions: #{e.message}"
     nil

@@ -16,13 +16,33 @@ module Almanac
     def initialize
       @lat = ENV.fetch("LOCATION_LAT").to_f
       @lon = ENV.fetch("LOCATION_LON").to_f
-
-      unless File.exist?(BSP_PATH)
-        raise "BSP file not found at #{BSP_PATH}. Please place de440s.bsp in vendor/"
-      end
-
-      @spk = Ephem::SPK.open(BSP_PATH.to_s)
       @season_cache = {}
+    end
+
+    def spk
+      @spk ||= EphemerisLoader.instance.spk
+    end
+
+    def calculate_live_positions(datetime = Time.current)
+      Rails.logger.info "Calculating live positions for #{datetime}"
+      jd = datetime_to_julian_date(datetime)
+      sun_pos = calculate_sun_position_bsp(jd)
+      moon_pos = calculate_moon_position_bsp(jd)
+
+      {
+        sun: {
+          azimuth: sun_pos[:azimuth],
+          altitude: sun_pos[:altitude],
+          right_ascension: sun_pos[:ra],
+          declination: sun_pos[:dec]
+        },
+        moon: {
+          azimuth: moon_pos[:azimuth],
+          altitude: moon_pos[:altitude],
+          right_ascension: moon_pos[:ra],
+          declination: moon_pos[:dec]
+        }
+      }
     end
 
     def bsp_coverage
@@ -219,9 +239,9 @@ module Almanac
       jd = datetime_to_julian_date(noon_time)
 
       # Get Sun distance (in AU, convert to km)
-      sun_state = @spk[SOLAR_SYSTEM_BARYCENTER, SUN].state_at(jd)
-      emb_state = @spk[SOLAR_SYSTEM_BARYCENTER, EARTH_MOON_BARYCENTER].state_at(jd)
-      earth_offset = @spk[EARTH_MOON_BARYCENTER, EARTH].state_at(jd)
+      sun_state = spk[SOLAR_SYSTEM_BARYCENTER, SUN].state_at(jd)
+      emb_state = spk[SOLAR_SYSTEM_BARYCENTER, EARTH_MOON_BARYCENTER].state_at(jd)
+      earth_offset = spk[EARTH_MOON_BARYCENTER, EARTH].state_at(jd)
 
       earth_pos = [
         emb_state.position[0] + earth_offset.position[0],
@@ -240,7 +260,7 @@ module Almanac
       )
 
       # Get Moon distance
-      moon_state = @spk[EARTH_MOON_BARYCENTER, MOON].state_at(jd)
+      moon_state = spk[EARTH_MOON_BARYCENTER, MOON].state_at(jd)
       moon_distance_km = Math.sqrt(
         moon_state.position[0]**2 + moon_state.position[1]**2 + moon_state.position[2]**2
       )
@@ -254,11 +274,11 @@ module Almanac
     def calculate_sun_position_bsp(jd)
       # Get positions using correct segment chain
       # Sun relative to SSB
-      sun_state = @spk[SOLAR_SYSTEM_BARYCENTER, SUN].state_at(jd)
+      sun_state = spk[SOLAR_SYSTEM_BARYCENTER, SUN].state_at(jd)
 
       # Earth position = EMB position + Earth offset from EMB
-      emb_state = @spk[SOLAR_SYSTEM_BARYCENTER, EARTH_MOON_BARYCENTER].state_at(jd)
-      earth_offset = @spk[EARTH_MOON_BARYCENTER, EARTH].state_at(jd)
+      emb_state = spk[SOLAR_SYSTEM_BARYCENTER, EARTH_MOON_BARYCENTER].state_at(jd)
+      earth_offset = spk[EARTH_MOON_BARYCENTER, EARTH].state_at(jd)
 
       earth_pos = [
         emb_state.position[0] + earth_offset.position[0],
@@ -287,10 +307,10 @@ module Almanac
 
     def calculate_moon_position_bsp(jd)
       # Moon relative to EMB
-      moon_offset = @spk[EARTH_MOON_BARYCENTER, MOON].state_at(jd)
+      moon_offset = spk[EARTH_MOON_BARYCENTER, MOON].state_at(jd)
 
       # Earth offset from EMB
-      earth_offset = @spk[EARTH_MOON_BARYCENTER, EARTH].state_at(jd)
+      earth_offset = spk[EARTH_MOON_BARYCENTER, EARTH].state_at(jd)
 
       # Moon relative to Earth
       rel_pos = [
@@ -749,11 +769,11 @@ module Almanac
       # This is used to determine astronomical seasons
 
       # Get Sun position relative to SSB
-      sun_state = @spk[SOLAR_SYSTEM_BARYCENTER, SUN].state_at(jd)
+      sun_state = spk[SOLAR_SYSTEM_BARYCENTER, SUN].state_at(jd)
 
       # Get Earth position relative to SSB
-      emb_state = @spk[SOLAR_SYSTEM_BARYCENTER, EARTH_MOON_BARYCENTER].state_at(jd)
-      earth_offset = @spk[EARTH_MOON_BARYCENTER, EARTH].state_at(jd)
+      emb_state = spk[SOLAR_SYSTEM_BARYCENTER, EARTH_MOON_BARYCENTER].state_at(jd)
+      earth_offset = spk[EARTH_MOON_BARYCENTER, EARTH].state_at(jd)
 
       earth_pos = [
         emb_state.position[0] + earth_offset.position[0],
