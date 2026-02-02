@@ -14,7 +14,7 @@
   }
 
   .generic-tile {
-    @apply border border-gray-200 bg-white rounded-lg flex flex-col shadow-lg;
+    @apply border border-gray-200 bg-white  flex flex-col shadow-lg;
 
     h2 {
       @apply m-0;

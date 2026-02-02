@@ -11,7 +11,7 @@
 }
 
 .weather-tile {
-  @apply border border-gray-200 bg-white rounded-lg flex flex-col shadow-lg;
+  @apply border border-gray-200 bg-white  flex flex-col shadow-lg;
 
   h2 {
     @apply m-0;
@@ -36,7 +36,7 @@
       @apply text-xs text-gray-400 text-center font-mono;
 
       .live {
-        @apply text-xs text-white bg-red-600 px-1 py-0.5 rounded-lg;
+        @apply text-xs text-white bg-red-600 px-1 py-0.5;
       }
 
       [data-weather-update-target="counter"] {

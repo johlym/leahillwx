@@ -32,7 +32,7 @@
       @apply flex lg:hidden;
 
       .mobile-toggle {
-        @apply -m-2.5 inline-flex items-center justify-center rounded-lg p-2.5 text-black;
+        @apply -m-2.5 inline-flex items-center justify-center  p-2.5 text-black;
 
         .icon {
           @apply text-xl;
@@ -60,7 +60,7 @@
       @apply space-y-1 px-4 pb-4;
 
       .mobile-link {
-        @apply -mx-3 block rounded-lg px-3 py-2 text-base/7 font-medium text-black no-underline hover:text-black hover:underline;
+        @apply -mx-3 block  px-3 py-2 text-base/7 font-medium text-black no-underline hover:text-black hover:underline;
       }
     }
   }
