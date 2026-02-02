@@ -1,24 +1,23 @@
-<div class="primary-container report-container">
-  <h1>Astronomical Almanac <small>for <%= @date.strftime("%A, %B %d, %Y") %></small></h1>
-  <%= render Shared::DateNavigationComponent.new(
-    current_year: @date.year,
-    current_month: @date.month,
-    current_day: @date.day,
-    base_path: "/almanac",
-    day_required: true
+<div class="primary-container">
+  <h1>Astronomical Almanac <small>for <%= @month_date.strftime("%B %Y") %></small></h1>
+  
+  <% if @current_entry %>
+    <%= render Almanac::CurrentDayCardComponent.new(
+      entry: @current_entry,
+      dynamic_positions: @dynamic_positions,
+      location: @location
+    ) %>
+  <% end %>
+  
+  <%= render Almanac::MonthNavigationComponent.new(
+    current_year: @month_date.year,
+    current_month: @month_date.month,
+    location: @location
   ) %>
   
-  <%= link_to "Download Text Version", almanac_day_path(@date.year, @date.strftime("%B").downcase, @date.day, format: :txt), class: "download-button" %>
-  
-  <%= render Almanac::AlmanacDataComponent.new(almanac_entry: @almanac_entry, dynamic_positions: @dynamic_positions) %>
-  
-  <div class="notes">
-    <h3>Notes:</h3>
-    <ul>
-      <li>All times shown in <%= @almanac_entry.timezone %> timezone</li>
-      <% if @dynamic_positions %>
-        <li>Current positions calculated at page load (<%= Time.current.strftime("%I:%M %p") %>)</li>
-      <% end %>
-    </ul>
-  </div>
+  <%= render Almanac::MonthlyCalendarComponent.new(
+    month_date: @month_date,
+    entries: @entries,
+    today: @today
+  ) %>
 </div>
