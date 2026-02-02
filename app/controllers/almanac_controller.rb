@@ -1,13 +1,7 @@
 class AlmanacController < ApplicationController
   def index
-    @date = Date.current
-    @almanac_entry = AlmanacEntry.find_by(date: @date)
-
-    if @almanac_entry
-      redirect_to almanac_day_path(@almanac_entry.date.year, @almanac_entry.date.strftime("%B").downcase, @almanac_entry.date.day)
-    else
-      @message = "No almanac data available yet. Please run: rake almanac:generate_all"
-    end
+    # Default to current month
+    redirect_to almanac_month_path(Date.current.year, Date.current.strftime("%B").downcase)
   end
 
   def show
@@ -15,7 +9,6 @@ class AlmanacController < ApplicationController
 
     year = params[:year].to_i
     month_name = params[:month_name]
-    day = params[:day].to_i
     month_num = Date::MONTHNAMES.index(month_name.capitalize)
 
     unless month_num
@@ -23,45 +16,40 @@ class AlmanacController < ApplicationController
       return
     end
 
-    unless day.between?(1, 31)
-      render_not_found("Invalid day: #{day}")
-      return
-    end
-
     begin
-      @date = Date.new(year, month_num, day)
+      @month_date = Date.new(year, month_num, 1)
     rescue ArgumentError
-      render_not_found("Invalid date: #{month_name.capitalize} #{day}, #{year}")
+      render_not_found("Invalid date: #{month_name.capitalize} #{year}")
       return
     end
 
-    @almanac_entry = AlmanacEntry.find_by(date: @date)
+    # Get all entries for the month
+    start_date = @month_date.beginning_of_month
+    end_date = @month_date.end_of_month
+    @entries = AlmanacEntry.where(date: start_date..end_date).order(:date).index_by(&:date)
 
-    unless @almanac_entry
-      render_not_found("Almanac data not found for #{@date}")
-      return
+    # Get today's entry for the current card (if viewing current month)
+    @today = Date.current
+    @current_entry = if @month_date.year == @today.year && @month_date.month == @today.month
+      AlmanacEntry.find_by(date: @today)
+    else
+      nil
     end
 
-    # Only calculate dynamic positions for today
-    @dynamic_positions = if @date == Date.current
+    # Calculate dynamic positions for today only
+    @dynamic_positions = if @current_entry
       calculate_dynamic_positions
     else
       nil
     end
 
-    @generation_time = (Time.current - @start_time).round(2)
+    # Get location info
+    @location = {
+      lat: ENV.fetch("LOCATION_LAT").to_f,
+      lon: ENV.fetch("LOCATION_LON").to_f
+    }
 
-    respond_to do |format|
-      format.html
-      format.text do
-        render plain: Almanac::TextComponent.new(
-          date: @date,
-          almanac_entry: @almanac_entry,
-          dynamic_positions: @dynamic_positions,
-          generation_time: @generation_time
-        ).render_in(view_context)
-      end
-    end
+    @generation_time = (Time.current - @start_time).round(2)
   end
 
   def available
@@ -89,9 +77,22 @@ class AlmanacController < ApplicationController
       lon: lon
     )
 
+    sun_pos = service.sun_position
+    moon_pos = service.moon_position
+
     {
-      sun: service.sun_position,
-      moon: service.moon_position
+      sun: {
+        azimuth: sun_pos[:azimuth_deg],
+        altitude: sun_pos[:altitude_deg],
+        right_ascension: sun_pos[:ra_deg],
+        declination: sun_pos[:dec_deg]
+      },
+      moon: {
+        azimuth: moon_pos[:azimuth_deg],
+        altitude: moon_pos[:altitude_deg],
+        right_ascension: moon_pos[:ra_deg],
+        declination: moon_pos[:dec_deg]
+      }
     }
   rescue StandardError => e
     Rails.logger.error "Error calculating dynamic positions: #{e.message}"
