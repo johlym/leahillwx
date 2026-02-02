@@ -15,3 +15,11 @@
 a {
   @apply text-brand-primary underline hover:no-underline;
 }
+
+.btn-primary {
+  @apply bg-brand-primary border border-brand-primary text-white px-4 py-2 rounded hover:bg-brand-light hover:border-brand-border hover:text-brand-primary transition-colors no-underline cursor-pointer;
+}
+
+.btn-secondary {
+  @apply bg-white border border-brand-primary text-brand-primary px-4 py-2 rounded hover:bg-brand-dark hover:border-brand-border hover:text-brand-primary transition-colors no-underline cursor-pointer;
+}
