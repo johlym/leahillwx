@@ -3,22 +3,30 @@
 # Table name: almanac_entries
 #
 #  id                         :bigint           not null, primary key
+#  astronomical_dawn_at       :datetime
+#  astronomical_dusk_at       :datetime
 #  civil_dawn_at              :datetime
 #  civil_dusk_at              :datetime
 #  date                       :date             not null
 #  daylight_delta_seconds     :integer
 #  daylight_seconds           :integer
+#  moon_distance_km           :float
 #  moon_illumination_pct      :float
 #  moon_phase                 :string
+#  moon_positions_1min        :jsonb
 #  moon_transit_at            :datetime
 #  moonrise_at                :datetime
 #  moonset_at                 :datetime
+#  nautical_dawn_at           :datetime
+#  nautical_dusk_at           :datetime
 #  next_equinox_at            :datetime
 #  next_full_moon_at          :datetime
 #  next_new_moon_at           :datetime
 #  next_solstice_at           :datetime
 #  solar_noon_at              :datetime
+#  sun_distance_km            :float
 #  sun_ecliptic_longitude_deg :float
+#  sun_positions_1min         :jsonb
 #  sunrise_at                 :datetime
 #  sunset_at                  :datetime
 #  timezone                   :string           default("America/Los_Angeles"), not null
