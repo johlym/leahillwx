@@ -117,9 +117,6 @@ GEM
       capybara (~> 3.0)
       ferrum (~> 0.17.0)
     date (3.5.1)
-    debug (1.11.1)
-      irb (~> 1.10)
-      reline (>= 0.3.8)
     deep_merge (1.2.2)
     dotenv (3.2.0)
     drb (2.2.3)
@@ -400,7 +397,6 @@ DEPENDENCIES
   capybara
   cssbundling-rails (~> 1.4)
   cuprite
-  debug
   dotenv (~> 3.2)
   ephem (~> 0.4.1)
   httparty (~> 0.24.0)
@@ -454,7 +450,6 @@ CHECKSUMS
   csv (3.3.5) sha256=6e5134ac3383ef728b7f02725d9872934f523cb40b961479f69cf3afa6c8e73f
   cuprite (0.17) sha256=b140d5dc70d08b97ad54bcf45cd95d0bd430e291e9dffe76fff851fddd57c12b
   date (3.5.1) sha256=750d06384d7b9c15d562c76291407d89e368dda4d4fff957eb94962d325a0dc0
-  debug (1.11.1) sha256=2e0b0ac6119f2207a6f8ac7d4a73ca8eb4e440f64da0a3136c30343146e952b6
   deep_merge (1.2.2) sha256=83ced3a3d7f95f67de958d2ce41b1874e83c8d94fe2ddbff50c8b4b82323563a
   dotenv (3.2.0) sha256=e375b83121ea7ca4ce20f214740076129ab8514cd81378161f11c03853fe619d
   drb (2.2.3) sha256=0b00d6fdb50995fe4a45dea13663493c841112e4068656854646f418fda13373
