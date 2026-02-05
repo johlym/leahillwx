@@ -20,6 +20,9 @@ module Celestial
       data
     rescue ArgumentError => e
       { error: "Invalid date: #{@year}-#{@month}-#{@day}" }
+    rescue Ephem::OutOfRangeError => e
+      Rails.logger.error "Date outside ephemeris coverage: #{@year}-#{@month}-#{@day}"
+      { error: "Date outside ephemeris coverage (1990-2050)" }
     rescue => e
       Rails.logger.error "Failed to generate ephemeris: #{e.message}"
       Rails.logger.error e.backtrace.join("\n")

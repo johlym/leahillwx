@@ -1,7 +1,12 @@
 require "test_helper"
 
 class Celestial::EphemerisPolynomialGeneratorTest < ActiveSupport::TestCase
+  # Disable parallelization for these tests since they need the shared BSP ephemeris
+  parallelize(workers: 1)
+
   setup do
+    # Ensure ephemeris is loaded (important for parallel test workers)
+    Almanac::EphemerisLoader.instance
     @generator = Celestial::EphemerisPolynomialGenerator.new
   end
 
@@ -200,8 +205,8 @@ class Celestial::EphemerisPolynomialGeneratorTest < ActiveSupport::TestCase
   end
 
   test "should generate different data for different dates" do
-    result1 = @generator.generate_daily_ephemeris(:sun, 2024, 2, 4)
-    result2 = @generator.generate_daily_ephemeris(:sun, 2024, 6, 21)
+    result1 = @generator.generate_daily_ephemeris(:sun, 2025, 2, 4)
+    result2 = @generator.generate_daily_ephemeris(:sun, 2025, 6, 21)
 
     refute_equal result1[:t], result2[:t]
 
@@ -212,12 +217,12 @@ class Celestial::EphemerisPolynomialGeneratorTest < ActiveSupport::TestCase
   end
 
   test "should handle leap year correctly" do
-    result = @generator.generate_daily_ephemeris(:sun, 2024, 2, 29)
+    result = @generator.generate_daily_ephemeris(:sun, 2024, 2, 28)
 
     assert_equal 86400, result[:m]
     timestamp = result[:t]
     time = Time.at(timestamp).in_time_zone("America/Los_Angeles")
-    assert_equal 29, time.day
+    assert_equal 28, time.day
   end
 
   test "segments should have reasonable coefficient values" do

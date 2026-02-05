@@ -1,6 +1,8 @@
 require "test_helper"
 
 class CelestialControllerTest < ActionDispatch::IntegrationTest
+  # Disable parallelization for these tests since they need the shared BSP ephemeris
+  parallelize(workers: 1)
   test "should get sun ephemeris for specific date" do
     get celestial_sun_url, params: { year: 2024, month: 2, day: 4 }
     assert_response :success

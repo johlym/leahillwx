@@ -1,6 +1,8 @@
 require "test_helper"
 
 class Celestial::EphemerisServiceTest < ActiveSupport::TestCase
+  # Disable parallelization for these tests since they need the shared BSP ephemeris
+  parallelize(workers: 1)
   test "should generate ephemeris with explicit date params" do
     result = Celestial::EphemerisService.generate(:sun, year: 2024, month: 2, day: 4)
 
