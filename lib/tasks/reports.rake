@@ -238,9 +238,14 @@ namespace :reports do
       exit 1
     end
 
-    processed = 0
-    errors = 0
+    daily_processed = 0
+    daily_errors = 0
+    hourly_processed = 0
+    hourly_errors = 0
 
+    # Process daily aggregations
+    puts "Processing daily aggregations..."
+    puts
     (start_date..end_date).each do |date|
       print "Processing #{date}... "
 
@@ -250,10 +255,36 @@ namespace :reports do
 
         status = entry.partial_period ? "✓ (partial)" : "✓"
         puts status
-        processed += 1
+        daily_processed += 1
       rescue StandardError => e
         puts "✗ ERROR: #{e.message}"
-        errors += 1
+        daily_errors += 1
+      end
+    end
+
+    puts
+    puts "Daily aggregations complete. Processing hourly aggregations..."
+    puts
+
+    # Process hourly aggregations
+    total_hours = ((end_date - start_date).to_i + 1) * 24
+    (start_date..end_date).each do |date|
+      puts "\nProcessing #{date}..."
+      (0..23).each do |hour|
+        datetime = Time.zone.parse("#{date} #{hour}:00:00")
+        print "  Hour #{hour.to_s.rjust(2, '0')}:00... "
+
+        begin
+          aggregator = WeatherData::HourlyAggregator.new(datetime)
+          entry = aggregator.aggregate
+
+          status = entry.partial_period ? "✓ (partial)" : "✓"
+          puts status
+          hourly_processed += 1
+        rescue StandardError => e
+          puts "✗ ERROR: #{e.message}"
+          hourly_errors += 1
+        end
       end
     end
 
@@ -261,8 +292,13 @@ namespace :reports do
     puts "=" * 80
     puts "Regeneration Complete"
     puts "=" * 80
-    puts "Processed: #{processed} days"
-    puts "Errors:    #{errors} days"
+    puts "Daily Reports:"
+    puts "  Processed: #{daily_processed} days"
+    puts "  Errors:    #{daily_errors} days"
+    puts
+    puts "Hourly Reports:"
+    puts "  Processed: #{hourly_processed}/#{total_hours} hours"
+    puts "  Errors:    #{hourly_errors} hours"
     puts "=" * 80
   end
 end
