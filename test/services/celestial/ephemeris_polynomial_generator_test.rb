@@ -1,12 +1,7 @@
 require "test_helper"
 
 class Celestial::EphemerisPolynomialGeneratorTest < ActiveSupport::TestCase
-  # Disable parallelization for these tests since they need the shared BSP ephemeris
-  parallelize(workers: 1)
-
   setup do
-    # Ensure ephemeris is loaded (important for parallel test workers)
-    Almanac::EphemerisLoader.instance
     @generator = Celestial::EphemerisPolynomialGenerator.new
   end
 
