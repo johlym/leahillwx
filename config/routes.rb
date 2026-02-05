@@ -44,5 +44,9 @@ Rails.application.routes.draw do
   get "almanac/available", to: "almanac#available", as: :available_almanac
   get "almanac/:year/:month_name", to: "almanac#show", as: :almanac_month
 
+  # Celestial routes (ephemeris API)
+  get "celestial/sun", to: "celestial#sun"
+  get "celestial/moon", to: "celestial#moon"
+
   get "up" => "rails/health#show", as: :rails_health_check
 end
