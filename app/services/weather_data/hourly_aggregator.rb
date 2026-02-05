@@ -80,8 +80,10 @@ module WeatherData
       wind_speeds_mps = measurements.map(&:wind_speed)
       avg_wind_speed_mps = wind_speeds_mps.sum / wind_speeds_mps.size
 
-      # Sum rain_day values since each measurement is incremental rain for that period
-      total_rain_mm = measurements.sum(&:rain_day)
+      # rain_day is a cumulative counter, so calculate the difference between max and min for this hour
+      max_rain = measurements.maximum(:rain_day) || 0.0
+      min_rain = measurements.minimum(:rain_day) || 0.0
+      total_rain_mm = max_rain - min_rain
 
       # Convert mean temp to Fahrenheit for degree day calculations
       mean_temp_f = celsius_to_fahrenheit(mean_temp_c)
