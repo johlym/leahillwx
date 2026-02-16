@@ -4,7 +4,7 @@ class OpenWeatherApiService
     @base_url = "https://api.openweathermap.org"
     @lat = ENV["LOCATION_LAT"]
     @lon = ENV["LOCATION_LON"]
-    @exclude = "current"
+    @exclude = "minutely"
     @units = "metric"
   end
 
