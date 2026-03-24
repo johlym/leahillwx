@@ -110,7 +110,7 @@ class RecordCalculator
 
     # Use ReportEntry for daily temperature ranges
     largest_range = if @scope == "yearly" && @year
-      ReportEntry.joins(:report)
+      ReportEntry.daily.joins(:report)
         .where(reports: { year: @year })
         .where.not(high_temp: nil, low_temp: nil)
         .select("report_entries.*, (high_temp - low_temp) as temp_range")
@@ -118,7 +118,7 @@ class RecordCalculator
         .limit(1)
         .first
     else
-      ReportEntry.where.not(high_temp: nil, low_temp: nil)
+      ReportEntry.daily.where.not(high_temp: nil, low_temp: nil)
         .select("report_entries.*, (high_temp - low_temp) as temp_range")
         .order("temp_range DESC")
         .limit(1)
@@ -131,7 +131,7 @@ class RecordCalculator
     end
 
     smallest_range = if @scope == "yearly" && @year
-      ReportEntry.joins(:report)
+      ReportEntry.daily.joins(:report)
         .where(reports: { year: @year })
         .where.not(high_temp: nil, low_temp: nil)
         .select("report_entries.*, (high_temp - low_temp) as temp_range")
@@ -139,7 +139,7 @@ class RecordCalculator
         .limit(1)
         .first
     else
-      ReportEntry.where.not(high_temp: nil, low_temp: nil)
+      ReportEntry.daily.where.not(high_temp: nil, low_temp: nil)
         .select("report_entries.*, (high_temp - low_temp) as temp_range")
         .order("temp_range ASC")
         .limit(1)
@@ -173,14 +173,14 @@ class RecordCalculator
   def calculate_rain_records
     # Use ReportEntry table for daily totals instead of raw measurements
     highest_daily = if @scope == "yearly" && @year
-      ReportEntry.joins(:report)
+      ReportEntry.daily.joins(:report)
         .where(reports: { year: @year })
         .where.not(rain: nil)
         .order(rain: :desc)
         .limit(1)
         .first
     else
-      ReportEntry.where.not(rain: nil)
+      ReportEntry.daily.where.not(rain: nil)
         .order(rain: :desc)
         .limit(1)
         .first
@@ -229,14 +229,12 @@ class RecordCalculator
 
     # Use ReportEntry data for daily rain totals
     daily_data = if @scope == "yearly" && @year
-      ReportEntry.joins(:report)
+      ReportEntry.daily.joins(:report)
         .where(reports: { year: @year })
-        .where.not(day: nil)
         .order("reports.year ASC, reports.month ASC, report_entries.day ASC")
         .pluck(Arel.sql("CAST(reports.year || '-' || LPAD(reports.month::text, 2, '0') || '-' || LPAD(report_entries.day::text, 2, '0') AS DATE)"), :rain)
     else
-      ReportEntry.joins(:report)
-        .where.not(day: nil)
+      ReportEntry.daily.joins(:report)
         .order("reports.year ASC, reports.month ASC, report_entries.day ASC")
         .pluck(Arel.sql("CAST(reports.year || '-' || LPAD(reports.month::text, 2, '0') || '-' || LPAD(report_entries.day::text, 2, '0') AS DATE)"), :rain)
     end

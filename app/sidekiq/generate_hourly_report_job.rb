@@ -1,5 +1,5 @@
 class GenerateHourlyReportJob
-  include Sidekiq::Worker
+  include Sidekiq::Job
 
   def perform(datetime = nil)
     # Default to the previous hour if no datetime provided, in Pacific time
@@ -25,6 +25,10 @@ class GenerateHourlyReportJob
       Rails.logger.info "  - Mean temp: #{entry.mean_temp&.round(2)}°C"
       Rails.logger.info "  - Partial hour: #{entry.partial_period}"
       Rails.logger.info "  - Processing time: #{processing_time} seconds"
+
+      today = target_datetime.to_date
+      Rails.logger.info "GenerateHourlyReportJob: Enqueuing daily report update for #{today}"
+      GenerateReportJob.perform_async(today.to_s)
 
     rescue StandardError => e
       Rails.logger.error "GenerateHourlyReportJob: Error processing #{target_datetime}"

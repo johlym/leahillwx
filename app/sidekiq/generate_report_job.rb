@@ -21,6 +21,12 @@ class GenerateReportJob
       Rails.logger.info "  - Partial day: #{entry.partial_period}"
       Rails.logger.info "  - Processing time: #{processing_time} seconds"
 
+      unless entry.partial_period
+        Rails.logger.info "GenerateReportJob: Day is complete — enqueuing records recalculation"
+        GenerateYearRecordsJob.perform_async(target_date.year)
+        GenerateAllTimeRecordsJob.perform_async
+      end
+
       # On the 1st of the month, also finalize previous month if missing last day
       if target_date.day == 1
         previous_month = target_date - 1.day

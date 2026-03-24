@@ -10,7 +10,7 @@ module WeatherData
     end
 
     def calculate
-      entries = report.entries.with_data.ordered
+      entries = report.entries.daily.with_data.ordered
 
       return report if entries.empty?
 
