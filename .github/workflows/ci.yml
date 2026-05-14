@@ -5,6 +5,10 @@ on:
   push:
     branches: [main]
 
+env:
+  LOCATION_LAT: 44.0000
+  LOCATION_LON: -88.0000
+
 jobs:
   scan_ruby:
     runs-on: ubuntu-latest
