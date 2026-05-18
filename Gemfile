@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 ruby file: ".ruby-version"
 
-gem "barnes", "~> 0.0.9"
+gem "barnes", "~> 1.0.0"
 gem "bootsnap", "~> 1.20", require: false
 gem "cssbundling-rails", "~> 1.4"
 gem "dotenv", "~> 3.2"
