@@ -2,7 +2,7 @@
   <div class="conditions-container">
     <div class="conditions-grid">
       <div class="current-conditions-wrapper">
-        <p class="timestamp"><%= Time.now.strftime("%B %d, %Y • %I:%M %p") %></p>
+        <p class="timestamp" data-weather-update-target="timestamp"><%= Time.now.in_time_zone("America/Los_Angeles").strftime("%B %d, %Y • %I:%M %p") %></p>
         <div class="current-temperature">
           <span class="temperature" data-weather-update-target="temperature"><%= current_temperature %>°</span>
           <div class="text-left">

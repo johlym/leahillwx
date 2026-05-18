@@ -2,6 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = [
+    "timestamp",
     "temperature",
     "feelsLike",
     "counter",
@@ -82,6 +83,24 @@ export default class extends Controller {
     if (this.hasLightTarget) {
       this.lightTarget.textContent = `${Math.round(data.light_lux)} lux`
     }
+
+    if (this.hasTimestampTarget) {
+      this.timestampTarget.textContent = this.formattedTimestamp()
+    }
+  }
+
+  formattedTimestamp() {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Los_Angeles",
+      month: "long",
+      day: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true
+    }).formatToParts(new Date())
+    const get = (type) => parts.find(p => p.type === type)?.value || ""
+    return `${get("month")} ${get("day")}, ${get("year")} \u2022 ${get("hour")}:${get("minute")} ${get("dayPeriod")}`
   }
 
   flashCounter() {
