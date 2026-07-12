@@ -9,7 +9,7 @@ class Home::Forecast::HourlyForecastComponent < ViewComponent::Base
   end
 
   def formatted_timestamp
-    timestamp.in_time_zone("America/Los_Angeles").strftime("%b %d, %y @ %I:%M %p")
+    timestamp.in_time_zone("America/Los_Angeles").strftime("%b %d, %Y @ %I:%M %p")
   end
 
   def night_time?(hour_time)

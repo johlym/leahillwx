@@ -15,10 +15,23 @@
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(80% 70% at 18% 25%, color-mix(in oklab, var(--accent) 14%, transparent), transparent 65%),
-    radial-gradient(70% 70% at 82% 45%, color-mix(in oklab, var(--accent-strong) 10%, transparent), transparent 65%);
+    radial-gradient(
+      80% 70% at 18% 25%,
+      color-mix(in oklab, var(--accent) 14%, transparent),
+      transparent 65%
+    ),
+    radial-gradient(
+      70% 70% at 82% 45%,
+      color-mix(in oklab, var(--accent-strong) 10%, transparent),
+      transparent 65%
+    );
   mask-image: linear-gradient(to bottom, black 0%, black 70%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 70%, transparent 100%);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    black 70%,
+    transparent 100%
+  );
 }
 
 .conditions-container {
@@ -78,7 +91,9 @@
   }
 }
 @media (min-width: 1024px) {
-  .current-temperature { justify-content: flex-start; }
+  .current-temperature {
+    justify-content: flex-start;
+  }
 }
 .current-temperature .temperature {
   font-family: var(--font-condensed);
@@ -91,14 +106,20 @@
     0 0 55px color-mix(in oklab, var(--accent) 22%, transparent);
   letter-spacing: -0.02em;
 }
-.condition-summary { text-align: center; }
+.condition-summary {
+  text-align: center;
+}
 @media (min-width: 640px) {
-  .condition-summary { text-align: left; }
+  .condition-summary {
+    text-align: left;
+  }
 }
 .condition-icon {
   font-size: 2.25rem;
   color: var(--text-strong);
-  filter: drop-shadow(0 0 12px color-mix(in oklab, var(--accent) 45%, transparent));
+  filter: drop-shadow(
+    0 0 12px color-mix(in oklab, var(--accent) 45%, transparent)
+  );
 }
 .condition-text {
   font-family: var(--font-condensed);
@@ -113,7 +134,10 @@
   font-size: 1rem;
   margin: 0;
 }
-.feels-like-sep { margin: 0 0.4rem; color: var(--subtle); }
+.feels-like-sep {
+  margin: 0 0.4rem;
+  color: var(--subtle);
+}
 
 /* Hero side column: wind card on top, sky-arc card below on tablet
    and above; side-by-side on desktop XL. */
@@ -124,7 +148,9 @@
   min-width: 0;
 }
 @media (min-width: 768px) {
-  .conditions-hero__side { grid-template-columns: 1fr 1fr; }
+  .conditions-hero__side {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .conditions-hero__wind-inner {
@@ -143,7 +169,9 @@
   align-items: center;
   justify-content: center;
 }
-.ui-stat__value--lg { font-size: 2.75rem !important; }
+.ui-stat__value--lg {
+  font-size: 2.75rem !important;
+}
 
 /* Live conditions strip — five tiles under the hero. */
 .conditions-strip {
@@ -154,17 +182,28 @@
   margin-bottom: 1rem;
 }
 @media (min-width: 640px) {
-  .conditions-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .conditions-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 @media (min-width: 1024px) {
-  .conditions-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .conditions-strip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 @media (min-width: 1280px) {
-  .conditions-strip { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .conditions-strip {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
 }
 
-.conditions-strip__card { min-height: 100%; }
-.conditions-strip__separator { color: var(--subtle); margin: 0 0.35em; }
+.conditions-strip__card {
+  min-height: 100%;
+}
+.conditions-strip__separator {
+  color: var(--subtle);
+  margin: 0 0.35em;
+}
 .conditions-strip__peak {
   margin-top: 0.35rem;
   font-size: 0.7rem;
@@ -188,8 +227,13 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
-.live-tile__label .ui-stat__label-icon { color: var(--accent); font-size: 1rem; }
-.live-tile__label-text { white-space: nowrap; }
+.live-tile__label .ui-stat__label-icon {
+  color: var(--accent);
+  font-size: 1rem;
+}
+.live-tile__label-text {
+  white-space: nowrap;
+}
 
 .live-tile__body {
   display: flex;
@@ -210,13 +254,17 @@
   font-weight: 500;
   text-shadow: 0 0 22px color-mix(in oklab, var(--accent) 22%, transparent);
 }
-.live-tile__number--xl { font-size: 3.25rem; }
+.live-tile__number--xl {
+  font-size: 3.25rem;
+}
 .live-tile__unit {
   font-size: 1.15rem;
   color: var(--muted);
   letter-spacing: 0.02em;
 }
-.live-tile__unit--lg { font-size: 1.35rem; }
+.live-tile__unit--lg {
+  font-size: 1.35rem;
+}
 .live-tile__meta {
   color: var(--muted);
   font-size: 0.78rem;
@@ -236,7 +284,7 @@
    style based on the current uvi. */
 .uv-scale {
   position: relative;
-  margin-top: 0.35rem;
+  margin: 0.3rem 0;
   height: 0.5rem;
   border-radius: 999px;
   background: linear-gradient(

@@ -2,7 +2,7 @@
   <div class="conditions-container">
     <div class="conditions-hero">
       <div class="conditions-hero__temp">
-        <p class="timestamp" data-weather-update-target="timestamp"><%= Time.now.in_time_zone("America/Los_Angeles").strftime("%b %d, %y @ %I:%M %p") %></p>
+        <p class="timestamp" data-weather-update-target="timestamp"><%= Time.now.in_time_zone("America/Los_Angeles").strftime("%b %d, %Y @ %I:%M %p") %></p>
         <div class="current-temperature">
           <span class="temperature" data-weather-update-target="temperature"><%= current_temperature %>°</span>
           <div class="condition-summary">
@@ -35,8 +35,7 @@
                   <span class="live-tile__unit live-tile__unit--lg">mph</span>
                 </div>
                 <p class="live-tile__meta">
-                  from <span data-weather-update-target="windDirection"><%= current_wind_direction %></span>
-                  <span class="conditions-strip__separator">·</span>
+                  from <span data-weather-update-target="windDirection"><%= current_wind_direction %></span><br />
                   <span data-weather-update-target="gustSpeed">Gusting to 0 mph</span>
                 </p>
               </div>

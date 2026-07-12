@@ -27,27 +27,19 @@ class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
     @current.wind_speed.round(0)
   end
 
+  WIND_DIRECTIONS = %w[
+  N NNE NE ENE E ESE SE SSE
+  S SSW SW WSW W WNW NW NNW
+].freeze
+
   def current_wind_direction
-    case @current.wind_dir
-    when 0..22.5
-      "N"
-    when 22.5..67.5
-      "NE"
-    when 67.5..112.5
-      "E"
-    when 112.5..157.5
-      "SE"
-    when 157.5..202.5
-      "S"
-    when 202.5..247.5
-      "SW"
-    when 247.5..292.5
-      "W"
-    when 292.5..337.5
-      "NW"
-    when 337.5..360
-      "N"
-    end
+    degrees = @current.wind_dir
+    return if degrees.nil?
+
+    normalized_degrees = degrees.to_f % 360
+    index = ((normalized_degrees + 11.25) / 22.5).floor % 16
+
+    WIND_DIRECTIONS[index]
   end
 
   def current_humidity
