@@ -31,7 +31,8 @@ Rails.application.routes.draw do
 
   # Records routes
   get "records", to: "records#index", as: :records
-  get "records/:year", to: "records#index", as: :records_year
+  get "records/:year", to: "records#index", as: :records_year, constraints: { year: /\d{4}/ }
+  get "records/:year/:month_name", to: "records#index", as: :records_month, constraints: { year: /\d{4}/ }
 
   # Graphs routes
   get "graphs", to: "graphs#index", as: :graphs

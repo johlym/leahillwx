@@ -1,0 +1,38 @@
+<%= render Ui::SectionHeaderComponent.new(title: title, subtitle: subtitle) %>
+
+<div class="ui-card-grid">
+  <% cards.each do |c| %>
+    <%= render Ui::CardComponent.new(padding: :default) do %>
+      <div class="record-card__label">
+        <i class="<%= c[:icon] %> record-card__icon"></i>
+        <span><%= c[:label] %></span>
+      </div>
+      <div class="record-card__value">
+        <span class="record-card__value-number"><%= c[:value] %></span>
+        <% if c[:unit].present? %>
+          <span class="record-card__value-unit"><%= c[:unit] %></span>
+        <% end %>
+        <% if c[:delta] %>
+          <span class="record-card__delta record-card__delta--<%= c[:delta][:direction] %>"
+                title="vs <%= @year - 1 %>">
+            <i class="fa-regular <%= case c[:delta][:direction]
+                                     when :up then 'fa-arrow-up'
+                                     when :down then 'fa-arrow-down'
+                                     else 'fa-minus'
+                                     end %>"
+               aria-hidden="true"></i>
+            <%= c[:delta][:formatted] %>
+          </span>
+        <% end %>
+      </div>
+      <% if c[:meta] %>
+        <p class="record-card__meta"><%= c[:meta] %></p>
+      <% end %>
+      <% if c[:delta] && c[:delta][:direction] != :flat %>
+        <p class="record-card__meta record-card__meta--muted">
+          <%= c[:delta][:direction] == :up ? c[:positive_label] : c[:negative_label] %> than last year
+        </p>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

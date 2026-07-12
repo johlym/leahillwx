@@ -6,6 +6,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .record-card__label {
@@ -37,6 +38,33 @@
   font-size: 0.9rem;
   color: var(--muted);
   letter-spacing: 0.02em;
+}
+.record-card__delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  margin-left: 0.5rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.35rem;
+  background-color: color-mix(in oklab, var(--surface-2) 60%, transparent);
+  border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+  color: var(--muted);
+  vertical-align: middle;
+}
+.record-card__delta--up {
+  color: var(--warning);
+  border-color: color-mix(in oklab, var(--warning) 40%, transparent);
+  background-color: color-mix(in oklab, var(--warning) 12%, var(--surface));
+}
+.record-card__delta--down {
+  color: var(--chart-6);
+  border-color: color-mix(in oklab, var(--chart-6) 40%, transparent);
+  background-color: color-mix(in oklab, var(--chart-6) 12%, var(--surface));
+}
+.record-card__delta--flat {
+  color: var(--subtle);
 }
 
 .record-card__meta {

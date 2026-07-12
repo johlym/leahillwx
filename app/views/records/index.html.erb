@@ -2,11 +2,15 @@
   <%= render Records::RecordsComponent.new(
     pivot: @pivot,
     selected_year: @selected_year,
+    selected_month: @selected_month,
     selected_year_record: @selected_year_record,
     all_time_record: @all_time_record,
     available_years: @available_years,
+    available_report_months_by_year: @available_report_months_by_year,
     heatmap_year: @heatmap_year,
     heatmap_days: @heatmap_days,
-    yearly_records: @yearly_records
+    yearly_records: @yearly_records,
+    report: @report,
+    prior_report: @prior_report
   ) %>
 </div>

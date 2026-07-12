@@ -2,24 +2,33 @@
 
 module Records
   class RecordsComponent < ViewComponent::Base
-    def initialize(pivot:, selected_year:, selected_year_record:, all_time_record:, available_years:, heatmap_year:, heatmap_days:, yearly_records: [])
+    def initialize(pivot:, selected_year:, selected_year_record:, all_time_record:, available_years:, heatmap_year:, heatmap_days:, yearly_records: [], selected_month: nil, report: nil, prior_report: nil, available_report_months_by_year: {})
       @pivot = pivot
       @selected_year = selected_year
+      @selected_month = selected_month
       @selected_year_record = selected_year_record
       @all_time_record = all_time_record
       @available_years = available_years
       @heatmap_year = heatmap_year
       @heatmap_days = heatmap_days
       @yearly_records = yearly_records
+      @report = report
+      @prior_report = prior_report
+      @available_report_months_by_year = available_report_months_by_year
     end
 
     private
 
-    attr_reader :pivot, :selected_year, :selected_year_record, :all_time_record,
-                :available_years, :heatmap_year, :heatmap_days, :yearly_records
+    attr_reader :pivot, :selected_year, :selected_month, :selected_year_record, :all_time_record,
+                :available_years, :heatmap_year, :heatmap_days, :yearly_records,
+                :report, :prior_report, :available_report_months_by_year
 
     def pivot_year?
       pivot == :year
+    end
+
+    def pivot_month?
+      pivot == :month
     end
 
     def active_record
@@ -27,15 +36,34 @@ module Records
     end
 
     def pivot_title
-      pivot_year? ? "#{selected_year} Records" : "All-Time Records"
+      case pivot
+      when :month
+        "#{Date::MONTHNAMES[selected_month]} #{selected_year} Records"
+      when :year
+        "#{selected_year} Records"
+      else
+        "All-Time Records"
+      end
     end
 
     def pivot_subtitle
-      if pivot_year?
+      case pivot
+      when :month
+        "Extremes from the month plus a comparison against #{selected_year - 1}."
+      when :year
         "Every recorded extreme for the #{selected_year} season."
       else
         "Every recorded extreme since the station came online."
       end
+    end
+
+    # Returns months available for the selected year, or the most recent
+    # year with data if none is selected. Used to populate the month
+    # picker in the header.
+    def months_available_for_pivot
+      year = selected_year || available_report_months_by_year.keys.max
+      return [] unless year
+      (available_report_months_by_year[year] || []).sort
     end
 
     def sections

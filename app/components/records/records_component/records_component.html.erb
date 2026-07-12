@@ -6,14 +6,39 @@
     <div class="records-actions">
       <%= render Ui::YearPickerComponent.new(
         base_path: records_path,
-        current_year: pivot_year? ? selected_year : nil,
+        current_year: pivot_year? || pivot_month? ? selected_year : nil,
         years: available_years,
         include_all_time: true,
         all_time_label: "All time",
         label: "Pivot"
       ) %>
+
+      <% if months_available_for_pivot.any? && selected_year %>
+        <label class="ui-year-picker">
+          <span class="ui-year-picker__label">Month</span>
+          <select class="ui-year-picker__select"
+                  onchange="if (this.value) { window.location.href = this.value; }">
+            <option value="<%= records_year_path(selected_year) %>">All months</option>
+            <% months_available_for_pivot.each do |m| %>
+              <option value="<%= records_month_path(selected_year, Date::MONTHNAMES[m].downcase) %>"
+                      <%= 'selected' if pivot_month? && m == selected_month %>>
+                <%= Date::MONTHNAMES[m] %>
+              </option>
+            <% end %>
+          </select>
+        </label>
+      <% end %>
     </div>
   <% end %>
+<% end %>
+
+<% if pivot_month? %>
+  <%= render Records::MonthComponent.new(
+    year: selected_year,
+    month: selected_month,
+    report: report,
+    prior_report: prior_report
+  ) %>
 <% end %>
 
 <% if heatmap_days.present? %>
@@ -23,21 +48,23 @@
   ) %>
 <% end %>
 
-<% if active_record.nil? %>
-  <%= render Ui::CardComponent.new(padding: :loose) do %>
-    <p class="text-[color:var(--muted)]">
-      No records available yet for <%= pivot_title.downcase %>. Records are
-      recalculated nightly at 12:02 AM or on demand via
-      <code class="record-inline-code">rake records:refresh</code>.
-    </p>
-  <% end %>
-<% else %>
-  <% sections.each do |section| %>
-    <%= render Ui::SectionHeaderComponent.new(title: section[:title], icon: section[:icon], level: 3) %>
-    <div class="ui-card-grid">
-      <% section[:rows].each do |row| %>
-        <%= render Records::RecordCardComponent.new(row: row, record: active_record, icon: row[:icon], history: yearly_records) %>
-      <% end %>
-    </div>
+<% unless pivot_month? %>
+  <% if active_record.nil? %>
+    <%= render Ui::CardComponent.new(padding: :loose) do %>
+      <p class="text-[color:var(--muted)]">
+        No records available yet for <%= pivot_title.downcase %>. Records are
+        recalculated nightly at 12:02 AM or on demand via
+        <code class="record-inline-code">rake records:refresh</code>.
+      </p>
+    <% end %>
+  <% else %>
+    <% sections.each do |section| %>
+      <%= render Ui::SectionHeaderComponent.new(title: section[:title], icon: section[:icon], level: 3) %>
+      <div class="ui-card-grid">
+        <% section[:rows].each do |row| %>
+          <%= render Records::RecordCardComponent.new(row: row, record: active_record, icon: row[:icon], history: yearly_records) %>
+        <% end %>
+      </div>
+    <% end %>
   <% end %>
 <% end %>

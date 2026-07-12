@@ -1,32 +1,58 @@
 class RecordsController < ApplicationController
   def index
     @available_years = Record.where(scope: "yearly").order(year: :desc).pluck(:year)
-
+    @available_report_months_by_year = Report.available_years_and_months
     @all_time_record = Record.all_time_record
 
-    if params[:year].present?
-      @selected_year = params[:year].to_i
-      @selected_year_record = Record.for_year(@selected_year).first
-      @pivot = :year
+    if params[:month_name].present? && params[:year].present?
+      pivot_to_month(params[:year].to_i, params[:month_name])
+    elsif params[:year].present?
+      pivot_to_year(params[:year].to_i)
     else
-      @selected_year = nil
-      @selected_year_record = nil
-      @pivot = :all_time
+      pivot_to_all_time
     end
 
-    # All yearly rows, oldest first, so record cards can render a
-    # sparkline of that metric across seasons.
     @yearly_records = Record.where(scope: "yearly").order(year: :asc).to_a
-
-    # For the heatmap, use the pivoted year when set, otherwise the
-    # most recent year that has any daily entries. Falls back to nil if
-    # nothing is available and the component will render an empty state.
-    heatmap_year = @selected_year || most_recent_year_with_data
-    @heatmap_year = heatmap_year
-    @heatmap_days = heatmap_year ? load_heatmap_days(heatmap_year) : []
   end
 
   private
+
+  def pivot_to_all_time
+    @pivot = :all_time
+    @selected_year = nil
+    @selected_month = nil
+    @selected_year_record = nil
+    @heatmap_year = most_recent_year_with_data
+    @heatmap_days = @heatmap_year ? load_heatmap_days(@heatmap_year) : []
+  end
+
+  def pivot_to_year(year)
+    @pivot = :year
+    @selected_year = year
+    @selected_month = nil
+    @selected_year_record = Record.for_year(year).first
+    @heatmap_year = year
+    @heatmap_days = load_heatmap_days(year)
+  end
+
+  def pivot_to_month(year, month_name)
+    month = Date::MONTHNAMES.index(month_name.to_s.capitalize)
+    unless month
+      pivot_to_year(year)
+      return
+    end
+
+    @pivot = :month
+    @selected_year = year
+    @selected_month = month
+    @month_name = Date::MONTHNAMES[month]
+    @report = Report.includes(:entries).find_by(year: year, month: month)
+    @prior_report = Report.includes(:entries).find_by(year: year - 1, month: month)
+
+    # Heatmap follows the pivoted year so the visual context stays put.
+    @heatmap_year = year
+    @heatmap_days = load_heatmap_days(year)
+  end
 
   def most_recent_year_with_data
     Report.where.not(id: nil).maximum(:year)
