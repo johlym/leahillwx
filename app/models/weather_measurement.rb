@@ -147,6 +147,7 @@ class WeatherMeasurement < ApplicationRecord
         measurement.wind_speed_mph, precision: 2, strip_insignificant_zeros: true
       ),
       wind_direction_compass: measurement.heading_compass,
+      wind_direction_deg: measurement.wind_dir,
       gust_speed_mph: ActionController::Base.helpers.number_with_precision(
         measurement.gust_speed_mph, precision: 2, strip_insignificant_zeros: true
       ),

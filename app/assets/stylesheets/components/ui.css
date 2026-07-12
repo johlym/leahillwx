@@ -61,14 +61,28 @@
   font-size: 0.8rem;
 }
 
-/* Card grids used by pages. */
+/* Card grids used by pages. Fixed 4-column layout that never stretches
+   the last row's cards; if a section has 1, 2, or 3 cards they still
+   render at 25% width with the remainder left empty. Wraps naturally
+   when there are more than 4. Steps down to 2-up on tablets and 1-up
+   on phones. */
 .ui-card-grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(1, minmax(0, 1fr));
 }
-.ui-card-grid--sm { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
-.ui-card-grid--lg { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+@media (min-width: 640px) {
+  .ui-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1024px) {
+  .ui-card-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+.ui-card-grid--sm { }
+.ui-card-grid--sm .ui-card { min-height: auto; }
+.ui-card-grid--lg { }
+@media (min-width: 1024px) {
+  .ui-card-grid--lg { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
 
 /* Stat -------------------------------------------------------------- */
 .ui-stat { display: flex; flex-direction: column; gap: 0.25rem; }

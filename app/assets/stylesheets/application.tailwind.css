@@ -6,6 +6,7 @@
 @import "./components/primary";
 @import "./components/ui";
 @import "./components/tooltip";
+@import "./components/compass";
 @import "./components/header";
 @import "./components/current";
 @import "./components/forecast-hourly";

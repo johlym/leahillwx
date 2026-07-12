@@ -1,96 +1,104 @@
 <section class="current-conditions" data-palette-transition>
   <div class="conditions-container">
-    <div class="conditions-grid">
-      <div class="current-conditions-wrapper">
-        <p class="timestamp" data-weather-update-target="timestamp"><%= Time.now.in_time_zone("America/Los_Angeles").strftime("%B %d, %Y • %I:%M %p") %></p>
-        <div class="current-temperature">
-          <span class="temperature" data-weather-update-target="temperature"><%= current_temperature %>°</span>
-          <div class="condition-summary">
-            <div class="condition-icon">
-              <%= render "root/shared/weather_icon", icon: weather_icon, night: night_time?, blackout: true %>
-            </div>
-            <p class="condition-text"><%= weather_description %></p>
+    <div class="conditions-hero">
+      <p class="timestamp" data-weather-update-target="timestamp"><%= Time.now.in_time_zone("America/Los_Angeles").strftime("%B %d, %Y • %I:%M %p") %></p>
+      <div class="current-temperature">
+        <span class="temperature" data-weather-update-target="temperature"><%= current_temperature %>°</span>
+        <div class="condition-summary">
+          <div class="condition-icon">
+            <%= render "root/shared/weather_icon", icon: weather_icon, night: night_time?, blackout: true %>
           </div>
+          <p class="condition-text"><%= weather_description %></p>
         </div>
-        <p class="feels-like">
-          <span data-weather-update-target="feelsLike">Feels like <%= current_feels_like %>°</span>
-          <% if today_high && today_low %>
-            <span class="feels-like-sep">·</span>
-            High <%= today_high %>° / Low <%= today_low %>°
-          <% end %>
-        </p>
       </div>
-
-      <div class="current-conditions-tiles">
-        <%= render Ui::CardComponent.new(padding: :default) do %>
-          <%= render Ui::StatComponent.new(
-            label: "Wind",
-            icon: "fa-regular fa-wind",
-            value: "#{current_wind_speed} #{current_wind_direction}",
-            unit: "mph",
-            secondary: content_tag(:span, "Gusting to 0 mph", data: { weather_update_target: "gustSpeed" })
-          ).with_content_data(weather_update_target: "windSpeed") if false %>
-          <div class="ui-stat ui-stat--md ui-stat--align-left">
-            <div class="ui-stat__label"><i class="fa-regular fa-wind ui-stat__label-icon"></i><span class="ui-stat__label-text">Wind</span></div>
-            <div class="ui-stat__value">
-              <span class="ui-stat__value-number" data-weather-update-target="windSpeed"><%= current_wind_speed %> <%= current_wind_direction %></span>
-              <span class="ui-stat__value-unit">mph</span>
-            </div>
-            <p class="ui-stat__secondary" data-weather-update-target="gustSpeed">Gusting to 0 mph</p>
-          </div>
+      <p class="feels-like">
+        <span data-weather-update-target="feelsLike">Feels like <%= current_feels_like %>°</span>
+        <% if today_high && today_low %>
+          <span class="feels-like-sep">·</span>
+          High <%= today_high %>° / Low <%= today_low %>°
         <% end %>
-
-        <%= render Ui::CardComponent.new(padding: :default) do %>
-          <div class="ui-stat ui-stat--md ui-stat--align-left">
-            <div class="ui-stat__label"><i class="fa-regular fa-hand-holding-droplet ui-stat__label-icon"></i><span class="ui-stat__label-text">Humidity</span></div>
-            <div class="ui-stat__value">
-              <span class="ui-stat__value-number" data-weather-update-target="humidity"><%= current_humidity %></span>
-              <span class="ui-stat__value-unit">%</span>
-            </div>
-          </div>
-        <% end %>
-
-        <%= render Ui::CardComponent.new(padding: :default) do %>
-          <div class="ui-stat ui-stat--md ui-stat--align-left">
-            <div class="ui-stat__label"><i class="fa-kit fa-regular-sun-circle-exclamation ui-stat__label-icon"></i><span class="ui-stat__label-text">UV Index</span></div>
-            <div class="ui-stat__value">
-              <span class="ui-stat__value-number" data-weather-update-target="uvi"><%= current_uvi %></span>
-            </div>
-            <p class="ui-stat__secondary"><span data-weather-update-target="solarIrradiance"><%= current_solar_irradiance %></span> W/m²</p>
-          </div>
-        <% end %>
-
-        <%= render Ui::CardComponent.new(padding: :default) do %>
-          <div class="ui-stat ui-stat--md ui-stat--align-left">
-            <div class="ui-stat__label"><i class="fa-regular fa-sunrise ui-stat__label-icon"></i><span class="ui-stat__label-text">Sunrise / Sunset</span></div>
-            <div class="ui-stat__value ui-stat__value--dual">
-              <span class="ui-stat__value-number ui-stat__value-number--sm"><%= current_sunrise %></span>
-            </div>
-            <p class="ui-stat__secondary"><%= current_sunset %></p>
-          </div>
-        <% end %>
-
-        <%= render Ui::CardComponent.new(padding: :default) do %>
-          <div class="ui-stat ui-stat--md ui-stat--align-left">
-            <div class="ui-stat__label"><i class="fa-regular fa-cloud-rain ui-stat__label-icon"></i><span class="ui-stat__label-text">Rain</span></div>
-            <div class="ui-stat__value">
-              <span class="ui-stat__value-number" data-weather-update-target="rainDay"><%= current_rain_day %></span>
-              <span class="ui-stat__value-unit">in</span>
-            </div>
-            <p class="ui-stat__secondary"><span data-weather-update-target="rainRate"><%= current_rain_hour %></span> in/hr</p>
-          </div>
-        <% end %>
-
-        <%= render Ui::CardComponent.new(padding: :default) do %>
-          <div class="ui-stat ui-stat--md ui-stat--align-left">
-            <div class="ui-stat__label"><i class="fa-regular fa-droplet-degree ui-stat__label-icon"></i><span class="ui-stat__label-text">Dew Point</span></div>
-            <div class="ui-stat__value">
-              <span class="ui-stat__value-number" data-weather-update-target="dewPoint"><%= current_dew_point %></span>
-              <span class="ui-stat__value-unit">°</span>
-            </div>
-          </div>
-        <% end %>
-      </div>
+      </p>
     </div>
   </div>
 </section>
+
+<div class="primary-container">
+  <div class="conditions-strip">
+    <%= render Ui::CardComponent.new(padding: :default, classes: "conditions-strip__card conditions-strip__card--wind") do %>
+      <div class="conditions-strip__wind">
+        <div class="conditions-strip__wind-values">
+          <div class="ui-stat__label"><i class="fa-regular fa-wind ui-stat__label-icon"></i><span class="ui-stat__label-text">Wind</span></div>
+          <div class="ui-stat__value">
+            <span class="ui-stat__value-number" data-weather-update-target="windSpeed"><%= current_wind_speed %></span>
+            <span class="ui-stat__value-unit">mph</span>
+          </div>
+          <p class="ui-stat__secondary">
+            from <span data-weather-update-target="windDirection"><%= current_wind_direction %></span>
+            <span class="conditions-strip__separator">·</span>
+            <span data-weather-update-target="gustSpeed">Gusting to 0 mph</span>
+          </p>
+        </div>
+        <div data-weather-update-target="windCompass">
+          <%= render Elements::CompassComponent.new(direction: @current.wind_dir, size: :md, show_label: false) %>
+        </div>
+      </div>
+    <% end %>
+
+    <%= render Ui::CardComponent.new(padding: :default, classes: "conditions-strip__card") do %>
+      <div class="ui-stat ui-stat--md ui-stat--align-left">
+        <div class="ui-stat__label"><i class="fa-regular fa-hand-holding-droplet ui-stat__label-icon"></i><span class="ui-stat__label-text">Humidity</span></div>
+        <div class="ui-stat__value">
+          <span class="ui-stat__value-number" data-weather-update-target="humidity"><%= current_humidity %></span>
+          <span class="ui-stat__value-unit">%</span>
+        </div>
+      </div>
+    <% end %>
+
+    <%= render Ui::CardComponent.new(padding: :default, classes: "conditions-strip__card") do %>
+      <div class="ui-stat ui-stat--md ui-stat--align-left">
+        <div class="ui-stat__label"><i class="fa-kit fa-regular-sun-circle-exclamation ui-stat__label-icon"></i><span class="ui-stat__label-text">UV Index</span></div>
+        <div class="ui-stat__value">
+          <span class="ui-stat__value-number" data-weather-update-target="uvi"><%= current_uvi %></span>
+        </div>
+        <p class="ui-stat__secondary"><span data-weather-update-target="solarIrradiance"><%= current_solar_irradiance %></span> W/m²</p>
+      </div>
+    <% end %>
+
+    <%= render Ui::CardComponent.new(padding: :default, classes: "conditions-strip__card") do %>
+      <div class="ui-stat ui-stat--md ui-stat--align-left">
+        <div class="ui-stat__label"><i class="fa-regular fa-sunrise ui-stat__label-icon"></i><span class="ui-stat__label-text">Sun</span></div>
+        <div class="conditions-strip__suntimes">
+          <div>
+            <span class="conditions-strip__suntimes-label">Rise</span>
+            <span class="conditions-strip__suntimes-value"><%= current_sunrise %></span>
+          </div>
+          <div>
+            <span class="conditions-strip__suntimes-label">Set</span>
+            <span class="conditions-strip__suntimes-value"><%= current_sunset %></span>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <%= render Ui::CardComponent.new(padding: :default, classes: "conditions-strip__card") do %>
+      <div class="ui-stat ui-stat--md ui-stat--align-left">
+        <div class="ui-stat__label"><i class="fa-regular fa-cloud-rain ui-stat__label-icon"></i><span class="ui-stat__label-text">Rain</span></div>
+        <div class="ui-stat__value">
+          <span class="ui-stat__value-number" data-weather-update-target="rainDay"><%= current_rain_day %></span>
+          <span class="ui-stat__value-unit">in</span>
+        </div>
+        <p class="ui-stat__secondary"><span data-weather-update-target="rainRate"><%= current_rain_hour %></span> in/hr</p>
+      </div>
+    <% end %>
+
+    <%= render Ui::CardComponent.new(padding: :default, classes: "conditions-strip__card") do %>
+      <div class="ui-stat ui-stat--md ui-stat--align-left">
+        <div class="ui-stat__label"><i class="fa-regular fa-droplet-degree ui-stat__label-icon"></i><span class="ui-stat__label-text">Dew Point</span></div>
+        <div class="ui-stat__value">
+          <span class="ui-stat__value-number" data-weather-update-target="dewPoint"><%= current_dew_point %></span>
+          <span class="ui-stat__value-unit">°F</span>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

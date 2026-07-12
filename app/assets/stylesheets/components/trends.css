@@ -1,13 +1,10 @@
 .trends-page { color: var(--text); }
 
 .trends-yoy-grid {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
   margin-top: 1rem;
-}
-@media (min-width: 1024px) {
-  .trends-yoy-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 .trends-rolling-grid {

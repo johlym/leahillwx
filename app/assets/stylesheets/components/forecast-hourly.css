@@ -27,8 +27,10 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.5rem;
   }
-  @media (min-width: 640px) { .hourly-forecast .hourly-forecast-row { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-  @media (min-width: 1024px) { .hourly-forecast .hourly-forecast-row { grid-template-columns: repeat(8, minmax(0, 1fr)); } }
+  @media (min-width: 480px) { .hourly-forecast .hourly-forecast-row { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  @media (min-width: 768px) { .hourly-forecast .hourly-forecast-row { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  @media (min-width: 1024px) { .hourly-forecast .hourly-forecast-row { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+  @media (min-width: 1280px) { .hourly-forecast .hourly-forecast-row { grid-template-columns: repeat(8, minmax(0, 1fr)); } }
 
   .hourly-forecast-item {
     background-color: var(--bg-elevated);

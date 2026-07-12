@@ -1,5 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 
+// Writes live weather values into stat cards. Each target receives a
+// raw *number/text only* — the units live in the surrounding HTML so
+// the JS can't accidentally double-print them.
 export default class extends Controller {
   static targets = [
     "timestamp",
@@ -7,6 +10,8 @@ export default class extends Controller {
     "feelsLike",
     "counter",
     "windSpeed",
+    "windDirection",
+    "windCompass",
     "gustSpeed",
     "rainDay",
     "rainRate",
@@ -15,7 +20,7 @@ export default class extends Controller {
     "pressure",
     "uvi",
     "solarIrradiance",
-    "light"
+    "light",
   ]
 
   connect() {
@@ -34,56 +39,50 @@ export default class extends Controller {
     if (this.hasTemperatureTarget) {
       this.temperatureTarget.textContent = `${parseFloat(data.temperature_f).toFixed(0)}°`
     }
-    
     if (this.hasFeelsLikeTarget) {
       this.feelsLikeTarget.textContent = `Feels like ${parseFloat(data.feels_like_f).toFixed(0)}°`
     }
-    
     if (this.hasCounterTarget) {
       this.counterTarget.textContent = data.counter.toLocaleString()
       this.flashCounter()
     }
-    
     if (this.hasWindSpeedTarget) {
-      this.windSpeedTarget.textContent = `${Math.round(data.wind_speed_mph)} mph ${data.wind_direction_compass}`
+      this.windSpeedTarget.textContent = Math.round(data.wind_speed_mph)
     }
-    
+    if (this.hasWindDirectionTarget) {
+      this.windDirectionTarget.textContent = data.wind_direction_compass
+    }
+    if (this.hasWindCompassTarget && typeof data.wind_direction_deg === "number") {
+      const needle = this.windCompassTarget.querySelector(".compass__needle")
+      if (needle) needle.setAttribute("transform", `rotate(${data.wind_direction_deg} 50 50)`)
+    }
     if (this.hasGustSpeedTarget) {
       this.gustSpeedTarget.textContent = `Gusting to ${Math.round(data.gust_speed_mph)} mph`
     }
-    
     if (this.hasRainDayTarget) {
-      this.rainDayTarget.textContent = `${Math.round(data.rain_day_in * 100) / 100} in.`
+      this.rainDayTarget.textContent = (Math.round(data.rain_day_in * 100) / 100).toFixed(2)
     }
-    
     if (this.hasRainRateTarget) {
-      this.rainRateTarget.textContent = `${Math.round(data.rain_rate_in * 100) / 100} in./hr`
+      this.rainRateTarget.textContent = (Math.round(data.rain_rate_in * 100) / 100).toFixed(2)
     }
-    
     if (this.hasDewPointTarget) {
-      this.dewPointTarget.textContent = `${parseFloat(data.dew_point_f).toFixed(0)}°`
+      this.dewPointTarget.textContent = parseFloat(data.dew_point_f).toFixed(0)
     }
-    
     if (this.hasHumidityTarget) {
-      this.humidityTarget.textContent = `${data.humidity}%`
+      this.humidityTarget.textContent = data.humidity
     }
-    
     if (this.hasPressureTarget) {
-      this.pressureTarget.textContent = `${Math.round(data.barometer_abs_mb)}mb`
+      this.pressureTarget.textContent = Math.round(data.barometer_abs_mb)
     }
-    
     if (this.hasUviTarget) {
-      this.uviTarget.textContent = `${Math.round(data.uvi)}`
+      this.uviTarget.textContent = Math.round(data.uvi)
     }
-    
     if (this.hasSolarIrradianceTarget) {
-      this.solarIrradianceTarget.textContent = `${Math.round(data.uv)} W/m²`
+      this.solarIrradianceTarget.textContent = Math.round(data.uv)
     }
-    
     if (this.hasLightTarget) {
-      this.lightTarget.textContent = `${Math.round(data.light_lux)} lux`
+      this.lightTarget.textContent = Math.round(data.light_lux)
     }
-
     if (this.hasTimestampTarget) {
       this.timestampTarget.textContent = this.formattedTimestamp()
     }
@@ -97,15 +96,15 @@ export default class extends Controller {
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-      hour12: true
+      hour12: true,
     }).formatToParts(new Date())
-    const get = (type) => parts.find(p => p.type === type)?.value || ""
+    const get = (type) => parts.find((p) => p.type === type)?.value || ""
     return `${get("month")} ${get("day")}, ${get("year")} \u2022 ${get("hour")}:${get("minute")} ${get("dayPeriod")}`
   }
 
   flashCounter() {
-    this.counterTarget.classList.add('counter-flash')
+    this.counterTarget.classList.add("counter-flash")
     void this.counterTarget.offsetWidth
-    this.counterTarget.classList.remove('counter-flash')
+    this.counterTarget.classList.remove("counter-flash")
   }
 }
