@@ -106,7 +106,7 @@
   padding: 1rem 1.25rem 1.25rem;
   margin: 1.5rem 0;
   color: var(--text);
-  overflow: hidden;
+  overflow: clip;
   backdrop-filter: saturate(140%) blur(4px);
   box-shadow:
     0 1px 0 color-mix(in oklab, var(--text) 4%, transparent) inset,
@@ -142,6 +142,7 @@
   padding-bottom: 0.25rem;
 }
 .temp-heatmap__grid-inner {
+  position: relative;
   display: grid;
   min-width: 540px;
   grid-template-columns: 2.75rem repeat(31, minmax(0.75rem, 1fr));
@@ -177,20 +178,23 @@
   font-weight: 700;
 }
 
-/* Row highlight overlay: sits in the same grid track as the month's
-   cells, painted on top with outline (never border) so it can't push
-   siblings around or affect layout. */
+/* Row highlight overlay. Grid children can use position: absolute
+   and still be placed by grid-row / grid-column; their containing
+   block becomes that grid area, and the default `inset` of 0 makes
+   them fill it exactly. This is far more reliable than depending on
+   align-self / justify-self stretch of an empty div (some engines
+   collapsed the empty div's row height, painting the outline as a
+   thin horizontal band). */
 .temp-heatmap__row-glow {
+  position: absolute;
+  inset: -3px;
   pointer-events: none;
-  align-self: stretch;
-  justify-self: stretch;
-  border-radius: 6px;
-  outline: 2px solid color-mix(in oklab, var(--accent) 85%, transparent);
-  outline-offset: 3px;
+  border-radius: 8px;
+  border: 2px solid color-mix(in oklab, var(--accent-strong) 90%, transparent);
   box-shadow:
-    0 0 20px color-mix(in oklab, var(--accent) 45%, transparent),
-    0 0 4px color-mix(in oklab, var(--accent) 85%, transparent) inset;
-  z-index: 2;
+    0 0 22px color-mix(in oklab, var(--accent) 55%, transparent),
+    0 0 4px color-mix(in oklab, var(--accent) 90%, transparent) inset;
+  z-index: 3;
 }
 
 .temp-heatmap__cell {

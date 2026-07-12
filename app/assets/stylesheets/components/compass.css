@@ -37,11 +37,16 @@
 }
 
 /* Needle blades. `fill` is set here — never as an SVG XML attribute
-   with `var()`, which paints unreliably. */
+   with `var()`, which paints unreliably. Rotation is a CSS transform
+   driven by the --compass-needle-deg custom property on the <g>,
+   which is set inline per compass. `transform-box: view-box` +
+   `transform-origin: 50% 50%` locks the pivot to (50, 50) in viewBox
+   coordinates so the needle spins around the center at any size. */
 .compass__needle {
-  transition: transform 800ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  transform: rotate(var(--compass-needle-deg, 0deg));
   transform-box: view-box;
   transform-origin: 50% 50%;
+  transition: transform 800ms cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 .compass__needle-fore {
   fill: var(--accent-strong, #ffd27a);

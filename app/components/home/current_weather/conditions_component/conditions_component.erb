@@ -24,19 +24,24 @@
       <div class="conditions-hero__side">
         <%= render Ui::CardComponent.new(padding: :default, classes: "conditions-hero__wind") do %>
           <div class="conditions-hero__wind-inner">
-            <div class="conditions-hero__wind-copy">
-              <div class="ui-stat__label"><i class="fa-regular fa-wind ui-stat__label-icon"></i><span class="ui-stat__label-text">Wind</span></div>
-              <div class="ui-stat__value ui-stat__value--lg">
-                <span class="ui-stat__value-number" data-weather-update-target="windSpeed"><%= current_wind_speed %></span>
-                <span class="ui-stat__value-unit">mph</span>
+            <div class="conditions-hero__wind-copy live-tile">
+              <div class="live-tile__label">
+                <i class="fa-regular fa-wind ui-stat__label-icon"></i>
+                <span class="live-tile__label-text">Wind</span>
               </div>
-              <p class="ui-stat__secondary">
-                from <span data-weather-update-target="windDirection"><%= current_wind_direction %></span>
-                <span class="conditions-strip__separator">·</span>
-                <span data-weather-update-target="gustSpeed">Gusting to 0 mph</span>
-              </p>
+              <div class="live-tile__body">
+                <div class="live-tile__value">
+                  <span class="live-tile__number live-tile__number--xl" data-weather-update-target="windSpeed"><%= current_wind_speed %></span>
+                  <span class="live-tile__unit live-tile__unit--lg">mph</span>
+                </div>
+                <p class="live-tile__meta">
+                  from <span data-weather-update-target="windDirection"><%= current_wind_direction %></span>
+                  <span class="conditions-strip__separator">·</span>
+                  <span data-weather-update-target="gustSpeed">Gusting to 0 mph</span>
+                </p>
+              </div>
               <% if today_peaks[:wind_gust_mph] %>
-                <p class="conditions-strip__peak">Peak gust today <%= today_peaks[:wind_gust_mph] %> mph</p>
+                <p class="live-tile__peak">Peak gust today <%= today_peaks[:wind_gust_mph] %> mph</p>
               <% end %>
             </div>
             <div class="conditions-hero__wind-compass" data-weather-update-target="windCompass">

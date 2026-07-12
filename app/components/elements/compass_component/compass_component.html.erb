@@ -2,8 +2,7 @@
      role="img"
      aria-label="Wind from <%= compass_label %> (<%= direction.round %>°)">
   <svg viewBox="0 0 100 100" class="compass__dial" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <%# Outer ring — inspired by the reference: single subtle circle,
-        no gradient, no fill. %>
+    <%# Outer ring. %>
     <circle cx="50" cy="50" r="44" fill="none" class="compass__ring" stroke-width="1.5" />
 
     <%# Cardinal letters. %>
@@ -14,7 +13,7 @@
       <text x="13" y="53">W</text>
     </g>
 
-    <%# Four cardinal tick marks — clean and simple like the reference. %>
+    <%# Four cardinal tick marks. %>
     <g class="compass__ticks" stroke-width="1.4">
       <line x1="50" y1="8" x2="50" y2="14" />
       <line x1="92" y1="50" x2="86" y2="50" />
@@ -22,14 +21,20 @@
       <line x1="8" y1="50" x2="14" y2="50" />
     </g>
 
-    <%# Needle — diamond-shape blades so each half tapers cleanly to
-        the hub. `direction` is meteorological (0 = N, 90 = E). %>
-    <g class="compass__needle" transform="rotate(<%= direction %> 50 50)">
+    <%# Needle. `direction` is meteorological (0 = N, 90 = E). We
+        drive the rotation entirely through CSS (via a custom property
+        on the <g>) rather than the SVG `transform` attribute, because
+        the attribute path conflicts with `transition: transform` in
+        several engines and the rotation origin drifts. CSS
+        `transform-origin` + `transform-box: view-box` guarantees the
+        pivot lands on (50, 50) in the viewBox coordinate system. %>
+    <g class="compass__needle" style="--compass-needle-deg: <%= direction %>deg;"
+       data-weather-update-target="windCompassNeedle">
       <path d="M50 18 L44 52 L50 47 L56 52 Z" class="compass__needle-fore" />
       <path d="M50 82 L46 52 L50 55 L54 52 Z" class="compass__needle-aft" />
     </g>
 
-    <%# Center hub — a bright cap so the needle terminates crisply. %>
+    <%# Center hub — painted on top of the needle. %>
     <circle cx="50" cy="50" r="3.5" class="compass__hub" />
   </svg>
 

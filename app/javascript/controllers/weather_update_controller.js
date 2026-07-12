@@ -54,7 +54,7 @@ export default class extends Controller {
     }
     if (this.hasWindCompassTarget && typeof data.wind_direction_deg === "number") {
       const needle = this.windCompassTarget.querySelector(".compass__needle")
-      if (needle) needle.setAttribute("transform", `rotate(${data.wind_direction_deg} 50 50)`)
+      if (needle) needle.style.setProperty("--compass-needle-deg", `${data.wind_direction_deg}deg`)
     }
     if (this.hasGustSpeedTarget) {
       this.gustSpeedTarget.textContent = `Gusting to ${Math.round(data.gust_speed_mph)} mph`
