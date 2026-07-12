@@ -27,13 +27,18 @@
   stroke: color-mix(in oklab, var(--text) 32%, transparent);
 }
 .compass__cardinals text {
-  fill: color-mix(in oklab, var(--text) 55%, transparent);
+  fill: color-mix(in oklab, var(--text) 60%, transparent);
   font-family: var(--font-condensed);
-  font-weight: 500;
+  font-weight: 600;
 }
 .compass__cardinals text.compass__cardinal--n {
   fill: var(--danger);
   font-weight: 700;
+}
+.compass__cardinals text.compass__cardinal--secondary {
+  fill: color-mix(in oklab, var(--text) 38%, transparent);
+  font-weight: 500;
+  letter-spacing: -0.03em;
 }
 
 /* Needle blades. `fill` is set here — never as an SVG XML attribute
