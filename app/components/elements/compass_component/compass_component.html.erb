@@ -2,54 +2,37 @@
      role="img"
      aria-label="Wind from <%= compass_label %> (<%= direction.round %>°)">
   <svg viewBox="0 0 100 100" class="compass__dial" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <%# Compass face — a slightly darker inset surface. Kept as a
-        simple solid so we don't rely on <linearGradient> stop-color
-        variables (which some engines evaluate lazily and drop). %>
-    <circle cx="50" cy="50" r="46"
-            class="compass__face"
-            stroke-width="1" />
-    <circle cx="50" cy="50" r="41" fill="none"
-            class="compass__ring"
-            stroke-width="0.5" />
-
-    <%# Tick marks: long tick every 45°, short tick every 22.5°. %>
-    <% 16.times do |i| %>
-      <% deg = i * 22.5 %>
-      <% long = (i % 2).zero? %>
-      <line x1="50" y1="<%= long ? 6 : 8 %>" x2="50" y2="<%= long ? 12 : 11 %>"
-            class="<%= long ? 'compass__tick compass__tick--long' : 'compass__tick' %>"
-            stroke-width="<%= long ? 1.4 : 0.8 %>"
-            transform="rotate(<%= deg %> 50 50)" />
-    <% end %>
+    <%# Outer ring — inspired by the reference: single subtle circle,
+        no gradient, no fill. %>
+    <circle cx="50" cy="50" r="44" fill="none" class="compass__ring" stroke-width="1.5" />
 
     <%# Cardinal letters. %>
-    <text x="50" y="21" text-anchor="middle" font-size="10" font-weight="700"
-          class="compass__cardinal compass__cardinal--n">N</text>
-    <text x="83" y="53" text-anchor="middle" font-size="8"
-          class="compass__cardinal">E</text>
-    <text x="50" y="88" text-anchor="middle" font-size="8"
-          class="compass__cardinal">S</text>
-    <text x="17" y="53" text-anchor="middle" font-size="8"
-          class="compass__cardinal">W</text>
-
-    <%# Needle. `direction` is meteorological (where the wind is coming
-        from), 0° = N, 90° = E. Rotation is applied as an SVG attribute
-        so the initial paint is correct even before the weather channel
-        broadcasts an update. Both blades share a class so the CSS
-        variable-driven fill and stroke apply reliably. %>
-    <g class="compass__needle" transform="rotate(<%= direction %> 50 50)">
-      <polygon points="50,10 44,52 56,52"
-               class="compass__needle-fore"
-               stroke-width="1.2" />
-      <polygon points="50,90 46,52 54,52"
-               class="compass__needle-aft"
-               stroke-width="0.8" />
+    <g class="compass__cardinals" font-size="9" text-anchor="middle" dominant-baseline="middle">
+      <text x="50" y="16" class="compass__cardinal--n">N</text>
+      <text x="87" y="53">E</text>
+      <text x="50" y="92">S</text>
+      <text x="13" y="53">W</text>
     </g>
 
-    <circle cx="50" cy="50" r="3.5"
-            class="compass__hub"
-            stroke-width="1" />
+    <%# Four cardinal tick marks — clean and simple like the reference. %>
+    <g class="compass__ticks" stroke-width="1.4">
+      <line x1="50" y1="8" x2="50" y2="14" />
+      <line x1="92" y1="50" x2="86" y2="50" />
+      <line x1="50" y1="92" x2="50" y2="86" />
+      <line x1="8" y1="50" x2="14" y2="50" />
+    </g>
+
+    <%# Needle — diamond-shape blades so each half tapers cleanly to
+        the hub. `direction` is meteorological (0 = N, 90 = E). %>
+    <g class="compass__needle" transform="rotate(<%= direction %> 50 50)">
+      <path d="M50 18 L44 52 L50 47 L56 52 Z" class="compass__needle-fore" />
+      <path d="M50 82 L46 52 L50 55 L54 52 Z" class="compass__needle-aft" />
+    </g>
+
+    <%# Center hub — a bright cap so the needle terminates crisply. %>
+    <circle cx="50" cy="50" r="3.5" class="compass__hub" />
   </svg>
+
   <% if show_label %>
     <span class="compass__label"><%= compass_label %></span>
   <% end %>
