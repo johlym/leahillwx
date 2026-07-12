@@ -16,7 +16,7 @@
       <% end %>
 
       <% (1..12).each do |m| %>
-        <div class="temp-heatmap__month-label" role="rowheader"><%= month_label(m) %></div>
+        <div class="temp-heatmap__month-label <%= 'temp-heatmap__month-label--highlight' if highlighted?(m) %>" role="rowheader"><%= month_label(m) %></div>
         <% (1..31).each do |d| %>
           <% day = days_by_month[m]&.find { |x| x[:day] == d } %>
           <% valid_date = Date.valid_date?(year, m, d) %>
@@ -36,6 +36,17 @@
               data-tooltip-body-value="<%= cell_body(day) %>"
             ></button>
           <% end %>
+        <% end %>
+        <% if highlighted?(m) %>
+          <%#
+            Row-spanning overlay: sits in the same grid row and column
+            span as the month's cells, painted after them in DOM order
+            so its outline draws on top. Uses outline (not border) so
+            it can't nudge cells or push other rows down.
+          %>
+          <div class="temp-heatmap__row-glow"
+               style="grid-row: <%= m + 1 %>; grid-column: 1 / -1;"
+               aria-hidden="true"></div>
         <% end %>
       <% end %>
     </div>

@@ -21,9 +21,10 @@ module Records
       "oklch(0.62 0.22 25)"     # red
     ].freeze
 
-    def initialize(year:, days:)
+    def initialize(year:, days:, highlight_month: nil)
       @year = year
       @days = days
+      @highlight_month = highlight_month
     end
 
     def render?
@@ -32,7 +33,11 @@ module Records
 
     private
 
-    attr_reader :year, :days
+    attr_reader :year, :days, :highlight_month
+
+    def highlighted?(month)
+      highlight_month && month == highlight_month
+    end
 
     # Group days by month for fast lookup while rendering rows.
     def days_by_month

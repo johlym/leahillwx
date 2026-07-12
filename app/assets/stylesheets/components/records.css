@@ -169,6 +169,28 @@
   align-self: center;
   padding-right: 0.35rem;
   text-align: right;
+  position: relative;
+  z-index: 1;
+}
+.temp-heatmap__month-label--highlight {
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+
+/* Row highlight overlay: sits in the same grid track as the month's
+   cells, painted on top with outline (never border) so it can't push
+   siblings around or affect layout. */
+.temp-heatmap__row-glow {
+  pointer-events: none;
+  align-self: stretch;
+  justify-self: stretch;
+  border-radius: 6px;
+  outline: 2px solid color-mix(in oklab, var(--accent) 85%, transparent);
+  outline-offset: 3px;
+  box-shadow:
+    0 0 20px color-mix(in oklab, var(--accent) 45%, transparent),
+    0 0 4px color-mix(in oklab, var(--accent) 85%, transparent) inset;
+  z-index: 2;
 }
 
 .temp-heatmap__cell {

@@ -32,6 +32,16 @@
   <% end %>
 <% end %>
 
+<%# Heatmap is always the first block below the header regardless of
+    pivot. In month view it highlights the pivoted month's row. %>
+<% if heatmap_days.present? %>
+  <%= render Records::TemperatureHeatmapComponent.new(
+    year: heatmap_year,
+    days: heatmap_days,
+    highlight_month: pivot_month? ? selected_month : nil
+  ) %>
+<% end %>
+
 <% if pivot_month? %>
   <%= render Records::MonthComponent.new(
     year: selected_year,
@@ -39,16 +49,7 @@
     report: report,
     prior_report: prior_report
   ) %>
-<% end %>
-
-<% if heatmap_days.present? %>
-  <%= render Records::TemperatureHeatmapComponent.new(
-    year: heatmap_year,
-    days: heatmap_days
-  ) %>
-<% end %>
-
-<% unless pivot_month? %>
+<% else %>
   <% if active_record.nil? %>
     <%= render Ui::CardComponent.new(padding: :loose) do %>
       <p class="text-[color:var(--muted)]">
