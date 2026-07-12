@@ -1,49 +1,60 @@
 <section class="current-conditions" data-palette-transition>
   <div class="conditions-container">
     <div class="conditions-hero">
-      <p class="timestamp" data-weather-update-target="timestamp"><%= Time.now.in_time_zone("America/Los_Angeles").strftime("%b %d, %y @ %I:%M %p") %></p>
-      <div class="current-temperature">
-        <span class="temperature" data-weather-update-target="temperature"><%= current_temperature %>°</span>
-        <div class="condition-summary">
-          <div class="condition-icon">
-            <%= render "root/shared/weather_icon", icon: weather_icon, night: night_time?, blackout: true %>
+      <div class="conditions-hero__temp">
+        <p class="timestamp" data-weather-update-target="timestamp"><%= Time.now.in_time_zone("America/Los_Angeles").strftime("%b %d, %y @ %I:%M %p") %></p>
+        <div class="current-temperature">
+          <span class="temperature" data-weather-update-target="temperature"><%= current_temperature %>°</span>
+          <div class="condition-summary">
+            <div class="condition-icon">
+              <%= render "root/shared/weather_icon", icon: weather_icon, night: night_time?, blackout: true %>
+            </div>
+            <p class="condition-text"><%= weather_description %></p>
           </div>
-          <p class="condition-text"><%= weather_description %></p>
         </div>
+        <p class="feels-like">
+          <span data-weather-update-target="feelsLike">Feels like <%= current_feels_like %>°</span>
+          <% if today_high && today_low %>
+            <span class="feels-like-sep">·</span>
+            High <%= today_high %>° / Low <%= today_low %>°
+          <% end %>
+        </p>
       </div>
-      <p class="feels-like">
-        <span data-weather-update-target="feelsLike">Feels like <%= current_feels_like %>°</span>
-        <% if today_high && today_low %>
-          <span class="feels-like-sep">·</span>
-          High <%= today_high %>° / Low <%= today_low %>°
+
+      <div class="conditions-hero__side">
+        <%= render Ui::CardComponent.new(padding: :default, classes: "conditions-hero__wind") do %>
+          <div class="conditions-hero__wind-inner">
+            <div class="conditions-hero__wind-copy">
+              <div class="ui-stat__label"><i class="fa-regular fa-wind ui-stat__label-icon"></i><span class="ui-stat__label-text">Wind</span></div>
+              <div class="ui-stat__value ui-stat__value--lg">
+                <span class="ui-stat__value-number" data-weather-update-target="windSpeed"><%= current_wind_speed %></span>
+                <span class="ui-stat__value-unit">mph</span>
+              </div>
+              <p class="ui-stat__secondary">
+                from <span data-weather-update-target="windDirection"><%= current_wind_direction %></span>
+                <span class="conditions-strip__separator">·</span>
+                <span data-weather-update-target="gustSpeed">Gusting to 0 mph</span>
+              </p>
+            </div>
+            <div class="conditions-hero__wind-compass" data-weather-update-target="windCompass">
+              <%= render Elements::CompassComponent.new(direction: @current.wind_dir, size: :lg, show_label: false) %>
+            </div>
+          </div>
         <% end %>
-      </p>
+
+        <% if @almanac %>
+          <%= render Ui::CardComponent.new(padding: :default, classes: "conditions-hero__sky") do %>
+            <div class="ui-stat__label"><i class="fa-regular fa-sunrise ui-stat__label-icon"></i><span class="ui-stat__label-text">Sun &amp; Moon Today</span></div>
+            <%= render Elements::SkyArcComponent.new(almanac: @almanac) %>
+          <% end %>
+        <% end %>
+      </div>
     </div>
   </div>
 </section>
 
 <div class="primary-container">
   <div class="conditions-strip">
-    <%= render Ui::CardComponent.new(padding: :default, classes: "conditions-strip__card conditions-strip__card--wind") do %>
-      <div class="conditions-strip__wind">
-        <div class="conditions-strip__wind-values">
-          <div class="ui-stat__label"><i class="fa-regular fa-wind ui-stat__label-icon"></i><span class="ui-stat__label-text">Wind</span></div>
-          <div class="ui-stat__value">
-            <span class="ui-stat__value-number" data-weather-update-target="windSpeed"><%= current_wind_speed %></span>
-            <span class="ui-stat__value-unit">mph</span>
-          </div>
-          <p class="ui-stat__secondary">
-            from <span data-weather-update-target="windDirection"><%= current_wind_direction %></span>
-            <span class="conditions-strip__separator">·</span>
-            <span data-weather-update-target="gustSpeed">Gusting to 0 mph</span>
-          </p>
-        </div>
-        <div data-weather-update-target="windCompass">
-          <%= render Elements::CompassComponent.new(direction: @current.wind_dir, size: :md, show_label: false) %>
-        </div>
-      </div>
-    <% end %>
-
     <%= render Ui::CardComponent.new(padding: :default, classes: "conditions-strip__card") do %>
       <div class="ui-stat ui-stat--md ui-stat--align-left">
         <div class="ui-stat__label"><i class="fa-regular fa-hand-holding-droplet ui-stat__label-icon"></i><span class="ui-stat__label-text">Humidity</span></div>
@@ -61,22 +72,6 @@
           <span class="ui-stat__value-number" data-weather-update-target="uvi"><%= current_uvi %></span>
         </div>
         <p class="ui-stat__secondary"><span data-weather-update-target="solarIrradiance"><%= current_solar_irradiance %></span> W/m²</p>
-      </div>
-    <% end %>
-
-    <%= render Ui::CardComponent.new(padding: :default, classes: "conditions-strip__card") do %>
-      <div class="ui-stat ui-stat--md ui-stat--align-left">
-        <div class="ui-stat__label"><i class="fa-regular fa-sunrise ui-stat__label-icon"></i><span class="ui-stat__label-text">Sun</span></div>
-        <div class="conditions-strip__suntimes">
-          <div>
-            <span class="conditions-strip__suntimes-label">Rise</span>
-            <span class="conditions-strip__suntimes-value"><%= current_sunrise %></span>
-          </div>
-          <div>
-            <span class="conditions-strip__suntimes-label">Set</span>
-            <span class="conditions-strip__suntimes-value"><%= current_sunset %></span>
-          </div>
-        </div>
       </div>
     <% end %>
 

@@ -12,14 +12,28 @@
 }
 
 .conditions-hero {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  align-items: center;
+}
+@media (min-width: 1024px) {
+  .conditions-hero {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 4fr);
+    gap: 2rem;
+  }
+}
+
+.conditions-hero__temp {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   gap: 0.75rem;
+  min-width: 0;
 }
 @media (min-width: 1024px) {
-  .conditions-hero {
+  .conditions-hero__temp {
     align-items: flex-start;
     text-align: left;
   }
@@ -54,7 +68,7 @@
 }
 .current-temperature .temperature {
   font-family: var(--font-condensed);
-  font-size: clamp(6rem, 22vw, 12rem);
+  font-size: clamp(6rem, 18vw, 11rem);
   color: var(--text-strong);
   font-weight: 300;
   line-height: 0.9;
@@ -87,62 +101,47 @@
 }
 .feels-like-sep { margin: 0 0.4rem; color: var(--subtle); }
 
-/* Live conditions strip — full-width row of tiles under the hero. */
-.conditions-strip {
+/* Hero side column: wind card on top, sky-arc card below on tablet
+   and above; side-by-side on desktop XL. */
+.conditions-hero__side {
   display: grid;
-  grid-template-columns: repeat(1, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 0.75rem;
-  margin-top: -1rem;
-  margin-bottom: 1rem;
-  position: relative;
-  z-index: 1;
-}
-@media (min-width: 640px) {
-  .conditions-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (min-width: 1024px) {
-  .conditions-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  min-width: 0;
 }
 @media (min-width: 1280px) {
-  /* Wind card gets 2x width so its compass has room to breathe. */
-  .conditions-strip {
-    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
-  }
-  .conditions-strip__card--wind { grid-column: span 1; }
+  .conditions-hero__side { grid-template-columns: 1fr 1fr; }
 }
 
-.conditions-strip__card { min-height: 100%; }
-
-.conditions-strip__wind {
+.conditions-hero__wind-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
 }
-.conditions-strip__wind-values {
+.conditions-hero__wind-copy {
   min-width: 0;
   flex: 1;
 }
-.conditions-strip__separator { color: var(--subtle); margin: 0 0.35em; }
+.conditions-hero__wind-compass {
+  flex-shrink: 0;
+}
+.ui-stat__value--lg { font-size: 2.75rem !important; }
 
-.conditions-strip__suntimes {
-  display: flex;
-  gap: 1rem;
+/* Live conditions strip — the remaining four tiles under the hero. */
+.conditions-strip {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 0.75rem;
   margin-top: 0.25rem;
+  margin-bottom: 1rem;
 }
-.conditions-strip__suntimes > div {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
+@media (min-width: 640px) {
+  .conditions-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-.conditions-strip__suntimes-label {
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-size: 0.65rem;
+@media (min-width: 1024px) {
+  .conditions-strip { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
-.conditions-strip__suntimes-value {
-  color: var(--text-strong);
-  font-family: var(--font-condensed);
-  font-size: 1.15rem;
-}
+
+.conditions-strip__card { min-height: 100%; }
+.conditions-strip__separator { color: var(--subtle); margin: 0 0.35em; }

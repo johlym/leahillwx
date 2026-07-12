@@ -1,0 +1,48 @@
+.sky-arc {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: var(--text);
+  width: 100%;
+}
+
+.sky-arc__svg {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 200 / 130;
+  filter: drop-shadow(0 6px 18px color-mix(in oklab, var(--accent) 20%, transparent));
+}
+
+.sky-arc__body { transition: transform 400ms ease; }
+.sky-arc__body--live circle { filter: drop-shadow(0 0 6px color-mix(in oklab, var(--warning) 70%, transparent)); }
+.sky-arc__body--dim { opacity: 0.35; }
+.sky-arc__body--moon.sky-arc__body--live circle {
+  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--muted) 70%, transparent));
+}
+
+.sky-arc__legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.sky-arc__legend-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.sky-arc__legend-times {
+  color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.75rem;
+}
+.sky-arc__swatch {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--border-strong) 50%, transparent);
+}
+.sky-arc__swatch--sun { background-color: var(--warning); }
+.sky-arc__swatch--moon { background-color: color-mix(in oklab, var(--muted) 90%, transparent); }
