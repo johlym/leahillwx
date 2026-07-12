@@ -39,6 +39,10 @@ Rails.application.routes.draw do
   get "graphs/:year/:month_name", to: "graphs#show", as: :graph
   get "graphs/:year/:month_name/:day", to: "graphs#show", as: :graph_day
 
+  # Trends routes
+  get "trends", to: "trends#index", as: :trends
+  get "trends/:year", to: "trends#show", as: :trends_year, constraints: { year: /\d{4}/ }
+
   # Almanac routes
   get "almanac", to: "almanac#index", as: :almanac
   get "almanac/available", to: "almanac#available", as: :available_almanac

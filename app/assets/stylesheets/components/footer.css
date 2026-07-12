@@ -1,3 +1,17 @@
 .footer {
-  @apply container max-w-7xl mx-auto text-gray-400 text-xs text-center p-4 mt-8;
+  @apply container max-w-7xl mx-auto text-xs text-center p-4 mt-8;
+  color: var(--subtle);
+  border-top: 1px solid var(--border);
+
+  p { margin: 0.25rem 0; }
+  a { color: var(--muted); }
+  a:hover { color: var(--accent); }
+  code {
+    background-color: var(--surface);
+    color: var(--muted);
+    padding: 0 0.3rem;
+    border-radius: 0.2rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.72rem;
+  }
 }

@@ -1,0 +1,9 @@
+<div class="primary-container">
+  <%= render Ui::SectionHeaderComponent.new(title: "Trends", subtitle: "How this station's climate is moving over time") %>
+
+  <%= render Ui::CardComponent.new(padding: :loose) do %>
+    <p class="text-[color:var(--muted)]">
+      <%= @message %>
+    </p>
+  <% end %>
+</div>

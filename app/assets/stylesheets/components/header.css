@@ -1,66 +1,121 @@
 .site-header {
-  @apply bg-transparent;
+  background-color: color-mix(in oklab, var(--bg) 85%, transparent);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: saturate(140%) blur(6px);
+  position: sticky;
+  top: 0;
+  z-index: 40;
 
   .nav {
-    @apply mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8;
+    @apply mx-auto flex max-w-7xl items-center justify-between p-3 lg:px-6;
+  }
 
-    .logo-container {
-      @apply flex lg:flex-1 items-center gap-2;
+  .logo-container {
+    @apply flex lg:flex-1 items-center gap-2;
 
-      .logo {
-        @apply -m-1.5 p-1.5 flex items-center gap-2 text-black no-underline;
-
-        .logo-image {
-          @apply h-8 w-auto;
-        }
-
-        .logo-text {
-          @apply text-lg font-bold;
-        }
-      }
-
-      .live {
-        @apply text-xs font-mono text-white bg-red-600 px-1 py-0.5;
-
-        &.hidden {
-          @apply hidden;
-        }
-      }
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-strong);
+      text-decoration: none;
+      padding: 0.25rem 0.35rem;
     }
 
-    .mobile-toggle-container {
-      @apply flex lg:hidden;
-
-      .mobile-toggle {
-        @apply -m-2.5 inline-flex items-center justify-center  p-2.5 text-black;
-
-        .icon {
-          @apply text-xl;
-
-          &.hidden {
-            @apply hidden;
-          }
-        }
-      }
+    .logo:hover {
+      color: var(--text-strong);
+      text-decoration: none;
     }
 
-    .nav-links {
-      @apply hidden lg:flex lg:gap-x-8;
+    .logo-image {
+      @apply h-8 w-auto;
+      filter: drop-shadow(0 0 6px color-mix(in oklab, var(--accent) 60%, transparent));
+    }
 
-      .nav-link {
-        @apply text-sm/6 font-medium text-black no-underline hover:text-black hover:underline;
-      }
+    .logo-text {
+      font-family: var(--font-condensed);
+      font-size: 1.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+    }
+
+    .live {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.7rem;
+      background-color: var(--danger);
+      color: var(--accent-contrast);
+      padding: 0.1rem 0.3rem;
+      border-radius: 0.2rem;
+      letter-spacing: 0.05em;
+      &.hidden { display: none; }
+    }
+  }
+
+  .mobile-toggle-container {
+    @apply flex lg:hidden;
+
+    .mobile-toggle {
+      color: var(--text);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 0.35rem;
+      padding: 0.4rem 0.55rem;
+      cursor: pointer;
+
+      .icon { font-size: 1.1rem; }
+      .icon.hidden { display: none; }
+    }
+  }
+
+  .nav-links {
+    @apply hidden lg:flex lg:gap-x-1;
+
+    .nav-link {
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.4rem 0.75rem;
+      border-radius: 0.35rem;
+      text-decoration: none;
+      transition: color 150ms ease, background-color 150ms ease;
+    }
+    .nav-link:hover {
+      color: var(--text-strong);
+      background-color: var(--surface);
+      text-decoration: none;
+    }
+    .nav-link--active {
+      color: var(--accent-strong);
+      background-color: color-mix(in oklab, var(--accent) 12%, transparent);
+    }
+    .nav-link--active:hover {
+      color: var(--accent-strong);
+      background-color: color-mix(in oklab, var(--accent) 18%, transparent);
     }
   }
 
   .mobile-menu {
     @apply lg:hidden;
+    border-top: 1px solid var(--border);
+    background-color: var(--bg-elevated);
 
     .mobile-menu-inner {
-      @apply space-y-1 px-4 pb-4;
+      @apply px-4 py-3 flex flex-col gap-1;
 
       .mobile-link {
-        @apply -mx-3 block  px-3 py-2 text-base/7 font-medium text-black no-underline hover:text-black hover:underline;
+        color: var(--text);
+        text-decoration: none;
+        padding: 0.55rem 0.75rem;
+        border-radius: 0.35rem;
+        font-weight: 500;
+      }
+      .mobile-link:hover {
+        background-color: var(--surface);
+        color: var(--text-strong);
+        text-decoration: none;
       }
     }
   }
