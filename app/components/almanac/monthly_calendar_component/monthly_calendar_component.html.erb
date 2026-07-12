@@ -1,17 +1,20 @@
 <div class="almanac-table" data-controller="almanac-table-toggle">
-  <!-- Toggle between Sun and Moon -->
-  <div class="toggle">
-    <button type="button" 
-            class="tab"
+  <div class="ui-tabs almanac-table__toggle" role="tablist">
+    <button type="button"
+            role="tab"
+            class="ui-tabs__tab"
             data-action="click->almanac-table-toggle#showSun"
             data-almanac-table-toggle-target="sunBtn">
-      <i class="far fa-sun"></i> Sun
+      <i class="fa-regular fa-sun ui-tabs__icon"></i>
+      <span class="ui-tabs__label">Sun</span>
     </button>
-    <button type="button" 
-            class="tab"
+    <button type="button"
+            role="tab"
+            class="ui-tabs__tab"
             data-action="click->almanac-table-toggle#showMoon"
             data-almanac-table-toggle-target="moonBtn">
-      <i class="far fa-moon"></i> Moon
+      <i class="fa-regular fa-moon ui-tabs__icon"></i>
+      <span class="ui-tabs__label">Moon</span>
     </button>
   </div>
 

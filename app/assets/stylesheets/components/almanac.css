@@ -1,73 +1,149 @@
+.almanac-container {
+  color: var(--text);
+}
+
+.almanac-month-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: stretch;
+  margin: 1rem 0 1.5rem;
+}
+@media (min-width: 768px) {
+  .almanac-month-nav {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+.almanac-month-nav__buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.almanac-month-nav__buttons .btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+}
+.almanac-month-nav__picker {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.almanac-current__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.almanac-current__list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+}
+.almanac-current__list li > span:first-child {
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.7rem;
+}
+.almanac-current__list li > span:last-child {
+  color: var(--text-strong);
+  font-family: var(--font-condensed);
+  font-size: 1rem;
+}
+.almanac-current__meta > span:last-child {
+  color: var(--subtle);
+  font-size: 0.75rem;
+  font-family: inherit;
+  font-style: italic;
+}
+
 .almanac-table {
-  .toggle {
-    @apply flex px-3 gap-3;
+  margin-top: 1.5rem;
 
-    .tab {
-      @apply flex-1 px-4 py-2 text-sm text-center font-semibold transition  rounded-b-none;
-    }
-
-    .active-tab {
-      @apply bg-brand-light text-brand-primary border border-brand-border border-b-0 hover:bg-brand-primary hover:text-white hover:border-brand-primary;
-    }
-
-    .inactive-tab {
-      @apply bg-gray-100 text-gray-600 border border-gray-200 border-b-0 hover:bg-gray-200 hover:text-gray-800 hover:border-gray-300;
-    }
+  .almanac-table__toggle {
+    margin-bottom: 0.75rem;
   }
 
   .table-container {
-    @apply overflow-x-auto;
+    overflow-x: auto;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+  }
+  .table-container.hidden { display: none; }
 
-    > table {
-      @apply w-max min-w-full text-[13px] border border-gray-300;
+  .table-container > table {
+    width: 100%;
+    min-width: max-content;
+    border-collapse: separate;
+    border-spacing: 0;
+    color: var(--text);
+    font-size: 0.75rem;
 
-      > thead {
-        @apply bg-gray-100 border border-gray-300;
-
-        > tr {
-          @apply divide-x divide-gray-300 border-b border-gray-300;
-
-          > th {
-            @apply p-1 text-center font-semibold;
-          }
-        }
-
-        .primary-header {
-          @apply bg-gray-100;
-        }
-
-        .secondary-header {
-          @apply bg-gray-50 text-gray-600;
-        }
-      }
-
-      > tbody {
-        @apply divide-y divide-gray-300 border border-gray-300;
-
-        > tr {
-          @apply divide-x divide-gray-300 hover:bg-gray-100 cursor-pointer;
-
-          &.today {
-            @apply bg-blue-50 font-semibold;
-          }
-
-          > td {
-            @apply p-1 text-center;
-          }
-
-          > td.expanded-row {
-            @apply bg-gray-100 px-4 py-4;
-
-            > div.expanded-container {
-              @apply max-w-4xl mx-auto;
-
-              > div.expanded-inner {
-                @apply bg-white border border-gray-300 p-4;
-              }
-            }
-          }
-        }
-      }
+    thead {
+      background-color: var(--bg-elevated);
+      color: var(--muted);
     }
+    thead tr {
+      border-bottom: 1px solid var(--border);
+    }
+    thead tr th {
+      padding: 0.5rem 0.4rem;
+      text-align: center;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 0.65rem;
+      border-right: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+    }
+    thead tr th:last-child { border-right: 0; }
+    thead .secondary-header th {
+      background-color: color-mix(in oklab, var(--bg-elevated) 70%, var(--surface));
+      color: var(--subtle);
+      font-size: 0.6rem;
+    }
+
+    tbody tr {
+      background-color: var(--surface);
+      cursor: pointer;
+      border-bottom: 1px solid color-mix(in oklab, var(--border) 40%, transparent);
+    }
+    tbody tr:hover { background-color: var(--surface-2); }
+    tbody tr.today {
+      background-color: color-mix(in oklab, var(--accent) 15%, var(--surface));
+    }
+    tbody tr.today td { color: var(--accent-strong); font-weight: 600; }
+    tbody td {
+      padding: 0.35rem 0.4rem;
+      text-align: center;
+      border-right: 1px solid color-mix(in oklab, var(--border) 40%, transparent);
+    }
+    tbody td:last-child { border-right: 0; }
+    tbody td.expanded-row {
+      background-color: var(--bg-elevated);
+      padding: 1rem;
+    }
+    tbody td.expanded-row .expanded-container {
+      max-width: 56rem;
+      margin: 0 auto;
+    }
+    tbody td.expanded-row .expanded-inner {
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      padding: 0.75rem;
+    }
+    .text-gray-500 { color: var(--muted) !important; }
+    span.text-xs { color: var(--subtle); }
   }
 }

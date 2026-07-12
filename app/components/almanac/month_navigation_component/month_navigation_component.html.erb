@@ -1,31 +1,32 @@
-<div class="flex flex-col md:flex-row items-center justify-between mb-6 gap-3" data-controller="almanac-navigation">
-  <div class="flex items-center gap-3">
-    <%= link_to almanac_month_path(prev_month.year, prev_month.strftime("%B").downcase), class: "btn-primary" do %>
-      ← <%= prev_month.strftime("%B") %>
+<div class="almanac-month-nav" data-controller="almanac-navigation">
+  <div class="almanac-month-nav__buttons">
+    <%= link_to almanac_month_path(prev_month.year, prev_month.strftime("%B").downcase), class: "btn-secondary" do %>
+      <i class="fa-regular fa-arrow-left" aria-hidden="true"></i>
+      <%= prev_month.strftime("%B") %>
     <% end %>
-    
-    <%= link_to almanac_month_path(next_month.year, next_month.strftime("%B").downcase), class: "btn-primary" do %>
-      <%= next_month.strftime("%B") %> →
+    <%= link_to almanac_month_path(next_month.year, next_month.strftime("%B").downcase), class: "btn-secondary" do %>
+      <%= next_month.strftime("%B") %>
+      <i class="fa-regular fa-arrow-right" aria-hidden="true"></i>
     <% end %>
   </div>
-  
-  <div class="flex items-center gap-2">
-    <label for="month-select" class="font-semibold">Month:</label>
-    <select id="month-select" class="px-3 py-2 border rounded w-30">
-      <% Date::MONTHNAMES.compact.each_with_index do |month, idx| %>
-        <option value="<%= month.downcase %>" <%= 'selected' if idx + 1 == current_month %>><%= month %></option>
-      <% end %>
-    </select>
-    
-    <label for="year-select" class="font-semibold">Year:</label>
-    <select id="year-select" class="px-3 py-2 border rounded w-30">
-      <% (1976..2076).each do |year| %>
-        <option value="<%= year %>" <%= 'selected' if year == current_year %>><%= year %></option>
-      <% end %>
-    </select>
-    
-    <button type="button" class="btn-primary" data-action="click->almanac-navigation#navigate">
-      Go
-    </button>
+
+  <div class="almanac-month-nav__picker">
+    <label class="ui-year-picker">
+      <span class="ui-year-picker__label">Month</span>
+      <select id="month-select" class="ui-year-picker__select">
+        <% Date::MONTHNAMES.compact.each_with_index do |month, idx| %>
+          <option value="<%= month.downcase %>" <%= 'selected' if idx + 1 == current_month %>><%= month %></option>
+        <% end %>
+      </select>
+    </label>
+    <label class="ui-year-picker">
+      <span class="ui-year-picker__label">Year</span>
+      <select id="year-select" class="ui-year-picker__select">
+        <% (1976..2076).each do |year| %>
+          <option value="<%= year %>" <%= 'selected' if year == current_year %>><%= year %></option>
+        <% end %>
+      </select>
+    </label>
+    <button type="button" class="btn-primary" data-action="click->almanac-navigation#navigate">Go</button>
   </div>
 </div>

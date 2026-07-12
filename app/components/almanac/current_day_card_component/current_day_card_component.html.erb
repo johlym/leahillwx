@@ -1,103 +1,49 @@
-<div class="bg-brand-light border border-brand-border  p-6 mb-6">
-  <h2 class="text-2xl font-bold mb-4">Today: <%= entry.date.strftime("%A, %B %d, %Y") %></h2>
-  
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <!-- Sun Section -->
-    <div class="bg-white  p-4 shadow">
-      <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
-        <i class="far fa-sun text-yellow-500"></i> Sun
-      </h3>
-      <div class="space-y-2 text-sm">
-        <div class="flex justify-between">
-          <span class="text-gray-600">Rise:</span>
-          <span class="font-medium"><%= format_time(entry.sunrise_at) %></span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-gray-600">Transit:</span>
-          <span class="font-medium"><%= format_time(entry.solar_noon_at) %></span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-gray-600">Set:</span>
-          <span class="font-medium"><%= format_time(entry.sunset_at) %></span>
-        </div>
-        <% if dynamic_positions && dynamic_positions[:sun] %>
-          <div class="flex justify-between">
-            <span class="text-gray-600">Altitude:</span>
-            <span class="font-medium"><%= format_degrees(dynamic_positions[:sun][:altitude]) %></span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-gray-600">Azimuth:</span>
-            <span class="font-medium"><%= format_degrees(dynamic_positions[:sun][:azimuth]) %></span>
-          </div>
-        <% end %>
-      </div>
-    </div>
-    
-    <!-- Moon Section -->
-    <div class="bg-white  p-4 shadow">
-      <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
-        <i class="far fa-moon text-blue-500"></i> Moon
-      </h3>
-      <div class="space-y-2 text-sm">
-        <div class="flex justify-between">
-          <span class="text-gray-600">Rise:</span>
-          <span class="font-medium"><%= format_time(entry.moonrise_at) %></span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-gray-600">Transit:</span>
-          <span class="font-medium"><%= format_time(entry.moon_transit_at) %></span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-gray-600">Set:</span>
-          <span class="font-medium"><%= format_time(entry.moonset_at) %></span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-gray-600">Phase:</span>
-          <span class="font-medium capitalize"><%= entry.moon_phase %></span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-gray-600">Illumination:</span>
-          <span class="font-medium"><%= entry.moon_illumination_pct&.round %>%</span>
-        </div>
-        <% if dynamic_positions && dynamic_positions[:moon] %>
-          <div class="flex justify-between">
-            <span class="text-gray-600">Altitude:</span>
-            <span class="font-medium"><%= format_degrees(dynamic_positions[:moon][:altitude]) %></span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-gray-600">Heading:</span>
-            <span class="font-medium"><%= moon_heading %></span>
-          </div>
-        <% end %>
-      </div>
-    </div>
-    
-    <!-- Additional Info -->
-    <div class="bg-white  p-4 shadow">
-      <h3 class="text-lg font-semibold mb-3">Details</h3>
-      <div class="space-y-2 text-sm">
-        <div class="flex justify-between">
-          <span class="text-gray-600">Daylight:</span>
-          <span class="font-medium"><%= entry.formatted_daylight %></span>
-        </div>
-        <% if entry.formatted_daylight_delta %>
-          <div class="text-xs text-gray-500 text-right">
-            <%= entry.formatted_daylight_delta %>
-          </div>
-        <% end %>
-        <% if entry.moon_distance_km %>
-          <div class="flex justify-between">
-            <span class="text-gray-600">Moon distance:</span>
-            <span class="font-medium"><%= number_with_delimiter((entry.moon_distance_km * 0.621371).round(0)) %> mi</span>
-          </div>
-        <% end %>
-        <% if entry.sun_distance_km %>
-          <div class="flex justify-between">
-            <span class="text-gray-600">Sun distance:</span>
-            <span class="font-medium"><%= ((entry.sun_distance_km * 0.621371) / 1_000_000).round(2) %> million mi</span>
-          </div>
-        <% end %>
-      </div>
-    </div>
-  </div>
+<%= render Ui::SectionHeaderComponent.new(
+  title: "Today",
+  subtitle: entry.date.strftime("%A, %B %-d, %Y"),
+  icon: "fa-regular fa-calendar-day",
+  level: 2
+) %>
+
+<div class="ui-card-grid">
+  <%= render Ui::CardComponent.new(title: "Sun", icon: "fa-regular fa-sun") do %>
+    <ul class="almanac-current__list">
+      <li><span>Rise</span><span><%= format_time(entry.sunrise_at) %></span></li>
+      <li><span>Transit</span><span><%= format_time(entry.solar_noon_at) %></span></li>
+      <li><span>Set</span><span><%= format_time(entry.sunset_at) %></span></li>
+      <% if dynamic_positions && dynamic_positions[:sun] %>
+        <li><span>Altitude</span><span><%= format_degrees(dynamic_positions[:sun][:altitude]) %></span></li>
+        <li><span>Azimuth</span><span><%= format_degrees(dynamic_positions[:sun][:azimuth]) %></span></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <%= render Ui::CardComponent.new(title: "Moon", icon: "fa-regular fa-moon") do %>
+    <ul class="almanac-current__list">
+      <li><span>Rise</span><span><%= format_time(entry.moonrise_at) %></span></li>
+      <li><span>Transit</span><span><%= format_time(entry.moon_transit_at) %></span></li>
+      <li><span>Set</span><span><%= format_time(entry.moonset_at) %></span></li>
+      <li><span>Phase</span><span class="capitalize"><%= entry.moon_phase %></span></li>
+      <li><span>Illumination</span><span><%= entry.moon_illumination_pct&.round %>%</span></li>
+      <% if dynamic_positions && dynamic_positions[:moon] %>
+        <li><span>Altitude</span><span><%= format_degrees(dynamic_positions[:moon][:altitude]) %></span></li>
+        <li><span>Heading</span><span><%= moon_heading %></span></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <%= render Ui::CardComponent.new(title: "Details", icon: "fa-regular fa-book-atlas") do %>
+    <ul class="almanac-current__list">
+      <li><span>Daylight</span><span><%= entry.formatted_daylight %></span></li>
+      <% if entry.formatted_daylight_delta %>
+        <li class="almanac-current__meta"><span></span><span><%= entry.formatted_daylight_delta %></span></li>
+      <% end %>
+      <% if entry.moon_distance_km %>
+        <li><span>Moon distance</span><span><%= number_with_delimiter((entry.moon_distance_km * 0.621371).round(0)) %> mi</span></li>
+      <% end %>
+      <% if entry.sun_distance_km %>
+        <li><span>Sun distance</span><span><%= ((entry.sun_distance_km * 0.621371) / 1_000_000).round(2) %>M mi</span></li>
+      <% end %>
+    </ul>
+  <% end %>
 </div>
