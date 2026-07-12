@@ -1,37 +1,18 @@
-.graphs-container {
-}
-
-.graphs-container h1 {
-  margin-bottom: 2rem;
-}
-
-.graph-section {
-  margin-top: 2rem;
-  padding: 1.5rem;
-  background: var(--surface-color, #ffffff);
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.line-graph-container {
+.graphs-stack {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 500px;
-  padding: 1rem;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
-.line-graph-container svg {
-  max-width: 100%;
-  height: auto;
+.graphs-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
 }
 
-@media (max-width: 768px) {
-  .line-graph-container svg {
-    width: 100%;
-  }
-
-  .graph-section {
-    padding: 1rem;
+@media (min-width: 1024px) {
+  .graphs-row {
+    grid-template-columns: 1fr 1fr;
   }
 }

@@ -1,6 +1,9 @@
-<div class="primary-container graphs-container">
-  <h1>Graphs</h1>
-  
+<div class="primary-container">
+  <%= render Ui::SectionHeaderComponent.new(
+    title: "Graphs",
+    subtitle: "#{@month_label} #{@current_year}#{" — Day #{@current_day}" if @current_day}"
+  ) %>
+
   <%= render Shared::DateNavigationComponent.new(
     current_year: @current_year,
     current_month: @current_month,
@@ -9,17 +12,48 @@
     day_required: false,
     jump_button: false
   ) %>
-  
-  <% if @temperature_data && @temperature_data.any? %>
-    <div class="graph-section">
-      <%= render Graphs::LineGraphComponent.new(
-        data: @temperature_data,
-        year: @current_year,
-        month: @current_month,
-        day: @current_day
+
+  <div class="graphs-stack">
+    <% if @temperature_chart %>
+      <%= render Ui::ChartComponent.new(
+        type: @temperature_chart[:type],
+        data: @temperature_chart[:data],
+        options: @temperature_chart[:options],
+        title: "Temperature",
+        subtitle: @current_day ? "Hourly" : "Daily high, low, and mean",
+        height: 420,
+        aria_label: "Line chart of temperature high, low, and mean"
       ) %>
+    <% else %>
+      <%= render Ui::CardComponent.new do %>
+        <p class="text-[color:var(--muted)]">No temperature data for this period.</p>
+      <% end %>
+    <% end %>
+
+    <div class="graphs-row">
+      <% if @rain_chart %>
+        <%= render Ui::ChartComponent.new(
+          type: @rain_chart[:type],
+          data: @rain_chart[:data],
+          options: @rain_chart[:options],
+          title: "Rain",
+          subtitle: "Precipitation totals",
+          height: 320,
+          aria_label: "Bar chart of rain totals"
+        ) %>
+      <% end %>
+
+      <% if @wind_chart %>
+        <%= render Ui::ChartComponent.new(
+          type: @wind_chart[:type],
+          data: @wind_chart[:data],
+          options: @wind_chart[:options],
+          title: "Wind",
+          subtitle: "Average and peak wind speeds",
+          height: 320,
+          aria_label: "Line chart of wind speeds"
+        ) %>
+      <% end %>
     </div>
-  <% else %>
-    <p>No temperature data available for the selected period.</p>
-  <% end %>
+  </div>
 </div>
