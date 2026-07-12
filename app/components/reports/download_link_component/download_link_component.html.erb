@@ -1,1 +1,4 @@
-<%= link_to "Download Text Version", download_path, class: "download-button" %>
+<%= link_to download_path, class: "btn-secondary reports-download" do %>
+  <i class="fa-regular fa-download" aria-hidden="true"></i>
+  <span>Download text version</span>
+<% end %>
