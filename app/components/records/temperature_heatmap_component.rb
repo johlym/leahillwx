@@ -21,8 +21,6 @@ module Records
       "oklch(0.62 0.22 25)"     # red
     ].freeze
 
-    LEGEND_STEPS = 7
-
     def initialize(year:, days:)
       @year = year
       @days = days
@@ -114,11 +112,17 @@ module Records
       [ 1, 5, 10, 15, 20, 25, 31 ]
     end
 
-    def legend_swatches
-      Array.new(LEGEND_STEPS) do |i|
-        t = LEGEND_STEPS == 1 ? 0.0 : i.to_f / (LEGEND_STEPS - 1)
-        interpolate_color(t)
+    # CSS linear-gradient string that reproduces the full ramp used by
+    # the cells. Each COLOR_STOPS entry is anchored at its evenly-spaced
+    # position across 0-100%, so a viewer sees the same interpolation
+    # in the legend as they do in the grid.
+    def legend_gradient
+      segments = COLOR_STOPS.length - 1
+      stops = COLOR_STOPS.each_with_index.map do |color, i|
+        pct = ((i.to_f / segments) * 100).round(2)
+        "#{color} #{pct}%"
       end
+      "linear-gradient(to right, #{stops.join(', ')})"
     end
   end
 end

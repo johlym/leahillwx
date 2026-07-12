@@ -114,10 +114,11 @@ class TrendsAnalyzer
       cards << anomaly_card(
         label: "vs #{normal_years.length}-year normal",
         title: "Temperature",
-        value: format_delta(delta_f, "°F"),
-        secondary: "focus #{c_to_f(ytd_focus_mean).round(1)}°F · normal #{c_to_f(baseline_mean_avg).round(1)}°F",
+        value: format_delta(delta_f, "°"),
+        secondary: "focus #{c_to_f(ytd_focus_mean).round(1)}° · normal #{c_to_f(baseline_mean_avg).round(1)}°",
         delta: delta_f,
-        good_when: :warmer
+        positive_label: "warmer",
+        negative_label: "cooler"
       )
     end
 
@@ -131,7 +132,8 @@ class TrendsAnalyzer
         value: format_delta(delta_in, " in"),
         secondary: "focus #{focus_in.round(2)} in · normal #{normal_in.round(2)} in",
         delta: delta_in,
-        good_when: :either
+        positive_label: "wetter",
+        negative_label: "drier"
       )
     end
 
@@ -145,7 +147,8 @@ class TrendsAnalyzer
         value: format_delta(delta_mph, " mph"),
         secondary: "focus #{focus_mph.round(1)} mph · normal #{normal_mph.round(1)} mph",
         delta: delta_mph,
-        good_when: :either
+        positive_label: "windier",
+        negative_label: "calmer"
       )
     end
 
@@ -159,21 +162,24 @@ class TrendsAnalyzer
     (available_years - [ current, focus_year ]).first(NORMAL_YEARS)
   end
 
-  def anomaly_card(title:, label:, value:, secondary:, delta:, good_when:)
+  def anomaly_card(title:, label:, value:, secondary:, delta:, positive_label:, negative_label:)
     trend = if delta.abs < 0.05
       :flat
-    elsif good_when == :warmer
-      delta.positive? ? :up : :down
     else
       delta.positive? ? :up : :down
     end
+    trend_label = case trend
+                  when :flat then "unchanged"
+                  when :up then positive_label
+                  when :down then negative_label
+                  end
     {
       title: title,
       label: label,
       value: value,
       secondary: secondary,
       trend: trend,
-      trend_label: trend == :flat ? "unchanged" : (delta.positive? ? "warmer/wetter/windier" : "cooler/drier/calmer")
+      trend_label: trend_label
     }
   end
 

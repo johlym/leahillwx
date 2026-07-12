@@ -15,6 +15,7 @@ module Elements
       @size = SIZES.key?(size) ? size : :md
       @label = label
       @show_label = show_label
+      @uid = SecureRandom.hex(4)
     end
 
     def compass_label
@@ -25,6 +26,6 @@ module Elements
 
     private
 
-    attr_reader :direction, :size, :show_label
+    attr_reader :direction, :size, :show_label, :uid
   end
 end

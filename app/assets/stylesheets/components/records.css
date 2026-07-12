@@ -195,9 +195,13 @@
   font-size: 0.75rem;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
-.temp-heatmap__legend-swatches {
-  display: inline-flex;
-  gap: 2px;
+.temp-heatmap__legend-bar {
+  width: clamp(9rem, 22vw, 16rem);
+  height: 0.75rem;
+  border-radius: 999px;
+  display: inline-block;
+  border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--accent) 8%, transparent) inset;
 }
 .temp-heatmap__legend-swatch {
   width: 1.15rem;
