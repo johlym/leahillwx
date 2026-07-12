@@ -1,25 +1,84 @@
+html {
+  background-color: var(--bg);
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+}
+
 .primary-container {
-  @apply container mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 my-2;
+  @apply container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 my-4;
 
   h1 {
-    @apply text-5xl font-condensed uppercase my-4;
+    @apply text-5xl font-condensed uppercase my-4 tracking-wide;
+    color: var(--text-strong);
   }
   h2 {
-    @apply text-3xl font-condensed uppercase my-4;
+    @apply text-3xl font-condensed uppercase my-4 tracking-wide;
+    color: var(--text-strong);
   }
   h3 {
-    @apply text-xl font-condensed uppercase my-4;
+    @apply text-xl font-condensed uppercase my-3 tracking-wide;
+    color: var(--text);
+  }
+  h1 small,
+  h2 small {
+    @apply text-base normal-case tracking-normal;
+    color: var(--muted);
   }
 }
 
 a {
-  @apply text-brand-primary underline hover:no-underline;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+a:hover {
+  color: var(--accent-strong);
+  text-decoration: none;
 }
 
 .btn-primary {
-  @apply bg-brand-primary border border-brand-primary text-white px-4 py-2 rounded hover:bg-brand-light hover:border-brand-border hover:text-brand-primary transition-colors no-underline cursor-pointer;
+  background-color: var(--accent);
+  border: 1px solid var(--accent);
+  color: var(--accent-contrast);
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+  font-weight: 600;
+}
+.btn-primary:hover {
+  background-color: var(--accent-strong);
+  border-color: var(--accent-strong);
+  color: var(--accent-contrast);
+  text-decoration: none;
 }
 
 .btn-secondary {
-  @apply bg-white border border-brand-primary text-brand-primary px-4 py-2 rounded hover:bg-brand-dark hover:border-brand-border hover:text-brand-primary transition-colors no-underline cursor-pointer;
+  background-color: transparent;
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+  font-weight: 500;
+}
+.btn-secondary:hover {
+  background-color: var(--surface);
+  border-color: var(--accent);
+  color: var(--accent-strong);
+  text-decoration: none;
+}
+
+.btn-primary[disabled],
+.btn-secondary[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
