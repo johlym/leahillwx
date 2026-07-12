@@ -36,7 +36,7 @@
     <%= render Ui::SectionHeaderComponent.new(title: section[:title], icon: section[:icon], level: 3) %>
     <div class="ui-card-grid">
       <% section[:rows].each do |row| %>
-        <%= render Records::RecordCardComponent.new(row: row, record: active_record, icon: row[:icon]) %>
+        <%= render Records::RecordCardComponent.new(row: row, record: active_record, icon: row[:icon], history: yearly_records) %>
       <% end %>
     </div>
   <% end %>

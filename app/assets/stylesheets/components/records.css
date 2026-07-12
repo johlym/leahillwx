@@ -45,6 +45,15 @@
 }
 .record-card__meta--muted { color: var(--subtle); font-style: italic; }
 
+.record-card__sparkline {
+  margin-top: 0.75rem;
+  height: 56px;
+  position: relative;
+  border-top: 1px dashed color-mix(in oklab, var(--border) 60%, transparent);
+  padding-top: 0.5rem;
+}
+.record-card__sparkline canvas { width: 100% !important; height: 100% !important; }
+
 .record-inline-code {
   background-color: var(--surface-2);
   border: 1px solid var(--border);

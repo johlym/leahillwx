@@ -174,31 +174,34 @@ export default class extends Controller {
   buildScales(options, palette) {
     const gridColor = withAlpha(palette.border, 0.4)
     const tickColor = palette.muted
+    const hideAxes = options.hideAxes === true
     const scales = {
       x: {
         stacked: options.stacked ?? false,
-        grid: { display: !options.hideGrid, color: gridColor, tickColor: gridColor },
-        border: { color: gridColor },
+        display: !hideAxes,
+        grid: { display: !hideAxes && !options.hideGrid, color: gridColor, tickColor: gridColor },
+        border: { display: !hideAxes, color: gridColor },
         ticks: {
           color: tickColor,
           maxRotation: 0,
           autoSkip: true,
           autoSkipPadding: 12,
         },
-        title: options.xLabel
+        title: options.xLabel && !hideAxes
           ? { display: true, text: options.xLabel, color: palette.muted }
           : undefined,
       },
       y: {
         stacked: options.stacked ?? false,
+        display: !hideAxes,
         beginAtZero: options.beginAtZero ?? false,
-        grid: { display: !options.hideGrid, color: gridColor, tickColor: gridColor },
-        border: { color: gridColor },
+        grid: { display: !hideAxes && !options.hideGrid, color: gridColor, tickColor: gridColor },
+        border: { display: !hideAxes, color: gridColor },
         ticks: {
           color: tickColor,
           callback: (v) => (options.yUnit ? `${v}${options.yUnit}` : v),
         },
-        title: options.yLabel
+        title: options.yLabel && !hideAxes
           ? { display: true, text: options.yLabel, color: palette.muted }
           : undefined,
       },

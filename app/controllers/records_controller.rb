@@ -14,6 +14,10 @@ class RecordsController < ApplicationController
       @pivot = :all_time
     end
 
+    # All yearly rows, oldest first, so record cards can render a
+    # sparkline of that metric across seasons.
+    @yearly_records = Record.where(scope: "yearly").order(year: :asc).to_a
+
     # For the heatmap, use the pivoted year when set, otherwise the
     # most recent year that has any daily entries. Falls back to nil if
     # nothing is available and the component will render an empty state.

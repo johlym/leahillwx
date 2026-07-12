@@ -2,7 +2,7 @@
 
 module Records
   class RecordsComponent < ViewComponent::Base
-    def initialize(pivot:, selected_year:, selected_year_record:, all_time_record:, available_years:, heatmap_year:, heatmap_days:)
+    def initialize(pivot:, selected_year:, selected_year_record:, all_time_record:, available_years:, heatmap_year:, heatmap_days:, yearly_records: [])
       @pivot = pivot
       @selected_year = selected_year
       @selected_year_record = selected_year_record
@@ -10,12 +10,13 @@ module Records
       @available_years = available_years
       @heatmap_year = heatmap_year
       @heatmap_days = heatmap_days
+      @yearly_records = yearly_records
     end
 
     private
 
     attr_reader :pivot, :selected_year, :selected_year_record, :all_time_record,
-                :available_years, :heatmap_year, :heatmap_days
+                :available_years, :heatmap_year, :heatmap_days, :yearly_records
 
     def pivot_year?
       pivot == :year

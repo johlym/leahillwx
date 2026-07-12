@@ -6,16 +6,21 @@
 #   | Highest Temperature         |
 #   |   102.4 °F                  |
 #   |   on Aug 12, 2023 · 4:15 PM |
+#   |   ~~~sparkline~~~           |
 #   +-----------------------------+
+#
+# `history` is an ordered array of Record rows (oldest first) used to
+# render the sparkline of that metric across seasons.
 module Records
   class RecordCardComponent < ViewComponent::Base
     include UnitConversions
     include DateTimeFormatting
 
-    def initialize(row:, record:, icon: nil)
+    def initialize(row:, record:, icon: nil, history: [])
       @row = row
       @record = record
       @icon = icon
+      @history = history
     end
 
     def call
@@ -23,14 +28,15 @@ module Records
         safe_join([
           label_block,
           value_block,
-          timestamp_block
+          timestamp_block,
+          sparkline_block
         ].compact)
       end
     end
 
     private
 
-    attr_reader :row, :record, :icon
+    attr_reader :row, :record, :icon, :history
 
     def label_block
       content_tag(:div, class: "record-card__label") do
@@ -61,7 +67,96 @@ module Records
       content_tag(:p, "on #{timestamp}", class: "record-card__meta")
     end
 
-    # ---- Formatting ----
+    # ---- Sparkline --------------------------------------------------
+
+    def sparkline_block
+      return nil if history.blank? || !sparkline_supported?
+      series = history_series
+      return nil if series.compact.length < 2
+
+      labels = history.map(&:year).map(&:to_s)
+      payload = {
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: [ {
+            label: row[:label],
+            data: series,
+            color: "var(--accent)",
+            borderWidth: 1.8,
+            tension: 0.35,
+            fill: true,
+            fillAlpha: 0.18,
+            spanGaps: true
+          } ]
+        },
+        options: {
+          hideLegend: true,
+          hideGrid: true,
+          hideAxes: true,
+          decimals: 1,
+          yUnit: sparkline_unit
+        }
+      }
+
+      content_tag(:div, class: "record-card__sparkline",
+                        data: {
+                          controller: "chart",
+                          chart_type_value: payload[:type],
+                          chart_data_value: payload[:data].to_json,
+                          chart_options_value: payload[:options].to_json
+                        },
+                        role: "img",
+                        "aria-label": "#{row[:label]} across #{labels.first}\u2013#{labels.last}") do
+        # Chart controller will inject a <canvas> here.
+        "".html_safe
+      end
+    end
+
+    def sparkline_supported?
+      %i[temp speed rain pressure solar wind_run humidity].include?(row[:type])
+    end
+
+    def sparkline_unit
+      case row[:type]
+      when :temp then "°F"
+      when :speed, :wind_run then " mph"
+      when :rain then " in"
+      when :pressure then " hPa"
+      when :solar then " W/m²"
+      when :humidity then "%"
+      end
+    end
+
+    def history_series
+      history.map do |rec|
+        raw = rec.public_send(row[:field]) rescue nil
+        next nil if raw.nil?
+
+        case row[:type]
+        when :temp
+          temp_fahrenheit(raw)&.round(1)
+        when :speed, :wind_run
+          if row[:type] == :speed
+            wind_speed_mph(raw)&.round(1)
+          else
+            raw.round(1)
+          end
+        when :rain
+          rain_in_inches(raw)&.round(2)
+        when :pressure
+          raw.round(1)
+        when :solar
+          raw.round(1)
+        when :humidity
+          raw.to_f.round(1)
+        else
+          nil
+        end
+      end
+    end
+
+    # ---- Formatting -------------------------------------------------
 
     def formatted_value_parts
       return { value: "—", unit: nil } if record.nil?
