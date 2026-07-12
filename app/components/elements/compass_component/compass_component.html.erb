@@ -2,23 +2,14 @@
      role="img"
      aria-label="Wind from <%= compass_label %> (<%= direction.round %>°)">
   <svg viewBox="0 0 100 100" class="compass__dial" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <defs>
-      <radialGradient id="compass-face-<%= uid %>" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" style="stop-color: var(--surface-2)" />
-        <stop offset="90%" style="stop-color: var(--surface)" />
-      </radialGradient>
-      <linearGradient id="compass-needle-<%= uid %>" x1="0" x2="0" y1="0" y2="1">
-        <stop offset="0%" style="stop-color: var(--accent-strong)" />
-        <stop offset="100%" style="stop-color: var(--accent)" />
-      </linearGradient>
-    </defs>
-
+    <%# Compass face — a slightly darker inset surface. Kept as a
+        simple solid so we don't rely on <linearGradient> stop-color
+        variables (which some engines evaluate lazily and drop). %>
     <circle cx="50" cy="50" r="46"
-            fill="url(#compass-face-<%= uid %>)"
-            style="stroke: var(--border-strong)"
+            class="compass__face"
             stroke-width="1" />
     <circle cx="50" cy="50" r="41" fill="none"
-            style="stroke: color-mix(in oklab, var(--border) 60%, transparent)"
+            class="compass__ring"
             stroke-width="0.5" />
 
     <%# Tick marks: long tick every 45°, short tick every 22.5°. %>
@@ -26,37 +17,37 @@
       <% deg = i * 22.5 %>
       <% long = (i % 2).zero? %>
       <line x1="50" y1="<%= long ? 6 : 8 %>" x2="50" y2="<%= long ? 12 : 11 %>"
-            style="stroke: <%= long ? "var(--muted)" : "color-mix(in oklab, var(--muted) 60%, transparent)" %>"
-            stroke-width="<%= long ? 1.2 : 0.8 %>"
+            class="<%= long ? 'compass__tick compass__tick--long' : 'compass__tick' %>"
+            stroke-width="<%= long ? 1.4 : 0.8 %>"
             transform="rotate(<%= deg %> 50 50)" />
     <% end %>
 
     <%# Cardinal letters. %>
-    <text x="50" y="20" text-anchor="middle" font-size="10" font-weight="700"
-          style="fill: var(--danger); font-family: var(--font-condensed)">N</text>
-    <text x="82" y="53" text-anchor="middle" font-size="8"
-          style="fill: var(--muted); font-family: var(--font-condensed)">E</text>
-    <text x="50" y="86" text-anchor="middle" font-size="8"
-          style="fill: var(--muted); font-family: var(--font-condensed)">S</text>
-    <text x="18" y="53" text-anchor="middle" font-size="8"
-          style="fill: var(--muted); font-family: var(--font-condensed)">W</text>
+    <text x="50" y="21" text-anchor="middle" font-size="10" font-weight="700"
+          class="compass__cardinal compass__cardinal--n">N</text>
+    <text x="83" y="53" text-anchor="middle" font-size="8"
+          class="compass__cardinal">E</text>
+    <text x="50" y="88" text-anchor="middle" font-size="8"
+          class="compass__cardinal">S</text>
+    <text x="17" y="53" text-anchor="middle" font-size="8"
+          class="compass__cardinal">W</text>
 
-    <%# Needle group. `direction` is meteorological (where the wind is
-        coming from), rotating 0 = N, 90 = E, etc. Rotation is applied
-        as an SVG attribute for the initial paint; the weather update
-        controller keeps the attribute in sync live. %>
+    <%# Needle. `direction` is meteorological (where the wind is coming
+        from), 0° = N, 90° = E. Rotation is applied as an SVG attribute
+        so the initial paint is correct even before the weather channel
+        broadcasts an update. Both blades share a class so the CSS
+        variable-driven fill and stroke apply reliably. %>
     <g class="compass__needle" transform="rotate(<%= direction %> 50 50)">
-      <polygon points="50,14 46,52 54,52"
-               fill="url(#compass-needle-<%= uid %>)"
-               style="stroke: var(--accent-strong)"
-               stroke-width="0.5" />
-      <polygon points="50,86 47,52 53,52"
-               style="fill: color-mix(in oklab, var(--muted) 65%, transparent); stroke: var(--border-strong)"
-               stroke-width="0.5" />
+      <polygon points="50,10 44,52 56,52"
+               class="compass__needle-fore"
+               stroke-width="1.2" />
+      <polygon points="50,90 46,52 54,52"
+               class="compass__needle-aft"
+               stroke-width="0.8" />
     </g>
 
-    <circle cx="50" cy="50" r="3"
-            style="fill: var(--surface-2); stroke: var(--accent)"
+    <circle cx="50" cy="50" r="3.5"
+            class="compass__hub"
             stroke-width="1" />
   </svg>
   <% if show_label %>
