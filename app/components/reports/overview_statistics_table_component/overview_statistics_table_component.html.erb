@@ -17,9 +17,9 @@
       </thead>
       <tbody>
         <tr>
-          <td><%= number_with_precision(temp_fahrenheit(report.month_mean_temp), precision: 2) %>° F</td>
-          <td><%= number_with_precision(temp_fahrenheit(report.month_high_temp), precision: 2) %>° F<br><span class="text-xs">(Day <%= report.month_high_temp_day || 'N/A' %>)</span></td>
-          <td><%= number_with_precision(temp_fahrenheit(report.month_low_temp), precision: 2) %>° F<br><span class="text-xs">(Day <%= report.month_low_temp_day || 'N/A' %>)</span></td>
+          <td><%= number_with_precision(temp_fahrenheit(report.month_mean_temp), precision: 2) %>°</td>
+          <td><%= number_with_precision(temp_fahrenheit(report.month_high_temp), precision: 2) %>°<br><span class="text-xs">(Day <%= report.month_high_temp_day || 'N/A' %>)</span></td>
+          <td><%= number_with_precision(temp_fahrenheit(report.month_low_temp), precision: 2) %>°<br><span class="text-xs">(Day <%= report.month_low_temp_day || 'N/A' %>)</span></td>
           <td><%= number_with_precision(report.total_heat_degree_days, precision: 2) %></td>
           <td><%= number_with_precision(report.total_cool_degree_days, precision: 2) %></td>
           <td><%= number_with_precision(rain_in_inches(report.total_rain), precision: 2) %> in.</td>

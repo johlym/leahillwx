@@ -42,9 +42,9 @@
                 <td colspan="9" class="no-data">N/A</td>
               <% end %>
             <% else %>
-              <td class="<%= 'font-bold' if row.is_max_mean_temp %>"><%= number_with_precision(temp_fahrenheit(row.entry.mean_temp), precision: 2) %>° F</td>
-              <td class="<%= 'font-bold' if row.is_max_high_temp %>"><%= number_with_precision(temp_fahrenheit(row.entry.high_temp), precision: 2) %>° F @ <%= row.entry.high_temp_time || 'N/A' %></td>
-              <td class="<%= 'font-bold' if row.is_max_low_temp %>"><%= number_with_precision(temp_fahrenheit(row.entry.low_temp), precision: 2) %>° F @ <%= row.entry.low_temp_time || 'N/A' %></td>
+              <td class="<%= 'font-bold' if row.is_max_mean_temp %>"><%= number_with_precision(temp_fahrenheit(row.entry.mean_temp), precision: 2) %>°</td>
+              <td class="<%= 'font-bold' if row.is_max_high_temp %>"><%= number_with_precision(temp_fahrenheit(row.entry.high_temp), precision: 2) %>° @ <%= row.entry.high_temp_time || 'N/A' %></td>
+              <td class="<%= 'font-bold' if row.is_max_low_temp %>"><%= number_with_precision(temp_fahrenheit(row.entry.low_temp), precision: 2) %>° @ <%= row.entry.low_temp_time || 'N/A' %></td>
               <td class="<%= 'font-bold' if row.is_max_heat_dd %>"><%= number_with_precision(row.entry.heat_degree_days, precision: 2) %>°</td>
               <td class="<%= 'font-bold' if row.is_max_cool_dd %>"><%= number_with_precision(row.entry.cool_degree_days, precision: 2) %>°</td>
               <td class="<%= 'font-bold' if row.is_max_rain %>"><%= number_with_precision(rain_in_inches(row.entry.rain), precision: 2) %> in.</td>

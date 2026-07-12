@@ -93,7 +93,7 @@ module Records
     end
 
     def cell_title(day)
-      Date.new(year, day[:month], day[:day]).strftime("%b %-d, %Y")
+      Date.new(year, day[:month], day[:day]).strftime("%b %d, %Y")
     end
 
     def cell_body(day)

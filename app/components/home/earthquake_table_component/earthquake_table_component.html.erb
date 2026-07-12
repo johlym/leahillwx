@@ -22,13 +22,9 @@
             </span>
           </div>
           <div class="eq-cell eq-timestamp-cell">
-            <% if earthquake.last_updated %>
-              <%= earthquake.last_updated.in_time_zone("America/Los_Angeles").strftime("%B %d, %Y") %><br />
-              at <%= earthquake.last_updated.in_time_zone("America/Los_Angeles").strftime("%I:%M %p") %>
-            <% else %>
-              <%= earthquake.eventtime.in_time_zone("America/Los_Angeles").strftime("%B %d, %Y") %><br />
-              at <%= earthquake.eventtime.in_time_zone("America/Los_Angeles").strftime("%I:%M %p") %>
-            <% end %>
+            <% time = earthquake.last_updated || earthquake.eventtime %>
+            <%= time.in_time_zone("America/Los_Angeles").strftime("%b %d, %Y") %><br />
+            <span class="eq-time">@ <%= time.in_time_zone("America/Los_Angeles").strftime("%I:%M %p") %></span>
           </div>
           <div class="eq-cell eq-location-cell">
             <%= link_to earthquake.place, earthquake.url, target: :blank %> <i class="fa-regular fa-arrow-up-right-from-square"></i>

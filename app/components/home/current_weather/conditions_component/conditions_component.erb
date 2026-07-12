@@ -1,7 +1,7 @@
 <section class="current-conditions" data-palette-transition>
   <div class="conditions-container">
     <div class="conditions-hero">
-      <p class="timestamp" data-weather-update-target="timestamp"><%= Time.now.in_time_zone("America/Los_Angeles").strftime("%B %d, %Y • %I:%M %p") %></p>
+      <p class="timestamp" data-weather-update-target="timestamp"><%= Time.now.in_time_zone("America/Los_Angeles").strftime("%b %d, %y @ %I:%M %p") %></p>
       <div class="current-temperature">
         <span class="temperature" data-weather-update-target="temperature"><%= current_temperature %>°</span>
         <div class="condition-summary">
@@ -96,7 +96,7 @@
         <div class="ui-stat__label"><i class="fa-regular fa-droplet-degree ui-stat__label-icon"></i><span class="ui-stat__label-text">Dew Point</span></div>
         <div class="ui-stat__value">
           <span class="ui-stat__value-number" data-weather-update-target="dewPoint"><%= current_dew_point %></span>
-          <span class="ui-stat__value-unit">°F</span>
+          <span class="ui-stat__value-unit">°</span>
         </div>
       </div>
     <% end %>

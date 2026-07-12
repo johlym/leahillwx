@@ -89,17 +89,18 @@ export default class extends Controller {
   }
 
   formattedTimestamp() {
+    // Match server format: "Aug 12, 25 @ 07:32 AM"
     const parts = new Intl.DateTimeFormat("en-US", {
       timeZone: "America/Los_Angeles",
-      month: "long",
+      month: "short",
       day: "2-digit",
-      year: "numeric",
+      year: "2-digit",
       hour: "2-digit",
       minute: "2-digit",
       hour12: true,
     }).formatToParts(new Date())
     const get = (type) => parts.find((p) => p.type === type)?.value || ""
-    return `${get("month")} ${get("day")}, ${get("year")} \u2022 ${get("hour")}:${get("minute")} ${get("dayPeriod")}`
+    return `${get("month")} ${get("day")}, ${get("year")} @ ${get("hour")}:${get("minute")} ${get("dayPeriod")}`
   }
 
   flashCounter() {

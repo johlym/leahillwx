@@ -4,8 +4,8 @@
 #
 #   +-----------------------------+
 #   | Highest Temperature         |
-#   |   102.4 °F                  |
-#   |   on Aug 12, 2023 · 4:15 PM |
+#   |   102.4 °                   |
+#   |   on Aug 12, 25 @ 04:15 PM  |
 #   |   ~~~sparkline~~~           |
 #   +-----------------------------+
 #
@@ -119,7 +119,7 @@ module Records
 
     def sparkline_unit
       case row[:type]
-      when :temp then "°F"
+      when :temp then "°"
       when :speed, :wind_run then " mph"
       when :rain then " in"
       when :pressure then " hPa"
@@ -166,7 +166,7 @@ module Records
 
       case row[:type]
       when :temp
-        { value: temp_fahrenheit(raw).round(1).to_s, unit: "°F" }
+        { value: temp_fahrenheit(raw).round(1).to_s, unit: "°" }
       when :speed
         { value: wind_speed_mph(raw).round(1).to_s, unit: "mph" }
       when :rain

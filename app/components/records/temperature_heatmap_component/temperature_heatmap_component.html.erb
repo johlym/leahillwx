@@ -23,7 +23,7 @@
           <% if !valid_date %>
             <div class="temp-heatmap__cell temp-heatmap__cell--void" aria-hidden="true"></div>
           <% elsif day.nil? %>
-            <div class="temp-heatmap__cell temp-heatmap__cell--empty" role="gridcell" aria-label="<%= Date.new(year, m, d).strftime('%b %-d, %Y') %>: no data"></div>
+            <div class="temp-heatmap__cell temp-heatmap__cell--empty" role="gridcell" aria-label="<%= Date.new(year, m, d).strftime('%b %d, %Y') %>: no data"></div>
           <% else %>
             <button
               type="button"
