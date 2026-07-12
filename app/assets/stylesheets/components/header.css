@@ -1,10 +1,17 @@
 .site-header {
-  background-color: color-mix(in oklab, var(--bg) 85%, transparent);
-  border-bottom: 1px solid var(--border);
-  backdrop-filter: saturate(140%) blur(6px);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--bg) 88%, transparent),
+      color-mix(in oklab, var(--bg) 72%, transparent)
+    );
+  border-bottom: 1px solid color-mix(in oklab, var(--border-strong) 55%, transparent);
+  backdrop-filter: saturate(160%) blur(10px);
+  -webkit-backdrop-filter: saturate(160%) blur(10px);
   position: sticky;
   top: 0;
   z-index: 40;
+  box-shadow: 0 20px 40px -30px rgba(0, 0, 0, 0.5);
 
   .nav {
     @apply mx-auto flex max-w-7xl items-center justify-between p-3 lg:px-6;
