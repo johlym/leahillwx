@@ -1,11 +1,3 @@
-<div class="generic-tile">
-  <% if heading.present? %>
-    <h2 class="weather-tile-heading"><%= heading %></h2>
-  <% end %>
-  <div class="weather-tile-content">
-    <% if subtitle.present? %>
-      <p class="tile-subtitle"><%= subtitle %></p>
-    <% end %>
-    <%= content %>
-  </div>
-</div>
+<%= render Ui::CardComponent.new(title: heading, subtitle: subtitle, padding: :default, classes: "generic-tile") do %>
+  <%= content %>
+<% end %>

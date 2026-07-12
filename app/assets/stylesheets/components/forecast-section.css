@@ -1,31 +1,52 @@
 .forecast-section {
-  @apply grid grid-cols-1 lg:grid-cols-10 gap-3;
-
-  .forecast-column {
-    @apply col-span-1 lg:col-span-6 flex flex-col gap-3;
-
-    > div {
-      @apply row-span-1;
-    }
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+@media (min-width: 1024px) {
+  .forecast-section {
+    grid-template-columns: 6fr 4fr;
   }
+}
 
-  .sidebar-column {
-    @apply col-span-1 lg:col-span-4 flex flex-col gap-3;
-  }
+.forecast-column,
+.sidebar-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
 
-  .generic-tile {
-    @apply border border-gray-200 bg-white  flex flex-col shadow-lg;
+.tile-subtitle {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-bottom: 0.6rem;
+}
 
-    h2 {
-      @apply m-0;
-    }
-
-    .weather-tile-heading {
-      @apply text-sm sm:text-lg p-1 sm:p-2 border-b rounded-t-lg border-gray-200 bg-gray-50 text-gray-dark;
-    }
-
-    .weather-tile-content {
-      @apply flex flex-col flex-1;
-    }
-  }
+.camera-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+.camera-grid figure {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+  overflow: hidden;
+  margin: 0;
+}
+.camera-grid figcaption {
+  color: var(--muted);
+  font-size: 0.75rem;
+  text-align: center;
+  padding: 0.35rem 0.4rem;
+  border-bottom: 1px solid var(--border);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.camera-grid img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: contrast(1.02);
 }

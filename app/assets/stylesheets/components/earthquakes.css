@@ -1,190 +1,119 @@
 .earthquake-table-container {
-  @apply w-full overflow-x-auto;
+  width: 100%;
+  overflow-x: auto;
 }
 
 .earthquake-table {
-  @apply w-[723px] border-b border-gray-200;
+  min-width: 720px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
 
   .eq-header {
-    @apply flex bg-gray-50;
+    display: flex;
+    background-color: var(--bg-elevated);
+    border-bottom: 1px solid var(--border);
 
     .eq-header-cell {
-      @apply px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+      padding: 0.6rem 0.8rem;
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
 
-      &.revised-header {
-        @apply p-0 shrink-0;
-        width: 16px;
-      }
-
-      &.mag-header {
-        @apply shrink-0 w-[50px];
-      }
-
-      &.timestamp-header {
-        @apply shrink-0 w-[150px];
-      }
-
-      &.location-header {
-        @apply flex-1;
-      }
-
-      &.distance-header {
-        @apply shrink-0 w-[100px];
-      }
-
-      &.depth-header {
-        @apply shrink-0 w-[100px];
-      }
+      &.revised-header { padding: 0; flex-shrink: 0; width: 16px; }
+      &.mag-header { flex-shrink: 0; width: 60px; }
+      &.timestamp-header { flex-shrink: 0; width: 150px; }
+      &.location-header { flex: 1; }
+      &.distance-header { flex-shrink: 0; width: 100px; }
+      &.depth-header { flex-shrink: 0; width: 100px; }
     }
   }
 
   .eq-body {
-    @apply flex flex-col gap-y-px bg-gray-200;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background-color: var(--border);
 
     .eq-row {
-      @apply flex odd:bg-white even:bg-gray-50 hover:bg-gray-100 transition-colors;
-
-      &.mag-4 {
-        @apply bg-yellow-50 hover:bg-yellow-100 ring ring-yellow-200;
-
-        .eq-cell {
-          &.revised-cell {
-            @apply p-0 shrink-0 w-4;
-            &.revised {
-              @apply bg-yellow-200;
-            }
-
-            div.revised-tag {
-              @apply h-full flex items-center justify-center text-yellow-700 text-[10px] tracking-widest -rotate-90 whitespace-nowrap;
-            }
-          }
-
-          &.eq-mag-cell {
-            span.mag {
-              @apply text-yellow-700;
-            }
-          }
-
-          &.eq-timestamp-cell,
-          &.eq-location-cell,
-          &.eq-distance-cell,
-          &.eq-location-cell > a,
-          &.eq-depth-cell {
-            @apply text-yellow-700;
-          }
-        }
-      }
-
-      &.mag-5,
-      &.mag-6 {
-        @apply bg-orange-50 hover:bg-orange-100 ring ring-orange-200;
-
-        .eq-cell {
-          &.revised-cell {
-            @apply p-0 shrink-0 w-4;
-            &.revised {
-              @apply bg-orange-200;
-            }
-
-            div.revised-tag {
-              @apply h-full flex items-center justify-center text-orange-700 text-[10px] tracking-widest -rotate-90 whitespace-nowrap;
-            }
-          }
-
-          &.eq-mag-cell {
-            span.mag {
-              @apply text-orange-700;
-            }
-          }
-
-          &.eq-timestamp-cell,
-          &.eq-location-cell,
-          &.eq-distance-cell,
-          &.eq-location-cell > a,
-          &.eq-depth-cell {
-            @apply text-orange-700;
-          }
-        }
-      }
-
-      &.mag-7,
-      &.mag-8,
-      &.mag-9 {
-        @apply bg-red-50 hover:bg-red-100 ring ring-red-200;
-
-        .eq-cell {
-          &.revised-cell {
-            @apply p-0 shrink-0 w-4;
-            &.revised {
-              @apply bg-red-200;
-            }
-
-            div.revised-tag {
-              @apply h-full flex items-center justify-center text-red-700 text-[10px] tracking-widest -rotate-90 whitespace-nowrap;
-            }
-          }
-          .eq-mag-cell {
-            span.mag {
-              @apply text-red-700;
-            }
-          }
-
-          &.eq-timestamp-cell,
-          &.eq-location-cell,
-          &.eq-distance-cell,
-          &.eq-location-cell > a,
-          &.eq-depth-cell {
-            @apply text-red-700;
-          }
-        }
-      }
-
-      .eq-cell {
-        @apply px-4 py-3 text-sm text-gray-700;
-
-        &.revised-cell {
-          @apply p-0 shrink-0 w-4;
-          &.revised {
-            @apply bg-gray-200;
-          }
-
-          div.revised-tag {
-            @apply h-full flex items-center justify-center text-gray-500 text-[10px] tracking-widest -rotate-90 whitespace-nowrap;
-          }
-        }
-
-        &.eq-mag-cell {
-          @apply shrink-0 whitespace-nowrap w-[50px];
-
-          span.mag {
-            @apply text-center text-2xl font-bold text-gray-900 font-stretch-50%;
-          }
-        }
-
-        &.eq-timestamp-cell {
-          @apply shrink-0 whitespace-nowrap w-[150px];
-        }
-
-        &.eq-location-cell {
-          @apply flex-1;
-        }
-
-        &.eq-distance-cell {
-          @apply shrink-0 whitespace-nowrap w-[100px];
-        }
-
-        &.eq-depth-cell {
-          @apply shrink-0 whitespace-nowrap w-[100px];
-        }
-      }
+      display: flex;
+      background-color: var(--surface);
+      transition: background-color 150ms ease;
     }
+    .eq-row:hover { background-color: var(--surface-2); }
+
+    .eq-cell {
+      padding: 0.7rem 0.8rem;
+      font-size: 0.85rem;
+      color: var(--text);
+
+      &.revised-cell {
+        padding: 0;
+        flex-shrink: 0;
+        width: 16px;
+        &.revised { background-color: var(--surface-2); }
+        div.revised-tag {
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--muted);
+          font-size: 10px;
+          letter-spacing: 0.15em;
+          transform: rotate(-90deg);
+          white-space: nowrap;
+        }
+      }
+
+      &.eq-mag-cell {
+        flex-shrink: 0;
+        white-space: nowrap;
+        width: 60px;
+        span.mag {
+          text-align: center;
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: var(--text-strong);
+          font-family: var(--font-condensed);
+        }
+      }
+      &.eq-timestamp-cell { flex-shrink: 0; white-space: nowrap; width: 150px; color: var(--muted); }
+      &.eq-location-cell { flex: 1; }
+      &.eq-location-cell a { color: var(--accent); }
+      &.eq-distance-cell { flex-shrink: 0; white-space: nowrap; width: 100px; color: var(--muted); }
+      &.eq-depth-cell { flex-shrink: 0; white-space: nowrap; width: 100px; color: var(--muted); }
+    }
+
+    /* Magnitude tinting — subtle warm bump for stronger quakes. */
+    .eq-row.mag-4 { background-color: color-mix(in oklab, var(--warning) 12%, var(--surface)); }
+    .eq-row.mag-4 .eq-cell,
+    .eq-row.mag-4 .eq-cell.eq-mag-cell span.mag { color: var(--warning); }
+    .eq-row.mag-5,
+    .eq-row.mag-6 { background-color: color-mix(in oklab, var(--warning) 22%, var(--surface)); }
+    .eq-row.mag-5 .eq-cell,
+    .eq-row.mag-6 .eq-cell,
+    .eq-row.mag-5 .eq-cell.eq-mag-cell span.mag,
+    .eq-row.mag-6 .eq-cell.eq-mag-cell span.mag { color: var(--warning); }
+    .eq-row.mag-7,
+    .eq-row.mag-8,
+    .eq-row.mag-9 { background-color: color-mix(in oklab, var(--danger) 22%, var(--surface)); }
+    .eq-row.mag-7 .eq-cell,
+    .eq-row.mag-8 .eq-cell,
+    .eq-row.mag-9 .eq-cell,
+    .eq-row.mag-7 .eq-cell.eq-mag-cell span.mag,
+    .eq-row.mag-8 .eq-cell.eq-mag-cell span.mag,
+    .eq-row.mag-9 .eq-cell.eq-mag-cell span.mag { color: var(--danger); }
   }
 }
 
 .usgs-logo {
-  @apply flex justify-end items-center p-2;
-
-  p {
-    @apply text-xs text-gray-500 mr-2;
-  }
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0.5rem 0;
+  color: var(--subtle);
+  font-size: 0.75rem;
+  gap: 0.5rem;
+  img { filter: brightness(0.9) contrast(1.05); }
 }

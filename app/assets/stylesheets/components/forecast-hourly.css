@@ -1,45 +1,73 @@
 .hourly-forecast {
-  @apply col-span-2 sm:col-span-2 lg:col-span-10 lg:row-span-2 rounded-b-lg mb-8;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1rem 1rem 0.75rem;
+  color: var(--text);
+  margin-top: 1rem;
 
-  p {
-    @apply text-right text-xs text-gray-500;
+  > h2.weather-tile-heading {
+    font-family: var(--font-condensed);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-strong);
+    font-size: 1.05rem;
+    margin: 0 0 0.25rem;
+  }
+
+  > p {
+    color: var(--subtle);
+    font-size: 0.75rem;
+    text-align: right;
+    margin-top: 0.5rem;
   }
 
   > .hourly-forecast-row {
-    @apply grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4 mb-2;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+  @media (min-width: 640px) { .hourly-forecast .hourly-forecast-row { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  @media (min-width: 1024px) { .hourly-forecast .hourly-forecast-row { grid-template-columns: repeat(8, minmax(0, 1fr)); } }
 
-    > .hourly-forecast-item {
-      @apply bg-neutral-50/50 inset-1 border border-neutral-100 shadow-sm  p-5 flex flex-col;
-
-      .hour {
-        @apply text-center text-4xl text-text font-condensed;
-
-        > .ampm {
-          @apply uppercase text-lg;
-        }
-      }
-
-      .icon-container {
-        @apply text-center py-2;
-
-        svg {
-          @apply text-3xl;
-        }
-      }
-      .conditions {
-        @apply flex flex-col gap-1;
-        .temperature {
-          @apply text-center text-4xl font-condensed text-text;
-        }
-
-        .wind {
-          @apply text-center text-sm text-text;
-        }
-
-        .precip {
-          @apply text-center text-sm text-text;
-        }
-      }
-    }
+  .hourly-forecast-item {
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    padding: 0.75rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    text-align: center;
+    transition: background-color 150ms ease, border-color 150ms ease;
+  }
+  .hourly-forecast-item:hover {
+    background-color: var(--surface-2);
+    border-color: var(--border-strong);
+  }
+  .hour {
+    font-family: var(--font-condensed);
+    color: var(--text-strong);
+    font-size: 1.75rem;
+    line-height: 1;
+  }
+  .hour .ampm {
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .icon-container { color: var(--text); font-size: 1.4rem; padding: 0.25rem 0; }
+  .conditions { display: flex; flex-direction: column; gap: 0.15rem; }
+  .conditions .temperature {
+    font-family: var(--font-condensed);
+    color: var(--text-strong);
+    font-size: 1.75rem;
+    line-height: 1;
+  }
+  .conditions .wind,
+  .conditions .precip {
+    color: var(--muted);
+    font-size: 0.75rem;
   }
 }

@@ -1,71 +1,103 @@
-.tile-subtitle {
-  @apply text-xs text-gray-500 text-center p-1 bg-gray-50 border-b border-gray-200 text-wrap;
+.weekly-forecast {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  color: var(--text);
+  overflow: hidden;
+
+  > .weather-tile-heading {
+    padding: 0.75rem 1rem;
+    background-color: var(--bg-elevated);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-condensed);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-strong);
+    font-size: 1.05rem;
+    margin: 0;
+  }
+  > .tile-subtitle {
+    padding: 0.35rem 1rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--subtle);
+    font-size: 0.75rem;
+    background-color: var(--bg-elevated);
+  }
 }
 
 .forecast-entry {
-  @apply border-b border-gray-200 px-5 py-3 flex flex-row flex-wrap sm:flex-nowrap items-center justify-center sm:justify-start odd:bg-white even:bg-gray-50 odd:hover:bg-gray-50 even:hover:bg-gray-100;
-
-  &:last-child {
-    @apply border-0 rounded-b-lg;
-  }
-
-  > .date-grid {
-    @apply w-1/3 sm:w-auto sm:min-w-[75px] text-left;
-
-    > .dayname {
-      @apply font-bold uppercase text-2xl font-stretch-50% leading-4 mb-1;
-    }
-
-    > .daynum {
-      @apply font-normal uppercase text-lg font-stretch-50% leading-4;
-    }
-  }
-
-  > .conditions {
-    @apply w-1/3 sm:w-auto sm:min-w-[150px] flex flex-row items-center justify-center sm:justify-start;
-
-    > .icon {
-      @apply flex justify-end;
-    }
-
-    > .high-low {
-      @apply pl-2;
-
-      > .high {
-        @apply font-extralight font-stretch-50% text-4xl;
-      }
-
-      > .low {
-        @apply font-light font-stretch-50% text-2xl text-gray-500;
-      }
-    }
-  }
-
-  > .forecast-text {
-    @apply w-full sm:w-auto sm:flex-1 mt-2 sm:mt-0 order-last sm:order-0;
-
-    > .forecast-description {
-      @apply font-medium;
-    }
-
-    > .forecast-summary {
-      @apply text-gray-600 italic text-sm pr-2;
-    }
-  }
-
-  > .wind {
-    @apply w-1/3 sm:w-auto sm:min-w-[75px] text-right order-0;
-
-    > .wind-speed {
-      @apply font-bold text-lg font-stretch-50%;
-    }
-
-    > .unit {
-      @apply text-sm;
-    }
-
-    > .wind-gust {
-      @apply text-xs text-gray-500 italic;
-    }
-  }
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  transition: background-color 150ms ease;
 }
+.forecast-entry:hover { background-color: var(--surface-2); }
+.forecast-entry:last-child { border-bottom: 0; }
+
+.forecast-entry > .date-grid {
+  min-width: 4.5rem;
+  color: var(--text);
+}
+.forecast-entry > .date-grid .dayname {
+  font-family: var(--font-condensed);
+  text-transform: uppercase;
+  font-size: 1.35rem;
+  color: var(--text-strong);
+  line-height: 1;
+  margin-bottom: 0.15rem;
+}
+.forecast-entry > .date-grid .daynum {
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
+.forecast-entry > .conditions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 8rem;
+}
+.forecast-entry > .conditions .icon { color: var(--text); font-size: 1.5rem; }
+.forecast-entry > .conditions .high-low { display: flex; align-items: baseline; gap: 0.5rem; }
+.forecast-entry > .conditions .high {
+  font-family: var(--font-condensed);
+  font-size: 2rem;
+  color: var(--text-strong);
+  line-height: 1;
+}
+.forecast-entry > .conditions .low {
+  font-family: var(--font-condensed);
+  font-size: 1.35rem;
+  color: var(--muted);
+  line-height: 1;
+}
+
+.forecast-entry > .forecast-text {
+  flex: 1 1 12rem;
+}
+.forecast-entry > .forecast-text .forecast-description {
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 0.15rem;
+}
+.forecast-entry > .forecast-text .forecast-summary {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.forecast-entry > .wind {
+  min-width: 6rem;
+  text-align: right;
+}
+.forecast-entry > .wind .wind-speed {
+  font-family: var(--font-condensed);
+  font-size: 1.15rem;
+  color: var(--text-strong);
+}
+.forecast-entry > .wind .unit { font-size: 0.85rem; color: var(--muted); margin-right: 0.15rem; }
+.forecast-entry > .wind .wind-gust { color: var(--subtle); font-size: 0.75rem; }

@@ -1,69 +1,68 @@
-<% content_for :body_class, @almanac.season %>
 <%= turbo_stream_from "weather_measurements" %>
 
 <%= render Home::CurrentWeather::ConditionsComponent.new(current: @current, almanac: @almanac, today_forecast: @forecast.days.first, current_forecast: @forecast.current) %>
+
 <div class="primary-container">
-  <div class="hourly-forecast">
-    <%= render Home::Forecast::HourlyForecastComponent.new(hours: @forecast.hours.first(8), timestamp: @forecast.created_at) %>
-  </div>
+  <%= render Home::Forecast::HourlyForecastComponent.new(hours: @forecast.hours.first(8), timestamp: @forecast.created_at) %>
 
   <div class="forecast-section">
     <div class="forecast-column">
       <%= render Home::Forecast::DailyForecastComponent.new(days: @forecast.days, timestamp: @forecast.created_at) %>
-      <%= render Home::GenericTileComponent.new(heading: "Earthquakes", subtitle: "The last 5 earthquakes nearest to this location.") do %>
-        <div class="overflow-x-auto">
-          <%= render Home::EarthquakeTableComponent.new(earthquakes: @earthquakes) %>
-        </div>
+
+      <%= render Ui::CardComponent.new(title: "Earthquakes", subtitle: "The last 5 earthquakes nearest to this location.") do %>
+        <%= render Home::EarthquakeTableComponent.new(earthquakes: @earthquakes) %>
       <% end %>
     </div>
+
     <div class="sidebar-column">
-      <%= render Home::GenericTileComponent.new(heading: "Auburn Traffic Cameras") do %>
+      <%= render Ui::CardComponent.new(title: "Auburn Traffic Cameras", padding: :default) do %>
         <div data-controller="image-refresh">
           <p class="tile-subtitle">
             Next refresh in <span data-image-refresh-target="countdown" class="font-mono">60</span> seconds.
           </p>
-          <div class="grid grid-cols-2 gap-2 p-2" id="traffic_cameras">
-            <div>
-              <h3 class="text-sm text-center font-bold">A ST SE and 2nd ST SE</h3>
-              <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/226.jpg" %>
-            </div>
-            <div>
-              <h3 class="text-sm text-center font-bold">8th ST NE and Harvey</h3>
-              <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/28.jpg" %>
-            </div>
-            <div>
-              <h3 class="text-sm text-center font-bold">S 277th ST and Auburn Way N</h3>
-              <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/12.jpg" %>
-            </div>
-            <div>
-              <h3 class="text-sm text-center font-bold">SE 312th ST and 124th AVE SE</h3>
-              <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/161.jpg" %>
-            </div>
+          <div class="camera-grid" id="traffic_cameras">
+            <figure>
+              <figcaption>A ST SE / 2nd ST SE</figcaption>
+              <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/226.jpg", alt: "A ST SE / 2nd ST SE" %>
+            </figure>
+            <figure>
+              <figcaption>8th ST NE / Harvey</figcaption>
+              <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/28.jpg", alt: "8th ST NE / Harvey" %>
+            </figure>
+            <figure>
+              <figcaption>S 277th ST / Auburn Way N</figcaption>
+              <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/12.jpg", alt: "S 277th ST / Auburn Way N" %>
+            </figure>
+            <figure>
+              <figcaption>SE 312th ST / 124th AVE SE</figcaption>
+              <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/161.jpg", alt: "SE 312th ST / 124th AVE SE" %>
+            </figure>
           </div>
         </div>
       <% end %>
-      <%= render Home::GenericTileComponent.new(heading: "Auburn Muni (S50)") do %>
+
+      <%= render Ui::CardComponent.new(title: "Auburn Muni (S50)", padding: :default) do %>
         <div data-controller="image-refresh">
           <p class="tile-subtitle">
             Next refresh in <span data-image-refresh-target="countdown" class="font-mono">60</span> seconds.
           </p>
-          <div class="grid grid-cols-2 gap-2 p-2" id="airport_cameras">
-            <div>
-              <h3 class="text-sm text-center font-bold">North</h3>
-              <%= image_tag "https://images.wsdot.wa.gov/airports/auburn2.jpg" %>
-            </div>
-            <div>
-              <h3 class="text-sm text-center font-bold">East</h3>
-              <%= image_tag "https://images.wsdot.wa.gov/airports/auburn4.jpg" %>
-            </div>
-            <div>
-              <h3 class="text-sm text-center font-bold">South</h3>
-              <%= image_tag "https://images.wsdot.wa.gov/airports/auburn3.jpg" %>
-            </div>
-            <div>
-              <h3 class="text-sm text-center font-bold">West</h3>
-              <%= image_tag "https://images.wsdot.wa.gov/airports/auburn1.jpg" %>
-            </div>
+          <div class="camera-grid" id="airport_cameras">
+            <figure>
+              <figcaption>North</figcaption>
+              <%= image_tag "https://images.wsdot.wa.gov/airports/auburn2.jpg", alt: "North" %>
+            </figure>
+            <figure>
+              <figcaption>East</figcaption>
+              <%= image_tag "https://images.wsdot.wa.gov/airports/auburn4.jpg", alt: "East" %>
+            </figure>
+            <figure>
+              <figcaption>South</figcaption>
+              <%= image_tag "https://images.wsdot.wa.gov/airports/auburn3.jpg", alt: "South" %>
+            </figure>
+            <figure>
+              <figcaption>West</figcaption>
+              <%= image_tag "https://images.wsdot.wa.gov/airports/auburn1.jpg", alt: "West" %>
+            </figure>
           </div>
         </div>
       <% end %>
