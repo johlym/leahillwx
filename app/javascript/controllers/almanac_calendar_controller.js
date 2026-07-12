@@ -1,45 +1,69 @@
 import { Controller } from "@hotwired/stimulus"
-import * as d3 from "d3"
+import {
+  Chart,
+  LineController,
+  LineElement,
+  PointElement,
+  LinearScale,
+  Tooltip,
+  Filler,
+} from "chart.js"
+import { readPaletteColors, withAlpha, observePaletteChanges } from "./helpers/palette"
 
+Chart.register(
+  LineController,
+  LineElement,
+  PointElement,
+  LinearScale,
+  Tooltip,
+  Filler,
+)
+
+// Expandable row on the almanac calendar: on click we reveal a hidden
+// row and render an hourly altitude curve for the sun or moon on that
+// day using Chart.js against the current time-of-day palette.
 export default class extends Controller {
   static targets = ["chevron", "expandedRow", "altitudeChart"]
-  
+
   connect() {
     this.expandedRows = new Set()
+    this.charts = new Map()
+    this.paletteObserver = observePaletteChanges(() => this.rethemeCharts())
+  }
+
+  disconnect() {
+    if (this.paletteObserver) this.paletteObserver.disconnect()
+    this.charts.forEach((chart) => chart.destroy())
+    this.charts.clear()
   }
 
   toggleRow(event) {
     const row = event.currentTarget
     const date = row.dataset.almanacCalendarDateValue
-    
-    // Find the expanded row
+
     const expandedRow = this.expandedRowTargets.find(
-      target => target.dataset.almanacCalendarDate === date
+      (target) => target.dataset.almanacCalendarDate === date
     )
-    
     if (!expandedRow) return
 
-    // Find the chevron in this row
     const chevron = row.querySelector('[data-almanac-calendar-target="chevron"]')
-    
+
     if (this.expandedRows.has(date)) {
-      // Collapse
-      expandedRow.classList.add('hidden')
-      if (chevron) chevron.textContent = '+'
+      expandedRow.classList.add("hidden")
+      if (chevron) chevron.textContent = "+"
       this.expandedRows.delete(date)
-      
-      // Clear chart
-      const chartContainer = expandedRow.querySelector('[data-almanac-calendar-target="altitudeChart"]')
-      if (chartContainer) {
-        chartContainer.innerHTML = ''
+
+      const existing = this.charts.get(date)
+      if (existing) {
+        existing.destroy()
+        this.charts.delete(date)
       }
+      const chartContainer = expandedRow.querySelector('[data-almanac-calendar-target="altitudeChart"]')
+      if (chartContainer) chartContainer.innerHTML = ""
     } else {
-      // Expand
-      expandedRow.classList.remove('hidden')
-      if (chevron) chevron.textContent = '-'
+      expandedRow.classList.remove("hidden")
+      if (chevron) chevron.textContent = "\u2212"
       this.expandedRows.add(date)
-      
-      // Create chart
       this.createAltitudeChart(expandedRow, date)
     }
   }
@@ -50,189 +74,111 @@ export default class extends Controller {
 
     const positionsJson = chartContainer.dataset.positions
     const dateLabel = chartContainer.dataset.date
-    const body = chartContainer.dataset.body || 'moon'
-    
+    const body = chartContainer.dataset.body || "moon"
     if (!positionsJson) return
 
+    let positions
     try {
-      const positions = JSON.parse(positionsJson)
-      
-      // Data is hourly (24 samples per day)
-      const sampledData = positions.map(pos => ({
-        minute: pos.h * 60,  // Convert hour to minute for x-axis scale
-        altitude: pos.alt
-      }))
-
-      // Set up dimensions
-      const margin = { top: 40, right: 30, bottom: 60, left: 60 }
-      const containerWidth = chartContainer.offsetWidth
-      const width = containerWidth - margin.left - margin.right
-      const height = 250 - margin.top - margin.bottom
-      const totalWidth = containerWidth
-      const totalHeight = height + margin.top + margin.bottom
-
-      // Clear any existing canvas
-      chartContainer.innerHTML = ''
-
-      // Create canvas
-      const canvas = document.createElement('canvas')
-      canvas.width = totalWidth
-      canvas.height = totalHeight
-      canvas.style.width = '100%'
-      canvas.style.height = 'auto'
-      chartContainer.appendChild(canvas)
-
-      const ctx = canvas.getContext('2d')
-      
-      // Scales
-      const x = d3.scaleLinear()
-        .domain([0, 1440])
-        .range([0, width])
-
-      const y = d3.scaleLinear()
-        .domain([-90, 90])
-        .range([height, 0])
-
-      // Translate context to account for margins
-      ctx.save()
-      ctx.translate(margin.left, margin.top)
-
-      // Helper function to draw smooth curve through points
-      const drawSmoothCurve = (points, closeToBottom = false) => {
-        if (points.length === 0) return
-
-        ctx.beginPath()
-        
-        if (closeToBottom) {
-          ctx.moveTo(x(points[0].minute), height)
-          ctx.lineTo(x(points[0].minute), y(points[0].altitude))
-        } else {
-          ctx.moveTo(x(points[0].minute), y(points[0].altitude))
-        }
-
-        // Use quadratic curves for smooth interpolation
-        for (let i = 0; i < points.length - 1; i++) {
-          const current = points[i]
-          const next = points[i + 1]
-          
-          const xCurrent = x(current.minute)
-          const yCurrent = y(current.altitude)
-          const xNext = x(next.minute)
-          const yNext = y(next.altitude)
-          
-          // Control point is midway between current and next
-          const cpX = (xCurrent + xNext) / 2
-          const cpY = (yCurrent + yNext) / 2
-          
-          ctx.quadraticCurveTo(xCurrent, yCurrent, cpX, cpY)
-        }
-        
-        // Draw to last point
-        const last = points[points.length - 1]
-        ctx.lineTo(x(last.minute), y(last.altitude))
-        
-        if (closeToBottom) {
-          ctx.lineTo(x(last.minute), height)
-          ctx.closePath()
-        }
-      }
-
-      // Draw area fill
-      ctx.fillStyle = 'rgba(59, 130, 246, 0.1)'
-      drawSmoothCurve(sampledData, true)
-      ctx.fill()
-
-      // Draw line
-      ctx.strokeStyle = 'rgb(59, 130, 246)'
-      ctx.lineWidth = 2
-      drawSmoothCurve(sampledData, false)
-      ctx.stroke()
-
-      // Draw horizon line at 0°
-      ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)'
-      ctx.lineWidth = 1
-      ctx.setLineDash([4, 4])
-      ctx.beginPath()
-      ctx.moveTo(0, y(0))
-      ctx.lineTo(width, y(0))
-      ctx.stroke()
-      ctx.setLineDash([])
-
-      // Draw axes
-      ctx.strokeStyle = '#000'
-      ctx.lineWidth = 1
-      ctx.fillStyle = '#000'
-      ctx.font = '10px sans-serif'
-      ctx.textAlign = 'center'
-
-      // X axis
-      ctx.beginPath()
-      ctx.moveTo(0, height)
-      ctx.lineTo(width, height)
-      ctx.stroke()
-
-      // X axis ticks and labels (every 3 hours)
-      for (let minute = 0; minute <= 1440; minute += 180) {
-        const xPos = x(minute)
-        ctx.beginPath()
-        ctx.moveTo(xPos, height)
-        ctx.lineTo(xPos, height + 6)
-        ctx.stroke()
-        
-        const hour = Math.floor(minute / 60)
-        const label = `${hour.toString().padStart(2, '0')}:00`
-        ctx.save()
-        ctx.translate(xPos, height + 10)
-        ctx.rotate(-Math.PI / 4)
-        ctx.textAlign = 'end'
-        ctx.fillText(label, 0, 0)
-        ctx.restore()
-      }
-
-      // Y axis
-      ctx.beginPath()
-      ctx.moveTo(0, 0)
-      ctx.lineTo(0, height)
-      ctx.stroke()
-
-      // Y axis ticks and labels
-      ctx.textAlign = 'right'
-      ctx.textBaseline = 'middle'
-      for (let deg = -90; deg <= 90; deg += 30) {
-        const yPos = y(deg)
-        ctx.beginPath()
-        ctx.moveTo(-6, yPos)
-        ctx.lineTo(0, yPos)
-        ctx.stroke()
-        ctx.fillText(deg.toString() + '°', -10, yPos)
-      }
-
-      ctx.restore()
-
-      // Draw title
-      ctx.fillStyle = '#000'
-      ctx.font = 'bold 14px sans-serif'
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'top'
-      const bodyName = body.charAt(0).toUpperCase() + body.slice(1)
-      ctx.fillText(`${bodyName} Altitude - ${dateLabel}`, totalWidth / 2, 10)
-
-      // Y axis label
-      ctx.save()
-      ctx.translate(15, totalHeight / 2)
-      ctx.rotate(-Math.PI / 2)
-      ctx.font = '12px sans-serif'
-      ctx.textAlign = 'center'
-      ctx.fillText('Altitude (degrees)', 0, 0)
-      ctx.restore()
-
-      // X axis label
-      ctx.font = '12px sans-serif'
-      ctx.textAlign = 'center'
-      ctx.fillText('Time', totalWidth / 2, totalHeight - 10)
-
-    } catch (error) {
-      console.error('Error creating altitude chart:', error)
+      positions = JSON.parse(positionsJson)
+    } catch (err) {
+      console.error("Error parsing almanac positions:", err)
+      return
     }
+
+    chartContainer.innerHTML = ""
+    const canvas = document.createElement("canvas")
+    canvas.setAttribute("role", "img")
+    canvas.setAttribute(
+      "aria-label",
+      `${body === "sun" ? "Sun" : "Moon"} altitude for ${dateLabel}`
+    )
+    chartContainer.style.height = "260px"
+    chartContainer.appendChild(canvas)
+
+    const palette = readPaletteColors()
+    const color = body === "sun" ? palette.chartColors[1] : palette.chartColors[0]
+
+    const labels = positions.map((p) => `${String(p.h).padStart(2, "0")}:00`)
+    const data = positions.map((p) => p.alt)
+
+    const chart = new Chart(canvas.getContext("2d"), {
+      type: "line",
+      data: {
+        labels,
+        datasets: [
+          {
+            label: `${body === "sun" ? "Sun" : "Moon"} altitude`,
+            data,
+            borderColor: color,
+            backgroundColor: withAlpha(color, 0.2),
+            fill: true,
+            tension: 0.35,
+            pointRadius: 0,
+            pointHoverRadius: 5,
+            pointHitRadius: 8,
+            spanGaps: true,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: palette.surface2,
+            titleColor: palette.textStrong,
+            bodyColor: palette.text,
+            borderColor: palette.border,
+            borderWidth: 1,
+            padding: 10,
+            callbacks: {
+              label: (item) => `Altitude: ${item.parsed.y.toFixed(1)}°`,
+            },
+          },
+        },
+        scales: {
+          x: {
+            grid: { color: withAlpha(palette.border, 0.4) },
+            border: { color: withAlpha(palette.border, 0.4) },
+            ticks: { color: palette.muted, maxRotation: 0, autoSkip: true, autoSkipPadding: 12 },
+          },
+          y: {
+            min: -90,
+            max: 90,
+            grid: { color: withAlpha(palette.border, 0.4) },
+            border: { color: withAlpha(palette.border, 0.4) },
+            ticks: {
+              color: palette.muted,
+              stepSize: 30,
+              callback: (v) => `${v}°`,
+            },
+          },
+        },
+      },
+    })
+
+    this.charts.set(date, chart)
+  }
+
+  rethemeCharts() {
+    if (this.charts.size === 0) return
+    const palette = readPaletteColors()
+    this.charts.forEach((chart) => {
+      const dataset = chart.data.datasets[0]
+      if (dataset) {
+        dataset.backgroundColor = withAlpha(dataset.borderColor, 0.2)
+      }
+      chart.options.plugins.tooltip.backgroundColor = palette.surface2
+      chart.options.plugins.tooltip.titleColor = palette.textStrong
+      chart.options.plugins.tooltip.bodyColor = palette.text
+      chart.options.plugins.tooltip.borderColor = palette.border
+      chart.options.scales.x.grid.color = withAlpha(palette.border, 0.4)
+      chart.options.scales.x.ticks.color = palette.muted
+      chart.options.scales.y.grid.color = withAlpha(palette.border, 0.4)
+      chart.options.scales.y.ticks.color = palette.muted
+      chart.update("none")
+    })
   }
 }

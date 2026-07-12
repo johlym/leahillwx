@@ -17,7 +17,7 @@
     "@tailwindcss/cli": "^4.1.18",
     "@tailwindcss/typography": "latest",
     "@tailwindplus/elements": "^1.0.0",
-    "d3": "^7.9.0",
+    "chart.js": "^4.5.1",
     "tailwindcss": "^4.1.18"
   }
 }
