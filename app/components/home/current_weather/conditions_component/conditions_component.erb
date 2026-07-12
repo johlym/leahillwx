@@ -35,6 +35,9 @@
                 <span class="conditions-strip__separator">·</span>
                 <span data-weather-update-target="gustSpeed">Gusting to 0 mph</span>
               </p>
+              <% if today_peaks[:wind_gust_mph] %>
+                <p class="conditions-strip__peak">Peak gust today <%= today_peaks[:wind_gust_mph] %> mph</p>
+              <% end %>
             </div>
             <div class="conditions-hero__wind-compass" data-weather-update-target="windCompass">
               <%= render Elements::CompassComponent.new(direction: @current.wind_dir, size: :lg, show_label: false) %>
@@ -56,42 +59,93 @@
 <div class="primary-container">
   <div class="conditions-strip">
     <%= render Ui::CardComponent.new(padding: :default, classes: "conditions-strip__card") do %>
-      <div class="ui-stat ui-stat--md ui-stat--align-left">
-        <div class="ui-stat__label"><i class="fa-regular fa-hand-holding-droplet ui-stat__label-icon"></i><span class="ui-stat__label-text">Humidity</span></div>
-        <div class="ui-stat__value">
-          <span class="ui-stat__value-number" data-weather-update-target="humidity"><%= current_humidity %></span>
-          <span class="ui-stat__value-unit">%</span>
+      <div class="live-tile">
+        <div class="live-tile__label">
+          <i class="fa-regular fa-hand-holding-droplet ui-stat__label-icon"></i>
+          <span class="live-tile__label-text">Humidity</span>
+        </div>
+        <div class="live-tile__body">
+          <div class="live-tile__value">
+            <span class="live-tile__number" data-weather-update-target="humidity"><%= current_humidity %></span>
+            <span class="live-tile__unit">%</span>
+          </div>
+          <% if today_peaks[:humidity] %>
+            <p class="live-tile__peak">Peak today <%= today_peaks[:humidity] %>%</p>
+          <% end %>
         </div>
       </div>
     <% end %>
 
     <%= render Ui::CardComponent.new(padding: :default, classes: "conditions-strip__card") do %>
-      <div class="ui-stat ui-stat--md ui-stat--align-left">
-        <div class="ui-stat__label"><i class="fa-kit fa-regular-sun-circle-exclamation ui-stat__label-icon"></i><span class="ui-stat__label-text">UV Index</span></div>
-        <div class="ui-stat__value">
-          <span class="ui-stat__value-number" data-weather-update-target="uvi"><%= current_uvi %></span>
+      <div class="live-tile">
+        <div class="live-tile__label">
+          <i class="fa-kit fa-regular-sun-circle-exclamation ui-stat__label-icon"></i>
+          <span class="live-tile__label-text">UV Index</span>
         </div>
-        <p class="ui-stat__secondary"><span data-weather-update-target="solarIrradiance"><%= current_solar_irradiance %></span> W/m²</p>
+        <div class="live-tile__body">
+          <div class="live-tile__value">
+            <span class="live-tile__number" data-weather-update-target="uvi"><%= current_uvi %></span>
+          </div>
+          <div class="uv-scale" aria-hidden="true">
+            <div class="uv-scale__marker" style="left: <%= uv_marker_position %>%;"></div>
+          </div>
+          <p class="live-tile__meta"><span data-weather-update-target="solarIrradiance"><%= current_solar_irradiance %></span> W/m² · <%= current_uv_index_category %></p>
+          <% if today_peaks[:uvi] %>
+            <p class="live-tile__peak">Peak today <%= today_peaks[:uvi] %></p>
+          <% end %>
+        </div>
       </div>
     <% end %>
 
     <%= render Ui::CardComponent.new(padding: :default, classes: "conditions-strip__card") do %>
-      <div class="ui-stat ui-stat--md ui-stat--align-left">
-        <div class="ui-stat__label"><i class="fa-regular fa-cloud-rain ui-stat__label-icon"></i><span class="ui-stat__label-text">Rain</span></div>
-        <div class="ui-stat__value">
-          <span class="ui-stat__value-number" data-weather-update-target="rainDay"><%= current_rain_day %></span>
-          <span class="ui-stat__value-unit">in</span>
+      <div class="live-tile">
+        <div class="live-tile__label">
+          <i class="fa-regular fa-cloud-rain ui-stat__label-icon"></i>
+          <span class="live-tile__label-text">Rain</span>
         </div>
-        <p class="ui-stat__secondary"><span data-weather-update-target="rainRate"><%= current_rain_hour %></span> in/hr</p>
+        <div class="live-tile__body">
+          <div class="live-tile__value">
+            <span class="live-tile__number" data-weather-update-target="rainDay"><%= current_rain_day %></span>
+            <span class="live-tile__unit">in</span>
+          </div>
+          <p class="live-tile__meta"><span data-weather-update-target="rainRate"><%= current_rain_hour %></span> in/hr right now</p>
+          <% if today_peaks[:rain_rate_in] %>
+            <p class="live-tile__peak">Peak rate today <%= today_peaks[:rain_rate_in] %> in/hr</p>
+          <% end %>
+        </div>
       </div>
     <% end %>
 
     <%= render Ui::CardComponent.new(padding: :default, classes: "conditions-strip__card") do %>
-      <div class="ui-stat ui-stat--md ui-stat--align-left">
-        <div class="ui-stat__label"><i class="fa-regular fa-droplet-degree ui-stat__label-icon"></i><span class="ui-stat__label-text">Dew Point</span></div>
-        <div class="ui-stat__value">
-          <span class="ui-stat__value-number" data-weather-update-target="dewPoint"><%= current_dew_point %></span>
-          <span class="ui-stat__value-unit">°</span>
+      <div class="live-tile">
+        <div class="live-tile__label">
+          <i class="fa-regular fa-droplet-degree ui-stat__label-icon"></i>
+          <span class="live-tile__label-text">Dew Point</span>
+        </div>
+        <div class="live-tile__body">
+          <div class="live-tile__value">
+            <span class="live-tile__number" data-weather-update-target="dewPoint"><%= current_dew_point %></span>
+            <span class="live-tile__unit">°</span>
+          </div>
+          <% if today_peaks[:dew_point_f] %>
+            <p class="live-tile__peak">Peak today <%= today_peaks[:dew_point_f] %>°</p>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <%= render Ui::CardComponent.new(padding: :default, classes: "conditions-strip__card") do %>
+      <div class="live-tile">
+        <div class="live-tile__label">
+          <i class="fa-regular fa-cloud ui-stat__label-icon"></i>
+          <span class="live-tile__label-text">Cloud Base</span>
+        </div>
+        <div class="live-tile__body">
+          <div class="live-tile__value">
+            <span class="live-tile__number"><%= number_with_delimiter(current_cloud_base_ft) %></span>
+            <span class="live-tile__unit">ft</span>
+          </div>
+          <p class="live-tile__meta">Estimated from temp/dew spread</p>
         </div>
       </div>
     <% end %>

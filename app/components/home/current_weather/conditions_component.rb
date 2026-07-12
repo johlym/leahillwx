@@ -1,12 +1,15 @@
 # frozen_string_literal: true
 
 class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
-  def initialize(current:, almanac:, today_forecast: nil, current_forecast: nil)
+  def initialize(current:, almanac:, today_forecast: nil, current_forecast: nil, today_peaks: {})
     @current = current
     @almanac = almanac
     @today_forecast = today_forecast
     @current_forecast = current_forecast
+    @today_peaks = today_peaks || {}
   end
+
+  attr_reader :today_peaks
 
   def season
     @almanac.season
@@ -93,6 +96,20 @@ class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
 
   def current_dew_point
     @current.dew_point.to_fahrenheit.round(0)
+  end
+
+  # Rough cloud-base altitude in feet. Formula: (T_F - Td_F) × 227.3.
+  # Positive spread means a base above ground; zero or negative means
+  # we're effectively in cloud/fog, so we clamp at 0.
+  def current_cloud_base_ft
+    spread = @current.temperature.to_fahrenheit - @current.dew_point.to_fahrenheit
+    return 0 if spread <= 0
+    (spread * 227.3).round(-2)
+  end
+
+  # UV Index scale is 0..12+. Convert to 0..1 position on the color bar.
+  def uv_marker_position
+    ((@current.uvi.to_f / 12.0) * 100.0).clamp(0.0, 100.0).round(1)
   end
 
   def today_high
