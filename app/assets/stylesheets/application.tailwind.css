@@ -16,6 +16,7 @@
 @import "./components/date-navigation";
 @import "./components/reports";
 @import "./components/records";
+@import "./components/trends";
 @import "./components/graphs";
 @import "./components/almanac";
 @import "./components/footer";
