@@ -15,8 +15,10 @@ import LineGraphController from "./line_graph_controller"
 import AlmanacNavigationController from "./almanac_navigation_controller"
 import AlmanacCalendarController from "./almanac_calendar_controller"
 import AlmanacTableToggleController from "./almanac_table_toggle_controller"
+import PaletteController from "./palette_controller"
 
 application.register("hello", HelloController)
+application.register("palette", PaletteController)
 application.register("connection-status", ConnectionStatusController)
 application.register("mobile-menu", MobileMenuController)
 application.register("image-refresh", ImageRefreshController)

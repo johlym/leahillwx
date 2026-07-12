@@ -1,5 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html
+  data-palette="<%= @palette || :night %>"
+  data-controller="palette"
+  <% if @palette_almanac&.sunrise_at %>
+    data-palette-sunrise-value="<%= @palette_almanac.sunrise_at.iso8601 %>"
+  <% end %>
+  <% if @palette_almanac&.sunset_at %>
+    data-palette-sunset-value="<%= @palette_almanac.sunset_at.iso8601 %>"
+  <% end %>
+  <% if @palette_next_transition_at %>
+    data-palette-next-transition-at-value="<%= @palette_next_transition_at.iso8601 %>"
+  <% end %>>
   <head>
     <title><%= content_for(:title) || "Lea Hill Weather (v2)" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -7,27 +18,25 @@
     <meta name="application-name" content="Lea Hill Weather">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="description" content="Current weather conditions and forecasts for Lea Hill, Auburn, WA">
+    <meta name="theme-color" content="#141625">
+    <meta name="color-scheme" content="dark">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <%= yield :head %>
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :application, "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
     <script src="https://kit.fontawesome.com/20b018c776.js" crossorigin="anonymous"></script>
   </head>
 
-  <body class="bg-linear-to-b from-gray-200 to-[30vh] to-white min-h-screen flex flex-col <%= yield(:body_class) %>" data-controller="weather-update">
+  <body class="min-h-screen flex flex-col <%= yield(:body_class) %>" data-controller="weather-update">
     <%= render "layouts/shared/header" %>
-    <%= yield %>
+    <main class="flex-1"><%= yield %></main>
     <%= render "layouts/shared/footer" %>
   </body>
 </html>
