@@ -54,3 +54,151 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.75em;
 }
+
+/* Temperature heatmap ---------------------------------------------- */
+.temp-heatmap {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem 1.25rem;
+  margin: 1.5rem 0;
+  color: var(--text);
+  overflow: hidden;
+}
+
+.temp-heatmap__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+.temp-heatmap__title {
+  margin: 0;
+  font-family: var(--font-condensed);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-strong);
+  font-size: 1.1rem;
+}
+.temp-heatmap__subtitle {
+  margin: 0.15rem 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+/* Horizontal scroll on small screens; the grid maintains its
+   aspect ratio via minmax(0, 1fr) columns. */
+.temp-heatmap__grid {
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+.temp-heatmap__grid-inner {
+  display: grid;
+  min-width: 540px;
+  grid-template-columns: 2.75rem repeat(31, minmax(0.75rem, 1fr));
+  gap: 3px;
+  align-items: stretch;
+}
+
+.temp-heatmap__corner {
+  height: 0.85rem;
+}
+.temp-heatmap__day-tick {
+  color: var(--subtle);
+  font-size: 0.65rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  text-align: center;
+  align-self: end;
+  padding-bottom: 0.25rem;
+}
+.temp-heatmap__month-label {
+  color: var(--muted);
+  font-family: var(--font-condensed);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+  align-self: center;
+  padding-right: 0.35rem;
+  text-align: right;
+}
+
+.temp-heatmap__cell {
+  aspect-ratio: 1 / 1;
+  border-radius: 3px;
+  border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+  padding: 0;
+  cursor: pointer;
+  transition: transform 120ms ease, outline 120ms ease, filter 120ms ease;
+  background-clip: padding-box;
+}
+.temp-heatmap__cell:hover,
+.temp-heatmap__cell:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  transform: scale(1.08);
+  filter: brightness(1.05);
+  z-index: 1;
+  position: relative;
+}
+.temp-heatmap__cell--empty {
+  background-color: transparent;
+  border: 1px dashed color-mix(in oklab, var(--border) 80%, transparent);
+  cursor: default;
+}
+.temp-heatmap__cell--void {
+  visibility: hidden;
+}
+.temp-heatmap__cell--partial {
+  /* The diagonal stripe overlay is applied inline as a background-image
+     alongside the interpolated color. This selector only tunes the
+     border to hint at the pattern. */
+  border-color: color-mix(in oklab, var(--text) 25%, transparent);
+}
+
+.temp-heatmap__legend {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border);
+}
+.temp-heatmap__legend-scale {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.temp-heatmap__legend-endpoint {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.temp-heatmap__legend-swatches {
+  display: inline-flex;
+  gap: 2px;
+}
+.temp-heatmap__legend-swatch {
+  width: 1.15rem;
+  height: 0.75rem;
+  border-radius: 2px;
+  display: inline-block;
+  border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+}
+.temp-heatmap__legend-swatch--partial {
+  background-image: repeating-linear-gradient(45deg, transparent 0 4px, rgba(0, 0, 0, 0.35) 4px 6px);
+  background-color: color-mix(in oklab, var(--muted) 45%, var(--surface));
+}
+.temp-heatmap__legend-partial {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+.temp-heatmap__legend-label {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

@@ -1,0 +1,59 @@
+<section class="temp-heatmap" aria-label="Daily high temperature heatmap for <%= year %>">
+  <header class="temp-heatmap__header">
+    <div class="temp-heatmap__titles">
+      <h3 class="temp-heatmap__title">Daily High Temperature</h3>
+      <p class="temp-heatmap__subtitle">Every day in <%= year %>. Purple is coldest, red is hottest. Hover a cell to see the day's high and low.</p>
+    </div>
+  </header>
+
+  <div class="temp-heatmap__grid" role="grid">
+    <div class="temp-heatmap__grid-inner">
+      <div class="temp-heatmap__corner"></div>
+      <% (1..31).each do |day| %>
+        <div class="temp-heatmap__day-tick" role="columnheader">
+          <% if day_ticks.include?(day) %><%= day %><% end %>
+        </div>
+      <% end %>
+
+      <% (1..12).each do |m| %>
+        <div class="temp-heatmap__month-label" role="rowheader"><%= month_label(m) %></div>
+        <% (1..31).each do |d| %>
+          <% day = days_by_month[m]&.find { |x| x[:day] == d } %>
+          <% valid_date = Date.valid_date?(year, m, d) %>
+          <% if !valid_date %>
+            <div class="temp-heatmap__cell temp-heatmap__cell--void" aria-hidden="true"></div>
+          <% elsif day.nil? %>
+            <div class="temp-heatmap__cell temp-heatmap__cell--empty" role="gridcell" aria-label="<%= Date.new(year, m, d).strftime('%b %-d, %Y') %>: no data"></div>
+          <% else %>
+            <button
+              type="button"
+              class="temp-heatmap__cell <%= 'temp-heatmap__cell--partial' if day[:partial] %>"
+              style="<%= cell_style(day) %>"
+              role="gridcell"
+              aria-label="<%= cell_title(day) %>: <%= cell_body(day) %>"
+              data-controller="tooltip"
+              data-tooltip-title-value="<%= cell_title(day) %>"
+              data-tooltip-body-value="<%= cell_body(day) %>"
+            ></button>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <footer class="temp-heatmap__legend">
+    <div class="temp-heatmap__legend-scale">
+      <span class="temp-heatmap__legend-endpoint"><%= temp_min.round %>&deg;F</span>
+      <div class="temp-heatmap__legend-swatches" aria-hidden="true">
+        <% legend_swatches.each do |c| %>
+          <span class="temp-heatmap__legend-swatch" style="background-color: <%= c %>;"></span>
+        <% end %>
+      </div>
+      <span class="temp-heatmap__legend-endpoint"><%= temp_max.round %>&deg;F</span>
+    </div>
+    <div class="temp-heatmap__legend-partial">
+      <span class="temp-heatmap__legend-swatch temp-heatmap__legend-swatch--partial" aria-hidden="true"></span>
+      <span class="temp-heatmap__legend-label">Partial-day data</span>
+    </div>
+  </footer>
+</section>
