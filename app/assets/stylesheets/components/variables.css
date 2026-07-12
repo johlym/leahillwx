@@ -20,6 +20,20 @@
 
   --breakpoint-xxs: 23rem;
   --breakpoint-xs: 30rem;
+
+  /*
+   * Legacy color aliases that resolve into the token layer below.
+   * These exist so utility classes like `text-text`, `bg-brand-primary`,
+   * and `border-gray` keep working while individual pages are migrated
+   * to the new --bg / --surface / --text / --accent tokens. Do not add
+   * new usages of these; use `text-(--text)` / `bg-(--surface)` etc.
+   */
+  --color-text: var(--text, oklch(0.96 0.02 250));
+  --color-gray: var(--muted, oklch(0.72 0.03 260));
+  --color-gray-alt: var(--subtle, oklch(0.60 0.035 265));
+  --color-gray-dark: var(--text-strong, oklch(0.995 0.005 250));
+  --color-gray-light: var(--surface, oklch(0.20 0.038 275));
+  --color-shadow: transparent;
 }
 
 /*
