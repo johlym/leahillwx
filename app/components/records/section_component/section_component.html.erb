@@ -1,9 +1,0 @@
-<div class="records-section">
-  <h2><%= title %></h2>
-  <%= render Records::Section::TableComponent.new(
-    rows: enriched_rows,
-    year_label: year_label,
-    current_year_label: current_year_label,
-    show_three_columns: show_three_columns
-  ) %>
-</div>

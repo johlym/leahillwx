@@ -1,0 +1,56 @@
+.records-page {
+  color: var(--text);
+}
+
+.records-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.record-card__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.35rem;
+}
+.record-card__icon { color: var(--accent); }
+
+.record-card__value {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  color: var(--text-strong);
+  font-family: var(--font-condensed);
+  line-height: 1;
+}
+.record-card__value-number {
+  font-size: 2rem;
+  font-weight: 500;
+}
+.record-card__value-unit {
+  font-size: 0.9rem;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+
+.record-card__meta {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+.record-card__meta--muted { color: var(--subtle); font-style: italic; }
+
+.record-inline-code {
+  background-color: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0 0.35rem;
+  border-radius: 0.25rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.75em;
+}

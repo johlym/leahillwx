@@ -15,6 +15,7 @@
 @import "./components/earthquakes";
 @import "./components/date-navigation";
 @import "./components/reports";
+@import "./components/records";
 @import "./components/graphs";
 @import "./components/almanac";
 @import "./components/footer";

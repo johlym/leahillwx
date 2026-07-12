@@ -1,17 +1,11 @@
-<div class="primary-container report-container">
-  <h1>Records</h1>
-
-  <% if @selected_year_record || @current_year_record || @all_time_record %>
-    <%= render Records::RecordsComponent.new(
-      selected_year_record: @selected_year_record,
-      current_year_record: @current_year_record,
-      all_time_record: @all_time_record,
-      selected_year: @selected_year,
-      current_year: @current_year
-    ) %>
-  <% else %>
-    <p class="no-records-message">
-      No records available yet. Records will be calculated nightly starting at 12:02 AM, or you can run the rake task manually.
-    </p>
-  <% end %>
+<div class="primary-container records-page">
+  <%= render Records::RecordsComponent.new(
+    pivot: @pivot,
+    selected_year: @selected_year,
+    selected_year_record: @selected_year_record,
+    all_time_record: @all_time_record,
+    available_years: @available_years,
+    heatmap_year: @heatmap_year,
+    heatmap_days: @heatmap_days
+  ) %>
 </div>

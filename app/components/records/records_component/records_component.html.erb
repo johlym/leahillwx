@@ -1,70 +1,43 @@
-<div class="records-page-content">
-  <h1>Weather Records</h1>
-  <p class="subtitle">Temperature (°F), Rain (in), Wind Speed (mph), Pressure (hPa)</p>
-  
-  <%= render Records::SectionComponent.new(
-    title: "Temperature Records",
-    rows: temperature_rows,
-    year_record: year_record,
-    current_year_record: current_year_record,
-    all_time_record: all_time_record,
-    year_label: year_label,
-    current_year_label: current_year_label,
-    show_three_columns: show_three_columns?
-  ) %>
+<%= render Ui::SectionHeaderComponent.new(
+  title: pivot_title,
+  subtitle: pivot_subtitle
+) do |s| %>
+  <% s.with_actions do %>
+    <div class="records-actions">
+      <%= render Ui::YearPickerComponent.new(
+        base_path: records_path,
+        current_year: pivot_year? ? selected_year : nil,
+        years: available_years,
+        include_all_time: true,
+        all_time_label: "All time",
+        label: "Pivot"
+      ) %>
+    </div>
+  <% end %>
+<% end %>
 
-  <%= render Records::SectionComponent.new(
-    title: "Wind Records",
-    rows: wind_rows,
-    year_record: year_record,
-    current_year_record: current_year_record,
-    all_time_record: all_time_record,
-    year_label: year_label,
-    current_year_label: current_year_label,
-    show_three_columns: show_three_columns?
+<% if heatmap_days.present? %>
+  <%= render Records::TemperatureHeatmapComponent.new(
+    year: heatmap_year,
+    days: heatmap_days
   ) %>
+<% end %>
 
-  <%= render Records::SectionComponent.new(
-    title: "Rain Records",
-    rows: rain_rows,
-    year_record: year_record,
-    current_year_record: current_year_record,
-    all_time_record: all_time_record,
-    year_label: year_label,
-    current_year_label: current_year_label,
-    show_three_columns: show_three_columns?
-  ) %>
-
-  <%= render Records::SectionComponent.new(
-    title: "Humidity Records",
-    rows: humidity_rows,
-    year_record: year_record,
-    current_year_record: current_year_record,
-    all_time_record: all_time_record,
-    year_label: year_label,
-    current_year_label: current_year_label,
-    show_three_columns: show_three_columns?
-  ) %>
-
-  <%= render Records::SectionComponent.new(
-    title: "Barometer Records",
-    rows: barometer_rows,
-    year_record: year_record,
-    current_year_record: current_year_record,
-    all_time_record: all_time_record,
-    year_label: year_label,
-    current_year_label: current_year_label,
-    show_three_columns: show_three_columns?
-  ) %>
-
-  <%= render Records::SectionComponent.new(
-    title: "Sun Records",
-    rows: sun_rows,
-    year_record: year_record,
-    current_year_record: current_year_record,
-    all_time_record: all_time_record,
-    year_label: year_label,
-    current_year_label: current_year_label,
-    show_three_columns: show_three_columns?
-  ) %>
-</div>
+<% if active_record.nil? %>
+  <%= render Ui::CardComponent.new(padding: :loose) do %>
+    <p class="text-[color:var(--muted)]">
+      No records available yet for <%= pivot_title.downcase %>. Records are
+      recalculated nightly at 12:02 AM or on demand via
+      <code class="record-inline-code">rake records:refresh</code>.
+    </p>
+  <% end %>
+<% else %>
+  <% sections.each do |section| %>
+    <%= render Ui::SectionHeaderComponent.new(title: section[:title], icon: section[:icon], level: 3) %>
+    <div class="ui-card-grid">
+      <% section[:rows].each do |row| %>
+        <%= render Records::RecordCardComponent.new(row: row, record: active_record, icon: row[:icon]) %>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
