@@ -8,7 +8,6 @@
 @import "./components/tooltip";
 @import "./components/header";
 @import "./components/current";
-@import "./components/weather-grid";
 @import "./components/forecast-hourly";
 @import "./components/forecast-grid";
 @import "./components/forecast-section";

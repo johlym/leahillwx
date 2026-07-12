@@ -1,35 +1,37 @@
-<!-- Weather Icon -->
-<%# Accepts: icon (OWM icon code like "01d", "02n", etc.), size (optional, e.g., "3x") %>
+<%# Weather icon rendered via FontAwesome duotone glyphs.
+    Accepts: icon (OWM icon code like "01d", "02n"), size (e.g., "3x"),
+             night (boolean), blackout (boolean → solid variant).
+    Colors are pulled from the current palette tokens so the icon
+    reads well on any time-of-day palette. %>
 <% base_icon = icon.to_s.gsub(/[dn]$/, '') %>
 <% prefix = "fa-fw fa-duotone fa-solid" %>
 <% isize = local_assigns[:size] ? "fa-#{local_assigns[:size]}" : "fa-2x" %>
-<% if local_assigns[:night] %>
-  <% sun_moon = "moon" %>
-<% else %>
-  <% sun_moon = "sun" %>
-<% end %>
-<% if local_assigns[:blackout] %>
-  <% prefix = "fa-fw fa-solid" %>
-<% end %>
+<% sun_moon = local_assigns[:night] ? "moon" : "sun" %>
+<% prefix = "fa-fw fa-solid" if local_assigns[:blackout] %>
+<%
+  primary = local_assigns[:night] ? "var(--chart-5)" : "var(--warning)"
+  secondary = "var(--muted)"
+  style_pair = "--fa-primary-color: #{primary}; --fa-secondary-color: #{secondary}; --fa-secondary-opacity: 1;"
+%>
 <% case base_icon %>
 <% when '01' %>
-  <i class="<%= isize %> <%= prefix %> fa-<%= sun_moon %>" style="--fa-primary-color: var(--color-brand-800); --fa-secondary-color: var(--color-brand-800);"></i>
+  <i class="<%= isize %> <%= prefix %> fa-<%= sun_moon %>" style="--fa-primary-color: <%= primary %>; --fa-secondary-color: <%= primary %>;"></i>
 <% when '02' %>
-  <i class="<%= isize %> <%= prefix %> fa-cloud-<%= sun_moon %>" style="--fa-primary-color: var(--color-stone-600); --fa-secondary-color: var(--color-brand-800); --fa-secondary-opacity: 1;"></i>
+  <i class="<%= isize %> <%= prefix %> fa-cloud-<%= sun_moon %>" style="<%= style_pair %>"></i>
 <% when '03' %>
-  <i class="<%= isize %> <%= prefix %> fa-cloud" style="--fa-primary-color: var(--color-brand-800); --fa-secondary-color: var(--color-brand-800); --fa-secondary-opacity: 1;"></i>
+  <i class="<%= isize %> <%= prefix %> fa-cloud" style="--fa-primary-color: <%= secondary %>; --fa-secondary-color: <%= secondary %>; --fa-secondary-opacity: 1;"></i>
 <% when '04' %>
-  <i class="<%= isize %> <%= prefix %> fa-clouds" style="--fa-primary-color: var(--color-brand-800); --fa-secondary-color: var(--color-stone-600); --fa-secondary-opacity: 1;"></i>
+  <i class="<%= isize %> <%= prefix %> fa-clouds" style="--fa-primary-color: <%= secondary %>; --fa-secondary-color: var(--subtle); --fa-secondary-opacity: 1;"></i>
 <% when '09' %>
-  <i class="<%= isize %> <%= prefix %> fa-cloud-rain" style="--fa-primary-color: var(--color-stone-600); --fa-secondary-color: var(--color-brand-800); --fa-secondary-opacity: 1;"></i>
+  <i class="<%= isize %> <%= prefix %> fa-cloud-rain" style="--fa-primary-color: <%= secondary %>; --fa-secondary-color: var(--chart-6); --fa-secondary-opacity: 1;"></i>
 <% when '10' %>
-  <i class="<%= isize %> <%= prefix %> fa-cloud-<%= sun_moon %>-rain" style="--fa-primary-color: #aaaaaa; --fa-secondary-color: var(--color-brand-800); --fa-secondary-opacity: 1;"></i>
+  <i class="<%= isize %> <%= prefix %> fa-cloud-<%= sun_moon %>-rain" style="--fa-primary-color: <%= secondary %>; --fa-secondary-color: var(--chart-6); --fa-secondary-opacity: 1;"></i>
 <% when '11' %>
-  <i class="<%= isize %> <%= prefix %> fa-cloud-bolt-<%= sun_moon %>" style="--fa-primary-color: var(--color-stone-600); --fa-secondary-color: var(--color-brand-800); --fa-secondary-opacity: 1;"></i>
+  <i class="<%= isize %> <%= prefix %> fa-cloud-bolt-<%= sun_moon %>" style="--fa-primary-color: <%= secondary %>; --fa-secondary-color: var(--warning); --fa-secondary-opacity: 1;"></i>
 <% when '13' %>
-  <i class="<%= isize %> <%= prefix %> fa-snowflake" style="--fa-primary-color: var(--color-brand-800); --fa-secondary-color: var(--color-brand-800); --fa-secondary-opacity: 1;"></i>
+  <i class="<%= isize %> <%= prefix %> fa-snowflake" style="--fa-primary-color: var(--chart-6); --fa-secondary-color: <%= secondary %>; --fa-secondary-opacity: 1;"></i>
 <% when '50' %>
-  <i class="<%= isize %> <%= prefix %> fa-cloud-fog" style="--fa-primary-color: var(--color-stone-600); --fa-secondary-color: var(--color-brand-800); --fa-secondary-opacity: 1;"></i>
+  <i class="<%= isize %> <%= prefix %> fa-cloud-fog" style="--fa-primary-color: <%= secondary %>; --fa-secondary-color: var(--subtle); --fa-secondary-opacity: 1;"></i>
 <% else %>
-  <i class="<%= isize %> <%= prefix %> fa-question" style="--fa-primary-color: var(--color-stone-600); --fa-secondary-color: var(--color-stone-600);"></i>
+  <i class="<%= isize %> <%= prefix %> fa-question" style="--fa-primary-color: <%= secondary %>; --fa-secondary-color: <%= secondary %>;"></i>
 <% end %>

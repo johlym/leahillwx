@@ -1,11 +1,10 @@
-<div class="reports-index">
-  <h1>Weather Reports</h1>
-  
-  <div class="message">
-    <p><%= @message %></p>
-  </div>
-  
-  <div class="info">
-    <p>Reports are automatically generated daily at 12:01 AM (America/Los_Angeles timezone) from collected weather measurements.</p>
-  </div>
+<div class="primary-container">
+  <%= render Ui::SectionHeaderComponent.new(title: "Weather Reports", subtitle: "Monthly climatological summaries.") %>
+
+  <%= render Ui::CardComponent.new(padding: :loose) do %>
+    <p class="text-[color:var(--text)]"><%= @message %></p>
+    <p class="text-[color:var(--muted)] mt-2 text-sm">
+      Reports are generated daily at 12:01 AM (America/Los_Angeles) from collected weather measurements.
+    </p>
+  <% end %>
 </div>
