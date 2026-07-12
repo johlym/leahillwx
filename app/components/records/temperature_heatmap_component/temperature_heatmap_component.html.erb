@@ -39,13 +39,14 @@
         <% end %>
         <% if highlighted?(m) %>
           <%#
-            Row-spanning overlay: sits in the same grid row and column
-            span as the month's cells, painted after them in DOM order
-            so its outline draws on top. Uses outline (not border) so
-            it can't nudge cells or push other rows down.
+            Row-spanning overlay. Positioned absolutely inside the
+            grid so it can't shift adjacent rows. When a grid item is
+            position: absolute, an unspecified grid-row-end defaults
+            to the *end of the grid*, not span 1 — so both start and
+            end are set explicitly to pin the outline to a single row.
           %>
           <div class="temp-heatmap__row-glow"
-               style="grid-row: <%= m + 1 %>; grid-column: 1 / -1;"
+               style="grid-row: <%= m + 1 %> / <%= m + 2 %>; grid-column: 1 / -1;"
                aria-hidden="true"></div>
         <% end %>
       <% end %>
