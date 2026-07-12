@@ -1,0 +1,38 @@
+.app-tooltip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 60;
+  pointer-events: none;
+  background-color: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  border-radius: 0.4rem;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transition: opacity 120ms ease;
+  max-width: 220px;
+  white-space: normal;
+  transform: translate3d(-9999px, -9999px, 0);
+  will-change: transform;
+}
+.app-tooltip.app-tooltip--visible { opacity: 1; }
+
+.app-tooltip__title {
+  font-weight: 600;
+  color: var(--text-strong);
+  font-family: var(--font-condensed);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.7rem;
+  margin-bottom: 0.2rem;
+}
+.app-tooltip__body {
+  color: var(--muted);
+}
+
+/* Optional arrow — can be added later via ::after. Skipped for now to
+   keep the tooltip trivially cheap. */

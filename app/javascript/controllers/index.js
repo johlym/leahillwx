@@ -16,10 +16,12 @@ import AlmanacCalendarController from "./almanac_calendar_controller"
 import AlmanacTableToggleController from "./almanac_table_toggle_controller"
 import PaletteController from "./palette_controller"
 import ChartController from "./chart_controller"
+import TooltipController from "./tooltip_controller"
 
 application.register("hello", HelloController)
 application.register("palette", PaletteController)
 application.register("chart", ChartController)
+application.register("tooltip", TooltipController)
 application.register("connection-status", ConnectionStatusController)
 application.register("mobile-menu", MobileMenuController)
 application.register("image-refresh", ImageRefreshController)
