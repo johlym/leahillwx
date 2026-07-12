@@ -100,7 +100,10 @@ export default class extends Controller {
 
   buildDatasets(rawDatasets, palette, options) {
     return rawDatasets.map((ds, i) => {
-      const color = ds.color || palette.chartColors[i % palette.chartColors.length]
+      const color = this.resolveColor(
+        ds.color,
+        palette.chartColors[i % palette.chartColors.length],
+      )
       const base = {
         label: ds.label,
         data: ds.data,
@@ -235,4 +238,21 @@ export default class extends Controller {
     return Number(v).toFixed(decimals)
   }
 
+  // Chart.js hands the string straight to the canvas API, which
+  // doesn't understand `var(--...)`. Resolve to the concrete computed
+  // value; if the server passed a plain color (oklch, hex, rgb, etc.)
+  // pass it through unchanged.
+  resolveColor(candidate, fallback) {
+    if (!candidate) return fallback
+    if (typeof candidate !== "string") return candidate
+    const match = candidate.trim().match(/^var\(\s*(--[a-zA-Z0-9-]+)\s*(?:,\s*(.+))?\)$/)
+    if (!match) return candidate
+    const [, name, defaultVal] = match
+    const resolved = getComputedStyle(document.documentElement)
+      .getPropertyValue(name)
+      .trim()
+    if (resolved) return resolved
+    if (defaultVal) return defaultVal.trim()
+    return fallback
+  }
 }
