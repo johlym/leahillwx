@@ -136,17 +136,17 @@ module Records
       return { magnitude: 0, direction: :flat, formatted: "no change" } if diff.abs < epsilon(type)
 
       converted = case type
-                  when :temp  then diff * 9.0 / 5.0
-                  when :speed then diff * 2.23694
-                  when :rain  then diff / 25.4
-                  else diff
-                  end
+      when :temp  then diff * 9.0 / 5.0
+      when :speed then diff * 2.23694
+      when :rain  then diff / 25.4
+      else diff
+      end
       unit = case type
-             when :temp  then "°"
-             when :speed then " mph"
-             when :rain  then " in"
-             else ""
-             end
+      when :temp  then "°"
+      when :speed then " mph"
+      when :rain  then " in"
+      else ""
+      end
 
       sign = converted.positive? ? "+" : ""
       formatted_val = "#{sign}#{converted.round(precision_for(type))}#{unit}"

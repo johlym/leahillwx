@@ -169,10 +169,10 @@ class TrendsAnalyzer
       delta.positive? ? :up : :down
     end
     trend_label = case trend
-                  when :flat then "unchanged"
-                  when :up then positive_label
-                  when :down then negative_label
-                  end
+    when :flat then "unchanged"
+    when :up then positive_label
+    when :down then negative_label
+    end
     {
       title: title,
       label: label,
