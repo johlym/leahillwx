@@ -16,6 +16,34 @@
   --color-brand-light: var(--color-brand-300);
   --color-brand-border: var(--color-brand-700);
 
+  /* Palette-driven semantic tokens. The concrete values live under
+     :root[data-palette="..."] below; here we bridge them into Tailwind's
+     theme so they generate real utilities (bg-surface, text-muted,
+     border-strong, ring-accent, etc.). Palette switching still works
+     because these vars resolve to var(--surface)/etc. at read time. */
+  --color-bg: var(--bg);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text: var(--text);
+  --color-text-strong: var(--text-strong);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-contrast: var(--accent-contrast);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--chart-6);
+
   --font-condensed: "Saira Extra Condensed", sans-serif;
 
   --breakpoint-xxs: 23rem;
