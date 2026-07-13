@@ -43,7 +43,7 @@ class RootController < ApplicationController
     dew_expr = Arel.sql("temperature - ((100 - humidity) / 5.0)")
     peak_dew_c = scope.pluck(dew_expr).compact.max
     peak_wind_mps = scope.maximum(:gust_speed)
-    peak_uvi = scope.maximum(:uvi)
+    peak_uvi = scope.maximum(:uvi).to_i
     peak_humidity = scope.maximum(:humidity)
     peak_rain_rate_mm = scope.maximum(:rain_rate)
 
