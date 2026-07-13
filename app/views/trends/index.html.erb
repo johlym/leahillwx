@@ -15,7 +15,7 @@
 
   <% unless @has_data %>
     <%= render Ui::CardComponent.new(padding: :loose) do %>
-      <p class="text-[color:var(--muted)]">No monthly reports yet. Trends will populate as the reports pipeline runs.</p>
+      <p class="text-muted">No monthly reports yet. Trends will populate as the reports pipeline runs.</p>
     <% end %>
   <% end %>
 
@@ -80,7 +80,7 @@
 
     <% if @anomalies.any? %>
       <%= render Ui::SectionHeaderComponent.new(title: "How #{@focus_year} compares", level: 3, subtitle: "Delta between #{@focus_year} year-to-date and the recent normal.") %>
-      <div class="ui-card-grid">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <% @anomalies.each do |a| %>
           <%= render Ui::CardComponent.new(padding: :default, title: a[:title]) do %>
             <%= render Ui::StatComponent.new(

@@ -26,7 +26,7 @@
           <div class="conditions-hero__wind-inner">
             <div class="conditions-hero__wind-copy live-tile">
               <div class="live-tile__label">
-                <i class="fa-regular fa-wind ui-stat__label-icon"></i>
+                <i class="fa-regular fa-wind text-accent text-base"></i>
                 <span class="live-tile__label-text">Wind</span>
               </div>
               <div class="live-tile__body">
@@ -51,7 +51,7 @@
 
         <% if @almanac %>
           <%= render Ui::CardComponent.new(padding: :default, classes: "conditions-hero__sky") do %>
-            <div class="ui-stat__label"><i class="fa-regular fa-sunrise ui-stat__label-icon"></i><span class="ui-stat__label-text">Sun &amp; Moon Today</span></div>
+            <div class="inline-flex items-center gap-[0.4rem] text-xs uppercase tracking-[0.06em] text-muted"><i class="fa-regular fa-sunrise text-accent"></i><span>Sun &amp; Moon Today</span></div>
             <%= render Elements::SkyArcComponent.new(almanac: @almanac) %>
           <% end %>
         <% end %>
@@ -65,7 +65,7 @@
     <%= render Ui::CardComponent.new(padding: :default, classes: "conditions-strip__card") do %>
       <div class="live-tile">
         <div class="live-tile__label">
-          <i class="fa-regular fa-hand-holding-droplet ui-stat__label-icon"></i>
+          <i class="fa-regular fa-hand-holding-droplet text-accent text-base"></i>
           <span class="live-tile__label-text">Humidity</span>
         </div>
         <div class="live-tile__body">
@@ -83,7 +83,7 @@
     <%= render Ui::CardComponent.new(padding: :default, classes: "conditions-strip__card") do %>
       <div class="live-tile">
         <div class="live-tile__label">
-          <i class="fa-kit fa-regular-sun-circle-exclamation ui-stat__label-icon"></i>
+          <i class="fa-kit fa-regular-sun-circle-exclamation text-accent text-base"></i>
           <span class="live-tile__label-text">UV Index</span>
         </div>
         <div class="live-tile__body">
@@ -104,7 +104,7 @@
     <%= render Ui::CardComponent.new(padding: :default, classes: "conditions-strip__card") do %>
       <div class="live-tile">
         <div class="live-tile__label">
-          <i class="fa-regular fa-cloud-rain ui-stat__label-icon"></i>
+          <i class="fa-regular fa-cloud-rain text-accent text-base"></i>
           <span class="live-tile__label-text">Rain</span>
         </div>
         <div class="live-tile__body">
@@ -123,7 +123,7 @@
     <%= render Ui::CardComponent.new(padding: :default, classes: "conditions-strip__card") do %>
       <div class="live-tile">
         <div class="live-tile__label">
-          <i class="fa-regular fa-droplet-degree ui-stat__label-icon"></i>
+          <i class="fa-regular fa-droplet-degree text-accent text-base"></i>
           <span class="live-tile__label-text">Dew Point</span>
         </div>
         <div class="live-tile__body">
@@ -141,7 +141,7 @@
     <%= render Ui::CardComponent.new(padding: :default, classes: "conditions-strip__card") do %>
       <div class="live-tile">
         <div class="live-tile__label">
-          <i class="fa-regular fa-cloud ui-stat__label-icon"></i>
+          <i class="fa-regular fa-cloud text-accent text-base"></i>
           <span class="live-tile__label-text">Cloud Base</span>
         </div>
         <div class="live-tile__body">

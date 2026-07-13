@@ -20,7 +20,8 @@ module Ui
     end
 
     def call
-      content_tag(:div, class: "ui-tabs ui-tabs--#{@size}", role: "tablist") do
+      root_class = [ "ui-tabs", (@size == :sm ? "ui-tabs-sm" : nil) ].compact.join(" ")
+      content_tag(:div, class: root_class, role: "tablist") do
         safe_join(@items.map { |item| render_item(item) })
       end
     end
@@ -29,21 +30,22 @@ module Ui
 
     def render_item(item)
       active = active?(item)
+      classes = [ "ui-tabs-tab", (active ? "ui-tabs-tab-active" : nil) ].compact.join(" ")
       content_tag(
         :button,
         button_content(item),
         type: "button",
         role: "tab",
         "aria-selected": active,
-        class: "ui-tabs__tab#{' ui-tabs__tab--active' if active}",
+        class: classes,
         data: item[:data] || (item[:action] ? { action: item[:action] } : {})
       )
     end
 
     def button_content(item)
       parts = []
-      parts << content_tag(:i, "", class: "#{item[:icon]} ui-tabs__icon") if item[:icon].present?
-      parts << content_tag(:span, item[:label], class: "ui-tabs__label")
+      parts << content_tag(:i, "", class: "#{item[:icon]} text-[0.85em]") if item[:icon].present?
+      parts << content_tag(:span, item[:label])
       safe_join(parts, " ")
     end
 

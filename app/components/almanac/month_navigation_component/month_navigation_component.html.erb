@@ -11,17 +11,17 @@
   </div>
 
   <div class="almanac-month-nav__picker">
-    <label class="ui-year-picker">
-      <span class="ui-year-picker__label">Month</span>
-      <select id="month-select" class="ui-year-picker__select">
+    <label class="inline-flex items-center gap-2 text-[0.8rem] uppercase tracking-[0.05em] text-muted">
+      <span>Month</span>
+      <select id="month-select" class="ui-year-picker-select">
         <% Date::MONTHNAMES.compact.each_with_index do |month, idx| %>
           <option value="<%= month.downcase %>" <%= 'selected' if idx + 1 == current_month %>><%= month %></option>
         <% end %>
       </select>
     </label>
-    <label class="ui-year-picker">
-      <span class="ui-year-picker__label">Year</span>
-      <select id="year-select" class="ui-year-picker__select">
+    <label class="inline-flex items-center gap-2 text-[0.8rem] uppercase tracking-[0.05em] text-muted">
+      <span>Year</span>
+      <select id="year-select" class="ui-year-picker-select">
         <% (1976..2076).each do |year| %>
           <option value="<%= year %>" <%= 'selected' if year == current_year %>><%= year %></option>
         <% end %>

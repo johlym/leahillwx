@@ -1,6 +1,6 @@
 <%= render Ui::SectionHeaderComponent.new(title: title, subtitle: subtitle) %>
 
-<div class="ui-card-grid">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
   <% cards.each do |c| %>
     <%= render Ui::CardComponent.new(padding: :default) do %>
       <div class="record-card__label">

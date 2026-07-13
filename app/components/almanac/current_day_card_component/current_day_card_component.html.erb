@@ -5,7 +5,7 @@
   level: 2
 ) %>
 
-<div class="ui-card-grid">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
   <%= render Ui::CardComponent.new(title: "Sun", icon: "fa-regular fa-sun") do %>
     <ul class="almanac-current__list">
       <li><span>Rise</span><span><%= format_time(entry.sunrise_at) %></span></li>
