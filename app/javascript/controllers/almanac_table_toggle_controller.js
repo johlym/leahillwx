@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 // Toggles between the Sun and Moon tables in the almanac. Reuses the
-// `.ui-tabs__tab--active` visual state to stay consistent with the
+// `.ui-tabs-tab-active` visual state to stay consistent with the
 // rest of the token-driven UI.
 export default class extends Controller {
   static targets = ["moonTable", "sunTable", "moonBtn", "sunBtn"]
@@ -25,7 +25,7 @@ export default class extends Controller {
   }
 
   setActive(button, active) {
-    button.classList.toggle("ui-tabs__tab--active", active)
+    button.classList.toggle("ui-tabs-tab-active", active)
     button.setAttribute("aria-selected", active ? "true" : "false")
   }
 }
