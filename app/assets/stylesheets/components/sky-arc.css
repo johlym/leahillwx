@@ -1,48 +1,39 @@
-.sky-arc {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  color: var(--text);
-  width: 100%;
-}
+/* Sun/moon arc infographic. SVG bodies have filter-based glows for
+   their "live" state and dimming for their off state; those need CSS
+   because they target SVG-inner elements. The wrapper/legend pieces
+   are inlined on the ERB template. */
 
-.sky-arc__svg {
-  width: 100%;
-  height: auto;
+@utility sky-arc-svg {
+  @apply w-full h-auto;
   aspect-ratio: 200 / 130;
-  filter: drop-shadow(0 6px 18px color-mix(in oklab, var(--accent) 20%, transparent));
+  filter: drop-shadow(0 6px 18px color-mix(in oklab, var(--color-accent) 20%, transparent));
 }
 
-.sky-arc__body { transition: transform 400ms ease; }
-.sky-arc__body--live circle { filter: drop-shadow(0 0 6px color-mix(in oklab, var(--warning) 70%, transparent)); }
-.sky-arc__body--dim { opacity: 0.35; }
-.sky-arc__body--moon.sky-arc__body--live circle {
-  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--muted) 70%, transparent));
+@utility sky-arc-body {
+  transition: transform 400ms ease;
 }
 
-.sky-arc__legend {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  font-size: 0.75rem;
-  color: var(--muted);
+@utility sky-arc-body-live {
+  & circle {
+    filter: drop-shadow(0 0 6px color-mix(in oklab, var(--color-warning) 70%, transparent));
+  }
 }
-.sky-arc__legend-row {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
+
+@utility sky-arc-body-dim {
+  @apply opacity-35;
 }
-.sky-arc__legend-times {
-  color: var(--text);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.75rem;
+
+/* Moon-specific "live" glow — cool white instead of warm yellow. */
+.sky-arc-body-moon.sky-arc-body-live circle {
+  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--color-muted) 70%, transparent));
 }
-.sky-arc__swatch {
-  display: inline-block;
-  width: 0.75rem;
-  height: 0.75rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in oklab, var(--border-strong) 50%, transparent);
+
+@utility sky-arc-swatch {
+  @apply inline-block size-3 rounded-full;
+  border: 1px solid color-mix(in oklab, var(--color-border-strong) 50%, transparent);
 }
-.sky-arc__swatch--sun { background-color: var(--warning); }
-.sky-arc__swatch--moon { background-color: color-mix(in oklab, var(--muted) 90%, transparent); }
+
+@utility sky-arc-swatch-sun  { @apply bg-warning; }
+@utility sky-arc-swatch-moon {
+  background-color: color-mix(in oklab, var(--color-muted) 90%, transparent);
+}

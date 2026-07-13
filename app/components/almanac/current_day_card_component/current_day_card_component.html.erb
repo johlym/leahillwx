@@ -7,7 +7,7 @@
 
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
   <%= render Ui::CardComponent.new(title: "Sun", icon: "fa-regular fa-sun") do %>
-    <ul class="almanac-current__list">
+    <ul class="almanac-current-list" role="list">
       <li><span>Rise</span><span><%= format_time(entry.sunrise_at) %></span></li>
       <li><span>Transit</span><span><%= format_time(entry.solar_noon_at) %></span></li>
       <li><span>Set</span><span><%= format_time(entry.sunset_at) %></span></li>
@@ -19,7 +19,7 @@
   <% end %>
 
   <%= render Ui::CardComponent.new(title: "Moon", icon: "fa-regular fa-moon") do %>
-    <ul class="almanac-current__list">
+    <ul class="almanac-current-list" role="list">
       <li><span>Rise</span><span><%= format_time(entry.moonrise_at) %></span></li>
       <li><span>Transit</span><span><%= format_time(entry.moon_transit_at) %></span></li>
       <li><span>Set</span><span><%= format_time(entry.moonset_at) %></span></li>
@@ -33,10 +33,10 @@
   <% end %>
 
   <%= render Ui::CardComponent.new(title: "Details", icon: "fa-regular fa-book-atlas") do %>
-    <ul class="almanac-current__list">
+    <ul class="almanac-current-list" role="list">
       <li><span>Daylight</span><span><%= entry.formatted_daylight %></span></li>
       <% if entry.formatted_daylight_delta %>
-        <li class="almanac-current__meta"><span></span><span><%= entry.formatted_daylight_delta %></span></li>
+        <li class="almanac-current-meta"><span></span><span><%= entry.formatted_daylight_delta %></span></li>
       <% end %>
       <% if entry.moon_distance_km %>
         <li><span>Moon distance</span><span><%= number_with_delimiter((entry.moon_distance_km * 0.621371).round(0)) %> mi</span></li>

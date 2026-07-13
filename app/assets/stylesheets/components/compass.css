@@ -1,78 +1,79 @@
-.compass {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.35rem;
-  color: var(--text);
+/* SVG compass. Everything is inside an <svg>, so descendant styling
+   is unavoidable (fill/stroke on child <path>/<text>/<circle>).
+   The size variants set a --compass-size custom property that the
+   dial reads. Rotation uses --compass-needle-deg set inline per
+   compass. */
+
+@utility compass {
+  @apply inline-flex flex-col items-center gap-[0.35rem] text-text;
 }
 
-.compass__dial {
+@utility compass-dial {
   width: var(--compass-size, 4rem);
   height: var(--compass-size, 4rem);
   overflow: visible;
 }
 
-.compass--xs { --compass-size: 1.5rem; }
-.compass--sm { --compass-size: 2.5rem; }
-.compass--md { --compass-size: 4rem; }
-.compass--lg { --compass-size: 6rem; }
+@utility compass-xs { --compass-size: 1.5rem; }
+@utility compass-sm { --compass-size: 2.5rem; }
+@utility compass-md { --compass-size: 4rem; }
+@utility compass-lg { --compass-size: 6rem; }
 
-/* Ring + ticks + cardinals are painted via CSS so `var()` resolves
-   reliably. This matches the reference svg — one subtle stroke ring,
-   4 short ticks, 4 letters. */
-.compass__ring {
-  stroke: color-mix(in oklab, var(--text) 22%, transparent);
-}
-.compass__ticks line {
-  stroke: color-mix(in oklab, var(--text) 32%, transparent);
-}
-.compass__cardinals text {
-  fill: color-mix(in oklab, var(--text) 60%, transparent);
-  font-family: var(--font-condensed);
-  font-weight: 600;
-}
-.compass__cardinals text.compass__cardinal--n {
-  fill: var(--danger);
-  font-weight: 700;
-}
-.compass__cardinals text.compass__cardinal--secondary {
-  fill: color-mix(in oklab, var(--text) 38%, transparent);
-  font-weight: 500;
-  letter-spacing: -0.03em;
+/* Ring, ticks, and cardinal letters — painted via CSS so var()
+   resolves reliably (var() in SVG XML attributes paints unreliably
+   in Safari). */
+@utility compass-ring {
+  stroke: color-mix(in oklab, var(--color-text) 22%, transparent);
 }
 
-/* Needle blades. `fill` is set here — never as an SVG XML attribute
-   with `var()`, which paints unreliably. Rotation is a CSS transform
-   driven by the --compass-needle-deg custom property on the <g>,
-   which is set inline per compass. `transform-box: view-box` +
-   `transform-origin: 50% 50%` locks the pivot to (50, 50) in viewBox
-   coordinates so the needle spins around the center at any size. */
-.compass__needle {
+@utility compass-ticks {
+  & line {
+    stroke: color-mix(in oklab, var(--color-text) 32%, transparent);
+  }
+}
+
+@utility compass-cardinals {
+  & text {
+    fill: color-mix(in oklab, var(--color-text) 60%, transparent);
+    font-family: var(--font-condensed);
+    @apply font-semibold;
+  }
+  & text.compass-cardinal-n {
+    @apply fill-danger font-bold;
+  }
+  & text.compass-cardinal-secondary {
+    fill: color-mix(in oklab, var(--color-text) 38%, transparent);
+    @apply font-medium tracking-[-0.03em];
+  }
+}
+
+/* Needle. transform-box + transform-origin lock the pivot to (50,50)
+   in viewBox coordinates so the needle spins around the center at
+   any physical size. */
+@utility compass-needle {
   transform: rotate(var(--compass-needle-deg, 0deg));
   transform-box: view-box;
   transform-origin: 50% 50%;
   transition: transform 800ms cubic-bezier(0.22, 0.61, 0.36, 1);
 }
-.compass__needle-fore {
-  fill: var(--accent-strong, #ffd27a);
-}
-.compass__needle-aft {
-  fill: color-mix(in oklab, var(--text) 35%, transparent);
+
+@utility compass-needle-fore {
+  fill: var(--color-accent-strong, #ffd27a);
 }
 
-.compass__hub {
-  fill: var(--text-strong, #fff);
+@utility compass-needle-aft {
+  fill: color-mix(in oklab, var(--color-text) 35%, transparent);
 }
 
-.compass__label {
-  font-family: var(--font-condensed);
-  font-size: 0.85rem;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--text-strong);
+@utility compass-hub {
+  fill: var(--color-text-strong, #fff);
 }
-.compass--xs .compass__label,
-.compass--sm .compass__label {
-  font-size: 0.7rem;
+
+@utility compass-label {
+  @apply font-condensed text-[0.85rem] font-medium tracking-[0.05em] uppercase text-text-strong;
+
+  .compass-xs > &,
+  .compass-sm > & {
+    @apply text-[0.7rem];
+  }
 }

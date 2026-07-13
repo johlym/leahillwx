@@ -1,4 +1,4 @@
-<div class="primary-container report-container">
+<div class="primary-container text-text">
   <h1>Climatological Summary <small>for <%= @report.month_name %> <%= @report.year %></small></h1>
 
   <%= render Shared::DateNavigationComponent.new(
@@ -14,7 +14,7 @@
 
   <%= render Reports::StatisticsTableComponent.new(report: @report, period_type: :daily, has_partial_periods: has_partial_days?(@report)) %>
 
-  <div class="notes">
+  <div class="report-notes">
     <h3>Notes:</h3>
     <ul>
       <li>Times shown in 24-hour format (HH:MM) in the <code>America/Los_Angeles</code> timezone</li>

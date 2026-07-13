@@ -43,20 +43,20 @@ export default class extends Controller {
     tip.innerHTML = ""
     if (this.hasTitleValue && this.titleValue) {
       const t = document.createElement("div")
-      t.className = "app-tooltip__title"
+      t.className = "app-tooltip-title"
       t.textContent = this.titleValue
       tip.appendChild(t)
     }
     if (this.hasBodyValue && this.bodyValue) {
       const b = document.createElement("div")
-      b.className = "app-tooltip__body"
+      b.className = "app-tooltip-body"
       b.textContent = this.bodyValue
       tip.appendChild(b)
     }
     tip.dataset.owner = this.uniqueId()
     tip.dataset.placement = this.placementValue
     tip.style.opacity = "0"
-    tip.classList.add("app-tooltip--visible")
+    tip.classList.add("app-tooltip-visible")
     this.reposition()
     // Reveal after position is set to avoid a flash at (0,0).
     requestAnimationFrame(() => (tip.style.opacity = "1"))
@@ -69,7 +69,7 @@ export default class extends Controller {
     const tip = this.constructor.tip
     if (!tip) return
     if (this.isOwner()) {
-      tip.classList.remove("app-tooltip--visible")
+      tip.classList.remove("app-tooltip-visible")
       tip.style.opacity = "0"
       delete tip.dataset.owner
     }

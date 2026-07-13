@@ -1,50 +1,50 @@
-<div class="compass compass--<%= size %>"
+<div class="compass compass-<%= size %>"
      role="img"
      aria-label="Wind from <%= compass_label %> (<%= direction.round %>°)">
-  <svg viewBox="0 0 100 100" class="compass__dial" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <svg viewBox="0 0 100 100" class="compass-dial" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <%# Outer ring. %>
-    <circle cx="50" cy="50" r="44" fill="none" class="compass__ring" stroke-width="1.5" />
+    <circle cx="50" cy="50" r="44" fill="none" class="compass-ring" stroke-width="1.5" />
 
     <%# 16 ticks around the ring. A long tick at each of the 8 named
         directions (N, NE, E, SE, S, SW, W, NW) and a short tick at
         each half-position (NNE, ENE, ESE, SSE, SSW, WSW, WNW, NNW).
         Everything is drawn at 12-o'clock and rotated into place. %>
-    <g class="compass__ticks">
+    <g class="compass-ticks">
       <% 16.times do |i| %>
         <% long = (i % 2).zero? %>
         <line x1="50" y1="8" x2="50" y2="<%= long ? 14 : 11 %>"
               stroke-width="<%= long ? 1.6 : 1 %>"
-              class="<%= long ? 'compass__tick compass__tick--long' : 'compass__tick' %>"
+              class="<%= long ? 'compass-tick compass-tick-long' : 'compass-tick' %>"
               transform="rotate(<%= i * 22.5 %> 50 50)" />
       <% end %>
     </g>
 
     <%# Cardinal + intercardinal letters, positioned on a smaller
         radius (~28) so they sit clearly inside the tick ring. %>
-    <g class="compass__cardinals" text-anchor="middle" dominant-baseline="middle">
-      <text x="50" y="22" font-size="10" font-weight="700" class="compass__cardinal compass__cardinal--n">N</text>
-      <text x="69.8" y="30.2" font-size="7" class="compass__cardinal compass__cardinal--secondary">NE</text>
-      <text x="78" y="50" font-size="9" class="compass__cardinal">E</text>
-      <text x="69.8" y="69.8" font-size="7" class="compass__cardinal compass__cardinal--secondary">SE</text>
-      <text x="50" y="78" font-size="9" class="compass__cardinal">S</text>
-      <text x="30.2" y="69.8" font-size="7" class="compass__cardinal compass__cardinal--secondary">SW</text>
-      <text x="22" y="50" font-size="9" class="compass__cardinal">W</text>
-      <text x="30.2" y="30.2" font-size="7" class="compass__cardinal compass__cardinal--secondary">NW</text>
+    <g class="compass-cardinals" text-anchor="middle" dominant-baseline="middle">
+      <text x="50" y="22" font-size="10" font-weight="700" class="compass-cardinal compass-cardinal-n">N</text>
+      <text x="69.8" y="30.2" font-size="7" class="compass-cardinal compass-cardinal-secondary">NE</text>
+      <text x="78" y="50" font-size="9" class="compass-cardinal">E</text>
+      <text x="69.8" y="69.8" font-size="7" class="compass-cardinal compass-cardinal-secondary">SE</text>
+      <text x="50" y="78" font-size="9" class="compass-cardinal">S</text>
+      <text x="30.2" y="69.8" font-size="7" class="compass-cardinal compass-cardinal-secondary">SW</text>
+      <text x="22" y="50" font-size="9" class="compass-cardinal">W</text>
+      <text x="30.2" y="30.2" font-size="7" class="compass-cardinal compass-cardinal-secondary">NW</text>
     </g>
 
     <%# Needle. Rotation lives on a CSS custom property so `transition:
-        transform` on .compass__needle animates smoothly and the pivot
+        transform` on .compass-needle animates smoothly and the pivot
         stays locked to (50,50) via transform-box + transform-origin. %>
-    <g class="compass__needle" style="--compass-needle-deg: <%= direction %>deg;">
-      <path d="M50 18 L44 52 L50 47 L56 52 Z" class="compass__needle-fore" />
-      <path d="M50 82 L46 52 L50 55 L54 52 Z" class="compass__needle-aft" />
+    <g class="compass-needle" style="--compass-needle-deg: <%= direction %>deg;">
+      <path d="M50 18 L44 52 L50 47 L56 52 Z" class="compass-needle-fore" />
+      <path d="M50 82 L46 52 L50 55 L54 52 Z" class="compass-needle-aft" />
     </g>
 
     <%# Center hub. %>
-    <circle cx="50" cy="50" r="3.5" class="compass__hub" />
+    <circle cx="50" cy="50" r="3.5" class="compass-hub" />
   </svg>
 
   <% if show_label %>
-    <span class="compass__label"><%= compass_label %></span>
+    <span class="compass-label"><%= compass_label %></span>
   <% end %>
 </div>

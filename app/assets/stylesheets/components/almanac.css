@@ -1,149 +1,94 @@
-.almanac-container {
-  color: var(--text);
-}
+/* Almanac page. The month navigation is pure layout (inlined on
+   month_navigation_component). The current-day list uses a shared
+   descendant pattern for its <li> children. The monthly calendar
+   table is dense and heavily-descended, so it stays as a flat
+   @utility with nested selectors. */
 
-.almanac-month-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  align-items: stretch;
-  margin: 1rem 0 1.5rem;
-}
-@media (min-width: 768px) {
-  .almanac-month-nav {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
+@utility almanac-current-list {
+  @apply list-none p-0 m-0 flex flex-col gap-[0.35rem];
+
+  & li {
+    @apply flex justify-between items-center gap-3 text-[0.85rem];
+  }
+  & li > span:first-child {
+    @apply text-muted uppercase tracking-[0.05em] text-[0.7rem];
+  }
+  & li > span:last-child {
+    @apply text-text-strong font-condensed text-base;
   }
 }
-.almanac-month-nav__buttons {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-.almanac-month-nav__buttons .btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.85rem;
-}
-.almanac-month-nav__picker {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  flex-wrap: wrap;
+
+@utility almanac-current-meta {
+  & > span:last-child {
+    @apply text-subtle text-[0.75rem] font-[inherit] italic;
+  }
 }
 
-.almanac-current__list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-.almanac-current__list li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: 0.85rem;
-}
-.almanac-current__list li > span:first-child {
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-size: 0.7rem;
-}
-.almanac-current__list li > span:last-child {
-  color: var(--text-strong);
-  font-family: var(--font-condensed);
-  font-size: 1rem;
-}
-.almanac-current__meta > span:last-child {
-  color: var(--subtle);
-  font-size: 0.75rem;
-  font-family: inherit;
-  font-style: italic;
-}
+@utility almanac-table {
+  @apply mt-6;
 
-.almanac-table {
-  margin-top: 1.5rem;
-
-  .almanac-table__toggle {
-    margin-bottom: 0.75rem;
+  & > .almanac-table-toggle {
+    @apply mb-3;
   }
 
-  .table-container {
-    overflow-x: auto;
-    background-color: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 0.75rem;
+  & .table-container {
+    @apply overflow-x-auto bg-surface border border-border rounded-xl;
   }
-  .table-container.hidden { display: none; }
 
-  .table-container > table {
-    width: 100%;
+  & .table-container > table {
+    @apply w-full text-[0.75rem] text-text;
     min-width: max-content;
     border-collapse: separate;
     border-spacing: 0;
-    color: var(--text);
-    font-size: 0.75rem;
-
-    thead {
-      background-color: var(--bg-elevated);
-      color: var(--muted);
-    }
-    thead tr {
-      border-bottom: 1px solid var(--border);
-    }
-    thead tr th {
-      padding: 0.5rem 0.4rem;
-      text-align: center;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      font-size: 0.65rem;
-      border-right: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
-    }
-    thead tr th:last-child { border-right: 0; }
-    thead .secondary-header th {
-      background-color: color-mix(in oklab, var(--bg-elevated) 70%, var(--surface));
-      color: var(--subtle);
-      font-size: 0.6rem;
-    }
-
-    tbody tr {
-      background-color: var(--surface);
-      cursor: pointer;
-      border-bottom: 1px solid color-mix(in oklab, var(--border) 40%, transparent);
-    }
-    tbody tr:hover { background-color: var(--surface-2); }
-    tbody tr.today {
-      background-color: color-mix(in oklab, var(--accent) 15%, var(--surface));
-    }
-    tbody tr.today td { color: var(--accent-strong); font-weight: 600; }
-    tbody td {
-      padding: 0.35rem 0.4rem;
-      text-align: center;
-      border-right: 1px solid color-mix(in oklab, var(--border) 40%, transparent);
-    }
-    tbody td:last-child { border-right: 0; }
-    tbody td.expanded-row {
-      background-color: var(--bg-elevated);
-      padding: 1rem;
-    }
-    tbody td.expanded-row .expanded-container {
-      max-width: 56rem;
-      margin: 0 auto;
-    }
-    tbody td.expanded-row .expanded-inner {
-      background-color: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 0.5rem;
-      padding: 0.75rem;
-    }
-    .text-gray-500 { color: var(--muted) !important; }
-    span.text-xs { color: var(--subtle); }
   }
+
+  & .table-container > table thead {
+    @apply bg-bg-elevated text-muted;
+  }
+  & .table-container > table thead tr {
+    @apply border-b border-border;
+  }
+  & .table-container > table thead tr th {
+    @apply px-[0.4rem] py-2 text-center font-medium uppercase tracking-[0.05em] text-[0.65rem];
+    border-right: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+  }
+  & .table-container > table thead tr th:last-child {
+    @apply border-r-0;
+  }
+  & .table-container > table thead .secondary-header th {
+    @apply text-subtle text-[0.6rem];
+    background-color: color-mix(in oklab, var(--color-bg-elevated) 70%, var(--color-surface));
+  }
+
+  & .table-container > table tbody tr {
+    @apply bg-surface cursor-pointer;
+    border-bottom: 1px solid color-mix(in oklab, var(--color-border) 40%, transparent);
+  }
+  & .table-container > table tbody tr:hover {
+    @apply bg-surface-2;
+  }
+  & .table-container > table tbody tr.today {
+    background-color: color-mix(in oklab, var(--color-accent) 15%, var(--color-surface));
+  }
+  & .table-container > table tbody tr.today td {
+    @apply text-accent-strong font-semibold;
+  }
+  & .table-container > table tbody td {
+    @apply px-[0.4rem] py-[0.35rem] text-center;
+    border-right: 1px solid color-mix(in oklab, var(--color-border) 40%, transparent);
+  }
+  & .table-container > table tbody td:last-child {
+    @apply border-r-0;
+  }
+  & .table-container > table tbody td.expanded-row {
+    @apply bg-bg-elevated p-4;
+  }
+  & .table-container > table tbody td.expanded-row .expanded-container {
+    @apply max-w-4xl mx-auto;
+  }
+  & .table-container > table tbody td.expanded-row .expanded-inner {
+    @apply bg-surface border border-border rounded-lg p-3;
+  }
+  & .table-container > table .text-gray-500 { color: var(--color-muted) !important; }
+  & .table-container > table span.text-xs { color: var(--color-subtle); }
 }
