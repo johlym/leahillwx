@@ -1,292 +1,88 @@
-/* Hero is intentionally transparent so the body's ambient background
-   flows through without a visible seam. Any hero-specific atmosphere
-   is layered as a pseudo-element that fades out into transparency at
-   the bottom edge. */
-.current-conditions {
-  color: var(--text);
-  padding: 1.5rem 0 1rem;
-  position: relative;
-  isolation: isolate;
-}
-.current-conditions::before {
-  content: "";
-  position: absolute;
-  inset: -2rem 0 -3rem 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(
-      80% 70% at 18% 25%,
-      color-mix(in oklab, var(--accent) 14%, transparent),
-      transparent 65%
-    ),
-    radial-gradient(
-      70% 70% at 82% 45%,
-      color-mix(in oklab, var(--accent-strong) 10%, transparent),
-      transparent 65%
-    );
-  mask-image: linear-gradient(to bottom, black 0%, black 70%, transparent 100%);
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    black 0%,
-    black 70%,
-    transparent 100%
-  );
-}
+/* Live-conditions hero + strip. Layout, typography, grid, and colour
+   flow through Tailwind utilities on conditions_component.erb; what
+   remains here is only the effects Tailwind has no first-class utility
+   for:
 
-.conditions-container {
-  @apply max-w-7xl container mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10;
-}
+   - current-conditions: masked pseudo-element with two radial glows
+     that fade out toward the bottom of the hero
+   - live-tile family: shared structure used 6+ times, factored as
+     flat utilities to avoid repeating long utility strings
+   - uv-scale / uv-scale-marker: the fixed rainbow gradient bar with
+     a positionable marker
+*/
 
-.conditions-hero {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-  align-items: center;
-}
-@media (min-width: 1024px) {
-  .conditions-hero {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 2rem;
+@utility current-conditions {
+  @apply relative isolate py-6 pb-4 text-text;
+
+  &::before {
+    content: "";
+    @apply absolute inset-x-0 -top-8 -bottom-12 -z-10 pointer-events-none;
+    background:
+      radial-gradient(
+        80% 70% at 18% 25%,
+        color-mix(in oklab, var(--color-accent) 14%, transparent),
+        transparent 65%
+      ),
+      radial-gradient(
+        70% 70% at 82% 45%,
+        color-mix(in oklab, var(--color-accent-strong) 10%, transparent),
+        transparent 65%
+      );
+    mask-image: linear-gradient(to bottom, black 0%, black 70%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, black 70%, transparent 100%);
   }
 }
 
-.conditions-hero__temp {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 0.75rem;
-  min-width: 0;
-}
-@media (min-width: 1024px) {
-  .conditions-hero__temp {
-    align-items: flex-start;
-    text-align: left;
-  }
+/* Live tile — repeated for every metric in the strip. */
+@utility live-tile {
+  @apply flex flex-col gap-[0.55rem] min-h-full;
 }
 
-.timestamp {
-  color: var(--muted);
-  font-family: var(--font-condensed);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.95rem;
-  margin: 0;
+@utility live-tile-label {
+  @apply flex items-center gap-[0.4rem] text-muted text-xs
+         uppercase tracking-[0.08em] whitespace-nowrap;
 }
 
-.current-temperature {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 0.25rem;
-}
-@media (min-width: 640px) {
-  .current-temperature {
-    flex-direction: row;
-    justify-content: center;
-    align-items: baseline;
-  }
-}
-@media (min-width: 1024px) {
-  .current-temperature {
-    justify-content: flex-start;
-  }
-}
-.current-temperature .temperature {
-  font-family: var(--font-condensed);
-  font-size: clamp(6rem, 18vw, 11rem);
-  color: var(--text-strong);
-  font-weight: 300;
-  line-height: 0.9;
-  text-shadow:
-    0 0 20px color-mix(in oklab, var(--accent-strong) 35%, transparent),
-    0 0 55px color-mix(in oklab, var(--accent) 22%, transparent);
-  letter-spacing: -0.02em;
-}
-.condition-summary {
-  text-align: center;
-}
-@media (min-width: 640px) {
-  .condition-summary {
-    text-align: left;
-  }
-}
-.condition-icon {
-  font-size: 2.25rem;
-  color: var(--text-strong);
-  filter: drop-shadow(
-    0 0 12px color-mix(in oklab, var(--accent) 45%, transparent)
-  );
-}
-.condition-text {
-  font-family: var(--font-condensed);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-size: 1.5rem;
-  color: var(--text);
-  margin-top: 0.25rem;
-}
-.feels-like {
-  color: var(--muted);
-  font-size: 1rem;
-  margin: 0;
-}
-.feels-like-sep {
-  margin: 0 0.4rem;
-  color: var(--subtle);
+@utility live-tile-body {
+  @apply flex flex-col gap-[0.3rem] min-w-0;
 }
 
-/* Hero side column: wind card on top, sky-arc card below on tablet
-   and above; side-by-side on desktop XL. */
-.conditions-hero__side {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.75rem;
-  min-width: 0;
-}
-@media (min-width: 768px) {
-  .conditions-hero__side {
-    grid-template-columns: 1fr 1fr;
-  }
+@utility live-tile-value {
+  @apply inline-flex items-baseline gap-1 text-text-strong
+         font-condensed leading-none tabular-nums;
 }
 
-.conditions-hero__wind-inner {
-  display: flex;
-  align-items: stretch;
-  justify-content: space-between;
-  gap: 1rem;
-}
-.conditions-hero__wind-copy {
-  min-width: 0;
-  flex: 1;
-}
-.conditions-hero__wind-compass {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.ui-stat__value--lg {
-  font-size: 2.75rem !important;
+@utility live-tile-number {
+  @apply text-[2.5rem] font-medium;
+  text-shadow: 0 0 22px color-mix(in oklab, var(--color-accent) 22%, transparent);
 }
 
-/* Live conditions strip — five tiles under the hero. */
-.conditions-strip {
-  display: grid;
-  grid-template-columns: repeat(1, minmax(0, 1fr));
-  gap: 0.75rem;
-  margin-top: 0.25rem;
-  margin-bottom: 1rem;
-}
-@media (min-width: 640px) {
-  .conditions-strip {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-@media (min-width: 1024px) {
-  .conditions-strip {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-@media (min-width: 1280px) {
-  .conditions-strip {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-  }
+@utility live-tile-number-xl {
+  @apply text-[3.25rem];
 }
 
-.conditions-strip__card {
-  min-height: 100%;
-}
-.conditions-strip__separator {
-  color: var(--subtle);
-  margin: 0 0.35em;
-}
-.conditions-strip__peak {
-  margin-top: 0.35rem;
-  font-size: 0.7rem;
-  color: color-mix(in oklab, var(--muted) 80%, transparent);
-  letter-spacing: 0.02em;
+@utility live-tile-unit {
+  @apply text-[1.15rem] text-muted tracking-[0.02em];
 }
 
-/* Live tile — three stacked rows: label, value+content, helper text. */
-.live-tile {
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-  min-height: 100%;
-}
-.live-tile__label {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  color: var(--muted);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-.live-tile__label .ui-stat__label-icon {
-  color: var(--accent);
-  font-size: 1rem;
-}
-.live-tile__label-text {
-  white-space: nowrap;
+@utility live-tile-unit-lg {
+  @apply text-[1.35rem];
 }
 
-.live-tile__body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  min-width: 0;
+@utility live-tile-meta {
+  @apply text-muted text-[0.78rem] leading-[1.35];
 }
-.live-tile__value {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.25rem;
-  color: var(--text-strong);
-  font-family: var(--font-condensed);
-  line-height: 1;
-}
-.live-tile__number {
-  font-size: 2.5rem;
-  font-weight: 500;
-  text-shadow: 0 0 22px color-mix(in oklab, var(--accent) 22%, transparent);
-}
-.live-tile__number--xl {
-  font-size: 3.25rem;
-}
-.live-tile__unit {
-  font-size: 1.15rem;
-  color: var(--muted);
-  letter-spacing: 0.02em;
-}
-.live-tile__unit--lg {
-  font-size: 1.35rem;
-}
-.live-tile__meta {
-  color: var(--muted);
-  font-size: 0.78rem;
-  line-height: 1.35;
-}
-.live-tile__peak {
-  color: color-mix(in oklab, var(--muted) 75%, transparent);
-  font-size: 0.7rem;
-  line-height: 1.3;
-  margin-top: auto;
-  padding-top: 0.35rem;
-  letter-spacing: 0.02em;
+
+@utility live-tile-peak {
+  @apply text-[0.7rem] leading-[1.3] mt-auto pt-[0.35rem] tracking-[0.02em];
+  color: color-mix(in oklab, var(--color-muted) 75%, transparent);
 }
 
 /* UV Index colour scale — green (0) -> yellow -> orange -> red ->
-   purple (12+). Marker is a small vertical bar positioned by inline
-   style based on the current uvi. */
-.uv-scale {
-  position: relative;
-  margin: 0.3rem 0;
-  height: 0.5rem;
-  border-radius: 999px;
+   purple (12+). Marker is positioned by an inline CSS variable set
+   from Ruby (`--uv:` percentage). */
+@utility uv-scale {
+  @apply relative my-[0.3rem] h-2 rounded-full;
   background: linear-gradient(
     to right,
     oklch(0.75 0.18 145) 0%,
@@ -296,16 +92,13 @@
     oklch(0.55 0.22 310) 100%
   );
   box-shadow:
-    0 0 0 1px color-mix(in oklab, var(--border) 60%, transparent),
-    0 1px 0 color-mix(in oklab, var(--text) 6%, transparent) inset;
+    0 0 0 1px color-mix(in oklab, var(--color-border) 60%, transparent),
+    0 1px 0 color-mix(in oklab, var(--color-text) 6%, transparent) inset;
 }
-.uv-scale__marker {
-  position: absolute;
-  top: -3px;
-  bottom: -3px;
-  width: 3px;
-  border-radius: 999px;
-  background-color: var(--text-strong);
+
+@utility uv-scale-marker {
+  @apply absolute -top-0.75 -bottom-0.75 w-0.75 rounded-full bg-text-strong;
+  left: var(--uv, 0%);
   transform: translateX(-50%);
-  box-shadow: 0 0 8px color-mix(in oklab, var(--text) 60%, transparent);
+  box-shadow: 0 0 8px color-mix(in oklab, var(--color-text) 60%, transparent);
 }
