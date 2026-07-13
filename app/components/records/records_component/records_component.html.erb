@@ -3,7 +3,7 @@
   subtitle: pivot_subtitle
 ) do |s| %>
   <% s.with_actions do %>
-    <div class="records-actions">
+    <div class="flex items-center gap-3 flex-wrap">
       <%= render Ui::YearPickerComponent.new(
         base_path: records_path,
         current_year: pivot_year? || pivot_month? ? selected_year : nil,

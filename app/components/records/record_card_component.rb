@@ -39,9 +39,9 @@ module Records
     attr_reader :row, :record, :icon, :history
 
     def label_block
-      content_tag(:div, class: "record-card__label") do
+      content_tag(:div, class: "record-card-label") do
         parts = []
-        parts << content_tag(:i, "", class: "#{icon} record-card__icon") if icon.present?
+        parts << content_tag(:i, "", class: icon) if icon.present?
         parts << content_tag(:span, row[:label])
         safe_join(parts, " ")
       end
@@ -49,11 +49,11 @@ module Records
 
     def value_block
       value_and_unit = formatted_value_parts
-      content_tag(:div, class: "record-card__value") do
+      content_tag(:div, class: "record-card-value") do
         parts = []
-        parts << content_tag(:span, value_and_unit[:value], class: "record-card__value-number")
+        parts << content_tag(:span, value_and_unit[:value], class: "record-card-value-number")
         if value_and_unit[:unit].present?
-          parts << content_tag(:span, value_and_unit[:unit], class: "record-card__value-unit")
+          parts << content_tag(:span, value_and_unit[:unit], class: "record-card-value-unit")
         end
         safe_join(parts)
       end
@@ -61,10 +61,10 @@ module Records
 
     def timestamp_block
       timestamp = formatted_timestamp
-      return content_tag(:p, "No data yet", class: "record-card__meta record-card__meta--muted") if record.nil?
+      return content_tag(:p, "No data yet", class: "record-card-meta record-card-meta-muted") if record.nil?
       return nil if timestamp.blank?
 
-      content_tag(:p, "on #{timestamp}", class: "record-card__meta")
+      content_tag(:p, "on #{timestamp}", class: "record-card-meta")
     end
 
     # ---- Sparkline --------------------------------------------------
@@ -99,7 +99,7 @@ module Records
         }
       }
 
-      content_tag(:div, class: "record-card__sparkline",
+      content_tag(:div, class: "record-card-sparkline",
                         data: {
                           controller: "chart",
                           chart_type_value: payload[:type],

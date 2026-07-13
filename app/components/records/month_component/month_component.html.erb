@@ -3,17 +3,17 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
   <% cards.each do |c| %>
     <%= render Ui::CardComponent.new(padding: :default) do %>
-      <div class="record-card__label">
-        <i class="<%= c[:icon] %> record-card__icon"></i>
+      <div class="record-card-label">
+        <i class="<%= c[:icon] %>"></i>
         <span><%= c[:label] %></span>
       </div>
-      <div class="record-card__value">
-        <span class="record-card__value-number"><%= c[:value] %></span>
+      <div class="record-card-value">
+        <span class="record-card-value-number"><%= c[:value] %></span>
         <% if c[:unit].present? %>
-          <span class="record-card__value-unit"><%= c[:unit] %></span>
+          <span class="record-card-value-unit"><%= c[:unit] %></span>
         <% end %>
         <% if c[:delta] %>
-          <span class="record-card__delta record-card__delta--<%= c[:delta][:direction] %>"
+          <span class="record-card-delta record-card-delta-<%= c[:delta][:direction] %>"
                 title="vs <%= @year - 1 %>">
             <i class="fa-regular <%= case c[:delta][:direction]
                                      when :up then 'fa-arrow-up'
@@ -26,10 +26,10 @@
         <% end %>
       </div>
       <% if c[:meta] %>
-        <p class="record-card__meta"><%= c[:meta] %></p>
+        <p class="record-card-meta"><%= c[:meta] %></p>
       <% end %>
       <% if c[:delta] && c[:delta][:direction] != :flat %>
-        <p class="record-card__meta record-card__meta--muted">
+        <p class="record-card-meta record-card-meta-muted">
           <%= c[:delta][:direction] == :up ? c[:positive_label] : c[:negative_label] %> than last year
         </p>
       <% end %>

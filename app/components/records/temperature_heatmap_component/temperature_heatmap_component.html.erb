@@ -1,33 +1,33 @@
 <section class="temp-heatmap" aria-label="Daily high temperature heatmap for <%= year %>">
-  <header class="temp-heatmap__header">
-    <div class="temp-heatmap__titles">
-      <h3 class="temp-heatmap__title">Daily High Temperature</h3>
-      <p class="temp-heatmap__subtitle">Every day in <%= year %>. Purple is coldest, red is hottest. Hover a cell to see the day's high and low.</p>
+  <header class="flex items-baseline justify-between gap-4 flex-wrap mb-3">
+    <div class="min-w-0">
+      <h3 class="m-0 font-condensed uppercase tracking-[0.05em] text-text-strong text-[1.1rem]">Daily High Temperature</h3>
+      <p class="mt-[0.15rem] text-muted text-[0.8rem]">Every day in <%= year %>. Purple is coldest, red is hottest. Hover a cell to see the day's high and low.</p>
     </div>
   </header>
 
-  <div class="temp-heatmap__grid" role="grid">
-    <div class="temp-heatmap__grid-inner">
-      <div class="temp-heatmap__corner"></div>
+  <div class="overflow-x-auto pb-1" role="grid">
+    <div class="temp-heatmap-grid-inner">
+      <div class="h-[0.85rem]"></div>
       <% (1..31).each do |day| %>
-        <div class="temp-heatmap__day-tick" role="columnheader">
+        <div class="temp-heatmap-day-tick" role="columnheader">
           <% if day_ticks.include?(day) %><%= day %><% end %>
         </div>
       <% end %>
 
       <% (1..12).each do |m| %>
-        <div class="temp-heatmap__month-label <%= 'temp-heatmap__month-label--highlight' if highlighted?(m) %>" role="rowheader"><%= month_label(m) %></div>
+        <div class="temp-heatmap-month-label <%= 'temp-heatmap-month-label-highlight' if highlighted?(m) %>" role="rowheader"><%= month_label(m) %></div>
         <% (1..31).each do |d| %>
           <% day = days_by_month[m]&.find { |x| x[:day] == d } %>
           <% valid_date = Date.valid_date?(year, m, d) %>
           <% if !valid_date %>
-            <div class="temp-heatmap__cell temp-heatmap__cell--void" aria-hidden="true"></div>
+            <div class="temp-heatmap-cell temp-heatmap-cell-void" aria-hidden="true"></div>
           <% elsif day.nil? %>
-            <div class="temp-heatmap__cell temp-heatmap__cell--empty" role="gridcell" aria-label="<%= Date.new(year, m, d).strftime('%b %d, %Y') %>: no data"></div>
+            <div class="temp-heatmap-cell temp-heatmap-cell-empty" role="gridcell" aria-label="<%= Date.new(year, m, d).strftime('%b %d, %Y') %>: no data"></div>
           <% else %>
             <button
               type="button"
-              class="temp-heatmap__cell <%= 'temp-heatmap__cell--partial' if day[:partial] %>"
+              class="temp-heatmap-cell <%= 'temp-heatmap-cell-partial' if day[:partial] %>"
               style="<%= cell_style(day) %>"
               role="gridcell"
               aria-label="<%= cell_title(day) %>: <%= cell_body(day) %>"
@@ -45,7 +45,7 @@
             to the *end of the grid*, not span 1 — so both start and
             end are set explicitly to pin the outline to a single row.
           %>
-          <div class="temp-heatmap__row-glow"
+          <div class="temp-heatmap-row-glow"
                style="grid-row: <%= m + 1 %> / <%= m + 2 %>; grid-column: 1 / -1;"
                aria-hidden="true"></div>
         <% end %>
@@ -53,17 +53,17 @@
     </div>
   </div>
 
-  <footer class="temp-heatmap__legend">
-    <div class="temp-heatmap__legend-scale">
-      <span class="temp-heatmap__legend-endpoint"><%= temp_min.round %>&deg;</span>
-      <div class="temp-heatmap__legend-bar"
-           style="background: <%= legend_gradient %>;"
+  <footer class="flex items-center gap-6 flex-wrap mt-[0.85rem] pt-[0.85rem] border-t border-border">
+    <div class="inline-flex items-center gap-2">
+      <span class="text-muted text-xs font-mono"><%= temp_min.round %>&deg;</span>
+      <div class="inline-block w-[clamp(9rem,22vw,16rem)] h-3 rounded-full"
+           style="background: <%= legend_gradient %>; border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent); box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-accent) 8%, transparent) inset;"
            aria-hidden="true"></div>
-      <span class="temp-heatmap__legend-endpoint"><%= temp_max.round %>&deg;</span>
+      <span class="text-muted text-xs font-mono"><%= temp_max.round %>&deg;</span>
     </div>
-    <div class="temp-heatmap__legend-partial">
-      <span class="temp-heatmap__legend-swatch temp-heatmap__legend-swatch--partial" aria-hidden="true"></span>
-      <span class="temp-heatmap__legend-label">Partial-day data</span>
+    <div class="inline-flex items-center gap-2 text-muted text-xs">
+      <span class="inline-block w-[1.15rem] h-3 rounded-xs border border-border/60 temp-heatmap-legend-swatch-partial" aria-hidden="true"></span>
+      <span class="uppercase tracking-[0.05em]">Partial-day data</span>
     </div>
   </footer>
 </section>
