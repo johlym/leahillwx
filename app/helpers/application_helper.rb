@@ -12,6 +12,6 @@ module ApplicationHelper
       request.path == path || request.path.start_with?("#{path}/")
     end
 
-    current ? "#{base} nav-link--active" : base
+    current ? "#{base} nav-link-active" : base
   end
 end

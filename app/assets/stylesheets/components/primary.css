@@ -1,103 +1,109 @@
-html {
-  background-color: var(--bg);
-  color-scheme: dark;
+/* Base document chrome + shared button primitives. Everything that
+   isn't a base type selector or a truly cross-page class lives on the
+   templates now. */
+
+@layer base {
+  html {
+    background-color: var(--color-bg);
+  }
+
+  body {
+    color: var(--color-text);
+    min-height: 100dvh;
+    background:
+      radial-gradient(
+        90% 60% at 15% -10%,
+        color-mix(in oklab, var(--color-accent) 12%, transparent),
+        transparent 55%
+      ),
+      radial-gradient(
+        70% 50% at 90% 100%,
+        color-mix(in oklab, var(--color-accent-strong) 8%, transparent),
+        transparent 60%
+      ),
+      var(--color-bg);
+  }
+
+  a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+  a:hover {
+    color: var(--color-accent-strong);
+    text-decoration: none;
+  }
 }
 
-body {
-  background:
-    radial-gradient(90% 60% at 15% -10%, color-mix(in oklab, var(--accent) 12%, transparent), transparent 55%),
-    radial-gradient(70% 50% at 90% 100%, color-mix(in oklab, var(--accent-strong) 8%, transparent), transparent 60%),
-    var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-}
-
-.primary-container {
+/* Page container. Also styles the h1/h2/h3 tree inside so raw markdown-
+   style views (e.g. graphs index) look correct without adding utilities
+   to every heading. */
+@utility primary-container {
   @apply container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 my-4;
 
-  h1 {
-    @apply text-5xl font-condensed uppercase my-4 tracking-wide;
-    color: var(--text-strong);
+  & h1 {
+    @apply text-5xl font-condensed uppercase my-4 tracking-wide text-text-strong;
   }
-  h2 {
-    @apply text-3xl font-condensed uppercase my-4 tracking-wide;
-    color: var(--text-strong);
+  & h2 {
+    @apply text-3xl font-condensed uppercase my-4 tracking-wide text-text-strong;
   }
-  h3 {
-    @apply text-xl font-condensed uppercase my-3 tracking-wide;
-    color: var(--text);
+  & h3 {
+    @apply text-xl font-condensed uppercase my-3 tracking-wide text-text;
   }
-  h1 small,
-  h2 small {
-    @apply text-base normal-case tracking-normal;
-    color: var(--muted);
+  & h1 small,
+  & h2 small {
+    @apply text-base normal-case tracking-normal text-muted;
   }
 }
 
-a {
-  color: var(--accent);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
-}
-a:hover {
-  color: var(--accent-strong);
-  text-decoration: none;
-}
-
-.btn-primary {
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--accent-strong) 100%, transparent),
-      color-mix(in oklab, var(--accent) 100%, transparent)
-    );
-  border: 1px solid color-mix(in oklab, var(--accent-strong) 65%, transparent);
-  color: var(--accent-contrast);
-  padding: 0.5rem 1rem;
-  border-radius: 0.4rem;
-  text-decoration: none;
-  cursor: pointer;
-  transition: background 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease, transform 100ms ease;
-  font-weight: 600;
+@utility btn-primary {
+  @apply inline-flex items-center gap-2 px-4 py-2 rounded-[0.4rem] cursor-pointer
+         text-accent-contrast font-semibold no-underline
+         transition-[background,border-color,color,box-shadow,transform] duration-150;
+  background: linear-gradient(
+    180deg,
+    var(--color-accent-strong),
+    var(--color-accent)
+  );
+  border: 1px solid color-mix(in oklab, var(--color-accent-strong) 65%, transparent);
   box-shadow:
     0 1px 0 color-mix(in oklab, #fff 15%, transparent) inset,
-    0 0 0 1px color-mix(in oklab, var(--accent) 25%, transparent),
-    0 6px 20px -10px color-mix(in oklab, var(--accent) 55%, transparent);
-}
-.btn-primary:hover {
-  color: var(--accent-contrast);
-  text-decoration: none;
-  box-shadow:
-    0 1px 0 color-mix(in oklab, #fff 20%, transparent) inset,
-    0 0 0 1px color-mix(in oklab, var(--accent) 45%, transparent),
-    0 10px 28px -12px color-mix(in oklab, var(--accent) 70%, transparent);
-}
-.btn-primary:active { transform: translateY(1px); }
+    0 0 0 1px color-mix(in oklab, var(--color-accent) 25%, transparent),
+    0 6px 20px -10px color-mix(in oklab, var(--color-accent) 55%, transparent);
 
-.btn-secondary {
-  background: color-mix(in oklab, var(--surface) 60%, transparent);
-  border: 1px solid color-mix(in oklab, var(--border-strong) 70%, transparent);
-  color: var(--text);
-  padding: 0.5rem 1rem;
-  border-radius: 0.4rem;
-  text-decoration: none;
-  cursor: pointer;
-  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease, transform 100ms ease;
-  font-weight: 500;
-  backdrop-filter: saturate(140%) blur(4px);
+  &:hover {
+    @apply text-accent-contrast no-underline;
+    box-shadow:
+      0 1px 0 color-mix(in oklab, #fff 20%, transparent) inset,
+      0 0 0 1px color-mix(in oklab, var(--color-accent) 45%, transparent),
+      0 10px 28px -12px color-mix(in oklab, var(--color-accent) 70%, transparent);
+  }
+  &:active {
+    transform: translateY(1px);
+  }
+  &[disabled] {
+    @apply opacity-40 cursor-not-allowed;
+  }
 }
-.btn-secondary:hover {
-  background-color: var(--surface-2);
-  border-color: color-mix(in oklab, var(--accent) 55%, transparent);
-  color: var(--accent-strong);
-  text-decoration: none;
-  box-shadow: 0 0 0 1px color-mix(in oklab, var(--accent) 25%, transparent);
-}
-.btn-secondary:active { transform: translateY(1px); }
 
-.btn-primary[disabled],
-.btn-secondary[disabled] {
-  opacity: 0.4;
-  cursor: not-allowed;
+@utility btn-secondary {
+  @apply inline-flex items-center gap-2 px-4 py-2 rounded-[0.4rem] cursor-pointer
+         text-text font-medium no-underline
+         backdrop-blur-sm backdrop-saturate-150
+         transition-[background-color,border-color,color,box-shadow,transform] duration-150;
+  background: color-mix(in oklab, var(--color-surface) 60%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-border-strong) 70%, transparent);
+
+  &:hover {
+    @apply bg-surface-2 text-accent-strong no-underline;
+    border-color: color-mix(in oklab, var(--color-accent) 55%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-accent) 25%, transparent);
+  }
+  &:active {
+    transform: translateY(1px);
+  }
+  &[disabled] {
+    @apply opacity-40 cursor-not-allowed;
+  }
 }

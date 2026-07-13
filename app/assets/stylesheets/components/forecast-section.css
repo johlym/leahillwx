@@ -1,52 +1,27 @@
-.forecast-section {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-  margin-top: 1rem;
+/* The .forecast-section, .forecast-column, .sidebar-column classes
+   have been inlined onto app/views/root/index.html.erb. Kept here:
+   - .tile-subtitle: shared across daily_forecast_component and camera
+     cards; a test also asserts on the class name.
+   - .camera-grid: wraps <figure> / <figcaption> / <img> children we
+     can't attach utilities to individually. */
+
+@utility tile-subtitle {
+  @apply text-muted text-[0.8rem] mb-[0.6rem];
 }
-@media (min-width: 1024px) {
-  .forecast-section {
-    grid-template-columns: 6fr 4fr;
+
+@utility camera-grid {
+  @apply grid grid-cols-2 gap-2;
+
+  & figure {
+    @apply m-0 rounded-[0.4rem] overflow-hidden border border-border bg-bg-elevated;
   }
-}
 
-.forecast-column,
-.sidebar-column {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
+  & figcaption {
+    @apply text-center text-muted text-[0.75rem] uppercase tracking-[0.04em]
+           px-[0.4rem] py-[0.35rem] border-b border-border;
+  }
 
-.tile-subtitle {
-  color: var(--muted);
-  font-size: 0.8rem;
-  margin-bottom: 0.6rem;
-}
-
-.camera-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.5rem;
-}
-.camera-grid figure {
-  background-color: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-radius: 0.4rem;
-  overflow: hidden;
-  margin: 0;
-}
-.camera-grid figcaption {
-  color: var(--muted);
-  font-size: 0.75rem;
-  text-align: center;
-  padding: 0.35rem 0.4rem;
-  border-bottom: 1px solid var(--border);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-.camera-grid img {
-  display: block;
-  width: 100%;
-  height: auto;
-  filter: contrast(1.02);
+  & img {
+    @apply block w-full h-auto filter-[contrast(1.02)];
+  }
 }

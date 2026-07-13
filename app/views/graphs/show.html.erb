@@ -13,7 +13,7 @@
     jump_button: false
   ) %>
 
-  <div class="graphs-stack">
+  <div class="flex flex-col gap-4 mt-4">
     <% if @temperature_chart %>
       <%= render Ui::ChartComponent.new(
         type: @temperature_chart[:type],
@@ -26,11 +26,11 @@
       ) %>
     <% else %>
       <%= render Ui::CardComponent.new do %>
-        <p class="text-[color:var(--muted)]">No temperature data for this period.</p>
+        <p class="text-muted">No temperature data for this period.</p>
       <% end %>
     <% end %>
 
-    <div class="graphs-row">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <% if @rain_chart %>
         <%= render Ui::ChartComponent.new(
           type: @rain_chart[:type],

@@ -1,4 +1,4 @@
-<div class="primary-container trends-page">
+<div class="primary-container text-text">
   <%= render Ui::SectionHeaderComponent.new(
     title: "Trends",
     subtitle: "How #{@focus_year} compares to recent history"
@@ -21,7 +21,7 @@
 
   <% if @has_data %>
     <%= render Ui::SectionHeaderComponent.new(title: "Year over year", level: 3, subtitle: "Monthly averages across the last few years. Bold line is the focus year.") %>
-    <div class="trends-yoy-grid">
+    <div class="flex flex-col gap-4 mt-4">
       <%= render Ui::ChartComponent.new(
         type: @yoy_temp_chart[:type],
         data: @yoy_temp_chart[:data],
@@ -54,7 +54,7 @@
     </div>
 
     <%= render Ui::SectionHeaderComponent.new(title: "Rolling averages", level: 3, subtitle: "Longer-term smoothing across every complete day on record.") %>
-    <div class="trends-rolling-grid">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
       <%= render Ui::ChartComponent.new(
         type: @rolling_temp_chart[:type],
         data: @rolling_temp_chart[:data],

@@ -1,39 +1,52 @@
 <header class="site-header" data-controller="mobile-menu">
-  <nav aria-label="Global" class="nav">
-    <div class="logo-container" data-controller="connection-status">
-      <a href="/" class="logo">
-        <%= image_tag "logo.png", alt: "Lea Hill Weather", class: "logo-image" %>
-        <span class="logo-text">Lea Hill Weather</span>
+  <nav aria-label="Global" class="mx-auto flex max-w-7xl items-center justify-between p-3 lg:px-6">
+    <div class="flex lg:flex-1 items-center gap-2" data-controller="connection-status">
+      <a href="/" class="inline-flex items-center gap-2 px-[0.35rem] py-1 no-underline text-text-strong hover:text-text-strong hover:no-underline">
+        <%= image_tag "logo.png", alt: "Lea Hill Weather",
+              class: "h-8 w-auto filter-[drop-shadow(0_0_6px_color-mix(in_oklab,var(--color-accent)_60%,transparent))]" %>
+        <span class="font-condensed text-[1.35rem] font-semibold uppercase tracking-[0.06em]">Lea Hill Weather</span>
       </a>
-      <span class="live hidden" data-connection-status-target="badge">LIVE</span>
+      <span class="hidden font-mono text-[0.7rem] tracking-[0.05em] bg-danger text-accent-contrast px-[0.3rem] py-[0.1rem] rounded-[0.2rem]"
+            data-connection-status-target="badge">LIVE</span>
     </div>
-    <div class="mobile-toggle-container">
-      <button type="button" class="mobile-toggle" data-mobile-menu-target="button" data-action="click->mobile-menu#toggle" aria-expanded="false">
+
+    <div class="flex lg:hidden">
+      <button type="button"
+              class="cursor-pointer text-text bg-transparent border border-border rounded-[0.35rem] px-[0.55rem] py-[0.4rem]"
+              data-mobile-menu-target="button" data-action="click->mobile-menu#toggle" aria-expanded="false">
         <span class="sr-only">Open main menu</span>
-        <i class="fa-regular fa-bars icon" aria-hidden="true" data-mobile-menu-target="openIcon"></i>
-        <i class="fa-regular fa-x icon hidden" aria-hidden="true" data-mobile-menu-target="closeIcon"></i>
+        <i class="fa-regular fa-bars text-[1.1rem]" aria-hidden="true" data-mobile-menu-target="openIcon"></i>
+        <i class="fa-regular fa-x text-[1.1rem] hidden" aria-hidden="true" data-mobile-menu-target="closeIcon"></i>
       </button>
     </div>
-    <div class="nav-links">
-      <%= link_to "Live", root_path, class: nav_link_classes(root_path) %>
+
+    <div class="hidden lg:flex lg:gap-x-1">
+      <%= link_to "Live",    root_path,    class: nav_link_classes(root_path) %>
       <%= link_to "Reports", reports_path, class: nav_link_classes(reports_path) %>
       <%= link_to "Records", records_path, class: nav_link_classes(records_path) %>
-      <%= link_to "Graphs", graphs_path, class: nav_link_classes(graphs_path) %>
-      <%= link_to "Trends", trends_path, class: nav_link_classes(trends_path) %>
+      <%= link_to "Graphs",  graphs_path,  class: nav_link_classes(graphs_path) %>
+      <%= link_to "Trends",  trends_path,  class: nav_link_classes(trends_path) %>
       <%= link_to "Almanac", almanac_path, class: nav_link_classes(almanac_path) %>
-      <%= link_to "About", about_path, class: nav_link_classes(about_path) %>
+      <%= link_to "About",   about_path,   class: nav_link_classes(about_path) %>
     </div>
   </nav>
 
-  <div id="mobile-menu" class="mobile-menu hidden" data-mobile-menu-target="menu">
-    <div class="mobile-menu-inner">
-      <%= link_to "Live", root_path, class: "mobile-link" %>
-      <%= link_to "Reports", reports_path, class: "mobile-link" %>
-      <%= link_to "Records", records_path, class: "mobile-link" %>
-      <%= link_to "Graphs", graphs_path, class: "mobile-link" %>
-      <%= link_to "Trends", trends_path, class: "mobile-link" %>
-      <%= link_to "Almanac", almanac_path, class: "mobile-link" %>
-      <%= link_to "About", about_path, class: "mobile-link" %>
+  <div id="mobile-menu"
+       class="hidden lg:hidden border-t border-border bg-bg-elevated"
+       data-mobile-menu-target="menu">
+    <div class="px-4 py-3 flex flex-col gap-1">
+      <% [
+           ["Live",    root_path],
+           ["Reports", reports_path],
+           ["Records", records_path],
+           ["Graphs",  graphs_path],
+           ["Trends",  trends_path],
+           ["Almanac", almanac_path],
+           ["About",   about_path]
+         ].each do |label, path| %>
+        <%= link_to label, path,
+              class: "px-3 py-[0.55rem] rounded-[0.35rem] text-text font-medium no-underline hover:bg-surface hover:text-text-strong hover:no-underline" %>
+      <% end %>
     </div>
   </div>
 </header>

@@ -1,17 +1,2 @@
-.footer {
-  @apply container max-w-7xl mx-auto text-xs text-center p-4 mt-8;
-  color: var(--subtle);
-  border-top: 1px solid var(--border);
-
-  p { margin: 0.25rem 0; }
-  a { color: var(--muted); }
-  a:hover { color: var(--accent); }
-  code {
-    background-color: var(--surface);
-    color: var(--muted);
-    padding: 0 0.3rem;
-    border-radius: 0.2rem;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 0.72rem;
-  }
-}
+/* All footer styling now lives inline on _footer.html.erb. This file
+   is intentionally empty and will be removed in Phase 6. */

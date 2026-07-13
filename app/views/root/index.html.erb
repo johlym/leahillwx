@@ -5,8 +5,8 @@
 <div class="primary-container">
   <%= render Home::Forecast::HourlyForecastComponent.new(hours: @forecast.hours.first(8), timestamp: @forecast.created_at) %>
 
-  <div class="forecast-section">
-    <div class="forecast-column">
+  <div class="grid grid-cols-1 lg:grid-cols-[6fr_4fr] gap-4 mt-4">
+    <div class="flex flex-col gap-4">
       <%= render Home::Forecast::DailyForecastComponent.new(days: @forecast.days, timestamp: @forecast.created_at) %>
 
       <%= render Ui::CardComponent.new(title: "Earthquakes", subtitle: "The last 5 earthquakes nearest to this location.") do %>
@@ -14,7 +14,7 @@
       <% end %>
     </div>
 
-    <div class="sidebar-column">
+    <div class="flex flex-col gap-4">
       <%= render Ui::CardComponent.new(title: "Auburn Traffic Cameras", padding: :default) do %>
         <div data-controller="image-refresh">
           <p class="tile-subtitle">

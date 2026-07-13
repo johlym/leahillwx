@@ -1,129 +1,39 @@
-.site-header {
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--bg) 88%, transparent),
-      color-mix(in oklab, var(--bg) 72%, transparent)
-    );
-  border-bottom: 1px solid color-mix(in oklab, var(--border-strong) 55%, transparent);
-  backdrop-filter: saturate(160%) blur(10px);
-  -webkit-backdrop-filter: saturate(160%) blur(10px);
-  position: sticky;
-  top: 0;
-  z-index: 40;
+/* Sticky glass header. Only the visual surface treatment (gradient +
+   backdrop-filter + border tint + drop shadow) lives here as a flat
+   @utility; layout, links, and interactive states are Tailwind
+   utilities on _header.html.erb / application_helper. */
+
+@utility site-header {
+  @apply sticky top-0 z-40 backdrop-blur-md backdrop-saturate-150;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-bg) 88%, transparent),
+    color-mix(in oklab, var(--color-bg) 72%, transparent)
+  );
+  border-bottom: 1px solid color-mix(in oklab, var(--color-border-strong) 55%, transparent);
   box-shadow: 0 20px 40px -30px rgba(0, 0, 0, 0.5);
+}
 
-  .nav {
-    @apply mx-auto flex max-w-7xl items-center justify-between p-3 lg:px-6;
+/* Nav link — flat utility so the shared application_helper#nav_link_classes
+   helper can render it without duplicating a long utility string, and so
+   the active state can layer additional styling cleanly. */
+@utility nav-link {
+  @apply inline-flex items-center gap-2 px-3 py-[0.4rem] rounded-[0.35rem]
+         text-muted text-[0.85rem] font-medium uppercase tracking-[0.05em]
+         no-underline
+         transition-[color,background-color] duration-150;
+
+  &:hover {
+    @apply text-text-strong bg-surface no-underline;
   }
+}
 
-  .logo-container {
-    @apply flex lg:flex-1 items-center gap-2;
+@utility nav-link-active {
+  @apply text-accent-strong;
+  background-color: color-mix(in oklab, var(--color-accent) 12%, transparent);
 
-    .logo {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--text-strong);
-      text-decoration: none;
-      padding: 0.25rem 0.35rem;
-    }
-
-    .logo:hover {
-      color: var(--text-strong);
-      text-decoration: none;
-    }
-
-    .logo-image {
-      @apply h-8 w-auto;
-      filter: drop-shadow(0 0 6px color-mix(in oklab, var(--accent) 60%, transparent));
-    }
-
-    .logo-text {
-      font-family: var(--font-condensed);
-      font-size: 1.35rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      font-weight: 600;
-    }
-
-    .live {
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 0.7rem;
-      background-color: var(--danger);
-      color: var(--accent-contrast);
-      padding: 0.1rem 0.3rem;
-      border-radius: 0.2rem;
-      letter-spacing: 0.05em;
-      &.hidden { display: none; }
-    }
-  }
-
-  .mobile-toggle-container {
-    @apply flex lg:hidden;
-
-    .mobile-toggle {
-      color: var(--text);
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 0.35rem;
-      padding: 0.4rem 0.55rem;
-      cursor: pointer;
-
-      .icon { font-size: 1.1rem; }
-      .icon.hidden { display: none; }
-    }
-  }
-
-  .nav-links {
-    @apply hidden lg:flex lg:gap-x-1;
-
-    .nav-link {
-      color: var(--muted);
-      font-size: 0.85rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      padding: 0.4rem 0.75rem;
-      border-radius: 0.35rem;
-      text-decoration: none;
-      transition: color 150ms ease, background-color 150ms ease;
-    }
-    .nav-link:hover {
-      color: var(--text-strong);
-      background-color: var(--surface);
-      text-decoration: none;
-    }
-    .nav-link--active {
-      color: var(--accent-strong);
-      background-color: color-mix(in oklab, var(--accent) 12%, transparent);
-    }
-    .nav-link--active:hover {
-      color: var(--accent-strong);
-      background-color: color-mix(in oklab, var(--accent) 18%, transparent);
-    }
-  }
-
-  .mobile-menu {
-    @apply lg:hidden;
-    border-top: 1px solid var(--border);
-    background-color: var(--bg-elevated);
-
-    .mobile-menu-inner {
-      @apply px-4 py-3 flex flex-col gap-1;
-
-      .mobile-link {
-        color: var(--text);
-        text-decoration: none;
-        padding: 0.55rem 0.75rem;
-        border-radius: 0.35rem;
-        font-weight: 500;
-      }
-      .mobile-link:hover {
-        background-color: var(--surface);
-        color: var(--text-strong);
-        text-decoration: none;
-      }
-    }
+  &:hover {
+    @apply text-accent-strong;
+    background-color: color-mix(in oklab, var(--color-accent) 18%, transparent);
   }
 }
