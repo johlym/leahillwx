@@ -95,18 +95,49 @@
     0 12px 28px -20px rgba(0, 0, 0, 0.6);
 }
 
-@utility temp-heatmap-grid-inner {
-  @apply relative grid gap-0.75 items-stretch;
+/* Outer grid owns the column tracks; each row is a subgrid so all
+   rows (day-tick header + 12 month rows) share one column axis and
+   stay perfectly aligned. */
+@utility temp-heatmap-grid {
+  @apply grid gap-y-0.75;
   min-width: 540px;
   grid-template-columns: 2.75rem repeat(31, minmax(0.75rem, 1fr));
 }
 
+@utility temp-heatmap-row {
+  @apply grid col-span-full items-center gap-x-0.75;
+  grid-template-columns: subgrid;
+}
+
+@utility temp-heatmap-row-ticks {
+  @apply items-end pb-1;
+}
+
+/* Highlight is a `::before` overlay rather than an `outline`, so:
+   - vertical extent (-inset-y-0.75 = -3px) exactly fills the 3px
+     row-gap and never bleeds onto the adjacent months' cells,
+   - horizontal edges stay flush with the row so the scroll
+     container's `overflow-x: auto` clip doesn't shave the sides,
+   - the row's own layout is untouched. */
+@utility temp-heatmap-row-highlight {
+  @apply relative z-10;
+
+  &::before {
+    content: "";
+    @apply absolute inset-x-0 -inset-y-0.75 pointer-events-none rounded-md;
+    border: 2px solid color-mix(in oklab, var(--color-accent-strong) 90%, transparent);
+    box-shadow:
+      0 0 22px color-mix(in oklab, var(--color-accent) 55%, transparent),
+      0 0 4px color-mix(in oklab, var(--color-accent) 90%, transparent) inset;
+  }
+}
+
 @utility temp-heatmap-day-tick {
-  @apply text-subtle text-[0.65rem] font-mono text-center self-end pb-1;
+  @apply text-subtle text-[0.65rem] font-mono text-center;
 }
 
 @utility temp-heatmap-month-label {
-  @apply relative z-10 self-center text-muted font-condensed uppercase
+  @apply text-muted font-condensed uppercase
          tracking-[0.05em] text-[0.75rem] pr-[0.35rem] text-right;
 }
 
@@ -115,19 +146,19 @@
 }
 
 @utility temp-heatmap-cell {
-  @apply aspect-square rounded-[3px] p-0 cursor-pointer
-         transition-[transform,outline,filter] duration-120 bg-clip-padding;
+  @apply aspect-square rounded-[3px] bg-clip-padding
+         transition-[transform,outline,filter] duration-120;
   border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
 
   &:hover,
   &:focus-visible {
-    @apply outline-2 outline-accent outline-offset-1 scale-105 relative z-10;
+    @apply outline-2 outline-accent outline-offset-1 scale-105 relative z-10 cursor-pointer;
     filter: brightness(1.05);
   }
 }
 
 @utility temp-heatmap-cell-empty {
-  @apply bg-transparent cursor-default;
+  @apply bg-transparent;
   border: 1px dashed color-mix(in oklab, var(--color-border) 80%, transparent);
 }
 
@@ -137,14 +168,6 @@
 
 @utility temp-heatmap-cell-partial {
   border-color: color-mix(in oklab, var(--color-text) 25%, transparent);
-}
-
-@utility temp-heatmap-row-glow {
-  @apply absolute -inset-0.75 pointer-events-none rounded-lg z-20;
-  border: 2px solid color-mix(in oklab, var(--color-accent-strong) 90%, transparent);
-  box-shadow:
-    0 0 22px color-mix(in oklab, var(--color-accent) 55%, transparent),
-    0 0 4px color-mix(in oklab, var(--color-accent) 90%, transparent) inset;
 }
 
 @utility temp-heatmap-legend-swatch-partial {

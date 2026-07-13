@@ -6,49 +6,48 @@
     </div>
   </header>
 
-  <div class="overflow-x-auto pb-1" role="grid">
-    <div class="temp-heatmap-grid-inner">
-      <div class="h-[0.85rem]"></div>
-      <% (1..31).each do |day| %>
-        <div class="temp-heatmap-day-tick" role="columnheader">
-          <% if day_ticks.include?(day) %><%= day %><% end %>
-        </div>
-      <% end %>
+  <%#
+    Column tracks are declared once on the outer grid; each row uses
+    `grid-template-columns: subgrid` so the month label and 31 day
+    cells always line up with the day-tick header, regardless of row
+    count. The highlighted month gets an `outline` — no absolutely
+    positioned overlay, no layout shift.
+  %>
+  <%#
+    `overflow-x: auto` promotes `overflow-y` to `auto` per spec, so the
+    scroll container also clips vertically. `py-2` keeps the highlight
+    ring and glow off the clip boundary for the first/last month rows.
+  %>
+  <div class="overflow-x-auto py-2">
+    <div class="temp-heatmap-grid" role="grid">
+      <div class="temp-heatmap-row temp-heatmap-row-ticks" role="row">
+        <div aria-hidden="true"></div>
+        <% (1..31).each do |day| %>
+          <div class="temp-heatmap-day-tick" role="columnheader">
+            <% if day_ticks.include?(day) %><%= day %><% end %>
+          </div>
+        <% end %>
+      </div>
 
       <% (1..12).each do |m| %>
-        <div class="temp-heatmap-month-label <%= 'temp-heatmap-month-label-highlight' if highlighted?(m) %>" role="rowheader"><%= month_label(m) %></div>
-        <% (1..31).each do |d| %>
-          <% day = days_by_month[m]&.find { |x| x[:day] == d } %>
-          <% valid_date = Date.valid_date?(year, m, d) %>
-          <% if !valid_date %>
-            <div class="temp-heatmap-cell temp-heatmap-cell-void" aria-hidden="true"></div>
-          <% elsif day.nil? %>
-            <div class="temp-heatmap-cell temp-heatmap-cell-empty" role="gridcell" aria-label="<%= Date.new(year, m, d).strftime('%b %d, %Y') %>: no data"></div>
-          <% else %>
-            <button
-              type="button"
-              class="temp-heatmap-cell <%= 'temp-heatmap-cell-partial' if day[:partial] %>"
-              style="<%= cell_style(day) %>"
-              role="gridcell"
-              aria-label="<%= cell_title(day) %>: <%= cell_body(day) %>"
-              data-controller="tooltip"
-              data-tooltip-title-value="<%= cell_title(day) %>"
-              data-tooltip-body-value="<%= cell_body(day) %>"
-            ></button>
+        <div class="temp-heatmap-row <%= 'temp-heatmap-row-highlight' if highlighted?(m) %>" role="row">
+          <div class="temp-heatmap-month-label <%= 'temp-heatmap-month-label-highlight' if highlighted?(m) %>" role="rowheader"><%= month_label(m) %></div>
+          <% (1..31).each do |d| %>
+            <% day = days_by_month[m]&.find { |x| x[:day] == d } %>
+            <% valid_date = Date.valid_date?(year, m, d) %>
+            <% if !valid_date %>
+              <div class="temp-heatmap-cell temp-heatmap-cell-void" aria-hidden="true"></div>
+            <% elsif day.nil? %>
+              <div class="temp-heatmap-cell temp-heatmap-cell-empty" role="gridcell" aria-label="<%= Date.new(year, m, d).strftime('%b %d, %Y') %>: no data"></div>
+            <% else %>
+              <div class="temp-heatmap-cell <%= 'temp-heatmap-cell-partial' if day[:partial] %>" style="<%= cell_style(day) %>" role="gridcell"
+                aria-label="<%= cell_title(day) %>: <%= cell_body(day) %>"
+                data-controller="tooltip"
+                data-tooltip-title-value="<%= cell_title(day) %>"
+                data-tooltip-body-value="<%= cell_body(day) %>"></div>
+            <% end %>
           <% end %>
-        <% end %>
-        <% if highlighted?(m) %>
-          <%#
-            Row-spanning overlay. Positioned absolutely inside the
-            grid so it can't shift adjacent rows. When a grid item is
-            position: absolute, an unspecified grid-row-end defaults
-            to the *end of the grid*, not span 1 — so both start and
-            end are set explicitly to pin the outline to a single row.
-          %>
-          <div class="temp-heatmap-row-glow"
-               style="grid-row: <%= m + 1 %> / <%= m + 2 %>; grid-column: 1 / -1;"
-               aria-hidden="true"></div>
-        <% end %>
+        </div>
       <% end %>
     </div>
   </div>
