@@ -6,13 +6,19 @@ class Reports::DownloadLinkComponentTest < ViewComponent::TestCase
   test "renders download link with correct text" do
     render_inline(Reports::DownloadLinkComponent.new(path: "/reports/2024/january"))
 
-    assert_selector "a", text: "Download Text Version"
+    assert_selector "a", text: "Download text version"
   end
 
   test "renders download link with correct CSS class" do
     render_inline(Reports::DownloadLinkComponent.new(path: "/reports/2024/january"))
 
-    assert_selector "a.download-button"
+    assert_selector "a.btn-secondary"
+  end
+
+  test "renders download icon" do
+    render_inline(Reports::DownloadLinkComponent.new(path: "/reports/2024/january"))
+
+    assert_selector "a i.fa-regular.fa-download[aria-hidden='true']"
   end
 
   test "appends .txt extension to path" do

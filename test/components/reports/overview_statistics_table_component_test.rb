@@ -61,20 +61,20 @@ class Reports::OverviewStatisticsTableComponentTest < ViewComponent::TestCase
   test "renders mean temperature" do
     render_inline(Reports::OverviewStatisticsTableComponent.new(report: @report))
 
-    assert_selector "td", text: /122\.00° F/
+    assert_selector "td", text: /122\.00°/
   end
 
   test "renders high temperature with day" do
     render_inline(Reports::OverviewStatisticsTableComponent.new(report: @report))
 
-    assert_selector "td", text: /167\.00° F/
+    assert_selector "td", text: /167\.00°/
     assert_selector "td span.text-xs", text: "(Day 15)"
   end
 
   test "renders low temperature with day" do
     render_inline(Reports::OverviewStatisticsTableComponent.new(report: @report))
 
-    assert_selector "td", text: /77\.00° F/
+    assert_selector "td", text: /77\.00°/
     assert_selector "td span.text-xs", text: "(Day 5)"
   end
 

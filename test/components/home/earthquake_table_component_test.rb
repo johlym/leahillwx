@@ -34,11 +34,12 @@ class Home::EarthquakeTableComponentTest < ViewComponent::TestCase
     earthquake = earthquakes(:one)
     render_inline(Home::EarthquakeTableComponent.new(earthquakes: [ earthquake ]))
 
-    expected_date = earthquake.eventtime.in_time_zone("America/Los_Angeles").strftime("%B %d, %Y")
-    expected_time = earthquake.eventtime.in_time_zone("America/Los_Angeles").strftime("%I:%M %p")
+    time = earthquake.last_updated || earthquake.eventtime
+    expected_date = time.in_time_zone("America/Los_Angeles").strftime("%b %d, %Y")
+    expected_time = time.in_time_zone("America/Los_Angeles").strftime("%I:%M %p")
 
-    assert_selector "div.eq-cell", text: /#{Regexp.escape(expected_date)}/
-    assert_selector "div.eq-cell", text: /#{Regexp.escape(expected_time)}/
+    assert_selector "div.eq-timestamp-cell", text: /#{Regexp.escape(expected_date)}/
+    assert_selector "span.eq-time", text: /#{Regexp.escape(expected_time)}/
   end
 
   test "renders distance with precision" do

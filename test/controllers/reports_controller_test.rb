@@ -30,7 +30,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
     Report.destroy_all
     get reports_url
     assert_response :success
-    assert_select "div.message"
+    assert_select "p", text: /No reports available yet/
   end
 
   test "should get available reports as json" do

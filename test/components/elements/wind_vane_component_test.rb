@@ -33,6 +33,26 @@ class Elements::WindVaneComponentTest < ViewComponent::TestCase
 
     assert_selector "i.fa-fw"
     assert_selector "i.fa-sharp-duotone"
-    assert_selector "i.fa-light"
+    assert_selector "i.fa-solid"
+    assert_selector "i.fa-location-arrow-up"
+    assert_selector "i.wind-vane"
+  end
+
+  test "sets aria-label with rounded direction" do
+    render_inline(Elements::WindVaneComponent.new(direction: 137.6))
+
+    assert_selector "i[aria-label='138 degrees']"
+  end
+
+  test "exposes role='img' for accessibility" do
+    render_inline(Elements::WindVaneComponent.new(direction: 0))
+
+    assert_selector "i[role='img']"
+  end
+
+  test "renders nothing when direction is nil" do
+    render_inline(Elements::WindVaneComponent.new(direction: nil))
+
+    assert_no_selector "i.wind-vane"
   end
 end

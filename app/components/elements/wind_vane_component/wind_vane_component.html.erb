@@ -1,4 +1,6 @@
-<i class="fa-fw fa-sharp-duotone fa-solid fa-location-arrow-up wind-vane"
-   style="--fa-primary-color: var(--accent); --fa-secondary-color: var(--muted); --fa-secondary-opacity: 0.6; display: inline-block; transform: rotate(<%= direction %>deg);"
-   role="img"
-   aria-label="<%= direction.round %> degrees"></i>
+<% if direction.present? %>
+  <i class="fa-fw fa-sharp-duotone fa-solid fa-location-arrow-up wind-vane"
+     style="--fa-primary-color: var(--accent); --fa-secondary-color: var(--muted); --fa-secondary-opacity: 0.6; display: inline-block; transform: rotate(<%= direction %>deg);"
+     role="img"
+     aria-label="<%= direction.round %> degrees"></i>
+<% end %>
