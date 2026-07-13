@@ -70,14 +70,6 @@ class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
     end
   end
 
-  def current_sunrise
-    @almanac.sunrise_at.in_time_zone("America/Los_Angeles").strftime("%I:%M %p")
-  end
-
-  def current_sunset
-    @almanac.sunset_at.in_time_zone("America/Los_Angeles").strftime("%I:%M %p")
-  end
-
   def current_rain_day
     @current.rain_day_in.round(2)
   end
