@@ -20,5 +20,11 @@
       <p class="live-tile-peak <%= "text-warning" if stale? %>"><%= as_of_label %></p>
       <p class="live-tile-meta mt-0.5"><%= source_label %></p>
     </div>
+    <%= render Home::CurrentWeather::LiveSparklineComponent.new(
+          series: @sparkline,
+          y_unit: "",
+          decimals: 0,
+          aria_label: "Hourly average AQI over the last 24 hours"
+        ) %>
   </div>
 <% end %>

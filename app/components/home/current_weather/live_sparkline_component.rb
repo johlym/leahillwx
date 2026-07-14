@@ -1,0 +1,69 @@
+# frozen_string_literal: true
+
+# Compact sparkline for home live tiles.
+# Plots the hourly average as a single accent line. Y-axis is scaled to
+# the overall 24h low/high and only those endpoint labels are shown.
+class Home::CurrentWeather::LiveSparklineComponent < ViewComponent::Base
+  def initialize(series:, y_unit: "", aria_label:, decimals: 0)
+    @series = series
+    @y_unit = y_unit
+    @aria_label = aria_label
+    @decimals = decimals
+  end
+
+  def render?
+    @series.present? && @series[:values]&.compact&.length.to_i >= 2
+  end
+
+  def call
+    content_tag(
+      :div,
+      "",
+      class: "live-tile-sparkline",
+      data: {
+        controller: "chart",
+        chart_type_value: "line",
+        chart_data_value: chart_data.to_json,
+        chart_options_value: chart_options.to_json
+      },
+      role: "img",
+      "aria-label": @aria_label
+    )
+  end
+
+  private
+
+  def chart_data
+    {
+      labels: @series[:labels],
+      datasets: [
+        {
+          label: "Average",
+          data: @series[:values],
+          color: "var(--accent)",
+          borderWidth: 1.6,
+          tension: 0.35,
+          spanGaps: true,
+          fill: true,
+          fillAlpha: 0.12
+        }
+      ]
+    }
+  end
+
+  def chart_options
+    options = {
+      hideLegend: true,
+      hideGrid: true,
+      hideXAxis: true,
+      yTicks: "minmax",
+      tooltipFormat: "hourValue",
+      styleGaps: true,
+      decimals: @decimals,
+      yUnit: @y_unit
+    }
+    options[:yMin] = @series[:y_min] if @series[:y_min]
+    options[:yMax] = @series[:y_max] if @series[:y_max]
+    options
+  end
+end

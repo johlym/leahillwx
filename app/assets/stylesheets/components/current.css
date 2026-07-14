@@ -87,8 +87,31 @@
 }
 
 @utility live-tile-peak {
-  @apply text-[0.7rem] leading-[1.3] mt-auto pt-[0.35rem] tracking-[0.02em];
+  @apply text-[0.7rem] leading-[1.3] pt-[0.35rem] tracking-[0.02em];
   color: color-mix(in oklab, var(--color-muted) 75%, transparent);
+}
+
+@utility live-tile-sparkline {
+  @apply relative mt-auto pt-2 h-[4.5rem] min-h-[4.5rem] shrink-0;
+  border-top: 1px dashed
+    color-mix(in oklab, var(--color-border) 60%, transparent);
+
+  & canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
+
+/* Stretch cards so sparklines share a bottom baseline even when card
+   body content heights differ (home live strip + wind card). */
+.current-conditions .ui-card:has(.live-tile),
+.primary-container .ui-card:has(.live-tile) {
+  @apply h-full flex flex-col;
+}
+
+.current-conditions .ui-card:has(.live-tile) > .text-text,
+.primary-container .ui-card:has(.live-tile) > .text-text {
+  @apply flex flex-1 flex-col min-h-0;
 }
 
 /* UV Index colour scale — green (0) -> yellow -> orange -> red ->

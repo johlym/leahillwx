@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 class Home::CurrentWeather::Pm25Component < ViewComponent::Base
-  def initialize(current:)
+  def initialize(current:, sparkline: nil)
     @current = current
+    @sparkline = sparkline
   end
 
   def render?

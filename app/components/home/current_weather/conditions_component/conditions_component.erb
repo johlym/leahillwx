@@ -30,30 +30,38 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3 min-w-0">
         <%= render Ui::CardComponent.new(padding: :default) do %>
-          <div class="flex items-stretch justify-between gap-4">
-            <div class="flex-1 min-w-0 live-tile">
-              <div class="live-tile-label">
-                <i class="fa-regular fa-wind text-accent text-base"></i>
-                <span>Wind</span>
-              </div>
-              <div class="live-tile-body">
-                <div class="live-tile-value">
-                  <span class="live-tile-number live-tile-number-xl"
-                        data-weather-update-target="windSpeed"><%= current_wind_speed %></span>
-                  <span class="live-tile-unit live-tile-unit-lg">mph</span>
+          <div class="live-tile">
+            <div class="flex items-stretch justify-between gap-4">
+              <div class="flex-1 min-w-0">
+                <div class="live-tile-label">
+                  <i class="fa-regular fa-wind text-accent text-base"></i>
+                  <span>Wind</span>
                 </div>
-                <p class="live-tile-meta">
-                  from <span data-weather-update-target="windDirection"><%= current_wind_direction %></span><br />
-                  <span data-weather-update-target="gustSpeed">Gusting to <%= current_gust_speed %> mph</span>
-                </p>
+                <div class="live-tile-body">
+                  <div class="live-tile-value">
+                    <span class="live-tile-number live-tile-number-xl"
+                          data-weather-update-target="windSpeed"><%= current_wind_speed %></span>
+                    <span class="live-tile-unit live-tile-unit-lg">mph</span>
+                  </div>
+                  <p class="live-tile-meta">
+                    from <span data-weather-update-target="windDirection"><%= current_wind_direction %></span><br />
+                    <span data-weather-update-target="gustSpeed">Gusting to <%= current_gust_speed %> mph</span>
+                  </p>
+                </div>
+                <% if today_peaks[:wind_gust_mph] %>
+                  <p class="live-tile-peak">Peak gust today <%= today_peaks[:wind_gust_mph] %> mph</p>
+                <% end %>
               </div>
-              <% if today_peaks[:wind_gust_mph] %>
-                <p class="live-tile-peak">Peak gust today <%= today_peaks[:wind_gust_mph] %> mph</p>
-              <% end %>
+              <div class="shrink-0 flex items-center justify-center" data-weather-update-target="windCompass">
+                <%= render Elements::CompassComponent.new(direction: @current.wind_dir, size: :lg, show_label: false) %>
+              </div>
             </div>
-            <div class="shrink-0 flex items-center justify-center" data-weather-update-target="windCompass">
-              <%= render Elements::CompassComponent.new(direction: @current.wind_dir, size: :lg, show_label: false) %>
-            </div>
+            <%= render Home::CurrentWeather::LiveSparklineComponent.new(
+                  series: hourly_ranges[:wind],
+                  y_unit: " mph",
+                  decimals: 0,
+                  aria_label: "Hourly average wind speed over the last 24 hours"
+                ) %>
           </div>
         <% end %>
 
@@ -72,7 +80,7 @@
 </section>
 
 <div class="primary-container">
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 mt-1 mb-4">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-1 mb-4">
     <%= render Ui::CardComponent.new(padding: :default) do %>
       <div class="live-tile">
         <div class="live-tile-label">
@@ -88,6 +96,12 @@
             <p class="live-tile-peak">Peak today <%= today_peaks[:humidity] %>%</p>
           <% end %>
         </div>
+        <%= render Home::CurrentWeather::LiveSparklineComponent.new(
+              series: hourly_ranges[:humidity],
+              y_unit: "%",
+              decimals: 0,
+              aria_label: "Hourly average humidity over the last 24 hours"
+            ) %>
       </div>
     <% end %>
 
@@ -112,10 +126,16 @@
             <p class="live-tile-peak">Peak today <%= today_peaks[:uvi] %></p>
           <% end %>
         </div>
+        <%= render Home::CurrentWeather::LiveSparklineComponent.new(
+              series: hourly_ranges[:uvi],
+              y_unit: "",
+              decimals: 0,
+              aria_label: "Hourly average UV index over the last 24 hours"
+            ) %>
       </div>
     <% end %>
 
-    <%= render Home::CurrentWeather::Pm25Component.new(current: aqi) %>
+    <%= render Home::CurrentWeather::Pm25Component.new(current: aqi, sparkline: hourly_ranges[:aqi]) %>
 
     <%= render Ui::CardComponent.new(padding: :default) do %>
       <div class="live-tile">
@@ -135,6 +155,12 @@
             <p class="live-tile-peak">Peak rate today <%= today_peaks[:rain_rate_in] %> in/hr</p>
           <% end %>
         </div>
+        <%= render Home::CurrentWeather::LiveSparklineComponent.new(
+              series: hourly_ranges[:rain_rate],
+              y_unit: " in",
+              decimals: 2,
+              aria_label: "Hourly average rain rate over the last 24 hours"
+            ) %>
       </div>
     <% end %>
 
@@ -153,6 +179,12 @@
             <p class="live-tile-peak">Peak today <%= today_peaks[:dew_point_f] %>°F</p>
           <% end %>
         </div>
+        <%= render Home::CurrentWeather::LiveSparklineComponent.new(
+              series: hourly_ranges[:dew_point],
+              y_unit: "°",
+              decimals: 0,
+              aria_label: "Hourly average dew point over the last 24 hours"
+            ) %>
       </div>
     <% end %>
 
@@ -169,6 +201,12 @@
           </div>
           <p class="live-tile-meta">Estimated from temp/dew spread</p>
         </div>
+        <%= render Home::CurrentWeather::LiveSparklineComponent.new(
+              series: hourly_ranges[:cloud_base],
+              y_unit: " ft",
+              decimals: 0,
+              aria_label: "Hourly average cloud base over the last 24 hours"
+            ) %>
       </div>
     <% end %>
   </div>

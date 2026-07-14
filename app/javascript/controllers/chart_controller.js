@@ -16,6 +16,7 @@ import {
   ArcElement,
 } from "chart.js"
 import { readPaletteColors, withAlpha, observePaletteChanges } from "./helpers/palette"
+import { gapHatchPlugin } from "./helpers/gap_hatch_plugin"
 
 Chart.register(
   LineController,
@@ -31,6 +32,7 @@ Chart.register(
   Filler,
   DoughnutController,
   ArcElement,
+  gapHatchPlugin,
 )
 
 // Renders a Chart.js chart driven by data-attributes from
@@ -45,7 +47,10 @@ Chart.register(
 //   }
 //   data-chart-options-value: {
 //     yUnit, y2Unit, xUnit, stacked, beginAtZero, aspectRatio,
-//     yLabel, xLabel, hideLegend, hideGrid, band: { fromKey, toKey }
+//     yLabel, xLabel, hideLegend, hideGrid, hideAxes, hideXAxis,
+//     yTicks: "minmax" | undefined, tooltipFormat: "hourValue" | undefined,
+//     styleGaps: true to dash + hatch segments that bridge missing points,
+//     decimals, band: { fromKey, toKey }
 //   }
 export default class extends Controller {
   static values = {
@@ -131,6 +136,12 @@ export default class extends Controller {
           below: withAlpha(color, 0.15),
         }
       }
+      if (options.styleGaps) {
+        base.spanGaps = true
+        base.segment = {
+          borderDash: (ctx) => (isGapSegment(ctx) ? [4, 3] : undefined),
+        }
+      }
       return base
     })
   }
@@ -164,7 +175,11 @@ export default class extends Controller {
           padding: 10,
           cornerRadius: 6,
           usePointStyle: true,
+          displayColors: options.tooltipFormat !== "hourValue",
           callbacks: this.buildTooltipCallbacks(options),
+        },
+        gapHatch: {
+          enabled: options.styleGaps === true,
         },
       },
       scales,
@@ -175,36 +190,76 @@ export default class extends Controller {
     const gridColor = withAlpha(palette.border, 0.4)
     const tickColor = palette.muted
     const hideAxes = options.hideAxes === true
+    const hideXAxis = hideAxes || options.hideXAxis === true
+    const showYAxis = !hideAxes
+    const showGrid = !hideAxes && !options.hideGrid
+    const yTickCallback = (v) => {
+      const decimals = options.decimals
+      const formatted =
+        typeof v === "number" && decimals !== undefined
+          ? this.formatNumber(v, decimals)
+          : v
+      return options.yUnit ? `${formatted}${options.yUnit}` : formatted
+    }
+    const yTicks = {
+      color: tickColor,
+      callback: yTickCallback,
+    }
+    // Sparkline-style: only the scale min/max (high/low) labels.
+    // Exact endpoints are enforced in afterBuildTicks below.
     const scales = {
       x: {
         stacked: options.stacked ?? false,
-        display: !hideAxes,
-        grid: { display: !hideAxes && !options.hideGrid, color: gridColor, tickColor: gridColor },
-        border: { display: !hideAxes, color: gridColor },
+        display: !hideXAxis,
+        grid: { display: showGrid, color: gridColor, tickColor: gridColor },
+        border: { display: !hideXAxis, color: gridColor },
         ticks: {
           color: tickColor,
           maxRotation: 0,
           autoSkip: true,
           autoSkipPadding: 12,
+          display: !hideXAxis,
         },
-        title: options.xLabel && !hideAxes
+        title: options.xLabel && !hideXAxis
           ? { display: true, text: options.xLabel, color: palette.muted }
           : undefined,
       },
       y: {
         stacked: options.stacked ?? false,
-        display: !hideAxes,
+        display: showYAxis,
         beginAtZero: options.beginAtZero ?? false,
-        grid: { display: !hideAxes && !options.hideGrid, color: gridColor, tickColor: gridColor },
-        border: { display: !hideAxes, color: gridColor },
-        ticks: {
-          color: tickColor,
-          callback: (v) => (options.yUnit ? `${v}${options.yUnit}` : v),
-        },
-        title: options.yLabel && !hideAxes
+        grid: { display: showGrid, color: gridColor, tickColor: gridColor },
+        border: { display: showYAxis, color: gridColor },
+        ticks: yTicks,
+        title: options.yLabel && showYAxis
           ? { display: true, text: options.yLabel, color: palette.muted }
           : undefined,
       },
+    }
+    if (options.yMin !== undefined && options.yMin !== null) scales.y.min = options.yMin
+    if (options.yMax !== undefined && options.yMax !== null) scales.y.max = options.yMax
+    if (
+      options.yMin !== undefined && options.yMin !== null &&
+      options.yMax !== undefined && options.yMax !== null &&
+      options.yMin === options.yMax
+    ) {
+      const pad = Math.abs(options.yMin) > 0 ? Math.abs(options.yMin) * 0.05 : 0.5
+      scales.y.min = options.yMin - pad
+      scales.y.max = options.yMax + pad
+    }
+    if (options.yTicks === "minmax") {
+      const dataMin = options.yMin
+      const dataMax = options.yMax
+      scales.y.afterBuildTicks = (axis) => {
+        if (dataMin === undefined || dataMin === null || dataMax === undefined || dataMax === null) {
+          const min = axis.min
+          const max = axis.max
+          axis.ticks = min === max ? [{ value: min }] : [{ value: min }, { value: max }]
+          return
+        }
+        axis.ticks =
+          dataMin === dataMax ? [{ value: dataMin }] : [{ value: dataMin }, { value: dataMax }]
+      }
     }
     if (options.y2Unit || options.y2Label) {
       scales.y2 = {
@@ -224,6 +279,20 @@ export default class extends Controller {
   }
 
   buildTooltipCallbacks(options) {
+    if (options.tooltipFormat === "hourValue") {
+      return {
+        title: () => "",
+        label: (item) => {
+          const val = item.parsed.y
+          if (val === null || val === undefined) return null
+          const unit = options.yUnit || ""
+          const formatted =
+            typeof val === "number" ? this.formatNumber(val, options.decimals ?? 1) : val
+          return `${item.label}: ${formatted}${unit}`
+        },
+      }
+    }
+
     return {
       label: (item) => {
         const val = item.parsed.y
@@ -238,8 +307,13 @@ export default class extends Controller {
   }
 
   formatNumber(v, decimals) {
-    if (Number.isInteger(v) && decimals === 0) return v.toString()
-    return Number(v).toFixed(decimals)
+    if (Number.isInteger(v) && (decimals === 0 || decimals === undefined)) {
+      return v.toLocaleString("en-US")
+    }
+    return Number(v).toLocaleString("en-US", {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    })
   }
 
   // Chart.js hands the string straight to the canvas API, which
@@ -259,4 +333,13 @@ export default class extends Controller {
     if (defaultVal) return defaultVal.trim()
     return fallback
   }
+}
+
+// Category-scale gap: endpoints are more than one index apart, so the
+// segment is bridging one or more missing hourly points.
+function isGapSegment(ctx) {
+  const x0 = ctx.p0?.parsed?.x
+  const x1 = ctx.p1?.parsed?.x
+  if (x0 == null || x1 == null) return false
+  return Math.abs(x1 - x0) > 1
 }
