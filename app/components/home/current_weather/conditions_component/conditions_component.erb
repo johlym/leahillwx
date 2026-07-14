@@ -4,7 +4,7 @@
       <div class="flex flex-col items-center text-center lg:items-start lg:text-left gap-3 min-w-0">
         <p class="text-muted font-condensed uppercase tracking-[0.08em] text-[0.95rem]"
            data-weather-update-target="timestamp">
-          <%= Time.now.in_time_zone("America/Los_Angeles").strftime("%b %d, %Y @ %I:%M %p") %>
+          <%= reading_timestamp %>
         </p>
 
         <div class="mt-1 flex flex-col items-center justify-center gap-4 sm:flex-row sm:items-baseline sm:justify-center lg:justify-start">
@@ -44,7 +44,7 @@
                 </div>
                 <p class="live-tile-meta">
                   from <span data-weather-update-target="windDirection"><%= current_wind_direction %></span><br />
-                  <span data-weather-update-target="gustSpeed">Gusting to 0 mph</span>
+                  <span data-weather-update-target="gustSpeed">Gusting to <%= current_gust_speed %> mph</span>
                 </p>
               </div>
               <% if today_peaks[:wind_gust_mph] %>

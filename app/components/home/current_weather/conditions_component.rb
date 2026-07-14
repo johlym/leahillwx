@@ -25,7 +25,7 @@ class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
   end
 
   def current_wind_speed
-    @current.wind_speed.round(0)
+    @current.wind_speed_mph.round(0)
   end
 
   WIND_DIRECTIONS = %w[
@@ -43,16 +43,20 @@ class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
     WIND_DIRECTIONS[index]
   end
 
+  def current_gust_speed
+    @current.gust_speed_mph.round(0)
+  end
+
   def current_humidity
     @current.humidity
   end
 
   def current_uvi
-    @current.uvi.round
+    @current.uvi.round(0)
   end
 
   def current_solar_irradiance
-    @current.uv.round
+    @current.uv.round(0)
   end
 
   def current_uv_index_category
@@ -72,15 +76,19 @@ class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
   end
 
   def current_rain_day
-    @current.rain_day_in.round(2)
+    format("%.2f", @current.rain_day_in)
   end
 
   def current_rain_hour
-    @current.rain_rate_in.round(2)
+    format("%.2f", @current.rain_rate_in)
   end
 
   def current_dew_point
     @current.dew_point.to_fahrenheit.round(0)
+  end
+
+  def reading_timestamp
+    Time.current.in_time_zone("America/Los_Angeles").strftime("%b %-d, %Y @ %-I:%M %p")
   end
 
   # Rough cloud-base altitude in feet. Formula: (T_F - Td_F) × 227.3.

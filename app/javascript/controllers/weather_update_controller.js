@@ -1,8 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Writes live weather values into stat cards. Each target receives a
-// raw *number/text only* — the units live in the surrounding HTML so
-// the JS can't accidentally double-print them.
+// Writes live weather values into stat cards. Keep units / decimal
+// precision identical to Home::CurrentWeather::ConditionsComponent.
 export default class extends Controller {
   static targets = [
     "timestamp",
@@ -37,17 +36,17 @@ export default class extends Controller {
 
   updateWeatherData(data) {
     if (this.hasTemperatureTarget) {
-      this.temperatureTarget.textContent = `${parseFloat(data.temperature_f).toFixed(0)}°`
+      this.temperatureTarget.textContent = `${this.asInt(data.temperature_f)}°F`
     }
     if (this.hasFeelsLikeTarget) {
-      this.feelsLikeTarget.textContent = `Feels like ${parseFloat(data.feels_like_f).toFixed(0)}°`
+      this.feelsLikeTarget.textContent = `Feels like ${this.asInt(data.feels_like_f)}°F`
     }
     if (this.hasCounterTarget) {
       this.counterTarget.textContent = data.counter.toLocaleString()
       this.flashCounter()
     }
     if (this.hasWindSpeedTarget) {
-      this.windSpeedTarget.textContent = Math.round(data.wind_speed_mph)
+      this.windSpeedTarget.textContent = this.asInt(data.wind_speed_mph)
     }
     if (this.hasWindDirectionTarget) {
       this.windDirectionTarget.textContent = data.wind_direction_compass
@@ -57,45 +56,54 @@ export default class extends Controller {
       if (needle) needle.style.setProperty("--compass-needle-deg", `${data.wind_direction_deg}deg`)
     }
     if (this.hasGustSpeedTarget) {
-      this.gustSpeedTarget.textContent = `Gusting to ${Math.round(data.gust_speed_mph)} mph`
+      this.gustSpeedTarget.textContent = `Gusting to ${this.asInt(data.gust_speed_mph)} mph`
     }
     if (this.hasRainDayTarget) {
-      this.rainDayTarget.textContent = (Math.round(data.rain_day_in * 100) / 100).toFixed(2)
+      this.rainDayTarget.textContent = this.asFixed2(data.rain_day_in)
     }
     if (this.hasRainRateTarget) {
-      this.rainRateTarget.textContent = (Math.round(data.rain_rate_in * 100) / 100).toFixed(2)
+      this.rainRateTarget.textContent = this.asFixed2(data.rain_rate_in)
     }
     if (this.hasDewPointTarget) {
-      this.dewPointTarget.textContent = parseFloat(data.dew_point_f).toFixed(0)
+      this.dewPointTarget.textContent = this.asInt(data.dew_point_f)
     }
     if (this.hasHumidityTarget) {
-      this.humidityTarget.textContent = data.humidity
+      this.humidityTarget.textContent = this.asInt(data.humidity)
     }
     if (this.hasPressureTarget) {
-      this.pressureTarget.textContent = Math.round(data.barometer_abs_mb)
+      this.pressureTarget.textContent = this.asInt(data.barometer_abs_mb)
     }
     if (this.hasUviTarget) {
-      this.uviTarget.textContent = Math.round(data.uvi)
+      this.uviTarget.textContent = this.asInt(data.uvi)
     }
     if (this.hasSolarIrradianceTarget) {
-      this.solarIrradianceTarget.textContent = Math.round(data.uv)
+      this.solarIrradianceTarget.textContent = this.asInt(data.uv)
     }
     if (this.hasLightTarget) {
-      this.lightTarget.textContent = Math.round(data.light_lux)
+      this.lightTarget.textContent = this.asInt(data.light_lux)
     }
     if (this.hasTimestampTarget) {
       this.timestampTarget.textContent = this.formattedTimestamp()
     }
   }
 
+  asInt(value) {
+    return Math.round(parseFloat(value)).toString()
+  }
+
+  asFixed2(value) {
+    return (Math.round(parseFloat(value) * 100) / 100).toFixed(2)
+  }
+
   formattedTimestamp() {
-    // Match server format: "Aug 12, 25 @ 07:32 AM"
+    // Match ConditionsComponent#reading_timestamp:
+    // "Jul 13, 2026 @ 9:24 PM"
     const parts = new Intl.DateTimeFormat("en-US", {
       timeZone: "America/Los_Angeles",
       month: "short",
-      day: "2-digit",
-      year: "2-digit",
-      hour: "2-digit",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
       minute: "2-digit",
       hour12: true,
     }).formatToParts(new Date())
