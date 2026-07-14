@@ -17,11 +17,17 @@ class BackfillAirNowPm25Job
     return if current > finish
 
     reading = AirNowHourlyObsService.new.fetch_reading(current)
-    Aqi.upsert_reading!(**reading) if reading
+    if reading
+      Aqi.upsert_reading!(**reading)
+      Rails.logger.info("[BackfillAirNowPm25Job] upserted #{current.iso8601} pm2_5=#{reading[:pm2_5]} aqi=#{reading[:epa_aqi]}")
+    else
+      Rails.logger.info("[BackfillAirNowPm25Job] no PM2.5 for #{current.iso8601} (skipping)")
+    end
 
     next_hour = current + 1.hour
     return if next_hour > finish
 
+    # One scheduled follow-up only — do not bulk-enqueue the whole range.
     self.class.perform_in(TRICKLE_DELAY, next_hour.iso8601, finish.iso8601)
   end
 
