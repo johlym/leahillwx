@@ -1,0 +1,25 @@
+<%= render Ui::CardComponent.new(padding: :default) do %>
+  <div class="live-tile">
+    <div class="live-tile-label">
+      <i class="fa-solid fa-smog text-accent text-base"></i>
+      <span>PM2.5</span>
+    </div>
+    <div class="live-tile-body">
+      <div class="live-tile-value">
+        <span class="live-tile-number <%= "text-warning" if stale? %>"><%= pm25_display %></span>
+        <span class="live-tile-unit">µg/m³</span>
+      </div>
+      <div class="aqi-scale" aria-hidden="true" style="--aqi: <%= marker_position %>%;">
+        <div class="aqi-scale-marker"></div>
+      </div>
+      <p class="live-tile-meta">
+        <%= category %>
+        <% if @current&.resolved_epa_aqi %>
+          · AQI <%= @current.resolved_epa_aqi %>
+        <% end %>
+      </p>
+      <p class="live-tile-peak <%= "text-warning" if stale? %>"><%= as_of_label %></p>
+      <p class="live-tile-meta mt-0.5"><%= source_label %></p>
+    </div>
+  </div>
+<% end %>

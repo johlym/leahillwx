@@ -4,9 +4,9 @@ download_open_weather_forecast_job:
   description: "Download forecast every 2 minutes"
 
 download_open_weather_aqi_job:
-  cron: "*/10 * * * *"
+  cron: "0 * * * *"
   class: "DownloadOpenWeatherAqiJob"
-  description: "Download air quality every 10 minutes"
+  description: "Download air quality every hour at the top of the hour"
 
 download_latest_earthquake_job:
   cron: "* * * * *"

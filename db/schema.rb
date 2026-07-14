@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_02_055800) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_14_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -50,14 +50,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_02_055800) do
   create_table "aqis", force: :cascade do |t|
     t.float "co"
     t.datetime "created_at", null: false
+    t.integer "epa_aqi"
     t.float "nh3"
     t.float "no"
     t.float "no2"
     t.float "o3"
+    t.datetime "observed_at"
     t.float "pm10"
     t.float "pm2_5"
     t.float "so2"
+    t.string "source"
     t.datetime "updated_at", null: false
+    t.index ["observed_at"], name: "index_aqis_on_observed_at", unique: true
+    t.index ["source"], name: "index_aqis_on_source"
   end
 
   create_table "earthquakes", force: :cascade do |t|

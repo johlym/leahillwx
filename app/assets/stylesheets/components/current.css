@@ -9,6 +9,8 @@
      flat utilities to avoid repeating long utility strings
    - uv-scale / uv-scale-marker: the fixed rainbow gradient bar with
      a positionable marker
+   - aqi-scale / aqi-scale-marker: EPA/AirNow AQI colour stops with
+     a positionable marker
 */
 
 @utility current-conditions {
@@ -99,6 +101,38 @@
 @utility uv-scale-marker {
   @apply absolute -top-0.75 -bottom-0.75 w-0.75 rounded-full bg-text-strong;
   left: var(--uv, 0%);
+  transform: translateX(-50%);
+  box-shadow: 0 0 8px color-mix(in oklab, var(--color-text) 60%, transparent);
+}
+
+/* EPA AQI colour scale (AirNow RGB). Stops match the piecewise bar:
+   0–100 → first third, 100–200 → middle, 200–500 → last third.
+   Category edges: 50≈16.7%, 100≈33.3%, 150=50%, 200≈66.7%, 300≈77.8%. */
+@utility aqi-scale {
+  @apply relative my-[0.3rem] h-2 rounded-full;
+  background: linear-gradient(
+    to right,
+    rgb(0, 228, 0) 0%,
+    rgb(0, 228, 0) 16.7%,
+    rgb(255, 255, 0) 16.7%,
+    rgb(255, 255, 0) 33.3%,
+    rgb(255, 126, 0) 33.3%,
+    rgb(255, 126, 0) 50%,
+    rgb(255, 0, 0) 50%,
+    rgb(255, 0, 0) 66.7%,
+    rgb(143, 63, 151) 66.7%,
+    rgb(143, 63, 151) 77.8%,
+    rgb(126, 0, 35) 77.8%,
+    rgb(126, 0, 35) 100%
+  );
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--color-border) 60%, transparent),
+    0 1px 0 color-mix(in oklab, var(--color-text) 6%, transparent) inset;
+}
+
+@utility aqi-scale-marker {
+  @apply absolute -top-0.75 -bottom-0.75 w-0.75 rounded-full bg-text-strong;
+  left: var(--aqi, 0%);
   transform: translateX(-50%);
   box-shadow: 0 0 8px color-mix(in oklab, var(--color-text) 60%, transparent);
 }

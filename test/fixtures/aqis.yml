@@ -1,27 +1,24 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-# This model initially had no columns defined. If you add columns to the
-# model remove the "{}" from the fixture names and add the columns immediately
-# below each fixture, per the syntax in the comments below
-#
 # == Schema Information
 #
 # Table name: aqis
 #
-#  id         :bigint           not null, primary key
-#  co         :float
-#  nh3        :float
-#  no         :float
-#  no2        :float
-#  o3         :float
-#  pm10       :float
-#  pm2_5      :float
-#  so2        :float
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
+#  id          :bigint           not null, primary key
+#  co          :float
+#  epa_aqi     :integer
+#  nh3         :float
+#  no          :float
+#  no2         :float
+#  o3          :float
+#  observed_at :datetime
+#  pm10        :float
+#  pm2_5       :float
+#  so2         :float
+#  source      :string
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
 #
-one: {}
-# column: value
+# Indexes
 #
-two: {}
-# column: value
+#  index_aqis_on_observed_at  (observed_at) UNIQUE
+#  index_aqis_on_source       (source)
+#

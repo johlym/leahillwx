@@ -25,9 +25,41 @@ class TrendsController < ApplicationController
 
     @rolling_temp_chart = rolling_temp_chart(rolling)
     @rain_cumulative_chart = cumulative_rain_chart(rolling[:rain_cumulative])
+    @aqi_daily_chart = aqi_daily_chart(@focus_year)
 
     @anomalies = @analyzer.anomalies
     @has_data = @available_years.any?
+  end
+
+  def aqi_daily_chart(year)
+    zone = ActiveSupport::TimeZone["America/Los_Angeles"]
+    from = zone.local(year, 1, 1).beginning_of_day
+    to = zone.local(year, 12, 31).end_of_day
+    series = Aqi.daily_averages(from: from, to: to)
+    return nil if series.blank?
+
+    {
+      type: "line",
+      data: {
+        labels: series.map { |row| row[:date].strftime("%b %-d") },
+        datasets: [
+          {
+            label: "Daily avg PM2.5",
+            data: series.map { |row| row[:pm2_5] },
+            borderWidth: 2,
+            tension: 0.2,
+            pointRadius: 0,
+            color: "rgb(255, 126, 0)"
+          }
+        ]
+      },
+      options: {
+        yUnit: " µg/m³",
+        yLabel: "PM2.5 (µg/m³)",
+        decimals: 1,
+        hideLegend: true
+      }
+    }
   end
 
   def yoy_chart(yoy, series_key, unit, y_label, decimals)

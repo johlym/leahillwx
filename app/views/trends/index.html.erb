@@ -52,7 +52,28 @@
         aria_label: "Year-over-year monthly peak wind"
       ) %>
     </div>
+  <% end %>
 
+  <% if @aqi_daily_chart %>
+    <%= render Ui::SectionHeaderComponent.new(
+      title: "Air quality",
+      level: 3,
+      subtitle: "Daily average PM2.5 for #{@focus_year}."
+    ) %>
+    <div class="mt-4">
+      <%= render Ui::ChartComponent.new(
+        type: @aqi_daily_chart[:type],
+        data: @aqi_daily_chart[:data],
+        options: @aqi_daily_chart[:options],
+        title: "PM2.5 — daily average",
+        subtitle: "µg/m³ · mean of hourly readings",
+        height: 320,
+        aria_label: "Daily average PM2.5 for the focus year"
+      ) %>
+    </div>
+  <% end %>
+
+  <% if @has_data %>
     <%= render Ui::SectionHeaderComponent.new(title: "Rolling averages", level: 3, subtitle: "Longer-term smoothing across every complete day on record.") %>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
       <%= render Ui::ChartComponent.new(
