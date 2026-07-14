@@ -1,17 +1,16 @@
 # frozen_string_literal: true
 
 class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
-  def initialize(current:, almanac:, today_forecast: nil, current_forecast: nil, today_peaks: {}, aqi: nil, aqi_history: [])
+  def initialize(current:, almanac:, today_forecast: nil, current_forecast: nil, today_peaks: {}, aqi: nil)
     @current = current
     @almanac = almanac
     @today_forecast = today_forecast
     @current_forecast = current_forecast
     @today_peaks = today_peaks || {}
     @aqi = aqi
-    @aqi_history = aqi_history || []
   end
 
-  attr_reader :today_peaks, :aqi, :aqi_history
+  attr_reader :today_peaks, :aqi
 
   def season
     @almanac.season

@@ -228,7 +228,8 @@ export default class extends Controller {
       label: (item) => {
         const val = item.parsed.y
         if (val === null || val === undefined) return null
-        const unit = options.yUnit || ""
+        const axis = item.dataset.yAxisID || "y"
+        const unit = axis === "y2" ? (options.y2Unit || "") : (options.yUnit || "")
         const formatted =
           typeof val === "number" ? this.formatNumber(val, options.decimals ?? 1) : val
         return `${item.dataset.label}: ${formatted}${unit}`

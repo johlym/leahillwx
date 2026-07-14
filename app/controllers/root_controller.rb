@@ -22,7 +22,6 @@ class RootController < ApplicationController
     @earthquakes = Earthquake.last(5).reverse
     @today_peaks = compute_today_peaks
     @aqi = Aqi.latest
-    @aqi_history = Aqi.recent(hours: 48)
   end
 
   def about

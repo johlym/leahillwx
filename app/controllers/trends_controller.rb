@@ -44,20 +44,33 @@ class TrendsController < ApplicationController
         labels: series.map { |row| row[:date].strftime("%b %-d") },
         datasets: [
           {
+            label: "Daily avg AQI",
+            data: series.map { |row| row[:epa_aqi] },
+            borderWidth: 2,
+            tension: 0.2,
+            pointRadius: 0,
+            color: "rgb(255, 126, 0)",
+            yAxisID: "y"
+          },
+          {
             label: "Daily avg PM2.5",
             data: series.map { |row| row[:pm2_5] },
             borderWidth: 2,
             tension: 0.2,
             pointRadius: 0,
-            color: "rgb(255, 126, 0)"
+            color: "rgb(143, 63, 151)",
+            yAxisID: "y2",
+            dashed: true
           }
         ]
       },
       options: {
-        yUnit: " µg/m³",
-        yLabel: "PM2.5 (µg/m³)",
+        yUnit: "",
+        yLabel: "AQI",
+        y2Unit: " µg/m³",
+        y2Label: "PM2.5 (µg/m³)",
         decimals: 1,
-        hideLegend: true
+        beginAtZero: true
       }
     }
   end

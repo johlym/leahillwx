@@ -172,10 +172,4 @@
       </div>
     <% end %>
   </div>
-
-  <% if aqi_history.any? %>
-    <div class="mb-4">
-      <%= render Home::CurrentWeather::Pm25HistoryComponent.new(history: aqi_history) %>
-    </div>
-  <% end %>
 </div>

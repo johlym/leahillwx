@@ -48,8 +48,9 @@ class Aqi < ApplicationRecord
     with_observation.where("observed_at >= ?", cutoff).chronological
   end
 
-  # Daily mean PM2.5 (and EPA AQI when present) for charting.
+  # Daily mean PM2.5 and EPA AQI for charting.
   # Days are bucketed in America/Los_Angeles.
+  # When epa_aqi is missing for a day, derive it from the day's mean PM2.5.
   def self.daily_averages(from:, to:, zone: "America/Los_Angeles")
     rows = with_observation
       .where(observed_at: from..to)
@@ -61,10 +62,17 @@ class Aqi < ApplicationRecord
       .map do |date, day_rows|
         pm_values = day_rows.map { |_, pm, _| pm }.compact
         aqi_values = day_rows.map { |_, _, aqi| aqi }.compact
+        pm2_5 = pm_values.any? ? (pm_values.sum / pm_values.size.to_f).round(2) : nil
+        epa_aqi =
+          if aqi_values.any?
+            (aqi_values.sum / aqi_values.size.to_f).round(1)
+          elsif pm2_5
+            epa_aqi_from_pm25(pm2_5)&.to_f
+          end
         {
           date: date,
-          pm2_5: pm_values.any? ? (pm_values.sum / pm_values.size.to_f).round(2) : nil,
-          epa_aqi: aqi_values.any? ? (aqi_values.sum / aqi_values.size.to_f).round(1) : nil
+          pm2_5: pm2_5,
+          epa_aqi: epa_aqi
         }
       end
   end

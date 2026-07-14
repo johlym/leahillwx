@@ -9,8 +9,14 @@ class Home::CurrentWeather::Pm25Component < ViewComponent::Base
     true
   end
 
+  def aqi_display
+    return "—" unless @current&.resolved_epa_aqi
+
+    @current.resolved_epa_aqi.to_i.to_s
+  end
+
   def pm25_display
-    return "—" unless @current&.pm2_5
+    return nil unless @current&.pm2_5
 
     format("%.1f", @current.pm2_5)
   end
