@@ -5,7 +5,7 @@
 # timezone, which is America/Los_Angeles for this app):
 #
 #   sunrise            -> :sunrise
-#   12:00 local        -> :midday
+#   1:00 local        -> :midday
 #   sunset - 1 hour    -> :sunset
 #   sunset + 10 min    -> :night
 #
@@ -29,11 +29,11 @@ class PaletteResolver
 
     if @at < sunrise
       :night
-    elsif @at < noon
+    elsif @at < noon_window_start
       :sunrise
-    elsif @at < sunset_minus_1h
+    elsif @at < sunset_window_start
       :midday
-    elsif @at < sunset_plus_10m
+    elsif @at < sunset_window_end
       :sunset
     else
       :night
@@ -46,7 +46,7 @@ class PaletteResolver
   def next_transition_at
     return nil unless almanac_usable?
 
-    boundaries = [ sunrise, noon, sunset_minus_1h, sunset_plus_10m ]
+    boundaries = [ sunrise, noon_window_start, sunset_window_start, sunset_window_end ]
     upcoming = boundaries.find { |b| b > @at }
     upcoming || next_day_first_boundary
   end
@@ -71,17 +71,17 @@ class PaletteResolver
     almanac.sunset_at.in_time_zone(zone)
   end
 
-  def noon
+  def noon_window_start
     day = sunrise.to_date
-    Time.use_zone(zone) { Time.zone.local(day.year, day.month, day.day, 12, 0, 0) }
+    Time.use_zone(zone) { Time.zone.local(day.year, day.month, day.day, 10, 0, 0) }
   end
 
-  def sunset_minus_1h
+  def sunset_window_start
     sunset - 1.hour
   end
 
-  def sunset_plus_10m
-    sunset + 10.minutes
+  def sunset_window_end
+    sunset + 30.minutes
   end
 
   # If all of today's boundaries have passed, we approximate the next
