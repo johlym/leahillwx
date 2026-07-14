@@ -9,7 +9,7 @@
 
         <div class="mt-1 flex flex-col items-center justify-center gap-4 sm:flex-row sm:items-baseline sm:justify-center lg:justify-start">
           <span class="font-condensed font-light leading-[0.9] tracking-[-0.02em] text-text-strong tabular-nums text-[clamp(6rem,18vw,11rem)] text-shadow-[0_0_20px_color-mix(in_oklab,var(--color-accent-strong)_35%,transparent),0_0_55px_color-mix(in_oklab,var(--color-accent)_22%,transparent)]"
-                data-weather-update-target="temperature"><%= current_temperature %>°</span>
+                data-weather-update-target="temperature"><%= current_temperature %>°F</span>
 
           <div class="text-center sm:text-left">
             <div class="text-[2.25rem] text-text-strong filter-[drop-shadow(0_0_12px_color-mix(in_oklab,var(--color-accent)_45%,transparent))]">
@@ -20,7 +20,7 @@
         </div>
 
         <p class="text-muted text-base">
-          <span data-weather-update-target="feelsLike">Feels like <%= current_feels_like %>°</span>
+          <span data-weather-update-target="feelsLike">Feels like <%= current_feels_like %>°F</span>
           <% if today_high && today_low %>
             <span class="mx-[0.4rem] text-subtle">·</span>
             High <%= today_high %>° / Low <%= today_low %>°
@@ -147,10 +147,10 @@
         <div class="live-tile-body">
           <div class="live-tile-value">
             <span class="live-tile-number" data-weather-update-target="dewPoint"><%= current_dew_point %></span>
-            <span class="live-tile-unit">°</span>
+            <span class="live-tile-unit">°F</span>
           </div>
           <% if today_peaks[:dew_point_f] %>
-            <p class="live-tile-peak">Peak today <%= today_peaks[:dew_point_f] %>°</p>
+            <p class="live-tile-peak">Peak today <%= today_peaks[:dew_point_f] %>°F</p>
           <% end %>
         </div>
       </div>
