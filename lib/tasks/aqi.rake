@@ -18,10 +18,10 @@ namespace :aqi do
     hours = ((end_time - start_time) / 1.hour).to_i + 1
     eta = (hours * BackfillAirNowPm25Job::TRICKLE_DELAY).inspect
 
-    puts "Enqueueing AirNow PM2.5 backfill from #{start_time.utc.iso8601} to #{end_time.utc.iso8601}"
-    puts "This queues ONE job that re-enqueues the next hour after each run (~#{hours} hours, ~#{eta} wall clock)."
+    puts "Enqueueing AirNow PM2.5 backfill from #{end_time.utc.iso8601} backward to #{start_time.utc.iso8601}"
+    puts "This queues ONE job that re-enqueues the previous hour after each run (~#{hours} hours, ~#{eta} wall clock)."
     puts "You will not see thousands of jobs in the queue — only the current run + one scheduled follow-up."
-    BackfillAirNowPm25Job.perform_async(start_time.utc.iso8601, end_time.utc.iso8601)
+    BackfillAirNowPm25Job.perform_async(end_time.utc.iso8601, start_time.utc.iso8601)
     puts "Queued."
   end
 end

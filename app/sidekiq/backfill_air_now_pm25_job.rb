@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Trickle-fetches one HourlyAQObs hour at a time for Auburn 29th St,
-# then re-enqueues the next hour until `end_time` is reached.
+# walking backward from `current_time` until `oldest_time` is reached.
 class BackfillAirNowPm25Job
   include Sidekiq::Job
 
@@ -9,12 +9,17 @@ class BackfillAirNowPm25Job
 
   TRICKLE_DELAY = 45.seconds
 
-  # start_time / end_time: ISO8601 strings or Time-like
-  def perform(start_time, end_time = nil)
-    current = parse_time(start_time).utc.change(min: 0, sec: 0)
-    finish = end_time.present? ? parse_time(end_time).utc.change(min: 0, sec: 0) : Time.current.utc.change(min: 0, sec: 0)
+  # current_time / oldest_time: ISO8601 strings or Time-like
+  # Starts at current_time (newest) and decrements one hour per run.
+  def perform(current_time, oldest_time = nil)
+    current = parse_time(current_time).utc.change(min: 0, sec: 0)
+    oldest = if oldest_time.present?
+      parse_time(oldest_time).utc.change(min: 0, sec: 0)
+    else
+      Time.zone.parse("2022-01-01").utc.change(min: 0, sec: 0)
+    end
 
-    return if current > finish
+    return if current < oldest
 
     reading = AirNowHourlyObsService.new.fetch_reading(current)
     if reading
@@ -24,11 +29,11 @@ class BackfillAirNowPm25Job
       Rails.logger.info("[BackfillAirNowPm25Job] no PM2.5 for #{current.iso8601} (skipping)")
     end
 
-    next_hour = current + 1.hour
-    return if next_hour > finish
+    prev_hour = current - 1.hour
+    return if prev_hour < oldest
 
     # One scheduled follow-up only — do not bulk-enqueue the whole range.
-    self.class.perform_in(TRICKLE_DELAY, next_hour.iso8601, finish.iso8601)
+    self.class.perform_in(TRICKLE_DELAY, prev_hour.iso8601, oldest.iso8601)
   end
 
   private
