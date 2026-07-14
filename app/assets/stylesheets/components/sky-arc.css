@@ -6,7 +6,9 @@
 @utility sky-arc-svg {
   @apply w-full h-auto;
   aspect-ratio: 200 / 130;
-  filter: drop-shadow(0 6px 18px color-mix(in oklab, var(--color-accent) 20%, transparent));
+  filter: drop-shadow(
+    0 6px 18px color-mix(in oklab, var(--color-accent) 20%, transparent)
+  );
 }
 
 @utility sky-arc-body {
@@ -15,7 +17,9 @@
 
 @utility sky-arc-body-live {
   & circle {
-    filter: drop-shadow(0 0 6px color-mix(in oklab, var(--color-warning) 70%, transparent));
+    filter: drop-shadow(
+      0 0 6px color-mix(in oklab, var(--color-warning) 70%, transparent)
+    );
   }
 }
 
@@ -25,15 +29,20 @@
 
 /* Moon-specific "live" glow — cool white instead of warm yellow. */
 .sky-arc-body-moon.sky-arc-body-live circle {
-  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--color-muted) 70%, transparent));
+  filter: drop-shadow(
+    0 0 6px color-mix(in oklab, var(--color-muted) 70%, transparent)
+  );
 }
 
 @utility sky-arc-swatch {
   @apply inline-block size-3 rounded-full;
-  border: 1px solid color-mix(in oklab, var(--color-border-strong) 50%, transparent);
+  border: 1px solid
+    color-mix(in oklab, var(--color-border-strong) 50%, transparent);
 }
 
-@utility sky-arc-swatch-sun  { @apply bg-warning; }
+@utility sky-arc-swatch-sun {
+  @apply bg-warning;
+}
 @utility sky-arc-swatch-moon {
   background-color: color-mix(in oklab, var(--color-muted) 90%, transparent);
 }

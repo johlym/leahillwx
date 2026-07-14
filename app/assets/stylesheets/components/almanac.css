@@ -50,32 +50,43 @@
   }
   & .table-container > table thead tr th {
     @apply px-[0.4rem] py-2 text-center font-medium uppercase tracking-[0.05em] text-[0.65rem];
-    border-right: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    border-right: 1px solid
+      color-mix(in oklab, var(--color-border) 60%, transparent);
   }
   & .table-container > table thead tr th:last-child {
     @apply border-r-0;
   }
   & .table-container > table thead .secondary-header th {
     @apply text-subtle text-[0.6rem];
-    background-color: color-mix(in oklab, var(--color-bg-elevated) 70%, var(--color-surface));
+    background-color: color-mix(
+      in oklab,
+      var(--color-bg-elevated) 70%,
+      var(--color-surface)
+    );
   }
 
   & .table-container > table tbody tr {
     @apply bg-surface cursor-pointer;
-    border-bottom: 1px solid color-mix(in oklab, var(--color-border) 40%, transparent);
+    border-bottom: 1px solid
+      color-mix(in oklab, var(--color-border) 40%, transparent);
   }
   & .table-container > table tbody tr:hover {
     @apply bg-surface-2;
   }
   & .table-container > table tbody tr.today {
-    background-color: color-mix(in oklab, var(--color-accent) 15%, var(--color-surface));
+    background-color: color-mix(
+      in oklab,
+      var(--color-accent) 15%,
+      var(--color-surface)
+    );
   }
   & .table-container > table tbody tr.today td {
     @apply text-accent-strong font-semibold;
   }
   & .table-container > table tbody td {
     @apply px-[0.4rem] py-[0.35rem] text-center;
-    border-right: 1px solid color-mix(in oklab, var(--color-border) 40%, transparent);
+    border-right: 1px solid
+      color-mix(in oklab, var(--color-border) 40%, transparent);
   }
   & .table-container > table tbody td:last-child {
     @apply border-r-0;
@@ -89,6 +100,10 @@
   & .table-container > table tbody td.expanded-row .expanded-inner {
     @apply bg-surface border border-border rounded-lg p-3;
   }
-  & .table-container > table .text-gray-500 { color: var(--color-muted) !important; }
-  & .table-container > table span.text-xs { color: var(--color-subtle); }
+  & .table-container > table .text-gray-500 {
+    color: var(--color-muted) !important;
+  }
+  & .table-container > table span.text-xs {
+    color: var(--color-subtle);
+  }
 }

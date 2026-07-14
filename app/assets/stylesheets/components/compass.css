@@ -14,10 +14,18 @@
   overflow: visible;
 }
 
-@utility compass-xs { --compass-size: 1.5rem; }
-@utility compass-sm { --compass-size: 2.5rem; }
-@utility compass-md { --compass-size: 4rem; }
-@utility compass-lg { --compass-size: 6rem; }
+@utility compass-xs {
+  --compass-size: 1.5rem;
+}
+@utility compass-sm {
+  --compass-size: 2.5rem;
+}
+@utility compass-md {
+  --compass-size: 4rem;
+}
+@utility compass-lg {
+  --compass-size: 6rem;
+}
 
 /* Ring, ticks, and cardinal letters — painted via CSS so var()
    resolves reliably (var() in SVG XML attributes paints unreliably

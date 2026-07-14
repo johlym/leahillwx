@@ -10,7 +10,8 @@
     color-mix(in oklab, var(--color-bg) 88%, transparent),
     color-mix(in oklab, var(--color-bg) 72%, transparent)
   );
-  border-bottom: 1px solid color-mix(in oklab, var(--color-border-strong) 55%, transparent);
+  border-bottom: 1px solid
+    color-mix(in oklab, var(--color-border-strong) 55%, transparent);
   box-shadow: 0 20px 40px -30px rgba(0, 0, 0, 0.5);
 }
 

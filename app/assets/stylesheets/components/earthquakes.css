@@ -25,7 +25,9 @@
 @utility eq-row {
   @apply flex bg-surface transition-[background-color] duration-150;
 
-  &:hover { @apply bg-surface-2; }
+  &:hover {
+    @apply bg-surface-2;
+  }
 }
 
 @utility eq-cell {
@@ -33,24 +35,48 @@
 }
 
 /* Column widths (shared between header and body cells) */
-.revised-header, .revised-cell   { @apply p-0 shrink-0 w-4; }
-.mag-header,     .eq-mag-cell    { @apply shrink-0 w-15 whitespace-nowrap; }
-.timestamp-header, .eq-timestamp-cell { @apply shrink-0 w-37.5 whitespace-nowrap; }
-.location-header, .eq-location-cell   { @apply flex-1; }
-.distance-header, .eq-distance-cell   { @apply shrink-0 w-25 whitespace-nowrap; }
-.depth-header,   .eq-depth-cell  { @apply shrink-0 w-25 whitespace-nowrap; }
+.revised-header,
+.revised-cell {
+  @apply p-0 shrink-0 w-4;
+}
+.mag-header,
+.eq-mag-cell {
+  @apply shrink-0 w-15 whitespace-nowrap;
+}
+.timestamp-header,
+.eq-timestamp-cell {
+  @apply shrink-0 w-37.5 whitespace-nowrap;
+}
+.location-header,
+.eq-location-cell {
+  @apply flex-1;
+}
+.distance-header,
+.eq-distance-cell {
+  @apply shrink-0 w-25 whitespace-nowrap;
+}
+.depth-header,
+.eq-depth-cell {
+  @apply shrink-0 w-25 whitespace-nowrap;
+}
 
 .eq-timestamp-cell,
 .eq-distance-cell,
-.eq-depth-cell { @apply text-muted; }
+.eq-depth-cell {
+  @apply text-muted;
+}
 
-.eq-location-cell a { @apply text-accent; }
+.eq-location-cell a {
+  @apply text-accent;
+}
 
 .eq-mag-cell span.mag {
   @apply text-center text-2xl font-bold text-text-strong font-condensed;
 }
 
-.revised-cell.revised { @apply bg-surface-2; }
+.revised-cell.revised {
+  @apply bg-surface-2;
+}
 .revised-cell div.revised-tag {
   @apply h-full flex items-center justify-center text-muted whitespace-nowrap;
   font-size: 10px;
@@ -59,29 +85,55 @@
 }
 
 /* Magnitude tinting — subtle warm bump for stronger quakes. */
-.eq-row.mag-4 { background-color: color-mix(in oklab, var(--color-warning) 12%, var(--color-surface)); }
+.eq-row.mag-4 {
+  background-color: color-mix(
+    in oklab,
+    var(--color-warning) 12%,
+    var(--color-surface)
+  );
+}
 .eq-row.mag-4 .eq-cell,
-.eq-row.mag-4 .eq-cell.eq-mag-cell span.mag { color: var(--color-warning); }
+.eq-row.mag-4 .eq-cell.eq-mag-cell span.mag {
+  color: var(--color-warning);
+}
 
 .eq-row.mag-5,
-.eq-row.mag-6 { background-color: color-mix(in oklab, var(--color-warning) 22%, var(--color-surface)); }
+.eq-row.mag-6 {
+  background-color: color-mix(
+    in oklab,
+    var(--color-warning) 22%,
+    var(--color-surface)
+  );
+}
 .eq-row.mag-5 .eq-cell,
 .eq-row.mag-6 .eq-cell,
 .eq-row.mag-5 .eq-cell.eq-mag-cell span.mag,
-.eq-row.mag-6 .eq-cell.eq-mag-cell span.mag { color: var(--color-warning); }
+.eq-row.mag-6 .eq-cell.eq-mag-cell span.mag {
+  color: var(--color-warning);
+}
 
 .eq-row.mag-7,
 .eq-row.mag-8,
-.eq-row.mag-9 { background-color: color-mix(in oklab, var(--color-danger) 22%, var(--color-surface)); }
+.eq-row.mag-9 {
+  background-color: color-mix(
+    in oklab,
+    var(--color-danger) 22%,
+    var(--color-surface)
+  );
+}
 .eq-row.mag-7 .eq-cell,
 .eq-row.mag-8 .eq-cell,
 .eq-row.mag-9 .eq-cell,
 .eq-row.mag-7 .eq-cell.eq-mag-cell span.mag,
 .eq-row.mag-8 .eq-cell.eq-mag-cell span.mag,
-.eq-row.mag-9 .eq-cell.eq-mag-cell span.mag { color: var(--color-danger); }
+.eq-row.mag-9 .eq-cell.eq-mag-cell span.mag {
+  color: var(--color-danger);
+}
 
 @utility usgs-logo {
   @apply flex items-center justify-end py-2 gap-2 text-subtle text-[0.75rem];
 
-  & img { filter: brightness(0.9) contrast(1.05); }
+  & img {
+    filter: brightness(0.9) contrast(1.05);
+  }
 }

@@ -16,7 +16,9 @@
   @apply inline-flex items-center gap-[0.4rem] text-muted text-xs
          uppercase tracking-[0.06em] mb-[0.35rem];
 
-  & > i { @apply text-accent; }
+  & > i {
+    @apply text-accent;
+  }
 }
 
 @utility record-card-value {
@@ -26,7 +28,8 @@
 
 @utility record-card-value-number {
   @apply text-[2.1rem] font-medium;
-  text-shadow: 0 0 22px color-mix(in oklab, var(--color-accent) 22%, transparent);
+  text-shadow: 0 0 22px
+    color-mix(in oklab, var(--color-accent) 22%, transparent);
 }
 
 @utility record-card-value-unit {
@@ -36,20 +39,32 @@
 @utility record-card-delta {
   @apply inline-flex items-center gap-[0.2rem] ml-2 font-mono text-xs
          px-[0.4rem] py-[0.15rem] rounded-[0.35rem] align-middle text-muted;
-  background-color: color-mix(in oklab, var(--color-surface-2) 60%, transparent);
+  background-color: color-mix(
+    in oklab,
+    var(--color-surface-2) 60%,
+    transparent
+  );
   border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
 }
 
 @utility record-card-delta-up {
   @apply text-warning;
   border-color: color-mix(in oklab, var(--color-warning) 40%, transparent);
-  background-color: color-mix(in oklab, var(--color-warning) 12%, var(--color-surface));
+  background-color: color-mix(
+    in oklab,
+    var(--color-warning) 12%,
+    var(--color-surface)
+  );
 }
 
 @utility record-card-delta-down {
   @apply text-chart-6;
   border-color: color-mix(in oklab, var(--color-chart-6) 40%, transparent);
-  background-color: color-mix(in oklab, var(--color-chart-6) 12%, var(--color-surface));
+  background-color: color-mix(
+    in oklab,
+    var(--color-chart-6) 12%,
+    var(--color-surface)
+  );
 }
 
 @utility record-card-delta-flat {
@@ -66,7 +81,8 @@
 
 @utility record-card-sparkline {
   @apply relative mt-3 pt-2 h-14;
-  border-top: 1px dashed color-mix(in oklab, var(--color-border) 60%, transparent);
+  border-top: 1px dashed
+    color-mix(in oklab, var(--color-border) 60%, transparent);
 
   & canvas {
     width: 100% !important;
@@ -125,7 +141,8 @@
   &::before {
     content: "";
     @apply absolute inset-x-0 -inset-y-0.75 pointer-events-none rounded-md;
-    border: 2px solid color-mix(in oklab, var(--color-accent-strong) 90%, transparent);
+    border: 2px solid
+      color-mix(in oklab, var(--color-accent-strong) 90%, transparent);
     box-shadow:
       0 0 22px color-mix(in oklab, var(--color-accent) 55%, transparent),
       0 0 4px color-mix(in oklab, var(--color-accent) 90%, transparent) inset;
@@ -171,6 +188,14 @@
 }
 
 @utility temp-heatmap-legend-swatch-partial {
-  background-image: repeating-linear-gradient(45deg, transparent 0 4px, rgba(0, 0, 0, 0.35) 4px 6px);
-  background-color: color-mix(in oklab, var(--color-muted) 45%, var(--color-surface));
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent 0 4px,
+    rgba(0, 0, 0, 0.35) 4px 6px
+  );
+  background-color: color-mix(
+    in oklab,
+    var(--color-muted) 45%,
+    var(--color-surface)
+  );
 }

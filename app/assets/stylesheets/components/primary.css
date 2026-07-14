@@ -66,7 +66,8 @@
     var(--color-accent-strong),
     var(--color-accent)
   );
-  border: 1px solid color-mix(in oklab, var(--color-accent-strong) 65%, transparent);
+  border: 1px solid
+    color-mix(in oklab, var(--color-accent-strong) 65%, transparent);
   box-shadow:
     0 1px 0 color-mix(in oklab, #fff 15%, transparent) inset,
     0 0 0 1px color-mix(in oklab, var(--color-accent) 25%, transparent),
@@ -77,7 +78,8 @@
     box-shadow:
       0 1px 0 color-mix(in oklab, #fff 20%, transparent) inset,
       0 0 0 1px color-mix(in oklab, var(--color-accent) 45%, transparent),
-      0 10px 28px -12px color-mix(in oklab, var(--color-accent) 70%, transparent);
+      0 10px 28px -12px
+        color-mix(in oklab, var(--color-accent) 70%, transparent);
   }
   &:active {
     transform: translateY(1px);
@@ -93,12 +95,14 @@
          backdrop-blur-sm backdrop-saturate-150
          transition-[background-color,border-color,color,box-shadow,transform] duration-150;
   background: color-mix(in oklab, var(--color-surface) 60%, transparent);
-  border: 1px solid color-mix(in oklab, var(--color-border-strong) 70%, transparent);
+  border: 1px solid
+    color-mix(in oklab, var(--color-border-strong) 70%, transparent);
 
   &:hover {
     @apply bg-surface-2 text-accent-strong no-underline;
     border-color: color-mix(in oklab, var(--color-accent) 55%, transparent);
-    box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-accent) 25%, transparent);
+    box-shadow: 0 0 0 1px
+      color-mix(in oklab, var(--color-accent) 25%, transparent);
   }
   &:active {
     transform: translateY(1px);

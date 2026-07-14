@@ -23,16 +23,23 @@
   }
   & .stats-table tbody tr td {
     @apply px-3 py-[0.6rem] text-center whitespace-nowrap text-text;
-    border-bottom: 1px solid color-mix(in oklab, var(--color-border) 50%, transparent);
+    border-bottom: 1px solid
+      color-mix(in oklab, var(--color-border) 50%, transparent);
   }
   & .stats-table tbody tr:last-child td {
     @apply border-b-0;
   }
-  & .stats-table td span.text-xs { color: var(--color-subtle); }
+  & .stats-table td span.text-xs {
+    color: var(--color-subtle);
+  }
 }
 
-@utility daily-data { @apply report-data-panel; }
-@utility hourly-data { @apply report-data-panel; }
+@utility daily-data {
+  @apply report-data-panel;
+}
+@utility hourly-data {
+  @apply report-data-panel;
+}
 
 @utility report-data-panel {
   @apply bg-surface border border-border rounded-xl px-5 py-4 my-4;
@@ -45,12 +52,20 @@
   }
   & .partial-day-note {
     @apply text-warning px-[0.9rem] py-[0.6rem] mb-3 rounded-[0.4rem] text-[0.85rem];
-    background-color: color-mix(in oklab, var(--color-warning) 15%, var(--color-surface));
+    background-color: color-mix(
+      in oklab,
+      var(--color-warning) 15%,
+      var(--color-surface)
+    );
     border: 1px solid color-mix(in oklab, var(--color-warning) 40%, transparent);
   }
-  & .partial-day-note:empty { @apply hidden; }
+  & .partial-day-note:empty {
+    @apply hidden;
+  }
 
-  & .report-table-wrapper { @apply overflow-x-auto; }
+  & .report-table-wrapper {
+    @apply overflow-x-auto;
+  }
   & .report-table {
     @apply min-w-full text-text text-[0.8rem];
     border-collapse: separate;
@@ -60,26 +75,47 @@
     @apply bg-bg-elevated text-muted px-2 py-[0.55rem] font-medium text-[0.7rem]
            uppercase tracking-[0.04em] text-center border-b border-border;
   }
-  & .report-table tbody tr { @apply bg-surface; }
+  & .report-table tbody tr {
+    @apply bg-surface;
+  }
   & .report-table tbody tr:nth-child(even) {
-    background-color: color-mix(in oklab, var(--color-bg-elevated) 60%, var(--color-surface));
+    background-color: color-mix(
+      in oklab,
+      var(--color-bg-elevated) 60%,
+      var(--color-surface)
+    );
   }
-  & .report-table tbody tr:hover { @apply bg-surface-2; }
+  & .report-table tbody tr:hover {
+    @apply bg-surface-2;
+  }
   & .report-table tbody tr.partial-day {
-    background-color: color-mix(in oklab, var(--color-warning) 15%, var(--color-surface));
+    background-color: color-mix(
+      in oklab,
+      var(--color-warning) 15%,
+      var(--color-surface)
+    );
   }
-  & .report-table tbody tr.partial-day td { @apply text-warning; }
+  & .report-table tbody tr.partial-day td {
+    @apply text-warning;
+  }
   & .report-table tbody td {
     @apply px-[0.4rem] py-2 text-center whitespace-nowrap;
-    border-bottom: 1px solid color-mix(in oklab, var(--color-border) 40%, transparent);
+    border-bottom: 1px solid
+      color-mix(in oklab, var(--color-border) 40%, transparent);
   }
-  & .report-table tbody tr:last-child td { @apply border-b-0; }
+  & .report-table tbody tr:last-child td {
+    @apply border-b-0;
+  }
   & .report-table td.no-data {
     @apply text-subtle italic;
     background-color: color-mix(in oklab, var(--color-border) 20%, transparent);
   }
-  & .report-table td a { @apply text-accent; }
-  & .report-table td.font-bold { @apply text-text-strong font-bold; }
+  & .report-table td a {
+    @apply text-accent;
+  }
+  & .report-table td.font-bold {
+    @apply text-text-strong font-bold;
+  }
 }
 
 @utility report-notes {
@@ -88,7 +124,9 @@
   & h3 {
     @apply mt-0 font-condensed uppercase tracking-[0.05em] text-base text-text-strong;
   }
-  & ul li { @apply list-disc ml-5; }
+  & ul li {
+    @apply list-disc ml-5;
+  }
   & code {
     @apply bg-surface-2 text-text px-[0.35rem] rounded-sm font-mono text-[0.85em];
   }

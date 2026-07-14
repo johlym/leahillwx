@@ -18,25 +18,59 @@
   @apply flex flex-wrap items-center px-4 py-[0.85rem] gap-3 border-b border-border
          transition-[background-color] duration-150;
 
-  &:hover      { @apply bg-surface-2; }
-  &:last-child { @apply border-b-0; }
+  &:hover {
+    @apply bg-surface-2;
+  }
+  &:last-child {
+    @apply border-b-0;
+  }
 
-  & > .date-grid                          { @apply min-w-18 text-text; }
-  & > .date-grid .dayname                 { @apply font-condensed uppercase text-[1.35rem] text-text-strong leading-none mb-[0.15rem]; }
-  & > .date-grid .daynum                  { @apply uppercase text-[0.85rem] text-muted tracking-[0.04em]; }
+  & > .date-grid {
+    @apply min-w-18 text-text;
+  }
+  & > .date-grid .dayname {
+    @apply font-condensed uppercase text-[1.35rem] text-text-strong leading-none mb-[0.15rem];
+  }
+  & > .date-grid .daynum {
+    @apply uppercase text-[0.85rem] text-muted tracking-[0.04em];
+  }
 
-  & > .conditions                         { @apply flex items-center gap-3 min-w-32; }
-  & > .conditions .icon                   { @apply text-text text-2xl; }
-  & > .conditions .high-low               { @apply flex items-baseline gap-2; }
-  & > .conditions .high                   { @apply font-condensed text-3xl text-text-strong leading-none; }
-  & > .conditions .low                    { @apply font-condensed text-[1.35rem] text-muted leading-none; }
+  & > .conditions {
+    @apply flex items-center gap-3 min-w-32;
+  }
+  & > .conditions .icon {
+    @apply text-text text-2xl;
+  }
+  & > .conditions .high-low {
+    @apply flex items-baseline gap-2;
+  }
+  & > .conditions .high {
+    @apply font-condensed text-3xl text-text-strong leading-none;
+  }
+  & > .conditions .low {
+    @apply font-condensed text-[1.35rem] text-muted leading-none;
+  }
 
-  & > .forecast-text                      { @apply flex-1 basis-48; }
-  & > .forecast-text .forecast-description { @apply text-text font-medium mb-[0.15rem]; }
-  & > .forecast-text .forecast-summary     { @apply text-muted text-[0.85rem]; }
+  & > .forecast-text {
+    @apply flex-1 basis-48;
+  }
+  & > .forecast-text .forecast-description {
+    @apply text-text font-medium mb-[0.15rem];
+  }
+  & > .forecast-text .forecast-summary {
+    @apply text-muted text-[0.85rem];
+  }
 
-  & > .wind                               { @apply min-w-24 text-right; }
-  & > .wind .wind-speed                   { @apply font-condensed text-[1.15rem] text-text-strong; }
-  & > .wind .unit                         { @apply text-[0.85rem] text-muted mr-[0.15rem]; }
-  & > .wind .wind-gust                    { @apply text-subtle text-[0.75rem]; }
+  & > .wind {
+    @apply min-w-24 text-right;
+  }
+  & > .wind .wind-speed {
+    @apply font-condensed text-[1.15rem] text-text-strong;
+  }
+  & > .wind .unit {
+    @apply text-[0.85rem] text-muted mr-[0.15rem];
+  }
+  & > .wind .wind-gust {
+    @apply text-subtle text-[0.75rem];
+  }
 }

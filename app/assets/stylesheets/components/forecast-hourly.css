@@ -33,9 +33,13 @@
   & .hour .ampm {
     @apply text-[0.85rem] text-muted uppercase tracking-[0.06em];
   }
-  & .icon-container { @apply text-text text-[1.4rem] py-1; }
+  & .icon-container {
+    @apply text-text text-[1.4rem] py-1;
+  }
 
-  & .conditions { @apply flex flex-col gap-[0.15rem]; }
+  & .conditions {
+    @apply flex flex-col gap-[0.15rem];
+  }
   & .conditions .temperature {
     @apply font-condensed text-text-strong text-[1.75rem] leading-none tabular-nums;
   }
