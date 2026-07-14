@@ -16,9 +16,8 @@ class ApplicationController < ActionController::Base
   # can render the correct palette immediately; the client re-syncs and
   # schedules the next boundary transition without polling.
   def resolve_palette
-    zone = "America/Los_Angeles"
-    now = Time.current.in_time_zone(zone)
-    @palette_almanac = AlmanacEntry.for_date(now.to_date)
+    now = Time.current
+    @palette_almanac = AlmanacEntry.for_date(Time.zone.today)
     resolver = PaletteResolver.new(almanac: @palette_almanac, at: now)
     @palette = resolver.palette
     @palette_next_transition_at = resolver.next_transition_at

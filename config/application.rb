@@ -33,7 +33,9 @@ module Leahillwx
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
-    # config.time_zone = "Central Time (US & Canada)"
+    # Station / site local timezone. Date.current and Time.zone then
+    # reflect Pacific calendar days (critical for almanac + sky arc).
+    config.time_zone = "America/Los_Angeles"
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end

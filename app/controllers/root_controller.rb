@@ -5,7 +5,7 @@ class RootController < ApplicationController
       .order(reading_date_time: :desc)
       .first
 
-    @almanac = AlmanacEntry.for_date(Date.today)
+    @almanac = AlmanacEntry.for_date(Time.zone.today)
 
     forecast_record = Forecast.last
 

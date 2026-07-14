@@ -98,7 +98,7 @@ class WeatherMeasurement < ApplicationRecord
   end
 
   def daytime?
-    almanac = AlmanacEntry.find_by(date: reading_date_time.to_date)
+    almanac = AlmanacEntry.find_by(date: reading_date_time.in_time_zone("America/Los_Angeles").to_date)
     return false unless almanac&.sunrise_at && almanac&.sunset_at
 
     reading_date_time.between?(almanac.sunrise_at, almanac.sunset_at)

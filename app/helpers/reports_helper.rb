@@ -2,7 +2,7 @@ module ReportsHelper
   def format_text_row(day, entry, report)
     if entry.nil? || !entry.has_data?
       # Future day or completely missing day
-      if day > Date.today.day && report.year == Date.today.year && report.month == Date.today.month
+      if day > Time.zone.today.day && report.year == Time.zone.today.year && report.month == Time.zone.today.month
         format("%3d", day)
       else
         format("%3d %6s %6s %5s %6s %5s %6s %6s %6s %6s %6s %5s %10s",

@@ -12,6 +12,8 @@ module Elements
   class SkyArcComponent < ViewComponent::Base
     def initialize(almanac:, now: Time.current)
       @almanac = almanac
+      # Always evaluate progress against the site timezone so UTC
+      # servers don't treat "tomorrow" as already started mid-evening.
       @now = now.in_time_zone(zone)
       @uid = SecureRandom.hex(4)
     end
