@@ -37,6 +37,7 @@ class WeatherData::LiveCardHourlyRangesTest < ActiveSupport::TestCase
     assert_equal 24, wind[:labels].length
     # avg of 2 and 4 m/s → 3 m/s → ~6.71 mph → 7
     assert_includes wind[:values], 7
+    assert_includes wind[:markers], 18 # peak gust that hour (8 m/s)
     assert_equal 1, wind[:y_min]  # 0.5 m/s → ~1.12 → 1
     assert_equal 18, wind[:y_max] # 8 m/s gust → ~17.9 → 18
 

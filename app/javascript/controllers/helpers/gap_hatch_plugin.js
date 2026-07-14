@@ -15,7 +15,7 @@ export const gapHatchPlugin = {
 
     chart.data.datasets.forEach((dataset, datasetIndex) => {
       const meta = chart.getDatasetMeta(datasetIndex)
-      if (dataset.hidden || meta.type !== "line" || !meta.data?.length) return
+      if (dataset.hidden || dataset.showLine === false || dataset.borderDash?.length || meta.type !== "line" || !meta.data?.length) return
 
       const values = dataset.data || []
       const points = meta.data
@@ -58,7 +58,7 @@ function hatchUnderSegment(ctx, chartArea, p0, p1, yBase, color) {
 
   const stroke = typeof color === "string" ? color : "rgba(128, 128, 128, 0.5)"
   ctx.strokeStyle = stroke
-  ctx.globalAlpha = 0.45
+  ctx.globalAlpha = 0.3
   ctx.lineWidth = 1
 
   const spacing = 4

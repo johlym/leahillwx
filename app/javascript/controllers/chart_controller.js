@@ -105,10 +105,13 @@ export default class extends Controller {
 
   buildDatasets(rawDatasets, palette, options) {
     return rawDatasets.map((ds, i) => {
-      const color = this.resolveColor(
+      let color = this.resolveColor(
         ds.color,
         palette.chartColors[i % palette.chartColors.length],
       )
+      if (typeof ds.colorAlpha === "number") {
+        color = withAlpha(color, ds.colorAlpha)
+      }
       const base = {
         label: ds.label,
         data: ds.data,
@@ -119,8 +122,8 @@ export default class extends Controller {
         borderWidth: ds.borderWidth ?? 2,
         borderDash: ds.dashed ? [6, 4] : undefined,
         pointRadius: ds.pointRadius ?? 0,
-        pointHoverRadius: 5,
-        pointHitRadius: 8,
+        pointHoverRadius: ds.pointHoverRadius ?? 5,
+        pointHitRadius: ds.pointHitRadius ?? 8,
         tension: ds.tension ?? 0.25,
         fill: ds.fill ?? false,
         stack: ds.stack,
@@ -128,6 +131,7 @@ export default class extends Controller {
         type: ds.type,
         hidden: ds.hidden ?? false,
         spanGaps: ds.spanGaps ?? true,
+        showLine: ds.showLine,
       }
       if (ds.fillTarget !== undefined) {
         base.fill = {
@@ -136,7 +140,9 @@ export default class extends Controller {
           below: withAlpha(color, 0.15),
         }
       }
-      if (options.styleGaps) {
+      // Gap dash/hatch only on the primary solid series — companion
+      // dashed lines (e.g. wind gusts) already read as secondary.
+      if (options.styleGaps && ds.showLine !== false && !ds.dashed) {
         base.spanGaps = true
         base.segment = {
           borderDash: (ctx) => (isGapSegment(ctx) ? [4, 3] : undefined),
@@ -283,12 +289,23 @@ export default class extends Controller {
       return {
         title: () => "",
         label: (item) => {
+          // Companion series (e.g. gust) is folded into the primary label.
+          if (item.dataset.label === "Gust") return null
+
           const val = item.parsed.y
           if (val === null || val === undefined) return null
           const unit = options.yUnit || ""
+          const decimals = options.decimals ?? 1
           const formatted =
-            typeof val === "number" ? this.formatNumber(val, options.decimals ?? 1) : val
-          return `${item.label}: ${formatted}${unit}`
+            typeof val === "number" ? this.formatNumber(val, decimals) : val
+          const hour = item.label || ""
+
+          const gustDataset = item.chart.data.datasets.find((d) => d.label === "Gust")
+          const gust = gustDataset?.data?.[item.dataIndex]
+          if (typeof gust === "number") {
+            return `${hour}: ${formatted}${unit} (${this.formatNumber(gust, decimals)})`
+          }
+          return `${hour}: ${formatted}${unit}`
         },
       }
     }

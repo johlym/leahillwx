@@ -3,6 +3,7 @@
 # Compact sparkline for home live tiles.
 # Plots the hourly average as a single accent line. Y-axis is scaled to
 # the overall 24h low/high and only those endpoint labels are shown.
+# Optional `markers` (e.g. wind gusts) render as a secondary dashed line.
 class Home::CurrentWeather::LiveSparklineComponent < ViewComponent::Base
   def initialize(series:, y_unit: "", aria_label:, decimals: 0)
     @series = series
@@ -34,20 +35,37 @@ class Home::CurrentWeather::LiveSparklineComponent < ViewComponent::Base
   private
 
   def chart_data
+    datasets = [
+      {
+        label: "Average",
+        data: @series[:values],
+        color: "var(--accent)",
+        borderWidth: 1.6,
+        tension: 0.35,
+        spanGaps: true,
+        fill: true,
+        fillAlpha: 0.12
+      }
+    ]
+
+    if @series[:markers].present?
+      datasets << {
+        label: "Gust",
+        data: @series[:markers],
+        color: "var(--accent)",
+        colorAlpha: 0.75,
+        borderWidth: 1.4,
+        tension: 0.35,
+        dashed: true,
+        fill: false,
+        spanGaps: true,
+        pointRadius: 0
+      }
+    end
+
     {
       labels: @series[:labels],
-      datasets: [
-        {
-          label: "Average",
-          data: @series[:values],
-          color: "var(--accent)",
-          borderWidth: 1.6,
-          tension: 0.35,
-          spanGaps: true,
-          fill: true,
-          fillAlpha: 0.12
-        }
-      ]
+      datasets: datasets
     }
   end
 

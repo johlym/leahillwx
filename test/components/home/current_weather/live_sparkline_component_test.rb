@@ -40,6 +40,33 @@ class Home::CurrentWeather::LiveSparklineComponentTest < ViewComponent::TestCase
     assert_equal 16, options["yMax"]
   end
 
+  test "renders gust as a secondary dashed line when markers are present" do
+    series = {
+      labels: [ "12 pm", "1 pm", "2 pm" ],
+      values: [ 5, 7, 6 ],
+      markers: [ 12, 15, 11 ],
+      y_min: 3,
+      y_max: 15
+    }
+
+    render_inline(
+      Home::CurrentWeather::LiveSparklineComponent.new(
+        series: series,
+        y_unit: " mph",
+        decimals: 0,
+        aria_label: "Hourly average wind speed over the last 24 hours"
+      )
+    )
+
+    data = JSON.parse(page.find(".live-tile-sparkline")["data-chart-data-value"])
+    assert_equal 2, data["datasets"].length
+    gust = data["datasets"][1]
+    assert_equal "Gust", gust["label"]
+    assert_equal true, gust["dashed"]
+    assert_equal 0.75, gust["colorAlpha"]
+    assert_equal [ 12, 15, 11 ], gust["data"]
+  end
+
   test "does not render when series is too sparse" do
     render_inline(
       Home::CurrentWeather::LiveSparklineComponent.new(

@@ -23,7 +23,7 @@ module WeatherData
       aqi = aqi_buckets
 
       {
-        wind: series_for(weather, :wind_avg, :wind_high, :wind_low, decimals: 0),
+        wind: wind_series_for(weather, decimals: 0),
         humidity: series_for(weather, :humidity_avg, :humidity_high, :humidity_low, decimals: 0),
         uvi: series_for(weather, :uvi_avg, :uvi_high, :uvi_low, decimals: 0),
         rain_rate: series_for(weather, :rain_avg, :rain_high, :rain_low, decimals: 2),
@@ -39,6 +39,17 @@ module WeatherData
 
     def hour_keys
       @hour_keys ||= (0...HOURS).map { |i| start_hour + i.hours }
+    end
+
+    # Wind plots hourly average speed as the line; peak gust each hour is
+    # returned separately so the sparkline can draw it as a dashed companion.
+    def wind_series_for(buckets, decimals:)
+      series = series_for(buckets, :wind_avg, :wind_high, :wind_low, decimals: decimals)
+      return nil if series.nil?
+
+      series.merge(
+        markers: hour_keys.map { |h| round_value(buckets.dig(h, :wind_high), decimals) }
+      )
     end
 
     def series_for(buckets, avg_key, high_key, low_key, decimals:)
