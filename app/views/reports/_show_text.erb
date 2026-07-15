@@ -16,9 +16,9 @@ MONTHLY STATISTICS:
                                               HEAT   COOL          AVG
 DAY   MEAN   HIGH  TIME    LOW  TIME    DEG    DEG   RAIN   WIND   HIGH  TIME    DOM DIR
 --------------------------------------------------------------------------------------------
-<% entries = report.entries.ordered -%>
+<% entries_by_day = report.entries.select { |e| e.hour.nil? }.index_by(&:day) -%>
 <% (1..report.days_in_month).each do |day| -%>
-<% entry = entries.find { |e| e.day == day } -%>
+<% entry = entries_by_day[day] -%>
 <%= format_text_row(day, entry, report) %>
 <% end -%>
 --------------------------------------------------------------------------------------------

@@ -21,9 +21,10 @@ DAILY STATISTICS:
                                               HEAT   COOL          AVG
 HOUR  MEAN   HIGH  TIME    LOW  TIME    DEG    DEG   RAIN   WIND   HIGH  TIME    DOM DIR
 --------------------------------------------------------------------------------------------
-<% entries = report.entries.hourly.for_day(day).ordered -%>
+<% hourly_entries = report.entries.select { |e| e.hour.present? && e.day == day }.sort_by(&:hour) -%>
+<% entries_by_hour = hourly_entries.index_by(&:hour) -%>
 <% (0..23).each do |hour| -%>
-<% entry = entries.find { |e| e.hour == hour } -%>
+<% entry = entries_by_hour[hour] -%>
 <%= format_hourly_text_row(hour, entry, report, day) %>
 <% end -%>
 --------------------------------------------------------------------------------------------
@@ -31,7 +32,7 @@ HOUR  MEAN   HIGH  TIME    LOW  TIME    DEG    DEG   RAIN   WIND   HIGH  TIME   
 Notes:
 - Times shown in 24-hour format (HH:MM) America/Los_Angeles timezone
 - Hours with no data shown as "N/A"
-<% if report.entries.hourly.for_day(day).any?(&:partial_period) -%>
+<% if hourly_entries.any?(&:partial_period) -%>
 - * Indicates partial hour (incomplete measurements)
 <% end -%>
 <% if generation_time -%>

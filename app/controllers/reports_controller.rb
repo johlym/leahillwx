@@ -10,13 +10,11 @@ class ReportsController < ApplicationController
   end
 
   def available
-    reports_data = Report.ordered.group_by(&:year)
+    reports = Report.ordered.includes(:entries)
 
-    result = reports_data.transform_values do |reports|
-      # Group by month and get available days for each
-      reports.group_by { |r| r.month_name.downcase }.transform_values do |month_reports|
-        # Get all days that have any entries for this month (daily or hourly)
-        month_reports.first.entries.pluck(:day).uniq.sort.map { |d| { day: d } }
+    result = reports.group_by(&:year).transform_values do |year_reports|
+      year_reports.group_by { |r| r.month_name.downcase }.transform_values do |month_reports|
+        month_reports.first.entries.map(&:day).uniq.sort.map { |d| { day: d } }
       end
     end
 

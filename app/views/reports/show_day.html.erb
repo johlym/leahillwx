@@ -20,7 +20,7 @@
     </div>
   <% end %>
 
-  <%= render Reports::StatisticsTableComponent.new(report: @report, day: @day, period_type: :hourly, has_partial_periods: @report.entries.hourly.for_day(@day).any?(&:partial_period)) %>
+  <%= render Reports::StatisticsTableComponent.new(report: @report, day: @day, period_type: :hourly, has_partial_periods: @report.entries.any? { |e| e.hour.present? && e.day == @day && e.partial_period }) %>
 
   <div class="report-notes">
     <h3>Notes:</h3>
