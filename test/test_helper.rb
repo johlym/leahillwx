@@ -4,9 +4,9 @@ if ENV["COVERAGE"] == "1"
   require "simplecov"
   SimpleCov.start "rails" do
     enable_coverage :branch
-    add_filter "/test/"
-    add_filter "/config/"
-    add_filter "/vendor/"
+    skip "/test/"
+    skip "/config/"
+    skip "/vendor/"
   end
 end
 

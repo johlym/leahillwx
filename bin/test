@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
 set -e
 
-bundle exec rails test
+# Optional coverage: COVERAGE=1 bin/test
+bundle exec rails test "$@"
