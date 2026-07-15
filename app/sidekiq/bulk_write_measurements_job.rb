@@ -68,5 +68,6 @@ class BulkWriteMeasurementsJob
     end
   rescue => e
     Rails.logger.error("Error in bulk measurement import: #{e.message}")
+    raise
   end
 end
