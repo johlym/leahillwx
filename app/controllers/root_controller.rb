@@ -37,8 +37,7 @@ class RootController < ApplicationController
     return {} unless scope.exists?
 
     peak_temp_c = scope.maximum(:temperature)
-    dew_expr = Arel.sql("temperature - ((100 - humidity) / 5.0)")
-    peak_dew_c = scope.pluck(dew_expr).compact.max
+    peak_dew_c = scope.maximum(Arel.sql("temperature - ((100 - humidity) / 5.0)"))
     peak_wind_mps = scope.maximum(:gust_speed)
     peak_uvi = scope.maximum(:uvi).to_i
     peak_humidity = scope.maximum(:humidity)
