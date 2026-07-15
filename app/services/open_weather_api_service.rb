@@ -1,6 +1,5 @@
 class OpenWeatherApiService
-  TIMEOUT_SECONDS = 10
-  class RequestError < StandardError; end
+  class RequestError < HttpClient::RequestError; end
 
   def initialize
     @appid = ENV["OPENWEATHER_API_KEY"]
@@ -48,16 +47,8 @@ class OpenWeatherApiService
   private
 
   def get_json(endpoint_path, params)
-    response = HTTParty.get(
-      @base_url + endpoint_path,
-      query: params,
-      timeout: TIMEOUT_SECONDS
-    )
-
-    unless response.success?
-      raise RequestError, "OpenWeather request failed with status #{response.code}"
-    end
-
-    JSON.parse(response.body)
+    HttpClient.get_json(@base_url + endpoint_path, query: params)
+  rescue HttpClient::RequestError => e
+    raise RequestError, e.message
   end
 end

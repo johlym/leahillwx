@@ -49,6 +49,12 @@ class DownloadLatestEarthquakeJobTest < ActiveSupport::TestCase
     assert_not earthquake.revised, "new earthquakes should not be marked revised"
   end
 
+  test "no-ops when USGS returns no earthquake" do
+    assert_no_difference "Earthquake.count" do
+      stub_api(nil) { DownloadLatestEarthquakeJob.new.perform }
+    end
+  end
+
   test "assigns distance computed from ENV location and event coordinates" do
     response = sample_api_response(usgs_id: "us7000dist")
     with_env("LOCATION_LAT" => "36", "LOCATION_LON" => "-120") do

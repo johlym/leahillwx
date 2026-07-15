@@ -45,6 +45,6 @@ class OpenWeatherApiServiceTest < ActiveSupport::TestCase
 
     @service.retrieve_forecast
 
-    assert_equal OpenWeatherApiService::TIMEOUT_SECONDS, captured[:timeout]
+    assert_equal HttpClient::DEFAULT_TIMEOUT, captured[:timeout]
   end
 end
