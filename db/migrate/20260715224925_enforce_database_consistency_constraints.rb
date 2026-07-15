@@ -14,6 +14,44 @@ class EnforceDatabaseConsistencyConstraints < ActiveRecord::Migration[8.1]
         SET last_updated = COALESCE(last_updated, updated_at, eventtime, created_at)
         WHERE last_updated IS NULL
       SQL
+
+      # usgs_id was added later; recover it from the USGS eventpage URL when present.
+      execute <<~SQL.squish
+        WITH candidates AS (
+          SELECT id,
+                 regexp_replace(url, '.*/', '') AS extracted_id,
+                 ROW_NUMBER() OVER (
+                   PARTITION BY regexp_replace(url, '.*/', '')
+                   ORDER BY id ASC
+                 ) AS row_num
+          FROM earthquakes
+          WHERE usgs_id IS NULL
+            AND url ~ 'earthquake\\.usgs\\.gov/.+/eventpage/'
+            AND regexp_replace(url, '.*/', '') <> ''
+        )
+        UPDATE earthquakes e
+        SET usgs_id = c.extracted_id
+        FROM candidates c
+        WHERE e.id = c.id
+          AND c.row_num = 1
+          AND NOT EXISTS (
+            SELECT 1
+            FROM earthquakes existing
+            WHERE existing.usgs_id = c.extracted_id
+          )
+      SQL
+
+      # Drop legacy rows that still cannot be identified (or would collide on usgs_id).
+      execute <<~SQL.squish
+        DELETE FROM earthquakes
+        WHERE usgs_id IS NULL
+      SQL
+
+      execute <<~SQL.squish
+        UPDATE earthquakes
+        SET revised = FALSE
+        WHERE revised IS NULL
+      SQL
     end
 
     # Verified no remaining nulls; rain_day already defaults to 0.0.
