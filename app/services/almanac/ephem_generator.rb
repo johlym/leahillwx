@@ -1,5 +1,7 @@
 module Almanac
   class EphemGenerator
+    include MathHelpers
+
     TIMEZONE = "America/Los_Angeles"
     BSP_PATH = Rails.root.join("vendor", "de440s.bsp")
 
@@ -16,7 +18,7 @@ module Almanac
     def initialize
       @lat = ENV.fetch("LOCATION_LAT").to_f
       @lon = ENV.fetch("LOCATION_LON").to_f
-      @season_cache = {}
+      @seasons = Seasons.new(spk_provider: self)
     end
 
     def spk
@@ -127,7 +129,19 @@ module Almanac
       }
     end
 
+    def astronomical_seasons_for_year(year)
+      seasons.astronomical_seasons_for_year(year)
+    end
+
+    def season_for_date(date)
+      seasons.season_for_date(date)
+    end
+
     private
+
+    def seasons
+      @seasons
+    end
 
     def calculate_sun_events(date)
       # Calculate events for the LOCAL timezone day (midnight to midnight in TIMEZONE)
@@ -228,7 +242,7 @@ module Almanac
       jd = datetime_to_julian_date(datetime)
 
       {
-        sun_ecliptic_longitude_deg: solar_ecliptic_longitude(jd)
+        sun_ecliptic_longitude_deg: seasons.solar_ecliptic_longitude(jd)
       }
     end
 
@@ -329,12 +343,6 @@ module Almanac
         ra: coords[:ra],
         dec: coords[:dec]
       }
-    end
-
-    def datetime_to_julian_date(datetime)
-      # Convert Ruby Time to Julian Date
-      # JD = (Unix timestamp / 86400) + 2440587.5
-      datetime.to_f / 86400.0 + 2440587.5
     end
 
     def utc_hours_to_datetime(year, month, day, utc_hours, tz)
@@ -650,53 +658,6 @@ module Almanac
       { phase_name: phases[index], illumination: illumination }
     end
 
-    # Helper math functions
-    def days_since_2000(year, month, day)
-      367.0 * year - ((7.0 * (year + ((month + 9.0) / 12.0))) / 4.0) +
-        (275.0 * month / 9.0) + day - 730530.0
-    end
-
-    def sun_ecliptic_position(d)
-      m = revolution(356.0470 + 0.9856002585 * d)
-      w = 282.9404 + 4.70935e-5 * d
-      e = 0.016709 - 1.151e-9 * d
-
-      e_anom = m + e * (180.0 / Math::PI) * sind(m) * (1.0 + e * cosd(m))
-      x = cosd(e_anom) - e
-      y = Math.sqrt(1.0 - e * e) * sind(e_anom)
-      _r = Math.sqrt(x * x + y * y)
-      v = atan2d(y, x)
-      lon = (v + w) % 360.0
-
-      [ lon, _r ]
-    end
-
-    def ra_from_ecliptic(lon, d)
-      obl_ecl = 23.4393 - 3.563e-7 * d
-      x = cosd(lon)
-      y = cosd(obl_ecl) * sind(lon)
-      atan2d(y, x)
-    end
-
-    def gmst0(d)
-      revolution((180.0 + 356.0470 + 282.9404) + (0.9856002585 + 4.70935e-5) * d)
-    end
-
-    def cartesian_to_equatorial(pos)
-      # Convert ICRF Cartesian coordinates (km) to RA/Dec (degrees)
-      x, y, z = pos
-
-      # Calculate right ascension
-      ra = atan2d(y, x)
-      ra = ra % 360.0  # Normalize to 0-360
-
-      # Calculate declination
-      r = Math.sqrt(x**2 + y**2 + z**2)
-      dec = asind(z / r)
-
-      { ra: ra, dec: dec }
-    end
-
     def equatorial_to_topocentric(ra, dec, jd)
       # Convert RA/Dec to Azimuth/Altitude for observer location
       # Calculate Greenwich Mean Sidereal Time
@@ -734,215 +695,6 @@ module Almanac
       azimuth = 360.0 - azimuth if Math.sin(ha_rad) > 0
 
       { azimuth: azimuth, altitude: altitude }
-    end
-
-    def revolution(x)
-      x - 360.0 * (x / 360.0).floor
-    end
-
-    def rev180(x)
-      x - 360.0 * ((x / 360.0 + 0.5).floor)
-    end
-
-    def sind(x)
-      Math.sin(x * Math::PI / 180.0)
-    end
-
-    def cosd(x)
-      Math.cos(x * Math::PI / 180.0)
-    end
-
-    def atan2d(y, x)
-      Math.atan2(y, x) * 180.0 / Math::PI
-    end
-
-    def acosd(x)
-      Math.acos(x) * 180.0 / Math::PI
-    end
-
-    def asind(x)
-      Math.asin(x) * 180.0 / Math::PI
-    end
-
-    def solar_ecliptic_longitude(jd)
-      # Calculate the Sun's apparent geocentric ecliptic longitude using DE440
-      # This is used to determine astronomical seasons
-
-      # Get Sun position relative to SSB
-      sun_state = spk[SOLAR_SYSTEM_BARYCENTER, SUN].state_at(jd)
-
-      # Get Earth position relative to SSB
-      emb_state = spk[SOLAR_SYSTEM_BARYCENTER, EARTH_MOON_BARYCENTER].state_at(jd)
-      earth_offset = spk[EARTH_MOON_BARYCENTER, EARTH].state_at(jd)
-
-      earth_pos = [
-        emb_state.position[0] + earth_offset.position[0],
-        emb_state.position[1] + earth_offset.position[1],
-        emb_state.position[2] + earth_offset.position[2]
-      ]
-
-      # Sun relative to Earth (geocentric)
-      rel_pos = [
-        sun_state.position[0] - earth_pos[0],
-        sun_state.position[1] - earth_pos[1],
-        sun_state.position[2] - earth_pos[2]
-      ]
-
-      # ICRF positions are in equatorial coordinates (J2000)
-      # Rotate to ecliptic coordinates using obliquity
-      x_eq, y_eq, z_eq = rel_pos
-      eps_rad = OBLIQUITY_J2000 * Math::PI / 180.0
-
-      # Rotation matrix from equatorial to ecliptic
-      # x_ecl = x_eq
-      # y_ecl = y_eq * cos(eps) + z_eq * sin(eps)
-      # z_ecl = -y_eq * sin(eps) + z_eq * cos(eps)
-      x_ecl = x_eq
-      y_ecl = y_eq * Math.cos(eps_rad) + z_eq * Math.sin(eps_rad)
-      _z_ecl = -y_eq * Math.sin(eps_rad) + z_eq * Math.cos(eps_rad)
-
-      # Calculate ecliptic longitude
-      lambda = Math.atan2(y_ecl, x_ecl) * 180.0 / Math::PI
-      lambda = lambda % 360.0  # Normalize to [0, 360)
-
-      lambda
-    end
-
-    def find_season_boundary(year, target_longitude)
-      # Find the Julian Date when the Sun's ecliptic longitude equals target_longitude
-      # Uses bisection method for robustness
-
-      # Determine search range based on target longitude
-      # These are approximate starting points for each season
-      search_ranges = {
-        0 => [ 3, 20, 3, 21 ],      # Vernal Equinox: March 19-21
-        90 => [ 6, 20, 6, 22 ],     # Summer Solstice: June 20-22
-        180 => [ 9, 21, 9, 23 ],    # Autumnal Equinox: September 21-23
-        270 => [ 12, 20, 12, 23 ]   # Winter Solstice: December 20-23
-      }
-
-      range = search_ranges[target_longitude]
-      raise "Invalid target longitude: #{target_longitude}" unless range
-
-      start_month, start_day, end_month, end_day = range
-
-      # Create JD range for search
-      jd_start = datetime_to_julian_date(Time.utc(year, start_month, start_day, 0, 0, 0))
-      jd_end = datetime_to_julian_date(Time.utc(year, end_month, end_day, 23, 59, 59))
-
-      # Bisection method to find when longitude crosses target
-      tolerance = 1e-6  # ~0.1 seconds precision
-
-      jd_low = jd_start
-      jd_high = jd_end
-
-      # Handle angle wrapping for vernal equinox (0° = 360°)
-      lambda_low = solar_ecliptic_longitude(jd_low)
-      lambda_high = solar_ecliptic_longitude(jd_high)
-
-      # For vernal equinox, we need to handle 360° -> 0° transition
-      if target_longitude == 0
-        # Adjust angles to be relative to 360° for comparison
-        lambda_low = lambda_low < 180 ? lambda_low + 360 : lambda_low
-        lambda_high = lambda_high < 180 ? lambda_high + 360 : lambda_high
-        target_adjusted = 360.0
-      else
-        target_adjusted = target_longitude.to_f
-      end
-
-      # Bisection
-      while (jd_high - jd_low) > tolerance
-        jd_mid = (jd_low + jd_high) / 2.0
-        lambda_mid = solar_ecliptic_longitude(jd_mid)
-
-        # Adjust for vernal equinox wrapping
-        if target_longitude == 0
-          lambda_mid = lambda_mid < 180 ? lambda_mid + 360 : lambda_mid
-        end
-
-        if lambda_mid < target_adjusted
-          jd_low = jd_mid
-          lambda_low = lambda_mid
-        else
-          jd_high = jd_mid
-          lambda_high = lambda_mid
-        end
-      end
-
-      # Return the midpoint as best estimate
-      (jd_low + jd_high) / 2.0
-    end
-
-    def astronomical_seasons_for_year(year)
-      # Return cached result if available
-      return @season_cache[year] if @season_cache[year]
-
-      # Compute season boundaries for the given year
-      seasons = {
-        spring_equinox: nil,
-        summer_solstice: nil,
-        autumn_equinox: nil,
-        winter_solstice: nil
-      }
-
-      # Find each season boundary
-      begin
-        # Vernal Equinox (λ = 0°)
-        jd = find_season_boundary(year, 0)
-        seasons[:spring_equinox] = jd_to_time(jd)
-
-        # Summer Solstice (λ = 90°)
-        jd = find_season_boundary(year, 90)
-        seasons[:summer_solstice] = jd_to_time(jd)
-
-        # Autumnal Equinox (λ = 180°)
-        jd = find_season_boundary(year, 180)
-        seasons[:autumn_equinox] = jd_to_time(jd)
-
-        # Winter Solstice (λ = 270°)
-        jd = find_season_boundary(year, 270)
-        seasons[:winter_solstice] = jd_to_time(jd)
-      rescue => e
-        Rails.logger.warn "Failed to calculate seasons for #{year}: #{e.message}"
-      end
-
-      # Cache the result
-      @season_cache[year] = seasons
-
-      seasons
-    end
-
-    def season_for_date(date)
-      # Determine which astronomical season a given date falls into
-      year = date.year
-
-      # Get season boundaries for this year
-      current_year_seasons = astronomical_seasons_for_year(year)
-
-      # Convert date to Time for comparison
-      date_time = Time.utc(date.year, date.month, date.day, 12, 0, 0)
-
-      # Determine season based on date
-      case
-      when current_year_seasons[:winter_solstice] && date_time >= current_year_seasons[:winter_solstice] then :winter
-      when current_year_seasons[:autumn_equinox] && date_time >= current_year_seasons[:autumn_equinox] then :fall
-      when current_year_seasons[:summer_solstice] && date_time >= current_year_seasons[:summer_solstice] then :summer
-      when current_year_seasons[:spring_equinox] && date_time >= current_year_seasons[:spring_equinox] then :spring
-      else :winter
-      end
-    end
-
-    def jd_to_time(jd)
-      # Convert Julian Date to Ruby Time (UTC)
-      Time.at((jd - 2440587.5) * 86400.0).utc
-    end
-
-    def jd_to_date(jd)
-      # Convert Julian Date to Ruby Date
-      # JD 0 is noon January 1, 4713 BC
-      # Unix epoch is JD 2440587.5
-      time = Time.at((jd - 2440587.5) * 86400.0).utc
-      Date.new(time.year, time.month, time.day)
     end
   end
 end
