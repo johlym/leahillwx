@@ -9,27 +9,21 @@ class RecordCalculator
     Rails.logger.info "Starting record calculation for #{@scope} #{@year || 'all-time'}"
 
     calculate_temperature_records
-    GC.start
     Rails.logger.info "✓ Temperature records calculated"
 
     calculate_wind_records
-    GC.start
     Rails.logger.info "✓ Wind records calculated"
 
     calculate_rain_records
-    GC.start
     Rails.logger.info "✓ Rain records calculated"
 
     calculate_humidity_records
-    GC.start
     Rails.logger.info "✓ Humidity records calculated"
 
     calculate_barometer_records
-    GC.start
     Rails.logger.info "✓ Barometer records calculated"
 
     calculate_sun_records
-    GC.start
     Rails.logger.info "✓ Sun records calculated"
 
     @record.save!
