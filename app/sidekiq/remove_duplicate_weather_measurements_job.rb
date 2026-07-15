@@ -1,5 +1,5 @@
 class RemoveDuplicateWeatherMeasurementsJob
-  include Sidekiq::Worker
+  include Sidekiq::Job
 
   def perform(*args)
     duplicate_date_times = WeatherMeasurement
