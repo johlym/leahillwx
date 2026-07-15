@@ -23,6 +23,11 @@
 #  updated_at   :datetime         not null
 #  usgs_id      :string
 #
+# Indexes
+#
+#  index_earthquakes_on_eventtime  (eventtime)
+#  index_earthquakes_on_usgs_id    (usgs_id) UNIQUE
+#
 one:
   {
     id: 1,

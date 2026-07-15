@@ -5,6 +5,6 @@ class DownloadOpenWeatherForecastJob
     service = OpenWeatherApiService.new
 
     ow_forecast = service.retrieve_forecast
-    Forecast.create(forecast: ow_forecast)
+    Forecast.create!(forecast: ow_forecast, interval: "daily")
   end
 end

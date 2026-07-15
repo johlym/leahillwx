@@ -17,6 +17,11 @@
 #  updated_at   :datetime         not null
 #  usgs_id      :string
 #
+# Indexes
+#
+#  index_earthquakes_on_eventtime  (eventtime)
+#  index_earthquakes_on_usgs_id    (usgs_id) UNIQUE
+#
 require "test_helper"
 
 class EarthquakeTest < ActiveSupport::TestCase

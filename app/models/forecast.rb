@@ -13,7 +13,15 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
+# Indexes
+#
+#  index_forecasts_on_interval_and_created_at  (interval,created_at DESC)
+#
 # EXAMPLE FORECAST DATA OBJECT: see `docs/example_forecast.json`
 class Forecast < ApplicationRecord
   validates :forecast, presence: true
+
+  def self.latest(interval: "daily")
+    where(interval: interval).order(created_at: :desc).first
+  end
 end

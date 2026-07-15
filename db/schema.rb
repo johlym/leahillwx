@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_15_222000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_15_223000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -79,6 +79,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_222000) do
     t.datetime "updated_at", null: false
     t.string "url"
     t.string "usgs_id"
+    t.index ["eventtime"], name: "index_earthquakes_on_eventtime"
+    t.index ["usgs_id"], name: "index_earthquakes_on_usgs_id", unique: true
   end
 
   create_table "forecasts", force: :cascade do |t|
@@ -86,6 +88,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_222000) do
     t.jsonb "forecast"
     t.string "interval", default: "daily", null: false
     t.datetime "updated_at", null: false
+    t.index ["interval", "created_at"], name: "index_forecasts_on_interval_and_created_at", order: { created_at: :desc }
   end
 
   create_table "records", force: :cascade do |t|

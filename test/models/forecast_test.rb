@@ -8,6 +8,10 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
+# Indexes
+#
+#  index_forecasts_on_interval_and_created_at  (interval,created_at DESC)
+#
 require "test_helper"
 
 class ForecastTest < ActiveSupport::TestCase

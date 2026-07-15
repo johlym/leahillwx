@@ -7,7 +7,7 @@ class RootController < ApplicationController
 
     @almanac = AlmanacEntry.for_date(Time.zone.today)
 
-    forecast_record = Forecast.last
+    forecast_record = Forecast.latest
 
     if forecast_record.nil? || forecast_record.created_at < 1.hour.ago
       DownloadOpenWeatherForecastJob.perform_async
