@@ -16,7 +16,10 @@ class WeatherData::LiveCardHourlyRangesTest < ActiveSupport::TestCase
 
   test "returns 10-minute averages for the local calendar day with overall high/low for the y-axis" do
     create_measurement(minutes_ago: 20, humidity: 60, temperature: 20, uvi: 3, rain_rate: 0, wind_speed: 2, gust_speed: 5)
-    create_measurement(minutes_ago: 20, humidity: 70, temperature: 22, uvi: 5, rain_rate: 1.27, wind_speed: 4, gust_speed: 8)
+    create_measurement_at(
+      @now - 20.minutes + 30.seconds,
+      humidity: 70, temperature: 22, uvi: 5, rain_rate: 1.27, wind_speed: 4, gust_speed: 8
+    )
     create_measurement(minutes_ago: 10, humidity: 55, temperature: 18, uvi: 1, rain_rate: 0, wind_speed: 1, gust_speed: 3)
     create_measurement(minutes_ago: 0, humidity: 50, temperature: 17, uvi: 0, rain_rate: 0, wind_speed: 0.5, gust_speed: 2)
 
