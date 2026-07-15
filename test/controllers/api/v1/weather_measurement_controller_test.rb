@@ -93,4 +93,32 @@ class Api::V1::WeatherMeasurementControllerTest < ActionDispatch::IntegrationTes
 
     assert_response :unprocessable_entity
   end
+
+  test "create treats duplicate reading_date_time as success" do
+    reading_at = Time.zone.parse("2026-06-01 12:00:00")
+    WeatherMeasurement.create!(
+      reading_date_time: reading_at,
+      barometer_abs: 1013.2,
+      barometer_rel: 1015.0,
+      gust_speed: 2.5,
+      light: 1200.0,
+      humidity: 65,
+      temperature: 18.5,
+      rain_day: 0.0,
+      rain_rate: 0.0,
+      uv: 3,
+      uvi: 3.0,
+      wind_dir: 180,
+      wind_speed: 1.2
+    )
+
+    assert_no_difference("WeatherMeasurement.count") do
+      post api_v1_weather_measurement_url,
+           params: measurement_payload(reading_date_time: reading_at.iso8601),
+           headers: auth_headers,
+           as: :json
+    end
+
+    assert_response :no_content
+  end
 end

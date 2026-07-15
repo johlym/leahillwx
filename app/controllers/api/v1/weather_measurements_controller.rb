@@ -13,18 +13,16 @@ class Api::V1::WeatherMeasurementsController < ApiController
   def create
     measurement_params = permit_measurement_params(params.require(:weather_measurement))
 
-    # Check if measurement with this timestamp already exists
-    if WeatherMeasurement.exists?(reading_date_time: measurement_params[:reading_date_time])
+    begin
+      @wm = WeatherMeasurement.new(measurement_params)
+      if @wm.save
+        head :no_content
+      else
+        render json: { errors: @wm.errors.full_messages }, status: :unprocessable_entity
+      end
+    rescue ActiveRecord::RecordNotUnique
       Rails.logger.info("Skipping duplicate measurement at #{measurement_params[:reading_date_time]}")
-      head :no_content # Return success but don't insert
-      return
-    end
-
-    @wm = WeatherMeasurement.new(measurement_params)
-    if @wm.save
       head :no_content
-    else
-      render json: { errors: @wm.errors.full_messages }, status: :unprocessable_entity
     end
   end
 

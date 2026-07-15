@@ -28,7 +28,7 @@
 #  index_weather_measurements_on_light              (light)
 #  index_weather_measurements_on_rain_day           (rain_day)
 #  index_weather_measurements_on_rain_rate          (rain_rate)
-#  index_weather_measurements_on_reading_date_time  (reading_date_time)
+#  index_weather_measurements_on_reading_date_time  (reading_date_time) UNIQUE
 #  index_weather_measurements_on_temperature        (temperature)
 #  index_weather_measurements_on_wind_speed         (wind_speed)
 #

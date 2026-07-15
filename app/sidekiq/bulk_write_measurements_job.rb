@@ -21,7 +21,7 @@ class BulkWriteMeasurementsJob
       deleted_count = WeatherMeasurement.where(reading_date_time: timestamps).delete_all
 
       # Insert all records
-      WeatherMeasurement.insert_all!(records) if records.any?
+      insert_measurements!(records) if records.any?
       Rails.logger.info("Bulk import (overwrite): #{records.size} inserted, #{deleted_count} deleted")
     elsif update_records
       # Update existing records and insert new ones
@@ -41,7 +41,7 @@ class BulkWriteMeasurementsJob
       end
 
       # Insert new records in bulk
-      WeatherMeasurement.insert_all!(new_records) if new_records.any?
+      insert_measurements!(new_records) if new_records.any?
       Rails.logger.info("Bulk import: #{new_records.size} created, #{updated_count} updated")
     else
       # Original behavior: filter out duplicates
@@ -64,10 +64,19 @@ class BulkWriteMeasurementsJob
       end
 
       # Insert only new records
-      WeatherMeasurement.insert_all!(new_records) if new_records.any?
+      insert_measurements!(new_records) if new_records.any?
     end
   rescue => e
     Rails.logger.error("Error in bulk measurement import: #{e.message}")
     raise
+  end
+
+  private
+
+  def insert_measurements!(records)
+    WeatherMeasurement.insert_all!(records, unique_by: :reading_date_time)
+  rescue ArgumentError
+    # unique_by requires a unique index; fall back until migration is applied
+    WeatherMeasurement.insert_all!(records)
   end
 end

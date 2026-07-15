@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_15_194214) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_15_222000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -213,7 +213,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_194214) do
     t.index ["light"], name: "index_weather_measurements_on_light"
     t.index ["rain_day"], name: "index_weather_measurements_on_rain_day"
     t.index ["rain_rate"], name: "index_weather_measurements_on_rain_rate"
-    t.index ["reading_date_time"], name: "index_weather_measurements_on_reading_date_time"
+    t.index ["reading_date_time"], name: "index_weather_measurements_on_reading_date_time", unique: true
     t.index ["temperature"], name: "index_weather_measurements_on_temperature"
     t.index ["wind_speed"], name: "index_weather_measurements_on_wind_speed"
   end
