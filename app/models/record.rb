@@ -70,7 +70,10 @@ class Record < ApplicationRecord
   validates :scope, uniqueness: { scope: :year }
 
   scope :for_year, ->(year) { where(scope: "yearly", year: year) }
-  scope :all_time_record, -> { where(scope: "all_time").first }
+
+  def self.all_time_record
+    find_by(scope: "all_time")
+  end
 
   def self.current_year_record
     for_year(Time.current.year).first
