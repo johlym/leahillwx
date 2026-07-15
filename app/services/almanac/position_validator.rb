@@ -24,10 +24,11 @@ module Almanac
   # This creates an expected ~1-2° parallax offset in angular separation.
   # This is correct behavior, not an error.
   class PositionValidator
-    # Tolerance thresholds for OBSERVABLE coordinates (degrees)
+    include MathHelpers
+
     SUN_ALTITUDE_TOLERANCE_DEG = 0.1
     MOON_ALTITUDE_TOLERANCE_DEG = 0.25
-    MOON_ANGULAR_SEPARATION_TOLERANCE_DEG = 2.0  # Accounts for topocentric vs geocentric parallax
+    MOON_ANGULAR_SEPARATION_TOLERANCE_DEG = 2.0
 
     DEG2RAD = Math::PI / 180.0
     RAD2DEG = 180.0 / Math::PI
@@ -36,12 +37,14 @@ module Almanac
       @lat = lat
       @lon = lon
       @elevation = elevation
+      @bsp_positions = BspPositions.new(
+        spk: EphemerisLoader.instance.spk,
+        lat: lat,
+        lon: lon
+      )
     end
 
-    # Validate sun position at a specific time
-    # Returns: { valid: Boolean, differences: Hash, warnings: Array, info: Array }
     def validate_sun_position(datetime)
-      # Get analytical position (real-time path)
       analytical_service = ApproximateCelestialPosition.new(
         datetime: datetime,
         lat: @lat,
@@ -50,21 +53,16 @@ module Almanac
       )
       analytical_pos = analytical_service.sun_position
 
-      # Get ephemeris position (authoritative path)
-      ephemeris_service = EphemGenerator.new
-      jd = ephemeris_service.send(:datetime_to_julian_date, datetime)
-      ephemeris_pos = ephemeris_service.send(:calculate_sun_position_bsp, jd)
+      jd = datetime_to_julian_date(datetime)
+      ephemeris_pos = @bsp_positions.sun_position(jd)
 
-      # Calculate differences
       differences = calculate_position_differences(analytical_pos, ephemeris_pos)
 
-      # Primary validation: OBSERVABLE coordinates only
       warnings = []
       if differences[:altitude_deg] > SUN_ALTITUDE_TOLERANCE_DEG
         warnings << "Sun altitude difference (#{differences[:altitude_deg].round(3)}°) exceeds tolerance (#{SUN_ALTITUDE_TOLERANCE_DEG}°)"
       end
 
-      # Informational only: RA/Dec differences (do NOT fail on these)
       info = []
       info << "RA diff: #{differences[:ra_deg].round(3)}° (informational - frame mismatch expected)"
       info << "Dec diff: #{differences[:dec_deg].round(3)}° (informational - frame mismatch expected)"
@@ -79,10 +77,7 @@ module Almanac
       }
     end
 
-    # Validate moon position at a specific time
-    # Returns: { valid: Boolean, differences: Hash, warnings: Array, info: Array }
     def validate_moon_position(datetime)
-      # Get analytical position (real-time path)
       analytical_service = ApproximateCelestialPosition.new(
         datetime: datetime,
         lat: @lat,
@@ -91,21 +86,16 @@ module Almanac
       )
       analytical_pos = analytical_service.moon_position
 
-      # Get ephemeris position (authoritative path)
-      ephemeris_service = EphemGenerator.new
-      jd = ephemeris_service.send(:datetime_to_julian_date, datetime)
-      ephemeris_pos = ephemeris_service.send(:calculate_moon_position_bsp, jd)
+      jd = datetime_to_julian_date(datetime)
+      ephemeris_pos = @bsp_positions.moon_position(jd)
 
-      # Calculate differences
       differences = calculate_position_differences(analytical_pos, ephemeris_pos)
 
-      # Primary validation: OBSERVABLE coordinates only
       warnings = []
       if differences[:altitude_deg] > MOON_ALTITUDE_TOLERANCE_DEG
         warnings << "Moon altitude difference (#{differences[:altitude_deg].round(3)}°) exceeds tolerance (#{MOON_ALTITUDE_TOLERANCE_DEG}°)"
       end
 
-      # Use horizontal angular separation (more stable than raw azimuth)
       ang_sep = horizontal_angular_separation(
         analytical_pos[:altitude_deg], analytical_pos[:azimuth_deg],
         ephemeris_pos[:altitude], ephemeris_pos[:azimuth]
@@ -114,7 +104,6 @@ module Almanac
         warnings << "Moon horizontal angular separation (#{ang_sep.round(3)}°) exceeds tolerance (#{MOON_ANGULAR_SEPARATION_TOLERANCE_DEG}°)"
       end
 
-      # Informational only: RA/Dec and azimuth differences (do NOT fail on these)
       info = []
       info << "RA diff: #{differences[:ra_deg].round(3)}° (informational - frame mismatch expected)"
       info << "Dec diff: #{differences[:dec_deg].round(3)}° (informational - frame mismatch expected)"
@@ -131,7 +120,6 @@ module Almanac
       }
     end
 
-    # Run validation for both sun and moon at current time
     def validate_current_positions
       datetime = Time.current
 
@@ -145,8 +133,6 @@ module Almanac
     private
 
     def horizontal_angular_separation(alt1, az1, alt2, az2)
-      # Calculate true angular distance between two points on celestial sphere
-      # This is more stable than raw azimuth difference, especially at high altitudes
       alt1r = alt1 * DEG2RAD
       az1r  = az1  * DEG2RAD
       alt2r = alt2 * DEG2RAD
@@ -159,17 +145,14 @@ module Almanac
     end
 
     def calculate_position_differences(analytical, ephemeris)
-      # Handle both hash key formats (symbols and strings)
       analytical = normalize_keys(analytical)
       ephemeris = normalize_keys(ephemeris)
 
-      # Calculate angular differences
       ra_diff = angular_difference(analytical[:ra_deg], ephemeris[:ra_deg])
       dec_diff = (analytical[:dec_deg] - ephemeris[:dec_deg]).abs
       alt_diff = (analytical[:altitude_deg] - ephemeris[:altitude_deg]).abs
       az_diff = angular_difference(analytical[:azimuth_deg], ephemeris[:azimuth_deg])
 
-      # Total position difference (Euclidean in RA/Dec space)
       total = Math.sqrt(ra_diff**2 + dec_diff**2)
 
       {
@@ -191,7 +174,6 @@ module Almanac
     end
 
     def angular_difference(angle1, angle2)
-      # Calculate shortest angular distance, handling wraparound at 360°
       diff = (angle1 - angle2).abs
       diff = 360.0 - diff if diff > 180.0
       diff
