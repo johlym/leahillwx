@@ -14,8 +14,10 @@ class SoilChannelsTest < ActiveSupport::TestCase
   end
 
   test "falls back to Ch N when channel is unnamed" do
-    assert_equal "Ch 1", SoilChannels.name_for(1)
-    assert_equal "Ch 8", SoilChannels.name_for(8)
+    with_soil_channel_names({}) do
+      assert_equal "Ch 1", SoilChannels.name_for(1)
+      assert_equal "Ch 8", SoilChannels.name_for(8)
+    end
   end
 
   test "returns configured friendly name" do
