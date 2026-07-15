@@ -32,6 +32,7 @@ end
 group :development do
   gem "annotaterb"
   gem "web-console"
+  gem "ruby-lsp-rails", require: false
 end
 
 group :test do
