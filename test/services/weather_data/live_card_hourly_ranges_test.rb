@@ -4,6 +4,7 @@ require "test_helper"
 
 class WeatherData::LiveCardHourlyRangesTest < ActiveSupport::TestCase
   setup do
+    # 2:30 pm PT on July 13 — absolute day axis runs 12 am → 11 pm PT.
     @now = Time.utc(2026, 7, 13, 21, 30, 0)
     travel_to @now
   end
@@ -12,7 +13,7 @@ class WeatherData::LiveCardHourlyRangesTest < ActiveSupport::TestCase
     travel_back
   end
 
-  test "returns hourly averages with overall 24h high/low for the y-axis" do
+  test "returns hourly averages for the local calendar day with overall high/low for the y-axis" do
     create_measurement(hours_ago: 2, humidity: 60, temperature: 20, uvi: 3, rain_rate: 0, wind_speed: 2, gust_speed: 5)
     create_measurement(hours_ago: 2, humidity: 70, temperature: 22, uvi: 5, rain_rate: 1.27, wind_speed: 4, gust_speed: 8)
     create_measurement(hours_ago: 1, humidity: 55, temperature: 18, uvi: 1, rain_rate: 0, wind_speed: 1, gust_speed: 3)
@@ -43,14 +44,17 @@ class WeatherData::LiveCardHourlyRangesTest < ActiveSupport::TestCase
 
     humidity = result[:humidity]
     assert_equal 24, humidity[:labels].length
-    assert_match(/\A\d{1,2} (am|pm)\z/, humidity[:labels].first)
+    assert_equal "12 am", humidity[:labels].first
+    assert_equal "11 pm", humidity[:labels].last
+    assert_equal "2 pm", humidity[:labels][14]
     assert_includes humidity[:values], 65 # avg of 60 and 70
-    assert_equal 50, humidity[:y_min] # lowest low across all hours
-    assert_equal 70, humidity[:y_max] # highest high across all hours
+    assert_equal 50, humidity[:y_min] # lowest low across hours so far
+    assert_equal 70, humidity[:y_max] # highest high across hours so far
 
-    # @now is 2026-07-13 21:30 UTC = 2:30 pm PT; current hour label is "2 pm"
-    assert_equal "2 pm", humidity[:labels].last
-    assert_equal "12 pm", humidity[:labels][-3] # two hours earlier
+    # Future hours of the local day stay blank so the line fills left-to-right.
+    assert_nil humidity[:values][15] # 3 pm
+    assert_nil humidity[:values][23] # 11 pm
+    assert_equal 65, humidity[:values][12] # 12 pm (2 hours before 2 pm)
 
     rain = result[:rain_rate]
     assert_in_delta 0.03, rain[:values].compact.find { |v| v > 0 }, 0.01 # avg of 0 and 0.05
@@ -64,6 +68,23 @@ class WeatherData::LiveCardHourlyRangesTest < ActiveSupport::TestCase
     assert_equal 51, aqi[:y_max]
   end
 
+  test "ignores measurements from the previous local day" do
+    # 11 pm PT yesterday is still within a rolling 24h window, but not today.
+    create_measurement_at(
+      Time.utc(2026, 7, 13, 6, 0, 0), # 11 pm PT July 12
+      humidity: 90, temperature: 15, uvi: 0, rain_rate: 0, wind_speed: 1, gust_speed: 2
+    )
+    create_measurement(hours_ago: 1, humidity: 55, temperature: 18, uvi: 1, rain_rate: 0)
+    create_measurement(hours_ago: 0, humidity: 50, temperature: 17, uvi: 0, rain_rate: 0)
+
+    result = WeatherData::LiveCardHourlyRanges.new(now: @now).call
+    humidity = result[:humidity]
+
+    refute_includes humidity[:values].compact, 90
+    assert_equal 50, humidity[:y_min]
+    assert_equal 55, humidity[:y_max]
+  end
+
   test "returns nil series when fewer than two hourly buckets have data" do
     create_measurement(hours_ago: 0, humidity: 50, temperature: 17, uvi: 0, rain_rate: 0)
 
@@ -74,8 +95,20 @@ class WeatherData::LiveCardHourlyRangesTest < ActiveSupport::TestCase
   private
 
   def create_measurement(hours_ago:, humidity:, temperature:, uvi:, rain_rate:, wind_speed: 1, gust_speed: 2)
+    create_measurement_at(
+      @now - hours_ago.hours,
+      humidity: humidity,
+      temperature: temperature,
+      uvi: uvi,
+      rain_rate: rain_rate,
+      wind_speed: wind_speed,
+      gust_speed: gust_speed
+    )
+  end
+
+  def create_measurement_at(reading_date_time, humidity:, temperature:, uvi:, rain_rate:, wind_speed: 1, gust_speed: 2)
     WeatherMeasurement.create!(
-      reading_date_time: @now - hours_ago.hours,
+      reading_date_time: reading_date_time,
       barometer_abs: 1013,
       barometer_rel: 1013,
       gust_speed: gust_speed,

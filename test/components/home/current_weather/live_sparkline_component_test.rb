@@ -16,12 +16,12 @@ class Home::CurrentWeather::LiveSparklineComponentTest < ViewComponent::TestCase
         series: series,
         y_unit: "%",
         decimals: 0,
-        aria_label: "Hourly average humidity over the last 24 hours"
+        aria_label: "Hourly average humidity so far today"
       )
     )
 
     assert_selector ".live-tile-sparkline[data-controller='chart']"
-    assert_selector ".live-tile-sparkline[aria-label='Hourly average humidity over the last 24 hours']"
+    assert_selector ".live-tile-sparkline[aria-label='Hourly average humidity so far today']"
 
     data = JSON.parse(page.find(".live-tile-sparkline")["data-chart-data-value"])
     assert_equal 1, data["datasets"].length
@@ -54,7 +54,7 @@ class Home::CurrentWeather::LiveSparklineComponentTest < ViewComponent::TestCase
         series: series,
         y_unit: " mph",
         decimals: 0,
-        aria_label: "Hourly average wind speed over the last 24 hours"
+        aria_label: "Hourly average wind speed so far today"
       )
     )
 

@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
-# Builds last-24h hourly series for the home-page live cards.
+# Builds today-so-far hourly series for the home-page live cards.
+# The X-axis is the absolute local calendar day (hour 0 → 23). As the
+# day progresses, completed hours fill in; future hours stay empty.
 # Each hour contributes its average as the plotted point. The Y-axis
-# range is the overall lowest low and highest high across the window.
+# range is the overall lowest low and highest high across hours with data.
 # Weather metrics come from WeatherMeasurement; AQI from Aqi (already hourly).
 module WeatherData
   class LiveCardHourlyRanges
+    ZONE = "America/Los_Angeles"
     HOURS = 24
     MM_TO_IN = 25.4
     MPS_TO_MPH = 2.23694
@@ -13,9 +16,11 @@ module WeatherData
 
     def initialize(now: Time.current)
       @now = now
+      local = now.in_time_zone(ZONE)
       # Normalize to UTC hour buckets so SQL date_trunc keys match.
-      @start_hour = (now.utc - (HOURS - 1).hours).beginning_of_hour
-      @end_hour = now.utc.beginning_of_hour
+      @start_hour = local.beginning_of_day.utc
+      @end_hour = local.beginning_of_hour.utc
+      @hour_keys = (0...HOURS).map { |h| local.beginning_of_day.change(hour: h).utc.beginning_of_hour }
     end
 
     def call
@@ -35,11 +40,7 @@ module WeatherData
 
     private
 
-    attr_reader :now, :start_hour, :end_hour
-
-    def hour_keys
-      @hour_keys ||= (0...HOURS).map { |i| start_hour + i.hours }
-    end
+    attr_reader :now, :start_hour, :end_hour, :hour_keys
 
     # Wind plots hourly average speed as the line; peak gust each hour is
     # returned separately so the sparkline can draw it as a dashed companion.
@@ -48,16 +49,16 @@ module WeatherData
       return nil if series.nil?
 
       series.merge(
-        markers: hour_keys.map { |h| round_value(buckets.dig(h, :wind_high), decimals) }
+        markers: hour_keys.map { |h| value_for_hour(h, buckets.dig(h, :wind_high), decimals) }
       )
     end
 
     def series_for(buckets, avg_key, high_key, low_key, decimals:)
-      values = hour_keys.map { |h| round_value(buckets.dig(h, avg_key), decimals) }
+      values = hour_keys.map { |h| value_for_hour(h, buckets.dig(h, avg_key), decimals) }
       return nil if values.compact.length < 2
 
-      highs = hour_keys.filter_map { |h| buckets.dig(h, high_key) }
-      lows = hour_keys.filter_map { |h| buckets.dig(h, low_key) }
+      highs = hour_keys.filter_map { |h| buckets.dig(h, high_key) if h <= end_hour }
+      lows = hour_keys.filter_map { |h| buckets.dig(h, low_key) if h <= end_hour }
 
       {
         labels: hour_keys.map { |h| hour_label(h) },
@@ -67,9 +68,16 @@ module WeatherData
       }
     end
 
+    # Future hours of the local day stay blank so the sparkline fills left-to-right.
+    def value_for_hour(hour, value, decimals)
+      return nil if hour > end_hour
+
+      round_value(value, decimals)
+    end
+
     def hour_label(utc_hour)
       # "12 pm", "3 am" — hour only, no minutes, Pacific local time.
-      utc_hour.in_time_zone("America/Los_Angeles").strftime("%-l %P").strip
+      utc_hour.in_time_zone(ZONE).strftime("%-l %P").strip
     end
 
     def round_value(value, decimals)

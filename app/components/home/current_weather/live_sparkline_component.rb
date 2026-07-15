@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 # Compact sparkline for home live tiles.
-# Plots the hourly average as a single accent line. Y-axis is scaled to
-# the overall 24h low/high and only those endpoint labels are shown.
-# Optional `markers` (e.g. wind gusts) render as a secondary dashed line.
+# Plots the hourly average as a single accent line across today's absolute
+# day (hour 0 → 23). Y-axis is scaled to today's low/high so far and only
+# those endpoint labels are shown. Optional `markers` (e.g. wind gusts)
+# render as a secondary dashed line.
 class Home::CurrentWeather::LiveSparklineComponent < ViewComponent::Base
   def initialize(series:, y_unit: "", aria_label:, decimals: 0)
     @series = series
