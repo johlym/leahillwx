@@ -1,11 +1,27 @@
+# frozen_string_literal: true
+
+if ENV["COVERAGE"] == "1"
+  require "simplecov"
+  SimpleCov.start "rails" do
+    enable_coverage :branch
+    add_filter "/test/"
+    add_filter "/config/"
+    add_filter "/vendor/"
+  end
+end
+
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
 
 module ActiveSupport
   class TestCase
-    # Run tests in parallel with specified workers
-    parallelize(workers: :number_of_processors)
+    # Coverage runs single-process so SimpleCov merges cleanly.
+    if ENV["COVERAGE"] == "1"
+      parallelize(workers: 1)
+    else
+      parallelize(workers: :number_of_processors)
+    end
 
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
