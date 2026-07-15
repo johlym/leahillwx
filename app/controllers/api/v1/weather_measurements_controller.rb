@@ -17,6 +17,10 @@ class Api::V1::WeatherMeasurementsController < ApiController
       @wm = WeatherMeasurement.new(measurement_params)
       if @wm.save
         head :no_content
+      elsif @wm.errors.of_kind?(:reading_date_time, :taken)
+        # Idempotent: station may retry the same reading; treat as success.
+        Rails.logger.info("Skipping duplicate measurement at #{measurement_params[:reading_date_time]}")
+        head :no_content
       else
         render json: { errors: @wm.errors.full_messages }, status: :unprocessable_entity
       end
