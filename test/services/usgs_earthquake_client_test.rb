@@ -1,6 +1,6 @@
 require "test_helper"
 
-class UsgsEarthquakeApiServiceTest < ActiveSupport::TestCase
+class UsgsEarthquakeClientTest < ActiveSupport::TestCase
   FakeResponse = Struct.new(:code, :body, keyword_init: true) do
     def success?
       code.to_i.between?(200, 299)
@@ -8,7 +8,7 @@ class UsgsEarthquakeApiServiceTest < ActiveSupport::TestCase
   end
 
   setup do
-    @service = UsgsEarthquakeApiService.new
+    @service = UsgsEarthquakeClient.new
     @original_get = HTTParty.method(:get)
   end
 

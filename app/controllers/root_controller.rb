@@ -13,7 +13,7 @@ class RootController < ApplicationController
       DownloadOpenWeatherForecastJob.perform_async
     end
 
-    @forecast = ForecastParserService.new(forecast_record || {}).parse
+    @forecast = ForecastParser.new(forecast_record || {}).parse
     @earthquakes = Earthquake.last(5).reverse
     @today_peaks = compute_today_peaks
     @hourly_ranges = WeatherData::LiveCardHourlyRanges.new.call

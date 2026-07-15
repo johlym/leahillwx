@@ -1,4 +1,4 @@
-class UsgsEarthquakeApiService
+class UsgsEarthquakeClient
   TIMEOUT_SECONDS = 10
 
   def initialize
@@ -32,3 +32,5 @@ class UsgsEarthquakeApiService
     }
   end
 end
+
+UsgsEarthquakeApiService = UsgsEarthquakeClient

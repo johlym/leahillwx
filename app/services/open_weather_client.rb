@@ -1,4 +1,4 @@
-class OpenWeatherApiService
+class OpenWeatherClient
   class RequestError < HttpClient::RequestError; end
 
   def initialize
@@ -52,3 +52,5 @@ class OpenWeatherApiService
     raise RequestError, e.message
   end
 end
+
+OpenWeatherApiService = OpenWeatherClient

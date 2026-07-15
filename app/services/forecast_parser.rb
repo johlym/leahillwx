@@ -1,4 +1,4 @@
-class ForecastParserService
+class ForecastParser
   def initialize(forecast)
     @raw_forecast = forecast
     @forecast_data = if forecast.nil?
@@ -402,3 +402,5 @@ class ForecastParserService
     end
   end
 end
+
+ForecastParserService = ForecastParser

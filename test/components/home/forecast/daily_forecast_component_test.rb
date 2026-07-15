@@ -5,7 +5,7 @@ require "test_helper"
 class Home::Forecast::DailyForecastComponentTest < ViewComponent::TestCase
   def setup
     @forecast_record = forecasts(:one)
-    @parsed_forecast = ForecastParserService.new(@forecast_record).parse
+    @parsed_forecast = ForecastParser.new(@forecast_record).parse
   end
 
   def test_renders_forecast_grid_container

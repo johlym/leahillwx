@@ -2,7 +2,7 @@ class DownloadLatestEarthquakeJob
   include Sidekiq::Job
 
   def perform(*args)
-    eq = UsgsEarthquakeApiService.new.get_latest_earthquake
+    eq = UsgsEarthquakeClient.new.get_latest_earthquake
     return if eq.nil?
 
     Rails.logger.info(eq)

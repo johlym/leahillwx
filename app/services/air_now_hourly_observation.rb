@@ -7,7 +7,7 @@ require "csv"
 #
 # URL pattern:
 #   https://s3-us-west-1.amazonaws.com/files.airnowtech.org/airnow/{YYYY}/{YYYYMMDD}/HourlyAQObs_{YYYYMMDDHH}.dat
-class AirNowHourlyObsService
+class AirNowHourlyObservation
   BASE_URL = "https://s3-us-west-1.amazonaws.com/files.airnowtech.org"
   DEFAULT_AQSID = "840530330047"
 
@@ -76,3 +76,5 @@ class AirNowHourlyObsService
     nil
   end
 end
+
+AirNowHourlyObsService = AirNowHourlyObservation

@@ -21,7 +21,7 @@ class BackfillAirNowPm25Job
 
     return if current < oldest
 
-    reading = AirNowHourlyObsService.new.fetch_reading(current)
+    reading = AirNowHourlyObservation.new.fetch_reading(current)
     if reading
       Aqi.upsert_reading!(**reading)
       Rails.logger.info("[BackfillAirNowPm25Job] upserted #{current.iso8601} pm2_5=#{reading[:pm2_5]} aqi=#{reading[:epa_aqi]}")

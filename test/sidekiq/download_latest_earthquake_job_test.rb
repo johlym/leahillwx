@@ -22,14 +22,14 @@ class DownloadLatestEarthquakeJobTest < ActiveSupport::TestCase
       def get_latest_earthquake = response
     end.new(response)
 
-    UsgsEarthquakeApiService.singleton_class.alias_method(:__orig_new, :new)
-    UsgsEarthquakeApiService.define_singleton_method(:new) { |*_args| fake }
+    UsgsEarthquakeClient.singleton_class.alias_method(:__orig_new, :new)
+    UsgsEarthquakeClient.define_singleton_method(:new) { |*_args| fake }
     begin
       yield
     ensure
-      UsgsEarthquakeApiService.singleton_class.remove_method(:new)
-      UsgsEarthquakeApiService.singleton_class.alias_method(:new, :__orig_new)
-      UsgsEarthquakeApiService.singleton_class.remove_method(:__orig_new)
+      UsgsEarthquakeClient.singleton_class.remove_method(:new)
+      UsgsEarthquakeClient.singleton_class.alias_method(:new, :__orig_new)
+      UsgsEarthquakeClient.singleton_class.remove_method(:__orig_new)
     end
   end
 

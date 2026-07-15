@@ -2,7 +2,7 @@ class DownloadOpenWeatherAqiJob
   include Sidekiq::Job
 
   def perform(*_args)
-    payload = OpenWeatherApiService.new.retrieve_aqi
+    payload = OpenWeatherClient.new.retrieve_aqi
     entry = payload.fetch("list").fetch(0)
     components = entry.fetch("components")
 

@@ -4,10 +4,10 @@ require "test_helper"
 
 class Home::Forecast::HourlyForecastComponentTest < ViewComponent::TestCase
   # The template renders raw ForecastHour objects (as built by
-  # ForecastParserService) so we construct them directly rather than
+  # ForecastParser) so we construct them directly rather than
   # spinning up a fake Forecast fixture with hourly data.
   def build_hour(dt:, temp: 15.0, wind_speed: 4.0, wind_gust: 6.0, pop: 0.25, icon: "10d")
-    ForecastParserService::ForecastHour.new(
+    ForecastParser::ForecastHour.new(
       dt: dt,
       temp: temp,
       feels_like: temp,

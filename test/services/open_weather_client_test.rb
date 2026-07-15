@@ -1,6 +1,6 @@
 require "test_helper"
 
-class OpenWeatherApiServiceTest < ActiveSupport::TestCase
+class OpenWeatherClientTest < ActiveSupport::TestCase
   FakeResponse = Struct.new(:code, :body, keyword_init: true) do
     def success?
       code.to_i.between?(200, 299)
@@ -8,7 +8,7 @@ class OpenWeatherApiServiceTest < ActiveSupport::TestCase
   end
 
   setup do
-    @service = OpenWeatherApiService.new
+    @service = OpenWeatherClient.new
     @original_get = HTTParty.method(:get)
   end
 
@@ -31,7 +31,7 @@ class OpenWeatherApiServiceTest < ActiveSupport::TestCase
       FakeResponse.new(code: 500, body: "error")
     end
 
-    assert_raises(OpenWeatherApiService::RequestError) do
+    assert_raises(OpenWeatherClient::RequestError) do
       @service.retrieve_forecast
     end
   end
