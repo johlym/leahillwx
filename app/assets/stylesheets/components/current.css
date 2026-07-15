@@ -178,7 +178,8 @@
   }
 }
 
-/* Latest sparkline sample — small accent dot with a restrained ring pulse. */
+/* Latest sparkline sample — only visible while the site is LIVE
+   (ActionCable connected; see connection-status + html.is-live). */
 .live-sparkline-pulse {
   position: absolute;
   top: 0;
@@ -190,6 +191,7 @@
   transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 1;
+  visibility: hidden;
 }
 
 .live-sparkline-pulse::after {
@@ -202,6 +204,13 @@
   border-radius: 50%;
   border: 1.5px solid var(--accent);
   transform: translate(-50%, -50%);
+}
+
+html.is-live .live-sparkline-pulse:not([hidden]) {
+  visibility: visible;
+}
+
+html.is-live .live-sparkline-pulse:not([hidden])::after {
   animation: live-sparkline-pulse-ring 1.8s ease-out infinite;
 }
 
@@ -217,7 +226,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .live-sparkline-pulse::after {
+  html.is-live .live-sparkline-pulse:not([hidden])::after {
     animation: none;
     opacity: 0.35;
     transform: translate(-50%, -50%) scale(1.8);

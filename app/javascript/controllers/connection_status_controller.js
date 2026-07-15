@@ -12,6 +12,7 @@ export default class extends Controller {
     if (this.checkInterval) {
       clearInterval(this.checkInterval)
     }
+    document.documentElement.classList.remove("is-live")
   }
 
   checkConnection() {
@@ -21,6 +22,7 @@ export default class extends Controller {
   }
 
   updateBadge(isConnected) {
+    document.documentElement.classList.toggle("is-live", !!isConnected)
     if (this.hasBadgeTarget) {
       this.badgeTarget.classList.toggle("hidden", !isConnected)
     }
