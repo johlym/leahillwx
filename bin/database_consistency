@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+require "rubygems"
+require "bundler/setup"
+
+# Baseline existing findings live in the todo file so CI stays green while
+# they are cleaned up. Pass -c yourself to override.
+unless ARGV.include?("-c") || ARGV.include?("--config") || ARGV.include?("install")
+  ARGV.unshift("-c", File.expand_path("../.database_consistency.todo.yml", __dir__))
+end
+
+load Gem.bin_path("database_consistency", "database_consistency")

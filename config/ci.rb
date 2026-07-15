@@ -8,6 +8,7 @@ CI.run do
   step "Security: Gem audit", "bin/bundler-audit"
   step "Security: Yarn vulnerability audit", "yarn audit"
   step "Security: Brakeman code analysis", "bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error"
+  step "Database: Consistency", "bin/database_consistency"
 
   step "Tests: Rails", "bin/rails test"
   step "Tests: System", "bin/rails test:system"

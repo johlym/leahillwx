@@ -22,10 +22,12 @@ gem "sidekiq-cron", "~> 2.3"
 gem "stimulus-rails", "~> 1.3"
 gem "turbo-rails", "~> 2.0"
 gem "view_component", "~> 4.12"
+gem "strong_migrations"
 
 group :development, :test do
   gem "brakeman", require: false
   gem "bundler-audit", require: false
+  gem "database_consistency", require: false
   gem "rubocop-rails-omakase", require: false
 end
 
