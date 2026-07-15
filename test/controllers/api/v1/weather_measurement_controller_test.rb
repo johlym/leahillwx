@@ -34,6 +34,30 @@ class Api::V1::WeatherMeasurementControllerTest < ActionDispatch::IntegrationTes
     }
   end
 
+  test "create rejects request when MEASUREMENT_API_KEY is blank" do
+    ENV.delete("MEASUREMENT_API_KEY")
+
+    assert_no_difference("WeatherMeasurement.count") do
+      post api_v1_weather_measurement_url,
+           params: measurement_payload,
+           headers: { "Authorization" => "Bearer ", "Content-Type" => "application/json" },
+           as: :json
+    end
+
+    assert_response :unauthorized
+  end
+
+  test "create rejects request with wrong api key" do
+    assert_no_difference("WeatherMeasurement.count") do
+      post api_v1_weather_measurement_url,
+           params: measurement_payload,
+           headers: { "Authorization" => "Bearer wrong-key", "Content-Type" => "application/json" },
+           as: :json
+    end
+
+    assert_response :unauthorized
+  end
+
   test "create stores soil channels" do
     payload = measurement_payload(
       soil: [ { channel: 1, moisture: 78.0, battery: 1.6 } ]
