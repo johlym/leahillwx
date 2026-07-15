@@ -153,7 +153,7 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
         .order(reading_date_time: :desc)
         .first
 
-      payload = current.send(:weather_data_json, current)
+      payload = WeatherMeasurements::LiveUpdateBroadcast.new.send(:payload, current)
 
       assert payload[:sparklines].is_a?(Hash)
       assert_equal 144, payload[:sparklines][:humidity][:labels].length
