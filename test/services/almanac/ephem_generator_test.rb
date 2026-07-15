@@ -39,11 +39,11 @@ class Almanac::EphemGeneratorTest < ActiveSupport::TestCase
 
     assert_not_nil seasons[:spring_equinox]
     assert_equal 3, seasons[:spring_equinox].month
-    assert_includes [19, 20, 21], seasons[:spring_equinox].day
+    assert_includes [ 19, 20, 21 ], seasons[:spring_equinox].day
 
     assert_not_nil seasons[:summer_solstice]
     assert_equal 6, seasons[:summer_solstice].month
-    assert_includes [20, 21, 22], seasons[:summer_solstice].day
+    assert_includes [ 20, 21, 22 ], seasons[:summer_solstice].day
   end
 
   test "season_for_date returns expected season" do

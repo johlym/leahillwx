@@ -101,7 +101,7 @@ module Celestial
     def unwrap_azimuth(samples)
       return samples if samples.empty?
 
-      unwrapped = [samples[0]]
+      unwrapped = [ samples[0] ]
       offset = 0.0
 
       samples.each_cons(2) do |prev, curr|
@@ -159,11 +159,11 @@ module Celestial
 
         if best_segment.nil?
           next_sample_time = samples[i + 1]&.dig(:t) || end_time
-          segment_end = [next_sample_time, current_start + MIN_SEGMENT_DURATION, end_time].min
+          segment_end = [ next_sample_time, current_start + MIN_SEGMENT_DURATION, end_time ].min
           segment_samples = samples.select { |s| s[:t] >= current_start && s[:t] <= segment_end }
 
           if segment_samples.empty?
-            segment_samples = [{ t: current_start, v: samples[i][:v] }]
+            segment_samples = [ { t: current_start, v: samples[i][:v] } ]
           end
 
           coeffs = fit_cubic_polynomial(segment_samples, current_start)
@@ -188,10 +188,10 @@ module Celestial
     end
 
     def fit_cubic_polynomial(samples, t0)
-      return [0.0, 0.0, 0.0, 0.0] if samples.empty?
+      return [ 0.0, 0.0, 0.0, 0.0 ] if samples.empty?
 
       if samples.length <= 2
-        return fit_linear_polynomial(samples, t0) + [0.0, 0.0]
+        return fit_linear_polynomial(samples, t0) + [ 0.0, 0.0 ]
       end
 
       a_matrix = Array.new(4) { Array.new(4, 0.0) }
@@ -201,7 +201,7 @@ module Celestial
         dt = sample[:t] - t0
         v = sample[:v]
 
-        dt_powers = [1.0, dt, dt**2, dt**3]
+        dt_powers = [ 1.0, dt, dt**2, dt**3 ]
 
         4.times do |i|
           b_vector[i] += v * dt_powers[i]
@@ -215,7 +215,7 @@ module Celestial
     end
 
     def fit_linear_polynomial(samples, t0)
-      return [samples[0][:v], 0.0] if samples.length == 1
+      return [ samples[0][:v], 0.0 ] if samples.length == 1
 
       sum_dt = 0.0
       sum_v = 0.0
@@ -235,13 +235,13 @@ module Celestial
       denominator = n * sum_dt2 - sum_dt**2
 
       if denominator.abs < 1e-10
-        return [sum_v / n, 0.0]
+        return [ sum_v / n, 0.0 ]
       end
 
       a1 = (n * sum_dt_v - sum_dt * sum_v) / denominator
       a0 = (sum_v - a1 * sum_dt) / n
 
-      [a0, a1]
+      [ a0, a1 ]
     end
 
     def solve_linear_system(a_matrix, b_vector)
@@ -296,7 +296,7 @@ module Celestial
         dt = sample[:t] - t0
         predicted = coeffs[0] + coeffs[1] * dt + coeffs[2] * dt**2 + coeffs[3] * dt**3
         error = (predicted - sample[:v]).abs
-        max_error = [max_error, error].max
+        max_error = [ max_error, error ].max
       end
 
       max_error

@@ -98,7 +98,7 @@ module Almanac
       cos_az = (Math.sin(dec_rad) - Math.sin(lat_rad) * sin_alt) /
                (Math.cos(lat_rad) * Math.cos(Math.asin(sin_alt)))
 
-      cos_az = [[-1.0, cos_az].max, 1.0].min
+      cos_az = [ [ -1.0, cos_az ].max, 1.0 ].min
       azimuth = Math.acos(cos_az) * 180.0 / Math::PI
 
       azimuth = 360.0 - azimuth if Math.sin(ha_rad) > 0

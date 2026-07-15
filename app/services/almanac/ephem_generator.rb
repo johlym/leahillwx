@@ -254,8 +254,8 @@ module Almanac
       illumination = ((1.0 - Math.cos(2.0 * Math::PI * position)) / 2.0 * 100.0).round(1)
       index = ((position * 8) + 0.5).to_i & 7
 
-      phases = ["new", "waxing crescent", "first quarter", "waxing gibbous",
-                "full", "waning gibbous", "last quarter", "waning crescent"]
+      phases = [ "new", "waxing crescent", "first quarter", "waxing gibbous",
+                "full", "waning gibbous", "last quarter", "waning crescent" ]
 
       { phase_name: phases[index], illumination: illumination }
     end
