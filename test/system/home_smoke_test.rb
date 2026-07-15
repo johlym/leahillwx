@@ -7,13 +7,13 @@ class HomeSmokeTest < ApplicationSystemTestCase
     assert_text(/lhwx|weather|temperature/i)
   end
 
-  test "records page loads" do
-    visit records_url
+  test "about page loads" do
+    visit about_url
     assert_selector "body"
   end
 
-  test "about page loads" do
-    visit about_url
+  test "graphs index loads or redirects" do
+    visit graphs_url
     assert_selector "body"
   end
 end

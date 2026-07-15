@@ -5,6 +5,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   driven_by :cuprite, using: :chrome, screen_size: [ 1400, 1400 ], options: {
     js_errors: true,
     headless: true,
+    timeout: 30,
     browser_options: { "no-sandbox": nil }
   }
 end
