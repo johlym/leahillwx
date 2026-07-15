@@ -183,9 +183,17 @@ export default class extends Controller {
       return
     }
 
+    // Chart.js x/y are relative to the canvas; the pulse is absolutely
+    // positioned on the padded sparkline wrapper. Map through the canvas
+    // box (and any CSS stretch vs chart layout size).
+    const parentRect = this.element.getBoundingClientRect()
+    const canvasRect = this.canvas.getBoundingClientRect()
+    const scaleX = this.chart.width ? canvasRect.width / this.chart.width : 1
+    const scaleY = this.chart.height ? canvasRect.height / this.chart.height : 1
+
     this.pulseEl.hidden = false
-    this.pulseEl.style.left = `${point.x}px`
-    this.pulseEl.style.top = `${point.y}px`
+    this.pulseEl.style.left = `${canvasRect.left - parentRect.left + point.x * scaleX}px`
+    this.pulseEl.style.top = `${canvasRect.top - parentRect.top + point.y * scaleY}px`
   }
 
   buildDatasets(rawDatasets, palette, options) {
