@@ -14,14 +14,16 @@ Rails.application.routes.draw do
 
   mount OasRails::Engine => "/docs"
 
-  # basic auth for sidekiq dashboard
-  if Rails.env.production? && ENV["SIDEKIQ_USER"] && ENV["SIDEKIQ_PASSWORD"]
+  # Sidekiq dashboard: open in development; elsewhere only when credentials are configured.
+  if Rails.env.development?
+    mount Sidekiq::Web => "/sidekiq"
+  elsif ENV["SIDEKIQ_USER"].present? && ENV["SIDEKIQ_PASSWORD"].present?
     Sidekiq::Web.use Rack::Auth::Basic do |username, password|
       ActiveSupport::SecurityUtils.secure_compare(::Digest::SHA256.hexdigest(username), ::Digest::SHA256.hexdigest(ENV["SIDEKIQ_USER"])) &
         ActiveSupport::SecurityUtils.secure_compare(::Digest::SHA256.hexdigest(password), ::Digest::SHA256.hexdigest(ENV["SIDEKIQ_PASSWORD"]))
     end
+    mount Sidekiq::Web => "/sidekiq"
   end
-  mount Sidekiq::Web => "/sidekiq"
 
   # Reports routes
   get "reports", to: "reports#index", as: :reports
