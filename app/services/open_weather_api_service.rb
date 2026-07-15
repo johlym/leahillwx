@@ -1,4 +1,7 @@
 class OpenWeatherApiService
+  TIMEOUT_SECONDS = 10
+  class RequestError < StandardError; end
+
   def initialize
     @appid = ENV["OPENWEATHER_API_KEY"]
     @base_url = "https://api.openweathermap.org"
@@ -17,8 +20,7 @@ class OpenWeatherApiService
       "exclude" => @exclude,
       "units" => @units
     }
-    response = HTTParty.get(@base_url + endpoint_path, query: params)
-    JSON.parse(response.body)
+    get_json(endpoint_path, params)
   end
 
   def retrieve_current
@@ -30,8 +32,7 @@ class OpenWeatherApiService
       "exclude" => "minutely,hourly,daily,alerts",
       "units" => @units
     }
-    response = HTTParty.get(@base_url + endpoint_path, query: params)
-    JSON.parse(response.body)
+    get_json(endpoint_path, params)
   end
 
   def retrieve_aqi
@@ -41,7 +42,22 @@ class OpenWeatherApiService
       "lat" => @lat,
       "lon" => @lon
     }
-    response = HTTParty.get(@base_url + endpoint_path, query: params)
+    get_json(endpoint_path, params)
+  end
+
+  private
+
+  def get_json(endpoint_path, params)
+    response = HTTParty.get(
+      @base_url + endpoint_path,
+      query: params,
+      timeout: TIMEOUT_SECONDS
+    )
+
+    unless response.success?
+      raise RequestError, "OpenWeather request failed with status #{response.code}"
+    end
+
     JSON.parse(response.body)
   end
 end
