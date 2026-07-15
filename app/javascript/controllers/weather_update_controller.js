@@ -97,22 +97,18 @@ export default class extends Controller {
     }
 
     return readings.map((reading) => {
-      const values = []
-      if (reading.moisture != null) {
-        values.push(
-          `<span class="soil-channel-value"><span class="soil-channel-number">${this.asInt(reading.moisture)}</span><span class="soil-channel-unit">%</span></span>`
-        )
-      }
-      if (reading.temperature_f != null) {
-        values.push(
-          `<span class="soil-channel-value"><span class="soil-channel-number">${this.asInt(reading.temperature_f)}</span><span class="soil-channel-unit">°F</span></span>`
-        )
-      }
-
       const name = reading.name || `Ch ${reading.channel}`
+      const moisture = reading.moisture != null
+        ? `<span class="soil-channel-number">${this.asInt(reading.moisture)}</span><span class="soil-channel-unit">%</span>`
+        : `<span class="soil-channel-na">N/A</span>`
+      const temperature = reading.temperature_f != null
+        ? `<span class="soil-channel-number">${this.asInt(reading.temperature_f)}</span><span class="soil-channel-unit">°F</span>`
+        : `<span class="soil-channel-na">N/A</span>`
+
       return `<div class="soil-channel">
-        <span class="soil-channel-label">${name}</span>
-        <div class="soil-channel-values">${values.join("")}</div>
+        <span class="soil-channel-name">${name}</span>
+        <span class="soil-channel-value">${moisture}</span>
+        <span class="soil-channel-value">${temperature}</span>
       </div>`
     }).join("")
   }

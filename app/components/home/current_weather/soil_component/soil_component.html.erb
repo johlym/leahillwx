@@ -6,28 +6,38 @@
     </div>
 
     <div class="live-tile-body flex-1 min-h-0">
-      <div class="soil-channels" data-weather-update-target="soil">
-        <% if readings? %>
-          <% readings.each do |reading| %>
-            <div class="soil-channel">
-              <span class="soil-channel-label"><%= reading["name"] %></span>
-              <div class="soil-channel-values">
-                <% if reading["moisture"] %>
-                  <span class="soil-channel-value">
+      <div class="soil-table">
+        <div class="soil-table-header" aria-hidden="true">
+          <span>Sensor</span>
+          <span>Humidity</span>
+          <span>Temp.</span>
+        </div>
+
+        <div class="soil-channels" data-weather-update-target="soil">
+          <% if readings? %>
+            <% readings.each do |reading| %>
+              <div class="soil-channel">
+                <span class="soil-channel-name"><%= reading["name"] %></span>
+                <span class="soil-channel-value">
+                  <% if reading["moisture"] %>
                     <span class="soil-channel-number"><%= reading["moisture"] %></span><span class="soil-channel-unit">%</span>
-                  </span>
-                <% end %>
-                <% if reading["temperature_f"] %>
-                  <span class="soil-channel-value">
+                  <% else %>
+                    <span class="soil-channel-na">N/A</span>
+                  <% end %>
+                </span>
+                <span class="soil-channel-value">
+                  <% if reading["temperature_f"] %>
                     <span class="soil-channel-number"><%= reading["temperature_f"] %></span><span class="soil-channel-unit">°F</span>
-                  </span>
-                <% end %>
+                  <% else %>
+                    <span class="soil-channel-na">N/A</span>
+                  <% end %>
+                </span>
               </div>
-            </div>
+            <% end %>
+          <% else %>
+            <p class="live-tile-meta">No sensors reporting</p>
           <% end %>
-        <% else %>
-          <p class="live-tile-meta">No sensors reporting</p>
-        <% end %>
+        </div>
       </div>
     </div>
   </div>
