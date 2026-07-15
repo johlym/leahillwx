@@ -1,7 +1,9 @@
 <section class="current-conditions" data-palette-transition>
-  <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center">
-      <div class="flex flex-col items-center text-center lg:items-start lg:text-left gap-3 min-w-0">
+  <%# Same 4-col / gap-3 tracks as the live strip below so Wind/Sun
+      align with AQI/Soil (and Humidity/UV with the temp span). %>
+  <div class="container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-6 lg:py-10">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 items-center">
+      <div class="md:col-span-2 flex flex-col items-center text-center lg:items-start lg:text-left gap-3 min-w-0">
         <p class="text-muted font-condensed uppercase tracking-[0.08em] text-[0.95rem]"
            data-weather-update-target="timestamp">
           <%= reading_timestamp %>
@@ -28,53 +30,51 @@
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 min-w-0">
-        <%= render Ui::CardComponent.new(padding: :default) do %>
-          <div class="live-tile">
-            <div class="flex items-stretch justify-between gap-4">
-              <div class="flex-1 min-w-0">
-                <div class="live-tile-label">
-                  <i class="fa-regular fa-wind text-accent text-base"></i>
-                  <span>Wind</span>
-                </div>
-                <div class="live-tile-body">
-                  <div class="live-tile-value">
-                    <span class="live-tile-number live-tile-number-xl"
-                          data-weather-update-target="windSpeed"><%= current_wind_speed %></span>
-                    <span class="live-tile-unit live-tile-unit-lg">mph</span>
-                  </div>
-                  <p class="live-tile-meta">
-                    from <span data-weather-update-target="windDirection"><%= current_wind_direction %></span><br />
-                    <span data-weather-update-target="gustSpeed">Gusting to <%= current_gust_speed %> mph</span>
-                  </p>
-                </div>
-                <% if today_peaks[:wind_gust_mph] %>
-                  <p class="live-tile-peak">Peak gust today <%= today_peaks[:wind_gust_mph] %> mph</p>
-                <% end %>
+      <%= render Ui::CardComponent.new(padding: :default) do %>
+        <div class="live-tile">
+          <div class="flex items-stretch justify-between gap-4">
+            <div class="flex-1 min-w-0">
+              <div class="live-tile-label">
+                <i class="fa-regular fa-wind text-accent text-base"></i>
+                <span>Wind</span>
               </div>
-              <div class="shrink-0 flex items-center justify-center" data-weather-update-target="windCompass">
-                <%= render Elements::CompassComponent.new(direction: @current.wind_dir, size: :lg, show_label: false) %>
+              <div class="live-tile-body">
+                <div class="live-tile-value">
+                  <span class="live-tile-number live-tile-number-xl"
+                        data-weather-update-target="windSpeed"><%= current_wind_speed %></span>
+                  <span class="live-tile-unit live-tile-unit-lg">mph</span>
+                </div>
+                <p class="live-tile-meta">
+                  from <span data-weather-update-target="windDirection"><%= current_wind_direction %></span><br />
+                  <span data-weather-update-target="gustSpeed">Gusting to <%= current_gust_speed %> mph</span>
+                </p>
               </div>
+              <% if today_peaks[:wind_gust_mph] %>
+                <p class="live-tile-peak">Peak gust today <%= today_peaks[:wind_gust_mph] %> mph</p>
+              <% end %>
             </div>
-            <%= render Home::CurrentWeather::LiveSparklineComponent.new(
-                  series: hourly_ranges[:wind],
-                  y_unit: " mph",
-                  decimals: 0,
-                  aria_label: "Hourly average wind speed over the last 24 hours"
-                ) %>
+            <div class="shrink-0 flex items-center justify-center" data-weather-update-target="windCompass">
+              <%= render Elements::CompassComponent.new(direction: @current.wind_dir, size: :lg, show_label: false) %>
+            </div>
           </div>
-        <% end %>
+          <%= render Home::CurrentWeather::LiveSparklineComponent.new(
+                series: hourly_ranges[:wind],
+                y_unit: " mph",
+                decimals: 0,
+                aria_label: "Hourly average wind speed over the last 24 hours"
+              ) %>
+        </div>
+      <% end %>
 
-        <% if @almanac %>
-          <%= render Ui::CardComponent.new(padding: :default) do %>
-            <div class="live-tile-label">
-              <i class="fa-regular fa-sunrise text-accent"></i>
-              <span>Sun &amp; Moon Today</span>
-            </div>
-            <%= render Elements::SkyArcComponent.new(almanac: @almanac) %>
-          <% end %>
+      <% if @almanac %>
+        <%= render Ui::CardComponent.new(padding: :default) do %>
+          <div class="live-tile-label">
+            <i class="fa-regular fa-sunrise text-accent"></i>
+            <span>Sun &amp; Moon Today</span>
+          </div>
+          <%= render Elements::SkyArcComponent.new(almanac: @almanac) %>
         <% end %>
-      </div>
+      <% end %>
     </div>
   </div>
 </section>
