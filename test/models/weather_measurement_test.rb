@@ -8,7 +8,7 @@
 #  gust_speed        :float            not null
 #  humidity          :integer          not null
 #  light             :float            not null
-#  rain_day          :float            default(0.0)
+#  rain_day          :float            default(0.0), not null
 #  rain_rate         :float            not null
 #  reading_date_time :datetime         not null
 #  soil              :jsonb            not null

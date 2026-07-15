@@ -26,7 +26,6 @@
 # Indexes
 #
 #  index_report_entries_on_report_day_hour  (report_id,day,hour) UNIQUE
-#  index_report_entries_on_report_id        (report_id)
 #
 # Foreign Keys
 #

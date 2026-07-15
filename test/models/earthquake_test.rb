@@ -3,19 +3,19 @@
 # Table name: earthquakes
 #
 #  id           :bigint           not null, primary key
-#  depth        :float
-#  distance     :float
-#  eventtime    :datetime
-#  last_updated :datetime
-#  lat          :float
-#  lon          :float
-#  magnitude    :float
-#  place        :string
-#  revised      :boolean          default(FALSE)
-#  url          :string
+#  depth        :float            not null
+#  distance     :float            not null
+#  eventtime    :datetime         not null
+#  last_updated :datetime         not null
+#  lat          :float            not null
+#  lon          :float            not null
+#  magnitude    :float            not null
+#  place        :string           not null
+#  revised      :boolean          default(FALSE), not null
+#  url          :string           not null
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
-#  usgs_id      :string
+#  usgs_id      :string           not null
 #
 # Indexes
 #

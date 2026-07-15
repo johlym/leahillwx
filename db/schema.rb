@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_15_223000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_15_224925) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -55,11 +55,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_223000) do
     t.float "no"
     t.float "no2"
     t.float "o3"
-    t.datetime "observed_at"
+    t.datetime "observed_at", null: false
     t.float "pm10"
-    t.float "pm2_5"
+    t.float "pm2_5", null: false
     t.float "so2"
-    t.string "source"
+    t.string "source", null: false
     t.datetime "updated_at", null: false
     t.index ["observed_at"], name: "index_aqis_on_observed_at", unique: true
     t.index ["source"], name: "index_aqis_on_source"
@@ -67,25 +67,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_223000) do
 
   create_table "earthquakes", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.float "depth"
-    t.float "distance"
-    t.datetime "eventtime"
-    t.datetime "last_updated"
-    t.float "lat"
-    t.float "lon"
-    t.float "magnitude"
-    t.string "place"
-    t.boolean "revised", default: false
+    t.float "depth", null: false
+    t.float "distance", null: false
+    t.datetime "eventtime", null: false
+    t.datetime "last_updated", null: false
+    t.float "lat", null: false
+    t.float "lon", null: false
+    t.float "magnitude", null: false
+    t.string "place", null: false
+    t.boolean "revised", default: false, null: false
     t.datetime "updated_at", null: false
-    t.string "url"
-    t.string "usgs_id"
+    t.string "url", null: false
+    t.string "usgs_id", null: false
     t.index ["eventtime"], name: "index_earthquakes_on_eventtime"
     t.index ["usgs_id"], name: "index_earthquakes_on_usgs_id", unique: true
   end
 
   create_table "forecasts", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.jsonb "forecast"
+    t.jsonb "forecast", null: false
     t.string "interval", default: "daily", null: false
     t.datetime "updated_at", null: false
     t.index ["interval", "created_at"], name: "index_forecasts_on_interval_and_created_at", order: { created_at: :desc }
@@ -169,7 +169,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_223000) do
     t.integer "wind_dir"
     t.string "wind_dir_compass"
     t.index ["report_id", "day", "hour"], name: "index_report_entries_on_report_day_hour", unique: true
-    t.index ["report_id"], name: "index_report_entries_on_report_id"
   end
 
   create_table "reports", force: :cascade do |t|
@@ -200,7 +199,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_223000) do
     t.float "gust_speed", null: false
     t.integer "humidity", null: false
     t.float "light", null: false
-    t.float "rain_day", default: 0.0
+    t.float "rain_day", default: 0.0, null: false
     t.float "rain_rate", null: false
     t.datetime "reading_date_time", null: false
     t.jsonb "soil", default: [], null: false

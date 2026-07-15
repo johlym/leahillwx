@@ -8,7 +8,7 @@
 #  gust_speed        :float            not null
 #  humidity          :integer          not null
 #  light             :float            not null
-#  rain_day          :float            default(0.0)
+#  rain_day          :float            default(0.0), not null
 #  rain_rate         :float            not null
 #  reading_date_time :datetime         not null
 #  soil              :jsonb            not null
@@ -44,6 +44,7 @@ class WeatherMeasurement < ApplicationRecord
   # Validations
   # Are all the fields present?
   validates :reading_date_time, :barometer_abs, :barometer_rel, :gust_speed, :light, :humidity, :temperature, :rain_day, :rain_rate, :uv, :uvi, :wind_dir, :wind_speed, presence: true
+  validates :reading_date_time, uniqueness: true
 
   # Are humidity, UV, wind direction integers?
   validates :humidity, :uv, :wind_dir, numericality: { only_integer: true }

@@ -9,11 +9,11 @@
 #  no          :float
 #  no2         :float
 #  o3          :float
-#  observed_at :datetime
+#  observed_at :datetime         not null
 #  pm10        :float
-#  pm2_5       :float
+#  pm2_5       :float            not null
 #  so2         :float
-#  source      :string
+#  source      :string           not null
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #
