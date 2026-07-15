@@ -62,7 +62,7 @@ class DownloadLatestEarthquakeJobTest < ActiveSupport::TestCase
     end
 
     earthquake = Earthquake.find_by!(usgs_id: "us7000dist")
-    expected = GeoDistanceService.distance(35.0, -119.0, 36, -120, unit: :mi)
+    expected = GeoDistance.distance(35.0, -119.0, 36, -120, unit: :mi)
     assert_in_delta expected, earthquake.distance, 0.0001
   end
 

@@ -1,4 +1,4 @@
-class GeoDistanceService
+class GeoDistance
   EARTH_RADIUS_KM = 6371.0
   EARTH_RADIUS_MI = 3958.8
 
@@ -20,3 +20,6 @@ class GeoDistanceService
     radius * c
   end
 end
+
+# Backwards-compatible alias while callers migrate off the Service suffix.
+GeoDistanceService = GeoDistance
