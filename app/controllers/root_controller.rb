@@ -9,16 +9,11 @@ class RootController < ApplicationController
 
     forecast_record = Forecast.last
 
-    # If no data exists at all, fetch synchronously
-    if forecast_record.nil?
-      ow_forecast = OpenWeatherApiService.new.retrieve_forecast
-      forecast_record = Forecast.create(forecast: ow_forecast)
-    # If data is stale, use it but refresh in background
-    elsif forecast_record.created_at < 1.hour.ago
+    if forecast_record.nil? || forecast_record.created_at < 1.hour.ago
       DownloadOpenWeatherForecastJob.perform_async
     end
 
-    @forecast = ForecastParserService.new(forecast_record).parse
+    @forecast = ForecastParserService.new(forecast_record || {}).parse
     @earthquakes = Earthquake.last(5).reverse
     @today_peaks = compute_today_peaks
     @hourly_ranges = WeatherData::LiveCardHourlyRanges.new.call

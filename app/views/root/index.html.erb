@@ -3,19 +3,23 @@
 <%= render Home::CurrentWeather::ConditionsComponent.new(
   current: @current,
   almanac: @almanac,
-  today_forecast: @forecast.days.first,
-  current_forecast: @forecast.current,
+  today_forecast: @forecast&.days&.first,
+  current_forecast: @forecast&.current,
   today_peaks: @today_peaks,
   aqi: @aqi,
   hourly_ranges: @hourly_ranges
 ) %>
 
 <div class="primary-container">
-  <%= render Home::Forecast::HourlyForecastComponent.new(hours: @forecast.hours.first(8), timestamp: @forecast.created_at) %>
+  <% if @forecast&.created_at %>
+    <%= render Home::Forecast::HourlyForecastComponent.new(hours: @forecast.hours.first(8), timestamp: @forecast.created_at) %>
+  <% end %>
 
   <div class="home-columns">
     <div class="home-column">
-      <%= render Home::Forecast::DailyForecastComponent.new(days: @forecast.days, timestamp: @forecast.created_at) %>
+      <% if @forecast&.created_at %>
+        <%= render Home::Forecast::DailyForecastComponent.new(days: @forecast.days, timestamp: @forecast.created_at) %>
+      <% end %>
 
       <%= render Ui::CardComponent.new(title: "Earthquakes", subtitle: "The last 5 earthquakes nearest to this location.") do %>
         <%= render Home::EarthquakeTableComponent.new(earthquakes: @earthquakes) %>
