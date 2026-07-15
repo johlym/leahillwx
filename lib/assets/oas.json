@@ -75,6 +75,38 @@
             "type": "number",
             "format": "float",
             "description": "Current wind speed (mph)"
+          },
+          "soil": {
+            "type": "array",
+            "maxItems": 8,
+            "description": "Soil moisture sensor readings (up to 8 channels)",
+            "items": {
+              "type": "object",
+              "required": ["channel"],
+              "properties": {
+                "channel": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 8,
+                  "description": "Soil sensor channel number (1-8)"
+                },
+                "moisture": {
+                  "type": "number",
+                  "format": "float",
+                  "description": "Soil moisture (0-100%)"
+                },
+                "temperature": {
+                  "type": "number",
+                  "format": "float",
+                  "description": "Soil temperature (°C)"
+                },
+                "battery": {
+                  "type": "number",
+                  "format": "float",
+                  "description": "Soil sensor battery voltage"
+                }
+              }
+            }
           }
         },
         "required": [
@@ -106,6 +138,13 @@
           "rain_event": 0.0,
           "rain_rate": 0.0,
           "temperature": 72.5,
+          "soil": [
+            {
+              "channel": 1,
+              "moisture": 78.0,
+              "battery": 1.6
+            }
+          ],
           "uv": 3,
           "uvi": 3.0,
           "wind_dir": 180,

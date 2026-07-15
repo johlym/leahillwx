@@ -20,6 +20,7 @@ export default class extends Controller {
     "uvi",
     "solarIrradiance",
     "light",
+    "soil",
   ]
 
   connect() {
@@ -85,6 +86,35 @@ export default class extends Controller {
     if (this.hasTimestampTarget) {
       this.timestampTarget.textContent = this.formattedTimestamp()
     }
+    if (this.hasSoilTarget) {
+      this.soilTarget.innerHTML = this.renderSoil(data.soil || [])
+    }
+  }
+
+  renderSoil(readings) {
+    if (!Array.isArray(readings) || readings.length === 0) {
+      return `<p class="live-tile-meta">No sensors reporting</p>`
+    }
+
+    return readings.map((reading) => {
+      const values = []
+      if (reading.moisture != null) {
+        values.push(
+          `<span class="soil-channel-value"><span class="soil-channel-number">${this.asInt(reading.moisture)}</span><span class="soil-channel-unit">%</span></span>`
+        )
+      }
+      if (reading.temperature_f != null) {
+        values.push(
+          `<span class="soil-channel-value"><span class="soil-channel-number">${this.asInt(reading.temperature_f)}</span><span class="soil-channel-unit">°F</span></span>`
+        )
+      }
+
+      const name = reading.name || `Ch ${reading.channel}`
+      return `<div class="soil-channel">
+        <span class="soil-channel-label">${name}</span>
+        <div class="soil-channel-values">${values.join("")}</div>
+      </div>`
+    }).join("")
   }
 
   asInt(value) {

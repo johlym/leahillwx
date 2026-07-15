@@ -1,0 +1,8 @@
+# Friendly names for soil moisture/temperature channels (1–8).
+# Unnamed channels fall back to "Ch N" in the UI.
+#
+# Example:
+# 1: Raised bed
+# 2: Tomato pots
+# 3: Lawn north
+1: Vegie Bed

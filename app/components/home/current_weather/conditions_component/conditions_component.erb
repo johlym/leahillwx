@@ -80,7 +80,9 @@
 </section>
 
 <div class="primary-container">
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-1 mb-4">
+  <%# lg: 1 Humidity, 2 UV, 3 AQI, 4 Soil (row-span-2)
+         5 Rain, 6 Dew Point, 7 Cloud Base, 4 Soil %>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-1 mb-4">
     <%= render Ui::CardComponent.new(padding: :default) do %>
       <div class="live-tile">
         <div class="live-tile-label">
@@ -136,6 +138,8 @@
     <% end %>
 
     <%= render Home::CurrentWeather::Pm25Component.new(current: aqi, sparkline: hourly_ranges[:aqi]) %>
+
+    <%= render Home::CurrentWeather::SoilComponent.new(readings: @current&.soil_readings || []) %>
 
     <%= render Ui::CardComponent.new(padding: :default) do %>
       <div class="live-tile">

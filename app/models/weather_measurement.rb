@@ -11,6 +11,7 @@
 #  rain_day          :float            default(0.0)
 #  rain_rate         :float            not null
 #  reading_date_time :datetime         not null
+#  soil              :jsonb            not null
 #  temperature       :float            not null
 #  uv                :integer          not null
 #  uvi               :float            not null
@@ -34,7 +35,11 @@
 class WeatherMeasurement < ApplicationRecord
   include FeelsLike
   include HeadingToCompass
+
+  MAX_SOIL_CHANNELS = 8
+
   after_create_commit :broadcast_update
+  before_validation :normalize_soil
 
   # Validations
   # Are all the fields present?
@@ -45,6 +50,8 @@ class WeatherMeasurement < ApplicationRecord
 
   # Are barometer absolute, barometer relative, day max wind, gust speed, light, rain day, rain event, rain rate, uvi, wind speed greater than or equal to 0?
   validates :barometer_abs, :barometer_rel, :gust_speed, :light, :rain_rate, :uvi, :wind_speed, numericality: { greater_than_or_equal_to: 0 }
+
+  validate :soil_channels_are_valid
 
   def barometer_abs_mmhg
     barometer_abs * 3.38637526
@@ -112,7 +119,111 @@ class WeatherMeasurement < ApplicationRecord
     reading_date_time.in_time_zone("America/Los_Angeles").strftime("%B %d, %Y %I:%M:%S %p %Z")
   end
 
+  # Display-ready soil readings for SSR / ActionCable (temps in °F).
+  def soil_readings
+    Array(soil).filter_map do |entry|
+      next unless entry.is_a?(Hash)
+
+      entry = entry.stringify_keys
+      channel = Integer(entry["channel"], exception: false)
+      next unless channel
+
+      reading = {
+        "channel" => channel,
+        "name" => SoilChannels.name_for(channel)
+      }
+      reading["moisture"] = entry["moisture"].to_f.round(0) if entry["moisture"].is_a?(Numeric)
+      if entry["temperature"].is_a?(Numeric)
+        reading["temperature_f"] = entry["temperature"].to_fahrenheit.round(0)
+      end
+      reading["battery"] = entry["battery"].to_f.round(2) if entry["battery"].is_a?(Numeric)
+      reading
+    end
+  end
+
+
   private
+
+  def normalize_soil
+    return if soil.nil?
+
+    self.soil = Array(soil).map do |entry|
+      hash = case entry
+      when ActionController::Parameters then entry.to_unsafe_h
+      when Hash then entry
+      else
+        entry
+      end
+
+      next hash unless hash.is_a?(Hash)
+
+      hash = hash.stringify_keys
+      normalized = { "channel" => hash["channel"] }
+      normalized["moisture"] = hash["moisture"] unless hash["moisture"].nil?
+      normalized["temperature"] = hash["temperature"] unless hash["temperature"].nil?
+      normalized["battery"] = hash["battery"] unless hash["battery"].nil?
+      normalized
+    end
+  end
+
+
+  def soil_channels_are_valid
+    return if soil.blank?
+
+    unless soil.is_a?(Array)
+      errors.add(:soil, "must be an array")
+      return
+    end
+
+    if soil.size > MAX_SOIL_CHANNELS
+      errors.add(:soil, "cannot have more than #{MAX_SOIL_CHANNELS} entries")
+    end
+
+    seen_channels = []
+
+    soil.each_with_index do |entry, index|
+      unless entry.is_a?(Hash)
+        errors.add(:soil, "entry at index #{index} must be an object")
+        next
+      end
+
+      entry = entry.stringify_keys
+      channel = Integer(entry["channel"], exception: false)
+      moisture = entry["moisture"]
+      temperature = entry["temperature"]
+      battery = entry["battery"]
+
+      if channel.nil? || !(1..MAX_SOIL_CHANNELS).cover?(channel)
+        errors.add(:soil, "channel must be an integer between 1 and #{MAX_SOIL_CHANNELS}")
+      elsif seen_channels.include?(channel)
+        errors.add(:soil, "channel #{channel} is duplicated")
+      else
+        seen_channels << channel
+      end
+
+      has_moisture = moisture.is_a?(Numeric)
+      has_temperature = temperature.is_a?(Numeric)
+
+      if !moisture.nil? && !has_moisture
+        errors.add(:soil, "moisture must be a number")
+      end
+
+      if !temperature.nil? && !has_temperature
+        errors.add(:soil, "temperature must be a number")
+      end
+
+      unless has_moisture || has_temperature
+        errors.add(:soil, "entry must include moisture or temperature")
+      end
+
+      if !battery.nil? && !battery.is_a?(Numeric)
+        errors.add(:soil, "battery must be a number")
+      elsif battery.is_a?(Numeric) && battery.negative?
+        errors.add(:soil, "battery must be greater than or equal to 0")
+      end
+    end
+  end
+
 
   def broadcast_update
     current_with_count = WeatherMeasurement
@@ -174,7 +285,9 @@ class WeatherMeasurement < ApplicationRecord
         ActionController::Base.helpers.number_with_precision(
           measurement.light, precision: 2, strip_insignificant_zeros: true
         )
-      )
+      ),
+      soil: measurement.soil_readings
     }
   end
 end
+

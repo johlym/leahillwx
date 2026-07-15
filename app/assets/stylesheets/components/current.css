@@ -11,6 +11,8 @@
      a positionable marker
    - aqi-scale / aqi-scale-marker: EPA/AirNow AQI colour stops with
      a positionable marker
+   - soil-channel family: compact multi-channel rows in the tall
+     soil card
 */
 
 @utility current-conditions {
@@ -169,4 +171,35 @@
   left: var(--aqi, 0%);
   transform: translateX(-50%);
   box-shadow: 0 0 8px color-mix(in oklab, var(--color-text) 60%, transparent);
+}
+
+/* Soil channel list — compact rows inside the tall soil card. */
+@utility soil-channels {
+  @apply grid gap-[0.35rem] min-w-0;
+}
+
+@utility soil-channel {
+  @apply grid grid-cols-[auto_1fr] items-baseline gap-x-3 gap-y-0
+         py-[0.2rem] border-b border-border/40 last:border-b-0;
+}
+
+@utility soil-channel-label {
+  @apply text-muted text-[0.72rem] uppercase tracking-[0.08em] whitespace-nowrap;
+}
+
+@utility soil-channel-values {
+  @apply flex flex-wrap items-baseline justify-end gap-x-3 gap-y-0 min-w-0;
+}
+
+@utility soil-channel-value {
+  @apply inline-flex items-baseline gap-[0.1rem] text-text-strong
+         font-condensed tabular-nums leading-none;
+}
+
+@utility soil-channel-number {
+  @apply text-[1.35rem] font-medium;
+}
+
+@utility soil-channel-unit {
+  @apply text-[0.78rem] text-muted tracking-[0.02em];
 }
