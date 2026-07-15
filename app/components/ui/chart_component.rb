@@ -14,13 +14,6 @@
 #   )
 module Ui
   class ChartComponent < ViewComponent::Base
-    FIGURE_CLASSES = <<~CLASSES.gsub(/\s+/, " ").strip.freeze
-      relative m-0 rounded-[0.85rem] border border-border-strong/55
-      bg-linear-160 from-surface/94 to-surface-2/94 text-text
-      backdrop-blur-sm backdrop-saturate-150 px-4 pt-4 pb-2
-      shadow-[0_1px_0_color-mix(in_oklab,var(--color-text)_4%,transparent)_inset,0_12px_30px_-20px_rgba(0,0,0,0.7)]
-    CLASSES
-
     def initialize(type:, data:, options: {}, height: 360, title: nil, subtitle: nil, aria_label: nil)
       @type = type.to_s
       @data = data
@@ -32,13 +25,13 @@ module Ui
     end
 
     def call
-      content_tag(:figure, class: FIGURE_CLASSES) do
+      content_tag(:figure, class: "ui-chart") do
         parts = []
         if @title.present? || @subtitle.present?
-          parts << content_tag(:figcaption, class: "flex flex-col gap-[0.15rem] mb-3") do
+          parts << content_tag(:figcaption, class: "ui-chart-caption") do
             safe_join([
-              @title.present?    ? content_tag(:span, @title,    class: "font-condensed uppercase tracking-[0.04em] text-[1.05rem] text-text-strong") : nil,
-              @subtitle.present? ? content_tag(:span, @subtitle, class: "text-[0.8rem] text-muted") : nil
+              @title.present?    ? content_tag(:span, @title,    class: "ui-chart-title") : nil,
+              @subtitle.present? ? content_tag(:span, @subtitle, class: "ui-chart-subtitle") : nil
             ].compact)
           end
         end
@@ -53,7 +46,7 @@ module Ui
       content_tag(
         :div,
         "",
-        class: "ui-chart-frame h-(--chart-height)",
+        class: "ui-chart-frame ui-chart-frame-sized",
         style: "--chart-height: #{@height.to_i}px;",
         data: {
           controller: "chart",

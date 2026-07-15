@@ -68,21 +68,21 @@ class Reports::OverviewStatisticsTableComponentTest < ViewComponent::TestCase
     render_inline(Reports::OverviewStatisticsTableComponent.new(report: @report))
 
     assert_selector "td", text: /167\.00°/
-    assert_selector "td span.text-xs", text: "(Day 15)"
+    assert_selector "td span.stats-day-meta", text: "(Day 15)"
   end
 
   test "renders low temperature with day" do
     render_inline(Reports::OverviewStatisticsTableComponent.new(report: @report))
 
     assert_selector "td", text: /77\.00°/
-    assert_selector "td span.text-xs", text: "(Day 5)"
+    assert_selector "td span.stats-day-meta", text: "(Day 5)"
   end
 
   test "renders N/A when high temp day is nil" do
     @report.month_high_temp_day = nil
     render_inline(Reports::OverviewStatisticsTableComponent.new(report: @report))
 
-    assert_selector "td span.text-xs", text: "(Day N/A)"
+    assert_selector "td span.stats-day-meta", text: "(Day N/A)"
   end
 
   test "renders degree days" do
@@ -108,7 +108,7 @@ class Reports::OverviewStatisticsTableComponentTest < ViewComponent::TestCase
     render_inline(Reports::OverviewStatisticsTableComponent.new(report: @report))
 
     assert_selector "td", text: /35\.00 mph/
-    assert_selector "td span.text-xs", text: "(Day 20)"
+    assert_selector "td span.stats-day-meta", text: "(Day 20)"
   end
 
   test "renders wind direction with vane component" do

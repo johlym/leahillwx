@@ -1,10 +1,6 @@
-/* Ui:: primitives. Everything Tailwind can express lives on the ERB
-   templates (or in the ViewComponent classes as utility strings). Only
-   the effects Tailwind has no first-class utility for are kept here —
-   pseudo-element glows, mask/gradient combos, multi-part color-mix
-   shadows, descendant selectors into dynamically-generated children,
-   and the SVG-arrow trick used by <select>. All class names are flat
-   (no BEM __/-- chains). */
+/* Ui:: primitives. Flat kebab class names (no BEM). Effects Tailwind
+   can't express (pseudo glows, SVG select chevron, canvas sizing) and
+   all layout/typography for the shared primitives live here. */
 
 /* Card — shared elevated surface. */
 @utility ui-card {
@@ -71,6 +67,51 @@
   );
 }
 
+@utility ui-card-pad-none {
+  @apply p-0;
+}
+@utility ui-card-pad-tight {
+  @apply p-3;
+}
+@utility ui-card-pad-default {
+  @apply p-5;
+}
+@utility ui-card-pad-loose {
+  @apply p-6;
+}
+
+@utility ui-card-header {
+  @apply flex items-start justify-between gap-4 mb-3;
+}
+
+@utility ui-card-header-text {
+  @apply min-w-0;
+}
+
+@utility ui-card-title {
+  @apply font-condensed uppercase tracking-[0.04em] text-[1.05rem] text-text-strong;
+
+  & > i {
+    @apply mr-[0.35rem] text-accent;
+  }
+}
+
+@utility ui-card-subtitle {
+  @apply mt-[0.15rem] text-xs text-muted;
+}
+
+@utility ui-card-actions {
+  @apply flex items-center gap-2 shrink-0;
+}
+
+@utility ui-card-body {
+  @apply text-text;
+}
+
+@utility ui-card-footer {
+  @apply mt-4 pt-3 border-t border-border text-xs text-muted;
+}
+
 /* Section header — needs the ::after underline gradient. */
 @utility ui-section-header {
   @apply relative flex items-end justify-between gap-4 mt-8 mb-4
@@ -87,10 +128,98 @@
   }
 }
 
-/* Year picker — the SVG chevron is a background-image trick that
-   Tailwind can't express as a utility, so keep the select as a
-   dedicated utility. Label + wrapper are pure layout and live in
-   Ruby as inline utilities. */
+@utility ui-section-header-text {
+  @apply min-w-0;
+}
+
+@utility ui-section-header-title {
+  @apply font-condensed uppercase tracking-[0.05em] text-text-strong text-[1.75rem];
+  text-shadow: 0 0 24px
+    color-mix(in oklab, var(--color-accent) 22%, transparent);
+
+  & > i {
+    @apply mr-[0.35rem] text-accent;
+  }
+}
+
+@utility ui-section-header-subtitle {
+  @apply mt-[0.15rem] text-[0.85rem] text-muted;
+}
+
+@utility ui-section-header-actions {
+  @apply flex items-center gap-3 shrink-0;
+}
+
+/* Stat — big value + label + optional secondary / trend. */
+@utility ui-stat {
+  @apply flex flex-col gap-1;
+}
+
+@utility ui-stat-left {
+  @apply items-start text-left;
+}
+@utility ui-stat-center {
+  @apply items-center text-center;
+}
+@utility ui-stat-right {
+  @apply items-end text-right;
+}
+
+@utility ui-stat-label {
+  @apply inline-flex items-center gap-[0.4rem] text-xs uppercase
+         tracking-[0.06em] text-muted;
+
+  & > i {
+    @apply text-accent;
+  }
+}
+
+@utility ui-stat-value {
+  @apply inline-flex items-baseline gap-[0.3rem] leading-none
+         font-condensed font-medium text-text-strong tabular-nums;
+}
+
+@utility ui-stat-value-sm {
+  @apply text-2xl;
+}
+@utility ui-stat-value-md {
+  @apply text-4xl;
+}
+@utility ui-stat-value-lg {
+  @apply text-5xl;
+}
+@utility ui-stat-value-xl {
+  @apply text-7xl;
+}
+
+@utility ui-stat-unit {
+  @apply text-[0.55em] font-normal tracking-[0.02em] text-muted;
+}
+
+@utility ui-stat-secondary {
+  @apply text-[0.8rem] text-muted;
+}
+
+@utility ui-stat-trend {
+  @apply inline-flex items-center gap-1 text-xs;
+}
+
+@utility ui-stat-trend-up {
+  @apply text-success;
+}
+@utility ui-stat-trend-down {
+  @apply text-danger;
+}
+@utility ui-stat-trend-flat {
+  @apply text-muted;
+}
+
+/* Year / month picker label + select. */
+@utility ui-field-label {
+  @apply inline-flex items-center gap-2 text-[0.8rem] uppercase
+         tracking-[0.05em] text-muted;
+}
+
 @utility ui-year-picker-select {
   @apply appearance-none cursor-pointer text-text font-[inherit] text-[0.85rem]
          py-[0.4rem] pl-[0.7rem] pr-8 rounded-[0.4rem]
@@ -122,9 +251,34 @@
   }
 }
 
-/* Chart — outer surface is expressible via utilities in the Ruby
-   component, but the canvas Chart.js injects into ui-chart-frame
-   needs !important sizing that we can't reach as a utility class. */
+/* Chart figure + frame. */
+@utility ui-chart {
+  @apply relative m-0 rounded-[0.85rem] border border-border-strong/55
+         text-text backdrop-blur-sm backdrop-saturate-150
+         px-4 pt-4 pb-2;
+  background: linear-gradient(
+    160deg,
+    color-mix(in oklab, var(--color-surface) 94%, transparent),
+    color-mix(in oklab, var(--color-surface-2) 94%, transparent)
+  );
+  box-shadow:
+    0 1px 0 color-mix(in oklab, var(--color-text) 4%, transparent) inset,
+    0 12px 30px -20px rgba(0, 0, 0, 0.7);
+}
+
+@utility ui-chart-caption {
+  @apply flex flex-col gap-[0.15rem] mb-3;
+}
+
+@utility ui-chart-title {
+  @apply font-condensed uppercase tracking-[0.04em] text-[1.05rem]
+         text-text-strong;
+}
+
+@utility ui-chart-subtitle {
+  @apply text-[0.8rem] text-muted;
+}
+
 @utility ui-chart-frame {
   @apply relative w-full;
 
@@ -134,11 +288,80 @@
   }
 }
 
-/* Tabs — active state has a color-mix inset shadow that isn't worth
-   inlining. Everything else could be utilities, but keep them as a
-   flat family so consumer templates outside TabsComponent (e.g.
-   almanac's monthly_calendar_component) can reuse them without
-   duplicating long utility strings. */
+@utility ui-chart-frame-sized {
+  height: var(--chart-height);
+}
+
+/* Shared layout grids used across pages/components. */
+@utility ui-card-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4;
+}
+
+@utility ui-stack {
+  @apply flex flex-col gap-4;
+}
+
+@utility ui-stack-spaced {
+  @apply flex flex-col gap-4 mt-4;
+}
+
+@utility ui-split-grid {
+  @apply grid grid-cols-1 lg:grid-cols-2 gap-4;
+}
+
+@utility ui-split-grid-spaced {
+  @apply grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4;
+}
+
+@utility ui-toolbar {
+  @apply flex items-center gap-3 flex-wrap;
+}
+
+@utility ui-message {
+  @apply text-muted;
+}
+
+@utility ui-message-spaced {
+  @apply text-muted mt-2 text-sm;
+}
+
+@utility ui-message-body {
+  @apply text-text;
+}
+
+/* Date navigation component. */
+@utility date-nav {
+  @apply bg-surface border border-border rounded-[0.6rem] px-4 py-3 my-4 text-text;
+}
+
+@utility date-nav-row {
+  @apply flex flex-wrap items-center gap-2;
+}
+
+@utility date-nav-field {
+  @apply inline-flex items-center;
+}
+
+@utility date-nav-select {
+  @apply bg-bg-elevated border border-border-strong text-text
+         px-[0.55rem] py-[0.35rem] rounded-[0.35rem] font-[inherit]
+         text-[0.85rem] disabled:opacity-40 disabled:cursor-not-allowed;
+}
+
+@utility date-nav-button {
+  @apply cursor-pointer bg-accent text-accent-contrast border border-accent
+         px-[0.9rem] py-[0.35rem] rounded-[0.35rem] font-[inherit]
+         font-semibold text-[0.8rem] uppercase tracking-[0.05em]
+         hover:enabled:bg-accent-strong hover:enabled:border-accent-strong
+         disabled:opacity-40 disabled:cursor-not-allowed
+         transition-[background-color,border-color] duration-150;
+}
+
+@utility date-nav-message {
+  @apply text-muted text-[0.8rem] mt-[0.4rem];
+}
+
+/* Tabs — active state has a color-mix inset shadow. */
 @utility ui-tabs {
   @apply inline-flex p-1 gap-1 rounded-[0.55rem]
          border border-border-strong/55 bg-bg-elevated/75
@@ -154,6 +377,10 @@
          font-[inherit] uppercase tracking-[0.05em] text-muted
          text-[0.85rem] px-[0.9rem] py-[0.4rem]
          transition-[color,background-color,border-color] duration-150;
+
+  & > i {
+    @apply text-[0.85em];
+  }
 
   &:hover {
     @apply text-text bg-surface;

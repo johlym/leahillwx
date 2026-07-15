@@ -18,20 +18,20 @@ class Ui::StatComponentTest < ViewComponent::TestCase
   test "omits label block when label is blank" do
     render_inline(Ui::StatComponent.new(value: "72"))
 
-    assert_no_selector "div.inline-flex.items-center span"
+    assert_no_selector ".ui-stat-label"
   end
 
   test "renders unit alongside the value when provided" do
     render_inline(Ui::StatComponent.new(value: "72", unit: "°F"))
 
     assert_selector "span", text: "72"
-    assert_selector "span", text: "°F"
+    assert_selector "span.ui-stat-unit", text: "°F"
   end
 
   test "renders secondary line when provided" do
     render_inline(Ui::StatComponent.new(value: "72", secondary: "vs. avg 68°F"))
 
-    assert_selector "p", text: "vs. avg 68°F"
+    assert_selector "p.ui-stat-secondary", text: "vs. avg 68°F"
   end
 
   test "omits secondary line when blank" do
@@ -55,49 +55,49 @@ class Ui::StatComponentTest < ViewComponent::TestCase
   test "renders up trend with success color and up arrow" do
     render_inline(Ui::StatComponent.new(value: "72", trend: :up, trend_label: "+2°"))
 
-    assert_selector "p.text-success i.fa-arrow-trend-up"
+    assert_selector "p.ui-stat-trend-up i.fa-arrow-trend-up"
     assert_selector "p", text: "+2°"
   end
 
   test "renders down trend with danger color and down arrow" do
     render_inline(Ui::StatComponent.new(value: "72", trend: :down, trend_label: "-1°"))
 
-    assert_selector "p.text-danger i.fa-arrow-trend-down"
+    assert_selector "p.ui-stat-trend-down i.fa-arrow-trend-down"
   end
 
   test "renders flat trend with muted color and minus icon" do
     render_inline(Ui::StatComponent.new(value: "72", trend: :flat, trend_label: "no change"))
 
-    assert_selector "p.text-muted i.fa-minus"
+    assert_selector "p.ui-stat-trend-flat i.fa-minus"
   end
 
   test "falls back to flat trend styling for unknown trend values" do
     render_inline(Ui::StatComponent.new(value: "72", trend: :sideways, trend_label: "flat-ish"))
 
-    assert_selector "p.text-muted i.fa-minus"
+    assert_selector "p.ui-stat-trend-flat i.fa-minus"
   end
 
   test "applies known size class" do
     render_inline(Ui::StatComponent.new(value: "72", size: :xl))
 
-    assert_selector "div.text-7xl"
+    assert_selector "div.ui-stat-value-xl"
   end
 
   test "falls back to md size for unknown size" do
     render_inline(Ui::StatComponent.new(value: "72", size: :ginormous))
 
-    assert_selector "div.text-4xl"
+    assert_selector "div.ui-stat-value-md"
   end
 
   test "applies center alignment classes" do
     render_inline(Ui::StatComponent.new(value: "72", align: :center))
 
-    assert_selector "div.items-center.text-center"
+    assert_selector "div.ui-stat.ui-stat-center"
   end
 
   test "falls back to left alignment for unknown alignment" do
     render_inline(Ui::StatComponent.new(value: "72", align: :diagonal))
 
-    assert_selector "div.items-start.text-left"
+    assert_selector "div.ui-stat.ui-stat-left"
   end
 end

@@ -1,6 +1,5 @@
-<div class="flex flex-col md:flex-row items-stretch md:items-center md:justify-between gap-3 my-4 mb-6"
-     data-controller="almanac-navigation">
-  <div class="flex flex-wrap gap-2 [&_.btn-secondary]:text-[0.85rem]">
+<div class="almanac-nav" data-controller="almanac-navigation">
+  <div class="almanac-nav-prev-next">
     <%= link_to almanac_month_path(prev_month.year, prev_month.strftime("%B").downcase), class: "btn-secondary" do %>
       <i class="fa-regular fa-arrow-left" aria-hidden="true"></i>
       <%= prev_month.strftime("%B") %>
@@ -11,8 +10,8 @@
     <% end %>
   </div>
 
-  <div class="flex flex-wrap items-center gap-2">
-    <label class="inline-flex items-center gap-2 text-[0.8rem] uppercase tracking-[0.05em] text-muted">
+  <div class="almanac-nav-pickers">
+    <label class="ui-field-label">
       <span>Month</span>
       <select id="month-select" class="ui-year-picker-select">
         <% Date::MONTHNAMES.compact.each_with_index do |month, idx| %>
@@ -20,7 +19,7 @@
         <% end %>
       </select>
     </label>
-    <label class="inline-flex items-center gap-2 text-[0.8rem] uppercase tracking-[0.05em] text-muted">
+    <label class="ui-field-label">
       <span>Year</span>
       <select id="year-select" class="ui-year-picker-select">
         <% (1976..2076).each do |year| %>

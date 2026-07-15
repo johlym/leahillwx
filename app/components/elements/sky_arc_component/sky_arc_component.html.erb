@@ -4,7 +4,7 @@
   for tick labels. The arc itself sweeps from (10, 100) -> (100, 10)
   -> (190, 100), giving a nice half-dome.
 %>
-<div class="flex flex-col gap-2 text-text w-full" role="img" aria-label="Sun and moon paths for today">
+<div class="sky-arc" role="img" aria-label="Sun and moon paths for today">
   <svg viewBox="0 0 200 130" class="sky-arc-svg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
     <defs>
       <linearGradient id="sky-fill-<%= uid %>" x1="0" x2="0" y1="0" y2="1">
@@ -83,17 +83,17 @@
     </text>
   </svg>
 
-  <div class="flex flex-col gap-[0.2rem] text-[0.75rem] text-muted">
-    <div class="inline-flex items-center gap-2">
+  <div class="sky-arc-legend">
+    <div class="sky-arc-legend-row">
       <span class="sky-arc-swatch sky-arc-swatch-sun"></span>
       <span>Sun</span>
-      <span class="text-text font-mono text-[0.75rem]"><%= sun_rise_label %> &ndash; <%= sun_set_label %></span>
+      <span class="sky-arc-legend-times"><%= sun_rise_label %> &ndash; <%= sun_set_label %></span>
     </div>
     <% if moon_rise_label || moon_set_label %>
-      <div class="inline-flex items-center gap-2">
+      <div class="sky-arc-legend-row">
         <span class="sky-arc-swatch sky-arc-swatch-moon"></span>
         <span>Moon</span>
-        <span class="text-text font-mono text-[0.75rem]">
+        <span class="sky-arc-legend-times">
           <%= moon_rise_label || "\u2014" %> &ndash; <%= moon_set_label || "\u2014" %>
         </span>
       </div>

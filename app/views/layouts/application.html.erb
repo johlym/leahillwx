@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html
-  class="antialiased scheme-only-dark"
   data-palette="<%= @palette || :night %>"
   data-controller="palette"
   <% if @palette_almanac&.sunrise_at %>
@@ -35,9 +34,9 @@
     <script src="https://kit.fontawesome.com/20b018c776.js" crossorigin="anonymous"></script>
   </head>
 
-  <body class="min-h-dvh flex flex-col <%= yield(:body_class) %>" data-controller="weather-update">
+  <body class="site-body <%= yield(:body_class) %>" data-controller="weather-update">
     <%= render "layouts/shared/header" %>
-    <main class="flex-1 isolate"><%= yield %></main>
+    <main class="site-main"><%= yield %></main>
     <%= render "layouts/shared/footer" %>
   </body>
 </html>

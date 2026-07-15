@@ -1,30 +1,30 @@
 <section class="current-conditions" data-palette-transition>
   <%# Same 4-col / gap-3 tracks as the live strip below so Wind/Sun
       align with AQI/Soil (and Humidity/UV with the temp span). %>
-  <div class="container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-6 lg:py-10">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 items-center">
-      <div class="md:col-span-2 flex flex-col items-center text-center lg:items-start lg:text-left gap-3 min-w-0">
-        <p class="text-muted font-condensed uppercase tracking-[0.08em] text-[0.95rem]"
+  <div class="current-conditions-inner">
+    <div class="current-conditions-hero">
+      <div class="current-conditions-primary">
+        <p class="current-conditions-timestamp"
            data-weather-update-target="timestamp">
           <%= reading_timestamp %>
         </p>
 
-        <div class="mt-1 flex flex-col items-center justify-center gap-4 sm:flex-row sm:items-baseline sm:justify-center lg:justify-start">
-          <span class="font-condensed font-light leading-[0.9] tracking-[-0.02em] text-text-strong tabular-nums text-[clamp(6rem,18vw,11rem)] text-shadow-[0_0_20px_color-mix(in_oklab,var(--color-accent-strong)_35%,transparent),0_0_55px_color-mix(in_oklab,var(--color-accent)_22%,transparent)]"
+        <div class="current-conditions-temp-row">
+          <span class="current-conditions-temp"
                 data-weather-update-target="temperature"><%= current_temperature %>°F</span>
 
-          <div class="text-center sm:text-left">
-            <div class="text-[2.25rem] text-text-strong filter-[drop-shadow(0_0_12px_color-mix(in_oklab,var(--color-accent)_45%,transparent))]">
+          <div class="current-conditions-desc">
+            <div class="current-conditions-icon">
               <%= render "root/shared/weather_icon", icon: weather_icon, night: night_time?, blackout: true %>
             </div>
-            <p class="mt-1 font-condensed uppercase tracking-[0.06em] text-2xl text-text"><%= weather_description %></p>
+            <p class="current-conditions-summary"><%= weather_description %></p>
           </div>
         </div>
 
-        <p class="text-muted text-base">
+        <p class="current-conditions-feels">
           <span data-weather-update-target="feelsLike">Feels like <%= current_feels_like %>°F</span>
           <% if today_high && today_low %>
-            <span class="mx-[0.4rem] text-subtle">·</span>
+            <span class="current-conditions-sep">·</span>
             High <%= today_high %>° / Low <%= today_low %>°
           <% end %>
         </p>
@@ -32,10 +32,10 @@
 
       <%= render Ui::CardComponent.new(padding: :default) do %>
         <div class="live-tile">
-          <div class="flex items-stretch justify-between gap-4">
-            <div class="flex-1 min-w-0">
+          <div class="live-tile-split">
+            <div class="live-tile-main">
               <div class="live-tile-label">
-                <i class="fa-regular fa-wind text-accent text-base"></i>
+                <i class="fa-regular fa-wind"></i>
                 <span>Wind</span>
               </div>
               <div class="live-tile-body">
@@ -53,7 +53,7 @@
                 <p class="live-tile-peak">Peak gust today <%= today_peaks[:wind_gust_mph] %> mph</p>
               <% end %>
             </div>
-            <div class="shrink-0 flex items-center justify-center" data-weather-update-target="windCompass">
+            <div class="live-tile-aside" data-weather-update-target="windCompass">
               <%= render Elements::CompassComponent.new(direction: @current.wind_dir, size: :lg, show_label: false) %>
             </div>
           </div>
@@ -69,7 +69,7 @@
       <% if @almanac %>
         <%= render Ui::CardComponent.new(padding: :default) do %>
           <div class="live-tile-label">
-            <i class="fa-regular fa-sunrise text-accent"></i>
+            <i class="fa-regular fa-sunrise"></i>
             <span>Sun &amp; Moon Today</span>
           </div>
           <%= render Elements::SkyArcComponent.new(almanac: @almanac) %>
@@ -82,11 +82,11 @@
 <div class="primary-container">
   <%# lg: 1 Humidity, 2 UV, 3 AQI, 4 Soil (row-span-2)
          5 Rain, 6 Dew Point, 7 Cloud Base, 4 Soil %>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-1 mb-4">
+  <div class="live-strip">
     <%= render Ui::CardComponent.new(padding: :default) do %>
       <div class="live-tile">
         <div class="live-tile-label">
-          <i class="fa-regular fa-hand-holding-droplet text-accent text-base"></i>
+          <i class="fa-regular fa-hand-holding-droplet"></i>
           <span>Humidity</span>
         </div>
         <div class="live-tile-body">
@@ -110,7 +110,7 @@
     <%= render Ui::CardComponent.new(padding: :default) do %>
       <div class="live-tile">
         <div class="live-tile-label">
-          <i class="fa-kit fa-regular-sun-circle-exclamation text-accent text-base"></i>
+          <i class="fa-kit fa-regular-sun-circle-exclamation"></i>
           <span>UV Index</span>
         </div>
         <div class="live-tile-body">
@@ -144,7 +144,7 @@
     <%= render Ui::CardComponent.new(padding: :default) do %>
       <div class="live-tile">
         <div class="live-tile-label">
-          <i class="fa-regular fa-cloud-rain text-accent text-base"></i>
+          <i class="fa-regular fa-cloud-rain"></i>
           <span>Rain</span>
         </div>
         <div class="live-tile-body">
@@ -171,7 +171,7 @@
     <%= render Ui::CardComponent.new(padding: :default) do %>
       <div class="live-tile">
         <div class="live-tile-label">
-          <i class="fa-regular fa-droplet-degree text-accent text-base"></i>
+          <i class="fa-regular fa-droplet-degree"></i>
           <span>Dew Point</span>
         </div>
         <div class="live-tile-body">
@@ -195,12 +195,12 @@
     <%= render Ui::CardComponent.new(padding: :default) do %>
       <div class="live-tile">
         <div class="live-tile-label">
-          <i class="fa-regular fa-cloud text-accent text-base"></i>
+          <i class="fa-regular fa-cloud"></i>
           <span>Cloud Base</span>
         </div>
         <div class="live-tile-body">
           <div class="live-tile-value">
-            <span class="live-tile-number tabular-nums"><%= number_with_delimiter(current_cloud_base_ft) %></span>
+            <span class="live-tile-number"><%= number_with_delimiter(current_cloud_base_ft) %></span>
             <span class="live-tile-unit">ft</span>
           </div>
           <p class="live-tile-meta">Estimated from temp/dew spread</p>

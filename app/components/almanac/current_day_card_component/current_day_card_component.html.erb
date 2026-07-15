@@ -5,7 +5,7 @@
   level: 2
 ) %>
 
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="ui-card-grid">
   <%= render Ui::CardComponent.new(title: "Sun", icon: "fa-regular fa-sun") do %>
     <ul class="almanac-current-list" role="list">
       <li><span>Rise</span><span><%= format_time(entry.sunrise_at) %></span></li>
@@ -23,7 +23,7 @@
       <li><span>Rise</span><span><%= format_time(entry.moonrise_at) %></span></li>
       <li><span>Transit</span><span><%= format_time(entry.moon_transit_at) %></span></li>
       <li><span>Set</span><span><%= format_time(entry.moonset_at) %></span></li>
-      <li><span>Phase</span><span class="capitalize"><%= entry.moon_phase %></span></li>
+      <li><span>Phase</span><span class="almanac-phase"><%= entry.moon_phase %></span></li>
       <li><span>Illumination</span><span><%= entry.moon_illumination_pct&.round %>%</span></li>
       <% if dynamic_positions && dynamic_positions[:moon] %>
         <li><span>Altitude</span><span><%= format_degrees(dynamic_positions[:moon][:altitude]) %></span></li>

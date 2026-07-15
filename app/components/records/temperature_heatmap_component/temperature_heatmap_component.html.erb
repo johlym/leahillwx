@@ -1,8 +1,8 @@
 <section class="temp-heatmap" aria-label="Daily high temperature heatmap for <%= year %>">
-  <header class="flex items-baseline justify-between gap-4 flex-wrap mb-3">
-    <div class="min-w-0">
-      <h3 class="m-0 font-condensed uppercase tracking-[0.05em] text-text-strong text-[1.1rem]">Daily High Temperature</h3>
-      <p class="mt-[0.15rem] text-muted text-[0.8rem]">Every day in <%= year %>. Purple is coldest, red is hottest. Hover a cell to see the day's high and low.</p>
+  <header class="temp-heatmap-header">
+    <div class="temp-heatmap-header-text">
+      <h3 class="temp-heatmap-title">Daily High Temperature</h3>
+      <p class="temp-heatmap-subtitle">Every day in <%= year %>. Purple is coldest, red is hottest. Hover a cell to see the day's high and low.</p>
     </div>
   </header>
 
@@ -18,7 +18,7 @@
     scroll container also clips vertically. `py-2` keeps the highlight
     ring and glow off the clip boundary for the first/last month rows.
   %>
-  <div class="overflow-x-auto py-2">
+  <div class="temp-heatmap-scroll">
     <div class="temp-heatmap-grid" role="grid">
       <div class="temp-heatmap-row temp-heatmap-row-ticks" role="row">
         <div aria-hidden="true"></div>
@@ -52,17 +52,17 @@
     </div>
   </div>
 
-  <footer class="flex items-center gap-6 flex-wrap mt-[0.85rem] pt-[0.85rem] border-t border-border">
-    <div class="inline-flex items-center gap-2">
-      <span class="text-muted text-xs font-mono"><%= temp_min.round %>&deg;</span>
-      <div class="inline-block w-[clamp(9rem,22vw,16rem)] h-3 rounded-full"
-           style="background: <%= legend_gradient %>; border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent); box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-accent) 8%, transparent) inset;"
+  <footer class="temp-heatmap-footer">
+    <div class="temp-heatmap-legend">
+      <span class="temp-heatmap-legend-label"><%= temp_min.round %>&deg;</span>
+      <div class="temp-heatmap-legend-bar"
+           style="background: <%= legend_gradient %>;"
            aria-hidden="true"></div>
-      <span class="text-muted text-xs font-mono"><%= temp_max.round %>&deg;</span>
+      <span class="temp-heatmap-legend-label"><%= temp_max.round %>&deg;</span>
     </div>
-    <div class="inline-flex items-center gap-2 text-muted text-xs">
-      <span class="inline-block w-[1.15rem] h-3 rounded-xs border border-border/60 temp-heatmap-legend-swatch-partial" aria-hidden="true"></span>
-      <span class="uppercase tracking-[0.05em]">Partial-day data</span>
+    <div class="temp-heatmap-legend-note">
+      <span class="temp-heatmap-legend-swatch temp-heatmap-legend-swatch-partial" aria-hidden="true"></span>
+      <span class="temp-heatmap-legend-note-label">Partial-day data</span>
     </div>
   </footer>
 </section>

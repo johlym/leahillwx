@@ -1,4 +1,4 @@
-<div class="primary-container text-text">
+<div class="primary-container">
   <h1>Climatological Summary <small>for <%= @report.month_name %> <%= @day %>, <%= @report.year %></small></h1>
 
   <%= render Shared::DateNavigationComponent.new(
@@ -16,7 +16,7 @@
   <% else %>
     <div class="monthly-statistics">
       <h2>Daily Summary</h2>
-      <p class="text-center text-stone-500 py-4">No data available for this day.</p>
+      <p class="report-empty">No data available for this day.</p>
     </div>
   <% end %>
 
@@ -30,5 +30,5 @@
       <li><%= link_to "← Back to Monthly Report", report_path(@report.year, Date::MONTHNAMES[@report.month].downcase) %></li>
     </ul>
   </div>
-  <p class="text-center text-xs">Report generated in <%= @generation_time %> seconds</p>
+  <p class="report-generation-time">Report generated in <%= @generation_time %> seconds</p>
 </div>

@@ -1,9 +1,8 @@
-/* Base document chrome + shared button primitives. Everything that
-   isn't a base type selector or a truly cross-page class lives on the
-   templates now. */
+/* Base document chrome + shared button primitives. */
 
 @layer base {
   html {
+    @apply antialiased scheme-only-dark;
     background-color: var(--color-bg);
   }
 
@@ -40,7 +39,7 @@
    style views (e.g. graphs index) look correct without adding utilities
    to every heading. */
 @utility primary-container {
-  @apply container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 my-4;
+  @apply container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 my-4 text-text;
 
   & h1 {
     @apply text-5xl font-condensed uppercase my-4 tracking-wide text-text-strong;
@@ -55,6 +54,15 @@
   & h2 small {
     @apply text-base normal-case tracking-normal text-muted;
   }
+}
+
+@utility about-article {
+  @apply container mx-auto px-3 sm:px-6 lg:px-8 my-4 text-text
+         prose prose-invert max-w-4xl;
+}
+
+@utility chart-section {
+  @apply mt-4;
 }
 
 @utility btn-primary {

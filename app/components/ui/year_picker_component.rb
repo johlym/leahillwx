@@ -5,8 +5,6 @@
 # to `base_path` (no year suffix).
 module Ui
   class YearPickerComponent < ViewComponent::Base
-    WRAPPER_CLASSES = "inline-flex items-center gap-2 text-[0.8rem] uppercase tracking-[0.05em] text-muted".freeze
-
     def initialize(base_path:, current_year:, years:, all_time_label: "All time", include_all_time: false, label: "Year")
       @base_path = base_path
       @current_year = current_year
@@ -17,7 +15,7 @@ module Ui
     end
 
     def call
-      content_tag(:label, class: WRAPPER_CLASSES) do
+      content_tag(:label, class: "ui-field-label") do
         safe_join([
           content_tag(:span, @label),
           select_element

@@ -29,9 +29,6 @@
   & .stats-table tbody tr:last-child td {
     @apply border-b-0;
   }
-  & .stats-table td span.text-xs {
-    color: var(--color-subtle);
-  }
 }
 
 @utility daily-data {
@@ -113,7 +110,7 @@
   & .report-table td a {
     @apply text-accent;
   }
-  & .report-table td.font-bold {
+  & .report-table td.report-cell-peak {
     @apply text-text-strong font-bold;
   }
 }
@@ -130,4 +127,33 @@
   & code {
     @apply bg-surface-2 text-text px-[0.35rem] rounded-sm font-mono text-[0.85em];
   }
+}
+
+@utility report-download-link {
+  @apply text-[0.85rem] mt-2 mb-4;
+}
+
+@utility report-period-cell {
+  @apply flex items-center gap-1;
+}
+
+@utility report-period-link {
+  @apply flex items-center gap-1;
+}
+
+@utility report-partial-icon {
+  @apply text-warning;
+}
+
+@utility report-empty {
+  @apply text-center text-muted py-4;
+}
+
+@utility report-generation-time {
+  @apply text-center text-xs text-muted;
+}
+
+@utility stats-day-meta {
+  @apply text-xs;
+  color: var(--color-subtle);
 }

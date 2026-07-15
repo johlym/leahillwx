@@ -1,7 +1,8 @@
-/* Sun/moon arc infographic. SVG bodies have filter-based glows for
-   their "live" state and dimming for their off state; those need CSS
-   because they target SVG-inner elements. The wrapper/legend pieces
-   are inlined on the ERB template. */
+/* Sun/moon arc infographic. */
+
+@utility sky-arc {
+  @apply flex flex-col gap-2 text-text w-full;
+}
 
 @utility sky-arc-svg {
   @apply w-full h-auto;
@@ -32,6 +33,18 @@
   filter: drop-shadow(
     0 0 6px color-mix(in oklab, var(--color-muted) 70%, transparent)
   );
+}
+
+@utility sky-arc-legend {
+  @apply flex flex-col gap-[0.2rem] text-[0.75rem] text-muted;
+}
+
+@utility sky-arc-legend-row {
+  @apply inline-flex items-center gap-2;
+}
+
+@utility sky-arc-legend-times {
+  @apply text-text font-mono text-[0.75rem];
 }
 
 @utility sky-arc-swatch {

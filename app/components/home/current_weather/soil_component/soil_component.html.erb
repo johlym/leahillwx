@@ -1,11 +1,11 @@
-<%= render Ui::CardComponent.new(padding: :default, classes: "lg:row-span-2") do %>
+<%= render Ui::CardComponent.new(padding: :default, classes: "soil-card") do %>
   <div class="live-tile">
     <div class="live-tile-label">
-      <i class="fa-solid fa-seedling text-accent text-base"></i>
+      <i class="fa-solid fa-seedling"></i>
       <span>Soil</span>
     </div>
 
-    <div class="live-tile-body flex-1 min-h-0">
+    <div class="live-tile-body live-tile-body-fill">
       <div class="soil-table">
         <div class="soil-table-header" aria-hidden="true">
           <span>Sensor</span>

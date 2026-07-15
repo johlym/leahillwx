@@ -5,7 +5,7 @@
             class="ui-tabs-tab"
             data-action="click->almanac-table-toggle#showSun"
             data-almanac-table-toggle-target="sunBtn">
-      <i class="fa-regular fa-sun text-[0.85em]"></i>
+      <i class="fa-regular fa-sun"></i>
       <span>Sun</span>
     </button>
     <button type="button"
@@ -13,7 +13,7 @@
             class="ui-tabs-tab"
             data-action="click->almanac-table-toggle#showMoon"
             data-almanac-table-toggle-target="moonBtn">
-      <i class="fa-regular fa-moon text-[0.85em]"></i>
+      <i class="fa-regular fa-moon"></i>
       <span>Moon</span>
     </button>
   </div>
@@ -54,21 +54,21 @@
                 data-action="click->almanac-calendar#toggleRow"
                 data-almanac-calendar-date-value="<%= date.iso8601 %>">
               <td>
-                <div class="flex items-center gap-1 justify-center">
+                <div class="almanac-day-cell">
                   <span><%= date.day %></span>
-                  <span class=" text-gray-500 font-mono" data-almanac-calendar-target="chevron">+</span>
+                  <span class="almanac-day-chevron" data-almanac-calendar-target="chevron">+</span>
                 </div>
               </td>
               <td>
                 <%= format_time(entry.sunrise_at, strip_leading_zero: true) %>
                 <% if az = sun_rise_azimuth(entry) %>
-                  <span class="text-xs text-gray-500">(<%=az.round(0)%>°)</span>
+                  <span class="almanac-cell-meta">(<%=az.round(0)%>°)</span>
                 <% end %>
               </td>
               <td>
                 <%= format_time(entry.sunset_at, strip_leading_zero: true) %>
                 <% if az = sun_set_azimuth(entry) %>
-                  <span class="text-xs text-gray-500">(<%=az.round(0)%>°)</span>
+                  <span class="almanac-cell-meta">(<%=az.round(0)%>°)</span>
                 <% end %>
               </td>
               <td><%= format_day_length(entry.daylight_seconds) %></td>
@@ -82,7 +82,7 @@
               <td>
                 <%= format_time(entry.solar_noon_at, strip_leading_zero: true) %>
                 <% if alt = sun_transit_altitude(entry) %>
-                  <span class="text-xs text-gray-500">(<%= alt.round(1) %>°)</span>
+                  <span class="almanac-cell-meta">(<%= alt.round(1) %>°)</span>
                 <% end %>
               </td>
               <td>
@@ -94,7 +94,7 @@
               <td colspan="14" class="expanded-row">
                 <div class="expanded-container">
                   <div class="expanded-inner">
-                    <div data-almanac-calendar-target="altitudeChart" 
+                    <div data-almanac-calendar-target="altitudeChart"
                          data-positions="<%= entry.sun_positions_hourly&.to_json %>"
                          data-date="<%= date.strftime('%B %d, %Y') %>"
                          data-body="sun">
@@ -116,7 +116,7 @@
   </div>
 
   <!-- Moon Table -->
-  <div class="table-container" data-almanac-table-toggle-target="moonTable" class="hidden" data-controller="almanac-calendar">
+  <div class="table-container hidden" data-almanac-table-toggle-target="moonTable" data-controller="almanac-calendar">
     <table>
       <thead>
         <tr>
@@ -139,13 +139,13 @@
           <% if entry %>
             <% moon_events = moon_events_for_day(entry) %>
             <% offset = column_offset_for_date(date, entry) %>
-            <tr class="<%= 'today' if is_today?(date) %>" 
+            <tr class="<%= 'today' if is_today?(date) %>"
                 data-action="click->almanac-calendar#toggleRow"
                 data-almanac-calendar-date-value="<%= date.iso8601 %>">
               <td>
-                <div class="flex items-center gap-1 justify-center">
+                <div class="almanac-day-cell">
                   <span><%= date.day %></span>
-                  <span class="text-gray-500 font-mono" data-almanac-calendar-target="chevron">+</span>
+                  <span class="almanac-day-chevron" data-almanac-calendar-target="chevron">+</span>
                 </div>
               </td>
               <% 3.times do |col| %>
@@ -166,7 +166,7 @@
                 <% if entry.moon_transit_at %>
                   <%= format_time(entry.moon_transit_at, strip_leading_zero: true) %>
                   <% if alt = moon_transit_altitude(entry) %>
-                    <span class="text-xs text-gray-500">(<%= alt.round(1) %>°)</span>
+                    <span class="almanac-cell-meta">(<%= alt.round(1) %>°)</span>
                   <% end %>
                 <% else %>
                   <span>-</span>
@@ -184,7 +184,7 @@
               <td class="expanded-row" colspan="7">
                 <div class="expanded-container">
                   <div class="expanded-inner">
-                    <div data-almanac-calendar-target="altitudeChart" 
+                    <div data-almanac-calendar-target="altitudeChart"
                          data-positions="<%= entry.moon_positions_hourly&.to_json %>"
                          data-date="<%= date.strftime('%B %d, %Y') %>"
                          data-body="moon">

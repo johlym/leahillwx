@@ -1,4 +1,4 @@
-<div class="primary-container text-text">
+<div class="primary-container">
   <%= render Ui::SectionHeaderComponent.new(
     title: "Trends",
     subtitle: "How #{@focus_year} compares to recent history"
@@ -15,13 +15,13 @@
 
   <% unless @has_data %>
     <%= render Ui::CardComponent.new(padding: :loose) do %>
-      <p class="text-muted">No monthly reports yet. Trends will populate as the reports pipeline runs.</p>
+      <p class="ui-message">No monthly reports yet. Trends will populate as the reports pipeline runs.</p>
     <% end %>
   <% end %>
 
   <% if @has_data %>
     <%= render Ui::SectionHeaderComponent.new(title: "Year over year", level: 3, subtitle: "Monthly averages across the last few years. Bold line is the focus year.") %>
-    <div class="flex flex-col gap-4 mt-4">
+    <div class="ui-stack-spaced">
       <%= render Ui::ChartComponent.new(
         type: @yoy_temp_chart[:type],
         data: @yoy_temp_chart[:data],
@@ -60,7 +60,7 @@
       level: 3,
       subtitle: "Daily average AQI and PM2.5 for #{@focus_year}."
     ) %>
-    <div class="mt-4">
+    <div class="chart-section">
       <%= render Ui::ChartComponent.new(
         type: @aqi_daily_chart[:type],
         data: @aqi_daily_chart[:data],
@@ -75,7 +75,7 @@
 
   <% if @has_data %>
     <%= render Ui::SectionHeaderComponent.new(title: "Rolling averages", level: 3, subtitle: "Longer-term smoothing across every complete day on record.") %>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+    <div class="ui-split-grid-spaced">
       <%= render Ui::ChartComponent.new(
         type: @rolling_temp_chart[:type],
         data: @rolling_temp_chart[:data],
@@ -101,7 +101,7 @@
 
     <% if @anomalies.any? %>
       <%= render Ui::SectionHeaderComponent.new(title: "How #{@focus_year} compares", level: 3, subtitle: "Delta between #{@focus_year} year-to-date and the recent normal.") %>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="ui-card-grid">
         <% @anomalies.each do |a| %>
           <%= render Ui::CardComponent.new(padding: :default, title: a[:title]) do %>
             <%= render Ui::StatComponent.new(

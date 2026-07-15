@@ -23,16 +23,16 @@
       <tbody>
         <% period_data.each do |row| %>
           <tr<%= ' class=partial-day' if row.partial_period? %>>
-            <td class="flex items-center gap-1 <%= 'no-data' if !row.has_data? %>">
+            <td class="report-period-cell <%= 'no-data' if !row.has_data? %>">
               <% if daily? %>
-                <%= link_to report_day_path(row.report.year, Date::MONTHNAMES[row.report.month].downcase, row.period), class: "flex items-center gap-1" do %>
+                <%= link_to report_day_path(row.report.year, Date::MONTHNAMES[row.report.month].downcase, row.period), class: "report-period-link" do %>
                   <%= row.period %><i class="fa-solid fa-magnifying-glass"></i>
                 <% end %>
               <% else %>
                 <%= row.period %>
               <% end %>
               <% if row.partial_period? %>
-                <i class="fa-regular fa-triangle-exclamation text-yellow-800"></i>
+                <i class="fa-regular fa-triangle-exclamation report-partial-icon"></i>
               <% end %>
             </td>
             <% if !row.has_data? %>
@@ -42,14 +42,14 @@
                 <td colspan="9" class="no-data">N/A</td>
               <% end %>
             <% else %>
-              <td class="<%= 'font-bold' if row.is_max_mean_temp %>"><%= number_with_precision(temp_fahrenheit(row.entry.mean_temp), precision: 2) %>°F</td>
-              <td class="<%= 'font-bold' if row.is_max_high_temp %>"><%= number_with_precision(temp_fahrenheit(row.entry.high_temp), precision: 2) %>° @ <%= row.entry.high_temp_time || 'N/A' %></td>
-              <td class="<%= 'font-bold' if row.is_max_low_temp %>"><%= number_with_precision(temp_fahrenheit(row.entry.low_temp), precision: 2) %>° @ <%= row.entry.low_temp_time || 'N/A' %></td>
-              <td class="<%= 'font-bold' if row.is_max_heat_dd %>"><%= number_with_precision(row.entry.heat_degree_days, precision: 2) %>°F</td>
-              <td class="<%= 'font-bold' if row.is_max_cool_dd %>"><%= number_with_precision(row.entry.cool_degree_days, precision: 2) %>°F</td>
-              <td class="<%= 'font-bold' if row.is_max_rain %>"><%= number_with_precision(rain_in_inches(row.entry.rain), precision: 2) %> in.</td>
-              <td class="<%= 'font-bold' if row.is_max_avg_wind %>"><%= number_with_precision(wind_speed_mph(row.entry.avg_wind_speed), precision: 2) %> mph</td>
-              <td class="<%= 'font-bold' if row.is_max_high_wind %>"><%= number_with_precision(wind_speed_mph(row.entry.high_wind_speed), precision: 2) %> mph @ <%= row.entry.high_wind_time || 'N/A' %></td>
+              <td class="<%= 'report-cell-peak' if row.is_max_mean_temp %>"><%= number_with_precision(temp_fahrenheit(row.entry.mean_temp), precision: 2) %>°F</td>
+              <td class="<%= 'report-cell-peak' if row.is_max_high_temp %>"><%= number_with_precision(temp_fahrenheit(row.entry.high_temp), precision: 2) %>° @ <%= row.entry.high_temp_time || 'N/A' %></td>
+              <td class="<%= 'report-cell-peak' if row.is_max_low_temp %>"><%= number_with_precision(temp_fahrenheit(row.entry.low_temp), precision: 2) %>° @ <%= row.entry.low_temp_time || 'N/A' %></td>
+              <td class="<%= 'report-cell-peak' if row.is_max_heat_dd %>"><%= number_with_precision(row.entry.heat_degree_days, precision: 2) %>°F</td>
+              <td class="<%= 'report-cell-peak' if row.is_max_cool_dd %>"><%= number_with_precision(row.entry.cool_degree_days, precision: 2) %>°F</td>
+              <td class="<%= 'report-cell-peak' if row.is_max_rain %>"><%= number_with_precision(rain_in_inches(row.entry.rain), precision: 2) %> in.</td>
+              <td class="<%= 'report-cell-peak' if row.is_max_avg_wind %>"><%= number_with_precision(wind_speed_mph(row.entry.avg_wind_speed), precision: 2) %> mph</td>
+              <td class="<%= 'report-cell-peak' if row.is_max_high_wind %>"><%= number_with_precision(wind_speed_mph(row.entry.high_wind_speed), precision: 2) %> mph @ <%= row.entry.high_wind_time || 'N/A' %></td>
               <td><%= row.entry.formatted_wind_dir %> <%= render Elements::WindVaneComponent.new(direction: row.entry.wind_dir) %></td>
             <% end %>
           </tr>

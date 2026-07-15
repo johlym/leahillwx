@@ -77,13 +77,13 @@ class Ui::CardComponentTest < ViewComponent::TestCase
   test "applies the padding class for known padding values" do
     render_inline(Ui::CardComponent.new(padding: :tight)) { "body" }
 
-    assert_selector ".ui-card.p-3"
+    assert_selector ".ui-card.ui-card-pad-tight"
   end
 
   test "falls back to default padding for unknown padding" do
     render_inline(Ui::CardComponent.new(padding: :huge)) { "body" }
 
-    assert_selector ".ui-card.p-5"
+    assert_selector ".ui-card.ui-card-pad-default"
   end
 
   test "appends caller-provided extra classes to the root" do

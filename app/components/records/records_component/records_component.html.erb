@@ -3,7 +3,7 @@
   subtitle: pivot_subtitle
 ) do |s| %>
   <% s.with_actions do %>
-    <div class="flex items-center gap-3 flex-wrap">
+    <div class="ui-toolbar">
       <%= render Ui::YearPickerComponent.new(
         base_path: records_path,
         current_year: pivot_year? || pivot_month? ? selected_year : nil,
@@ -14,7 +14,7 @@
       ) %>
 
       <% if months_available_for_pivot.any? && selected_year %>
-        <label class="inline-flex items-center gap-2 text-[0.8rem] uppercase tracking-[0.05em] text-muted">
+        <label class="ui-field-label">
           <span>Month</span>
           <select class="ui-year-picker-select"
                   onchange="if (this.value) { window.location.href = this.value; }">
@@ -52,7 +52,7 @@
 <% else %>
   <% if active_record.nil? %>
     <%= render Ui::CardComponent.new(padding: :loose) do %>
-      <p class="text-muted">
+      <p class="ui-message">
         No records available yet for <%= pivot_title.downcase %>. Records are
         recalculated nightly at 12:02 AM or on demand via
         <code class="record-inline-code">rake records:refresh</code>.
@@ -61,7 +61,7 @@
   <% else %>
     <% sections.each do |section| %>
       <%= render Ui::SectionHeaderComponent.new(title: section[:title], icon: section[:icon], level: 3) %>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="ui-card-grid">
         <% section[:rows].each do |row| %>
           <%= render Records::RecordCardComponent.new(row: row, record: active_record, icon: row[:icon], history: yearly_records) %>
         <% end %>

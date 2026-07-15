@@ -13,8 +13,8 @@
 <div class="primary-container">
   <%= render Home::Forecast::HourlyForecastComponent.new(hours: @forecast.hours.first(8), timestamp: @forecast.created_at) %>
 
-  <div class="grid grid-cols-1 lg:grid-cols-[6fr_4fr] gap-4 mt-4">
-    <div class="flex flex-col gap-4">
+  <div class="home-columns">
+    <div class="home-column">
       <%= render Home::Forecast::DailyForecastComponent.new(days: @forecast.days, timestamp: @forecast.created_at) %>
 
       <%= render Ui::CardComponent.new(title: "Earthquakes", subtitle: "The last 5 earthquakes nearest to this location.") do %>
@@ -22,11 +22,11 @@
       <% end %>
     </div>
 
-    <div class="flex flex-col gap-4">
+    <div class="home-column">
       <%= render Ui::CardComponent.new(title: "Auburn Traffic Cameras", padding: :default) do %>
         <div data-controller="image-refresh">
           <p class="tile-subtitle">
-            Next refresh in <span data-image-refresh-target="countdown" class="font-mono">60</span> seconds.
+            Next refresh in <span data-image-refresh-target="countdown" class="tile-subtitle-mono">60</span> seconds.
           </p>
           <div class="camera-grid" id="traffic_cameras">
             <figure>
@@ -52,7 +52,7 @@
       <%= render Ui::CardComponent.new(title: "Auburn Muni (S50)", padding: :default) do %>
         <div data-controller="image-refresh">
           <p class="tile-subtitle">
-            Next refresh in <span data-image-refresh-target="countdown" class="font-mono">60</span> seconds.
+            Next refresh in <span data-image-refresh-target="countdown" class="tile-subtitle-mono">60</span> seconds.
           </p>
           <div class="camera-grid" id="airport_cameras">
             <figure>

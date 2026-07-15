@@ -1,12 +1,19 @@
-/* The .forecast-section, .forecast-column, .sidebar-column classes
-   have been inlined onto app/views/root/index.html.erb. Kept here:
-   - .tile-subtitle: shared across daily_forecast_component and camera
-     cards; a test also asserts on the class name.
-   - .camera-grid: wraps <figure> / <figcaption> / <img> children we
-     can't attach utilities to individually. */
+/* Home page columns below the live strip, plus camera grids. */
+
+@utility home-columns {
+  @apply grid grid-cols-1 lg:grid-cols-[6fr_4fr] gap-4 mt-4;
+}
+
+@utility home-column {
+  @apply flex flex-col gap-4;
+}
 
 @utility tile-subtitle {
   @apply text-muted text-[0.8rem] mb-[0.6rem];
+}
+
+@utility tile-subtitle-mono {
+  @apply font-mono;
 }
 
 @utility camera-grid {

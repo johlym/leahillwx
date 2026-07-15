@@ -44,7 +44,7 @@ module Ui
 
     def button_content(item)
       parts = []
-      parts << content_tag(:i, "", class: "#{item[:icon]} text-[0.85em]") if item[:icon].present?
+      parts << content_tag(:i, "", class: item[:icon]) if item[:icon].present?
       parts << content_tag(:span, item[:label])
       safe_join(parts, " ")
     end

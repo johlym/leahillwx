@@ -1,8 +1,21 @@
-/* Almanac page. The month navigation is pure layout (inlined on
-   month_navigation_component). The current-day list uses a shared
-   descendant pattern for its <li> children. The monthly calendar
-   table is dense and heavily-descended, so it stays as a flat
-   @utility with nested selectors. */
+/* Almanac page — current-day cards, month navigation, monthly calendar. */
+
+@utility almanac-nav {
+  @apply flex flex-col md:flex-row items-stretch md:items-center
+         md:justify-between gap-3 my-4 mb-6;
+}
+
+@utility almanac-nav-prev-next {
+  @apply flex flex-wrap gap-2;
+
+  & .btn-secondary {
+    @apply text-[0.85rem];
+  }
+}
+
+@utility almanac-nav-pickers {
+  @apply flex flex-wrap items-center gap-2;
+}
 
 @utility almanac-current-list {
   @apply list-none p-0 m-0 flex flex-col gap-[0.35rem];
@@ -22,6 +35,10 @@
   & > span:last-child {
     @apply text-subtle text-[0.75rem] font-[inherit] italic;
   }
+}
+
+@utility almanac-phase {
+  @apply capitalize;
 }
 
 @utility almanac-table {
@@ -100,10 +117,16 @@
   & .table-container > table tbody td.expanded-row .expanded-inner {
     @apply bg-surface border border-border rounded-lg p-3;
   }
-  & .table-container > table .text-gray-500 {
-    color: var(--color-muted) !important;
+
+  & .almanac-day-cell {
+    @apply flex items-center gap-1 justify-center;
   }
-  & .table-container > table span.text-xs {
-    color: var(--color-subtle);
+
+  & .almanac-day-chevron {
+    @apply text-muted font-mono;
+  }
+
+  & .almanac-cell-meta {
+    @apply text-xs text-subtle;
   }
 }

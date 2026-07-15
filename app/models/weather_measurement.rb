@@ -290,4 +290,3 @@ class WeatherMeasurement < ApplicationRecord
     }
   end
 end
-

@@ -65,4 +65,3 @@ class Api::V1::WeatherMeasurementsController < ApiController
     )
   end
 end
-

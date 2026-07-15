@@ -1,14 +1,4 @@
-/* Records page: record cards + GitHub-style heatmap.
-
-   record-card-* utilities cover the shared card body that appears in
-   both record_card_component.rb and month_component.html.erb; their
-   deltas require several state variants that would be tedious to
-   duplicate inline.
-
-   temp-heatmap-* utilities cover the pieces of the calendar heatmap
-   that have too much markup (or too many state variants) to inline
-   cleanly on the template. Where a rule was pure layout, it's now on
-   the template. */
+/* Records page: record cards + GitHub-style heatmap. */
 
 /* --- Record card body ------------------------------------------- */
 
@@ -199,3 +189,57 @@
     var(--color-surface)
   );
 }
+
+@utility temp-heatmap-header {
+  @apply flex items-baseline justify-between gap-4 flex-wrap mb-3;
+}
+
+@utility temp-heatmap-header-text {
+  @apply min-w-0;
+}
+
+@utility temp-heatmap-title {
+  @apply m-0 font-condensed uppercase tracking-[0.05em] text-text-strong
+         text-[1.1rem];
+}
+
+@utility temp-heatmap-subtitle {
+  @apply mt-[0.15rem] text-muted text-[0.8rem];
+}
+
+@utility temp-heatmap-scroll {
+  @apply overflow-x-auto py-2;
+}
+
+@utility temp-heatmap-footer {
+  @apply flex items-center gap-6 flex-wrap mt-[0.85rem] pt-[0.85rem]
+         border-t border-border;
+}
+
+@utility temp-heatmap-legend {
+  @apply inline-flex items-center gap-2;
+}
+
+@utility temp-heatmap-legend-label {
+  @apply text-muted text-xs font-mono;
+}
+
+@utility temp-heatmap-legend-bar {
+  @apply inline-block w-[clamp(9rem,22vw,16rem)] h-3 rounded-full;
+  border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+  box-shadow: 0 0 0 1px
+    color-mix(in oklab, var(--color-accent) 8%, transparent) inset;
+}
+
+@utility temp-heatmap-legend-note {
+  @apply inline-flex items-center gap-2 text-muted text-xs;
+}
+
+@utility temp-heatmap-legend-swatch {
+  @apply inline-block w-[1.15rem] h-3 rounded-xs border border-border/60;
+}
+
+@utility temp-heatmap-legend-note-label {
+  @apply uppercase tracking-[0.05em];
+}
+

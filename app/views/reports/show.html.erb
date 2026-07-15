@@ -1,4 +1,4 @@
-<div class="primary-container text-text">
+<div class="primary-container">
   <h1>Climatological Summary <small>for <%= @report.month_name %> <%= @report.year %></small></h1>
 
   <%= render Shared::DateNavigationComponent.new(
@@ -21,5 +21,5 @@
       <li>Days with no data shown as "N/A"</li>
     </ul>
   </div>
-  <p class="text-center text-xs">Report generated in <%= @generation_time %> seconds</p>
+  <p class="report-generation-time">Report generated in <%= @generation_time %> seconds</p>
 </div>

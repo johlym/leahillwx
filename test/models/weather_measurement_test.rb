@@ -143,5 +143,3 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
     SoilChannels.reload!
   end
 end
-
-

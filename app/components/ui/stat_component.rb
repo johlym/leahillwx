@@ -5,22 +5,22 @@
 module Ui
   class StatComponent < ViewComponent::Base
     SIZE_CLASSES = {
-      sm: "text-2xl",
-      md: "text-4xl",
-      lg: "text-5xl",
-      xl: "text-7xl"
+      sm: "ui-stat-value-sm",
+      md: "ui-stat-value-md",
+      lg: "ui-stat-value-lg",
+      xl: "ui-stat-value-xl"
     }.freeze
 
     ALIGN_CLASSES = {
-      left:   "items-start text-left",
-      center: "items-center text-center",
-      right:  "items-end text-right"
+      left:   "ui-stat-left",
+      center: "ui-stat-center",
+      right:  "ui-stat-right"
     }.freeze
 
     TREND_CLASSES = {
-      up:   { icon: "fa-arrow-trend-up",   color: "text-success" },
-      down: { icon: "fa-arrow-trend-down", color: "text-danger"  },
-      flat: { icon: "fa-minus",            color: "text-muted"   }
+      up:   { icon: "fa-arrow-trend-up",   color: "ui-stat-trend-up" },
+      down: { icon: "fa-arrow-trend-down", color: "ui-stat-trend-down" },
+      flat: { icon: "fa-minus",            color: "ui-stat-trend-flat" }
     }.freeze
 
     def initialize(
@@ -46,7 +46,7 @@ module Ui
     end
 
     def call
-      content_tag(:div, class: "flex flex-col gap-1 #{ALIGN_CLASSES[@align]}") do
+      content_tag(:div, class: "ui-stat #{ALIGN_CLASSES[@align]}") do
         safe_join([
           label_block,
           value_block,
@@ -61,9 +61,9 @@ module Ui
     def label_block
       return nil if @label.blank?
 
-      content_tag(:div, class: "inline-flex items-center gap-[0.4rem] text-xs uppercase tracking-[0.06em] text-muted") do
+      content_tag(:div, class: "ui-stat-label") do
         parts = []
-        parts << content_tag(:i, "", class: "#{@icon} text-accent") if @icon.present?
+        parts << content_tag(:i, "", class: @icon) if @icon.present?
         parts << content_tag(:span, @label)
         safe_join(parts)
       end
@@ -72,10 +72,10 @@ module Ui
     def value_block
       content_tag(
         :div,
-        class: "inline-flex items-baseline gap-[0.3rem] leading-none font-condensed font-medium text-text-strong tabular-nums #{SIZE_CLASSES[@size]}"
+        class: "ui-stat-value #{SIZE_CLASSES[@size]}"
       ) do
         parts = [ content_tag(:span, @value) ]
-        parts << content_tag(:span, @unit, class: "text-[0.55em] font-normal tracking-[0.02em] text-muted") if @unit.present?
+        parts << content_tag(:span, @unit, class: "ui-stat-unit") if @unit.present?
         safe_join(parts)
       end
     end
@@ -83,7 +83,7 @@ module Ui
     def secondary_block
       return nil if @secondary.blank?
 
-      content_tag(:p, @secondary, class: "text-[0.8rem] text-muted")
+      content_tag(:p, @secondary, class: "ui-stat-secondary")
     end
 
     def trend_block
@@ -91,7 +91,7 @@ module Ui
 
       trend_key = @trend.to_sym
       spec = TREND_CLASSES[trend_key] || TREND_CLASSES[:flat]
-      content_tag(:p, class: "inline-flex items-center gap-1 text-xs #{spec[:color]}") do
+      content_tag(:p, class: "ui-stat-trend #{spec[:color]}") do
         safe_join([
           content_tag(:i, "", class: "fa-regular #{spec[:icon]}"),
           " ",

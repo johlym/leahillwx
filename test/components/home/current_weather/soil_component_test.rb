@@ -21,7 +21,7 @@ class Home::CurrentWeather::SoilComponentTest < ViewComponent::TestCase
     assert_text "Ch 2"
     assert_text "55"
     assert_text "N/A"
-    assert_selector ".ui-card.lg\\:row-span-2"
+    assert_selector ".ui-card.soil-card"
     assert_selector ".soil-table-header"
     assert_selector "[data-weather-update-target='soil']"
   end

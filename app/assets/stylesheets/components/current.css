@@ -1,19 +1,5 @@
-/* Live-conditions hero + strip. Layout, typography, grid, and colour
-   flow through Tailwind utilities on conditions_component.erb; what
-   remains here is only the effects Tailwind has no first-class utility
-   for:
-
-   - current-conditions: masked pseudo-element with two radial glows
-     that fade out toward the bottom of the hero
-   - live-tile family: shared structure used 6+ times, factored as
-     flat utilities to avoid repeating long utility strings
-   - uv-scale / uv-scale-marker: the fixed rainbow gradient bar with
-     a positionable marker
-   - aqi-scale / aqi-scale-marker: EPA/AirNow AQI colour stops with
-     a positionable marker
-   - soil-channel family: compact multi-channel rows in the tall
-     soil card
-*/
+/* Live-conditions hero + strip. Markup uses semantic component classes;
+   Tailwind utilities stay here via @apply. Flat kebab names (no BEM). */
 
 @utility current-conditions {
   @apply relative isolate py-6 pb-4 text-text;
@@ -47,6 +33,66 @@
   }
 }
 
+/* Same 4-col / gap-3 tracks as the live strip so Wind/Sun align with
+   AQI/Soil (and Humidity/UV with the temp span). */
+@utility current-conditions-inner {
+  @apply container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-6 lg:py-10;
+}
+
+@utility current-conditions-hero {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 items-center;
+}
+
+@utility current-conditions-primary {
+  @apply md:col-span-2 flex flex-col items-center text-center
+         lg:items-start lg:text-left gap-3 min-w-0;
+}
+
+@utility current-conditions-timestamp {
+  @apply text-muted font-condensed uppercase tracking-[0.08em] text-[0.95rem];
+}
+
+@utility current-conditions-temp-row {
+  @apply mt-1 flex flex-col items-center justify-center gap-4
+         sm:flex-row sm:items-baseline sm:justify-center lg:justify-start;
+}
+
+@utility current-conditions-temp {
+  @apply font-condensed font-light leading-[0.9] tracking-[-0.02em]
+         text-text-strong tabular-nums text-[clamp(6rem,18vw,11rem)];
+  text-shadow:
+    0 0 20px color-mix(in oklab, var(--color-accent-strong) 35%, transparent),
+    0 0 55px color-mix(in oklab, var(--color-accent) 22%, transparent);
+}
+
+@utility current-conditions-desc {
+  @apply text-center sm:text-left;
+}
+
+@utility current-conditions-icon {
+  @apply text-[2.25rem] text-text-strong;
+  filter: drop-shadow(
+    0 0 12px color-mix(in oklab, var(--color-accent) 45%, transparent)
+  );
+}
+
+@utility current-conditions-summary {
+  @apply mt-1 font-condensed uppercase tracking-[0.06em] text-2xl text-text;
+}
+
+@utility current-conditions-feels {
+  @apply text-muted text-base;
+}
+
+@utility current-conditions-sep {
+  @apply mx-[0.4rem] text-subtle;
+}
+
+/* Live strip below the hero — same column tracks as the hero grid. */
+@utility live-strip {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-1 mb-4;
+}
+
 /* Live tile — repeated for every metric in the strip. */
 @utility live-tile {
   @apply flex flex-col gap-[0.55rem] min-h-full;
@@ -55,10 +101,18 @@
 @utility live-tile-label {
   @apply flex items-center gap-[0.4rem] text-muted text-xs
          uppercase tracking-[0.08em] whitespace-nowrap;
+
+  & > i {
+    @apply text-accent text-base;
+  }
 }
 
 @utility live-tile-body {
   @apply flex flex-col gap-[0.3rem] min-w-0;
+}
+
+@utility live-tile-body-fill {
+  @apply flex-1 min-h-0;
 }
 
 @utility live-tile-value {
@@ -67,7 +121,7 @@
 }
 
 @utility live-tile-number {
-  @apply text-[2.5rem] font-medium;
+  @apply text-[2.5rem] font-medium tabular-nums;
   text-shadow: 0 0 22px
     color-mix(in oklab, var(--color-accent) 22%, transparent);
 }
@@ -88,9 +142,29 @@
   @apply text-muted text-[0.78rem] leading-[1.35];
 }
 
+@utility live-tile-meta-tight {
+  @apply mt-0.5;
+}
+
 @utility live-tile-peak {
   @apply text-[0.7rem] leading-[1.3] pt-[0.35rem] tracking-[0.02em];
   color: color-mix(in oklab, var(--color-muted) 75%, transparent);
+}
+
+@utility live-tile-stale {
+  @apply text-warning;
+}
+
+@utility live-tile-split {
+  @apply flex items-stretch justify-between gap-4;
+}
+
+@utility live-tile-main {
+  @apply flex-1 min-w-0;
+}
+
+@utility live-tile-aside {
+  @apply shrink-0 flex items-center justify-center;
 }
 
 @utility live-tile-sparkline {
@@ -104,6 +178,11 @@
   }
 }
 
+/* Tall soil card spans two rows in the live strip at lg. */
+@utility soil-card {
+  @apply lg:row-span-2;
+}
+
 /* Stretch cards so sparklines share a bottom baseline even when card
    body content heights differ (home live strip + wind card). */
 .current-conditions .ui-card:has(.live-tile),
@@ -111,8 +190,8 @@
   @apply h-full flex flex-col;
 }
 
-.current-conditions .ui-card:has(.live-tile) > .text-text,
-.primary-container .ui-card:has(.live-tile) > .text-text {
+.current-conditions .ui-card:has(.live-tile) > .ui-card-body,
+.primary-container .ui-card:has(.live-tile) > .ui-card-body {
   @apply flex flex-1 flex-col min-h-0;
 }
 
