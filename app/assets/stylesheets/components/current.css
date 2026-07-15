@@ -178,6 +178,52 @@
   }
 }
 
+/* Latest sparkline sample — small accent dot with a restrained ring pulse. */
+.live-sparkline-pulse {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.live-sparkline-pulse::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  transform: translate(-50%, -50%);
+  animation: live-sparkline-pulse-ring 1.8s ease-out infinite;
+}
+
+@keyframes live-sparkline-pulse-ring {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.6);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-sparkline-pulse::after {
+    animation: none;
+    opacity: 0.35;
+    transform: translate(-50%, -50%) scale(1.8);
+  }
+}
+
 /* Tall soil card spans two rows in the live strip at lg. */
 @utility soil-card {
   @apply lg:row-span-2;

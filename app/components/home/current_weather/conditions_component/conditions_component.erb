@@ -59,9 +59,10 @@
           </div>
           <%= render Home::CurrentWeather::LiveSparklineComponent.new(
                 series: hourly_ranges[:wind],
+                metric: "wind",
                 y_unit: " mph",
                 decimals: 0,
-                aria_label: "Hourly average wind speed so far today"
+                aria_label: "10-minute average wind speed so far today"
               ) %>
         </div>
       <% end %>
@@ -100,9 +101,10 @@
         </div>
         <%= render Home::CurrentWeather::LiveSparklineComponent.new(
               series: hourly_ranges[:humidity],
+              metric: "humidity",
               y_unit: "%",
               decimals: 0,
-              aria_label: "Hourly average humidity so far today"
+              aria_label: "10-minute average humidity so far today"
             ) %>
       </div>
     <% end %>
@@ -130,9 +132,10 @@
         </div>
         <%= render Home::CurrentWeather::LiveSparklineComponent.new(
               series: hourly_ranges[:uvi],
+              metric: "uvi",
               y_unit: "",
               decimals: 0,
-              aria_label: "Hourly average UV index so far today"
+              aria_label: "10-minute average UV index so far today"
             ) %>
       </div>
     <% end %>
@@ -161,9 +164,10 @@
         </div>
         <%= render Home::CurrentWeather::LiveSparklineComponent.new(
               series: hourly_ranges[:rain_rate],
+              metric: "rain_rate",
               y_unit: " in",
               decimals: 2,
-              aria_label: "Hourly average rain rate so far today"
+              aria_label: "10-minute average rain rate so far today"
             ) %>
       </div>
     <% end %>
@@ -185,9 +189,10 @@
         </div>
         <%= render Home::CurrentWeather::LiveSparklineComponent.new(
               series: hourly_ranges[:dew_point],
+              metric: "dew_point",
               y_unit: "°",
               decimals: 0,
-              aria_label: "Hourly average dew point so far today"
+              aria_label: "10-minute average dew point so far today"
             ) %>
       </div>
     <% end %>
@@ -207,9 +212,10 @@
         </div>
         <%= render Home::CurrentWeather::LiveSparklineComponent.new(
               series: hourly_ranges[:cloud_base],
+              metric: "cloud_base",
               y_unit: " ft",
               decimals: 0,
-              aria_label: "Hourly average cloud base so far today"
+              aria_label: "10-minute average cloud base so far today"
             ) %>
       </div>
     <% end %>

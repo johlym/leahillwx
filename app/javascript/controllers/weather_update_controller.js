@@ -2,6 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 // Writes live weather values into stat cards. Keep units / decimal
 // precision identical to Home::CurrentWeather::ConditionsComponent.
+// Also refreshes live-tile sparklines when the broadcast includes series.
 export default class extends Controller {
   static targets = [
     "timestamp",
@@ -24,11 +25,12 @@ export default class extends Controller {
   ]
 
   connect() {
-    this.element.addEventListener("weather:update", this.handleUpdate.bind(this))
+    this.boundHandleUpdate = this.handleUpdate.bind(this)
+    this.element.addEventListener("weather:update", this.boundHandleUpdate)
   }
 
   disconnect() {
-    this.element.removeEventListener("weather:update", this.handleUpdate.bind(this))
+    this.element.removeEventListener("weather:update", this.boundHandleUpdate)
   }
 
   handleUpdate(event) {
@@ -89,6 +91,83 @@ export default class extends Controller {
     if (this.hasSoilTarget) {
       this.soilTarget.innerHTML = this.renderSoil(data.soil || [])
     }
+    if (data.sparklines) {
+      this.updateSparklines(data.sparklines)
+    }
+  }
+
+  updateSparklines(sparklines) {
+    document.querySelectorAll("[data-live-sparkline]").forEach((el) => {
+      const metric = el.dataset.liveSparkline
+      const series = sparklines[metric]
+      if (!series) return
+
+      const decimals = Number(el.dataset.liveSparklineDecimals || 0)
+      const yUnit = el.dataset.liveSparklineYUnit || ""
+      const chartData = this.sparklineChartData(series)
+      const chartOptions = this.sparklineChartOptions(series, { decimals, yUnit })
+
+      const chartController = this.application.getControllerForElementAndIdentifier(el, "chart")
+      if (chartController) {
+        chartController.dataValue = chartData
+        chartController.optionsValue = chartOptions
+      } else {
+        el.setAttribute("data-chart-data-value", JSON.stringify(chartData))
+        el.setAttribute("data-chart-options-value", JSON.stringify(chartOptions))
+      }
+    })
+  }
+
+  sparklineChartData(series) {
+    const datasets = [
+      {
+        label: "Average",
+        data: series.values || [],
+        color: "var(--accent)",
+        borderWidth: 1.6,
+        tension: 0.35,
+        spanGaps: true,
+        fill: true,
+        fillAlpha: 0.12,
+      },
+    ]
+
+    if (Array.isArray(series.markers)) {
+      datasets.push({
+        label: "Gust",
+        data: series.markers,
+        color: "var(--accent)",
+        colorAlpha: 0.75,
+        borderWidth: 1.4,
+        tension: 0.35,
+        dashed: true,
+        fill: false,
+        spanGaps: true,
+        pointRadius: 0,
+      })
+    }
+
+    return {
+      labels: series.labels || [],
+      datasets,
+    }
+  }
+
+  sparklineChartOptions(series, { decimals, yUnit }) {
+    const options = {
+      hideLegend: true,
+      hideGrid: true,
+      hideXAxis: true,
+      yTicks: "minmax",
+      tooltipFormat: "hourValue",
+      styleGaps: true,
+      livePulse: true,
+      decimals,
+      yUnit,
+    }
+    if (series.y_min != null) options.yMin = series.y_min
+    if (series.y_max != null) options.yMax = series.y_max
+    return options
   }
 
   renderSoil(readings) {

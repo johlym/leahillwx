@@ -286,7 +286,8 @@ class WeatherMeasurement < ApplicationRecord
           measurement.light, precision: 2, strip_insignificant_zeros: true
         )
       ),
-      soil: measurement.soil_readings
+      soil: measurement.soil_readings,
+      sparklines: WeatherData::LiveCardHourlyRanges.new.call
     }
   end
 end

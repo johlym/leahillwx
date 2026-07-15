@@ -1,26 +1,34 @@
 # frozen_string_literal: true
 
-# Builds today-so-far hourly series for the home-page live cards.
-# The X-axis is the absolute local calendar day (hour 0 → 23). As the
-# day progresses, completed hours fill in; future hours stay empty.
-# Each hour contributes its average as the plotted point. The Y-axis
-# range is the overall lowest low and highest high across hours with data.
-# Weather metrics come from WeatherMeasurement; AQI from Aqi (already hourly).
+# Builds today-so-far 10-minute series for the home-page live cards.
+# The X-axis is the absolute local calendar day (00:00 → 23:50). As the
+# day progresses, completed buckets fill in; future buckets stay empty.
+# Each bucket contributes its average as the plotted point. The Y-axis
+# range is the overall lowest low and highest high across buckets with data.
+# Weather metrics come from WeatherMeasurement; AQI from Aqi.
 module WeatherData
   class LiveCardHourlyRanges
     ZONE = "America/Los_Angeles"
-    HOURS = 24
+    INTERVAL_MINUTES = 10
+    BUCKETS_PER_DAY = (24 * 60) / INTERVAL_MINUTES
     MM_TO_IN = 25.4
     MPS_TO_MPH = 2.23694
     CLOUD_BASE_FT_PER_C_SPREAD = (9.0 / 5.0) * 227.3
 
+    BUCKET_SQL = <<~SQL.squish.freeze
+      date_trunc('hour', reading_date_time)
+        + (FLOOR(EXTRACT(MINUTE FROM reading_date_time) / #{INTERVAL_MINUTES})
+           * INTERVAL '#{INTERVAL_MINUTES} minutes')
+    SQL
+
     def initialize(now: Time.current)
       @now = now
       local = now.in_time_zone(ZONE)
-      # Normalize to UTC hour buckets so SQL date_trunc keys match.
-      @start_hour = local.beginning_of_day.utc
-      @end_hour = local.beginning_of_hour.utc
-      @hour_keys = (0...HOURS).map { |h| local.beginning_of_day.change(hour: h).utc.beginning_of_hour }
+      day_start = local.beginning_of_day
+      # Normalize to UTC bucket keys so SQL aggregates match Ruby keys.
+      @start_bucket = day_start.utc
+      @end_bucket = bucket_floor(local).utc
+      @bucket_keys = (0...BUCKETS_PER_DAY).map { |i| (day_start + (i * INTERVAL_MINUTES).minutes).utc }
     end
 
     def call
@@ -40,44 +48,49 @@ module WeatherData
 
     private
 
-    attr_reader :now, :start_hour, :end_hour, :hour_keys
+    attr_reader :now, :start_bucket, :end_bucket, :bucket_keys
 
-    # Wind plots hourly average speed as the line; peak gust each hour is
+    # Wind plots bucket-average speed as the line; peak gust each bucket is
     # returned separately so the sparkline can draw it as a dashed companion.
     def wind_series_for(buckets, decimals:)
       series = series_for(buckets, :wind_avg, :wind_high, :wind_low, decimals: decimals)
-      return nil if series.nil?
-
       series.merge(
-        markers: hour_keys.map { |h| value_for_hour(h, buckets.dig(h, :wind_high), decimals) }
+        markers: bucket_keys.map { |b| value_for_bucket(b, buckets.dig(b, :wind_high), decimals) }
       )
     end
 
     def series_for(buckets, avg_key, high_key, low_key, decimals:)
-      values = hour_keys.map { |h| value_for_hour(h, buckets.dig(h, avg_key), decimals) }
-      return nil if values.compact.length < 2
+      values = bucket_keys.map { |b| value_for_bucket(b, buckets.dig(b, avg_key), decimals) }
+      highs = bucket_keys.filter_map { |b| buckets.dig(b, high_key) if b <= end_bucket }
+      lows = bucket_keys.filter_map { |b| buckets.dig(b, low_key) if b <= end_bucket }
 
-      highs = hour_keys.filter_map { |h| buckets.dig(h, high_key) if h <= end_hour }
-      lows = hour_keys.filter_map { |h| buckets.dig(h, low_key) if h <= end_hour }
-
-      {
-        labels: hour_keys.map { |h| hour_label(h) },
-        values: values,
-        y_min: round_value(lows.min, decimals),
-        y_max: round_value(highs.max, decimals)
+      series = {
+        labels: bucket_keys.map { |b| bucket_label(b) },
+        values: values
       }
+      if lows.any? && highs.any?
+        series[:y_min] = round_value(lows.min, decimals)
+        series[:y_max] = round_value(highs.max, decimals)
+      end
+      series
     end
 
-    # Future hours of the local day stay blank so the sparkline fills left-to-right.
-    def value_for_hour(hour, value, decimals)
-      return nil if hour > end_hour
+    # Future buckets of the local day stay blank so the sparkline fills left-to-right.
+    def value_for_bucket(bucket, value, decimals)
+      return nil if bucket > end_bucket
 
       round_value(value, decimals)
     end
 
-    def hour_label(utc_hour)
-      # "12 pm", "3 am" — hour only, no minutes, Pacific local time.
-      utc_hour.in_time_zone(ZONE).strftime("%-l %P").strip
+    def bucket_label(utc_bucket)
+      # "12:00 am", "2:30 pm" — Pacific local time at 10-minute resolution.
+      utc_bucket.in_time_zone(ZONE).strftime("%-l:%M %P").strip
+    end
+
+    def bucket_floor(time)
+      t = time.respond_to?(:utc) ? time.utc : Time.parse(time.to_s).utc
+      minutes = (t.min / INTERVAL_MINUTES) * INTERVAL_MINUTES
+      Time.utc(t.year, t.month, t.day, t.hour, minutes, 0)
     end
 
     def round_value(value, decimals)
@@ -93,11 +106,11 @@ module WeatherData
       cloud_expr = "GREATEST(((100.0 - humidity) / 5.0) * #{CLOUD_BASE_FT_PER_C_SPREAD}, 0)"
 
       rows = WeatherMeasurement
-        .where(reading_date_time: start_hour..(end_hour + 1.hour - 1.second))
-        .group(Arel.sql("date_trunc('hour', reading_date_time)"))
-        .order(Arel.sql("date_trunc('hour', reading_date_time)"))
+        .where(reading_date_time: start_bucket..(end_bucket + INTERVAL_MINUTES.minutes - 1.second))
+        .group(Arel.sql(BUCKET_SQL))
+        .order(Arel.sql(BUCKET_SQL))
         .pluck(
-          Arel.sql("date_trunc('hour', reading_date_time)"),
+          Arel.sql(BUCKET_SQL),
           Arel.sql("AVG(wind_speed)"),
           Arel.sql("MAX(gust_speed)"),
           Arel.sql("MIN(wind_speed)"),
@@ -118,8 +131,8 @@ module WeatherData
           Arel.sql("MIN(#{cloud_expr})")
         )
 
-      rows.each_with_object({}) do |(hour, wind_avg, wind_hi, wind_lo, hum_avg, hum_hi, hum_lo, uvi_avg, uvi_hi, uvi_lo, rain_avg, rain_hi, rain_lo, dew_avg, dew_hi, dew_lo, cloud_avg, cloud_hi, cloud_lo), memo|
-        key = normalize_hour(hour)
+      rows.each_with_object({}) do |(bucket, wind_avg, wind_hi, wind_lo, hum_avg, hum_hi, hum_lo, uvi_avg, uvi_hi, uvi_lo, rain_avg, rain_hi, rain_lo, dew_avg, dew_hi, dew_lo, cloud_avg, cloud_hi, cloud_lo), memo|
+        key = normalize_bucket(bucket)
         memo[key] = {
           # Y-axis high uses peak gust; low/avg use sustained wind speed.
           wind_avg: wind_avg ? wind_avg * MPS_TO_MPH : nil,
@@ -146,11 +159,11 @@ module WeatherData
 
     def aqi_buckets
       rows = Aqi.with_observation
-        .where(observed_at: start_hour..(end_hour + 1.hour - 1.second))
+        .where(observed_at: start_bucket..(end_bucket + INTERVAL_MINUTES.minutes - 1.second))
         .pluck(:observed_at, :epa_aqi, :pm2_5)
 
       rows.each_with_object({}) do |(observed_at, epa_aqi, pm2_5), memo|
-        key = normalize_hour(observed_at)
+        key = normalize_bucket(observed_at)
         value = epa_aqi.presence || Aqi.epa_aqi_from_pm25(pm2_5)
         next if value.nil?
 
@@ -167,9 +180,8 @@ module WeatherData
       end
     end
 
-    def normalize_hour(time)
-      t = time.respond_to?(:utc) ? time.utc : Time.parse(time.to_s).utc
-      t.beginning_of_hour
+    def normalize_bucket(time)
+      bucket_floor(time)
     end
 
     def c_to_f(celsius)

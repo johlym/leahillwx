@@ -1,20 +1,22 @@
 # frozen_string_literal: true
 
 # Compact sparkline for home live tiles.
-# Plots the hourly average as a single accent line across today's absolute
-# day (hour 0 → 23). Y-axis is scaled to today's low/high so far and only
+# Plots the 10-minute average as a single accent line across today's absolute
+# day (00:00 → 23:50). Y-axis is scaled to today's low/high so far and only
 # those endpoint labels are shown. Optional `markers` (e.g. wind gusts)
-# render as a secondary dashed line.
+# render as a secondary dashed line. `metric` keys the tile for live websocket
+# updates.
 class Home::CurrentWeather::LiveSparklineComponent < ViewComponent::Base
-  def initialize(series:, y_unit: "", aria_label:, decimals: 0)
-    @series = series
+  def initialize(series:, metric:, y_unit: "", aria_label:, decimals: 0)
+    @series = series || { labels: [], values: [] }
+    @metric = metric
     @y_unit = y_unit
     @aria_label = aria_label
     @decimals = decimals
   end
 
   def render?
-    @series.present? && @series[:values]&.compact&.length.to_i >= 2
+    @metric.present?
   end
 
   def call
@@ -24,6 +26,9 @@ class Home::CurrentWeather::LiveSparklineComponent < ViewComponent::Base
       class: "live-tile-sparkline",
       data: {
         controller: "chart",
+        live_sparkline: @metric,
+        live_sparkline_decimals: @decimals,
+        live_sparkline_y_unit: @y_unit,
         chart_type_value: "line",
         chart_data_value: chart_data.to_json,
         chart_options_value: chart_options.to_json
@@ -39,7 +44,7 @@ class Home::CurrentWeather::LiveSparklineComponent < ViewComponent::Base
     datasets = [
       {
         label: "Average",
-        data: @series[:values],
+        data: @series[:values] || [],
         color: "var(--accent)",
         borderWidth: 1.6,
         tension: 0.35,
@@ -65,7 +70,7 @@ class Home::CurrentWeather::LiveSparklineComponent < ViewComponent::Base
     end
 
     {
-      labels: @series[:labels],
+      labels: @series[:labels] || [],
       datasets: datasets
     }
   end
@@ -78,6 +83,7 @@ class Home::CurrentWeather::LiveSparklineComponent < ViewComponent::Base
       yTicks: "minmax",
       tooltipFormat: "hourValue",
       styleGaps: true,
+      livePulse: true,
       decimals: @decimals,
       yUnit: @y_unit
     }

@@ -50,6 +50,7 @@ Chart.register(
 //     yLabel, xLabel, hideLegend, hideGrid, hideAxes, hideXAxis,
 //     yTicks: "minmax" | undefined, tooltipFormat: "hourValue" | undefined,
 //     styleGaps: true to dash + hatch segments that bridge missing points,
+//     livePulse: true to mark the latest non-null point with a pulsing dot,
 //     decimals, band: { fromKey, toKey }
 //   }
 export default class extends Controller {
@@ -63,6 +64,7 @@ export default class extends Controller {
     this.canvas = document.createElement("canvas")
     this.canvas.setAttribute("role", "img")
     this.element.appendChild(this.canvas)
+    this.ensurePulseEl()
     this.buildChart()
     this.paletteObserver = observePaletteChanges(() => this.applyPaletteTheme())
   }
@@ -73,6 +75,19 @@ export default class extends Controller {
     if (this.canvas && this.canvas.parentNode === this.element) {
       this.element.removeChild(this.canvas)
     }
+    if (this.pulseEl && this.pulseEl.parentNode === this.element) {
+      this.element.removeChild(this.pulseEl)
+    }
+  }
+
+  dataValueChanged() {
+    if (!this.chart) return
+    this.refreshChart()
+  }
+
+  optionsValueChanged() {
+    if (!this.chart) return
+    this.refreshChart()
   }
 
   buildChart() {
@@ -87,9 +102,27 @@ export default class extends Controller {
       type,
       data: { labels: data.labels || [], datasets },
       options: this.buildChartOptions(options, paletteColors, type),
+      plugins: [livePulsePlugin],
     }
 
     this.chart = new Chart(this.canvas.getContext("2d"), config)
+    this.chart.$positionLivePulse = () => this.positionPulse()
+    this.positionPulse()
+  }
+
+  refreshChart() {
+    if (!this.chart) return
+    const data = this.dataValue || {}
+    const options = this.optionsValue || {}
+    const paletteColors = readPaletteColors()
+
+    this.ensurePulseEl()
+    this.chart.data.labels = data.labels || []
+    this.chart.data.datasets = this.buildDatasets(data.datasets || [], paletteColors, options)
+    this.chart.options = this.buildChartOptions(options, paletteColors, this.typeValue || "line")
+    this.chart.$positionLivePulse = () => this.positionPulse()
+    this.chart.update("none")
+    this.positionPulse()
   }
 
   applyPaletteTheme() {
@@ -101,6 +134,58 @@ export default class extends Controller {
     this.chart.data.datasets = datasets.map((d, i) => ({ ...this.chart.data.datasets[i], ...d }))
     this.chart.options = this.buildChartOptions(options, paletteColors, this.typeValue)
     this.chart.update("none")
+    this.positionPulse()
+  }
+
+  ensurePulseEl() {
+    const enabled = this.optionsValue?.livePulse === true
+    if (!enabled) {
+      if (this.pulseEl) this.pulseEl.hidden = true
+      return
+    }
+    if (this.pulseEl) return
+    this.pulseEl = document.createElement("span")
+    this.pulseEl.className = "live-sparkline-pulse"
+    this.pulseEl.setAttribute("aria-hidden", "true")
+    this.pulseEl.hidden = true
+    this.element.appendChild(this.pulseEl)
+  }
+
+  positionPulse() {
+    if (!this.pulseEl || !this.chart || this.optionsValue?.livePulse !== true) {
+      if (this.pulseEl) this.pulseEl.hidden = true
+      return
+    }
+
+    const dataset = this.chart.data.datasets[0]
+    if (!dataset?.data?.length) {
+      this.pulseEl.hidden = true
+      return
+    }
+
+    let lastIndex = -1
+    for (let i = dataset.data.length - 1; i >= 0; i -= 1) {
+      const value = dataset.data[i]
+      if (value !== null && value !== undefined) {
+        lastIndex = i
+        break
+      }
+    }
+    if (lastIndex < 0) {
+      this.pulseEl.hidden = true
+      return
+    }
+
+    const meta = this.chart.getDatasetMeta(0)
+    const point = meta?.data?.[lastIndex]
+    if (!point || point.skip) {
+      this.pulseEl.hidden = true
+      return
+    }
+
+    this.pulseEl.hidden = false
+    this.pulseEl.style.left = `${point.x}px`
+    this.pulseEl.style.top = `${point.y}px`
   }
 
   buildDatasets(rawDatasets, palette, options) {
@@ -186,6 +271,9 @@ export default class extends Controller {
         },
         gapHatch: {
           enabled: options.styleGaps === true,
+        },
+        livePulse: {
+          enabled: options.livePulse === true,
         },
       },
       scales,
@@ -353,10 +441,20 @@ export default class extends Controller {
 }
 
 // Category-scale gap: endpoints are more than one index apart, so the
-// segment is bridging one or more missing hourly points.
+// segment is bridging one or more missing points.
 function isGapSegment(ctx) {
   const x0 = ctx.p0?.parsed?.x
   const x1 = ctx.p1?.parsed?.x
   if (x0 == null || x1 == null) return false
   return Math.abs(x1 - x0) > 1
+}
+
+const livePulsePlugin = {
+  id: "livePulse",
+  afterDraw(chart) {
+    if (chart.options.plugins?.livePulse?.enabled !== true) return
+    if (typeof chart.$positionLivePulse === "function") {
+      chart.$positionLivePulse()
+    }
+  },
 }

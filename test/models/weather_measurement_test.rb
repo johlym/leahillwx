@@ -142,4 +142,22 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
   ensure
     SoilChannels.reload!
   end
+
+  test "broadcast payload includes live sparkline series" do
+    travel_to Time.utc(2026, 7, 13, 21, 30, 0) do
+      WeatherMeasurement.create!(valid_attrs(humidity: 55, reading_date_time: 10.minutes.ago))
+      WeatherMeasurement.create!(valid_attrs(humidity: 50))
+
+      current = WeatherMeasurement
+        .select("weather_measurements.*, (SELECT COUNT(*) FROM weather_measurements) as total_count")
+        .order(reading_date_time: :desc)
+        .first
+
+      payload = current.send(:weather_data_json, current)
+
+      assert payload[:sparklines].is_a?(Hash)
+      assert_equal 144, payload[:sparklines][:humidity][:labels].length
+      assert_includes payload[:sparklines][:humidity][:values], 50
+    end
+  end
 end

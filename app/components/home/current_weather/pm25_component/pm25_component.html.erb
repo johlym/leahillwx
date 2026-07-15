@@ -22,9 +22,10 @@
     </div>
     <%= render Home::CurrentWeather::LiveSparklineComponent.new(
           series: @sparkline,
+          metric: "aqi",
           y_unit: "",
           decimals: 0,
-          aria_label: "Hourly average AQI so far today"
+          aria_label: "10-minute average AQI so far today"
         ) %>
   </div>
 <% end %>
