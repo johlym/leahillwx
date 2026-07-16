@@ -49,14 +49,14 @@
                   <span data-weather-update-target="gustSpeed">Gusting to <%= current_gust_speed %> mph</span>
                 </p>
               </div>
-              <% if today_peaks[:wind_gust_mph] %>
-                <p class="live-tile-peak">Peak gust today <%= today_peaks[:wind_gust_mph] %> mph</p>
-              <% end %>
             </div>
             <div class="live-tile-aside" data-weather-update-target="windCompass">
               <%= render Elements::CompassComponent.new(direction: @current.wind_dir, size: :lg, show_label: false) %>
             </div>
           </div>
+          <% if today_peaks[:wind_gust_mph] %>
+            <p class="live-tile-peak">Peak gust today <%= today_peaks[:wind_gust_mph] %> mph</p>
+          <% end %>
           <%= render Home::CurrentWeather::LiveSparklineComponent.new(
                 series: hourly_ranges[:wind],
                 metric: "wind",
@@ -95,10 +95,10 @@
             <span class="live-tile-number" data-weather-update-target="humidity"><%= current_humidity %></span>
             <span class="live-tile-unit">%</span>
           </div>
-          <% if today_peaks[:humidity] %>
-            <p class="live-tile-peak">Peak today <%= today_peaks[:humidity] %>%</p>
-          <% end %>
         </div>
+        <% if today_peaks[:humidity] %>
+          <p class="live-tile-peak">Peak today <%= today_peaks[:humidity] %>%</p>
+        <% end %>
         <%= render Home::CurrentWeather::LiveSparklineComponent.new(
               series: hourly_ranges[:humidity],
               metric: "humidity",
@@ -126,10 +126,10 @@
             <span data-weather-update-target="solarIrradiance"><%= current_solar_irradiance %></span> W/m²
             · <%= current_uv_index_category %>
           </p>
-          <% if today_peaks[:uvi] %>
-            <p class="live-tile-peak">Peak today <%= today_peaks[:uvi] %></p>
-          <% end %>
         </div>
+        <% if today_peaks[:uvi] %>
+          <p class="live-tile-peak">Peak today <%= today_peaks[:uvi] %></p>
+        <% end %>
         <%= render Home::CurrentWeather::LiveSparklineComponent.new(
               series: hourly_ranges[:uvi],
               metric: "uvi",
@@ -158,10 +158,10 @@
           <p class="live-tile-meta">
             <span data-weather-update-target="rainRate"><%= current_rain_hour %></span> in/hr right now
           </p>
-          <% if today_peaks[:rain_rate_in] %>
-            <p class="live-tile-peak">Peak rate today <%= today_peaks[:rain_rate_in] %> in/hr</p>
-          <% end %>
         </div>
+        <% if today_peaks[:rain_rate_in] %>
+          <p class="live-tile-peak">Peak rate today <%= today_peaks[:rain_rate_in] %> in/hr</p>
+        <% end %>
         <%= render Home::CurrentWeather::LiveSparklineComponent.new(
               series: hourly_ranges[:rain_rate],
               metric: "rain_rate",
@@ -183,10 +183,10 @@
             <span class="live-tile-number" data-weather-update-target="dewPoint"><%= current_dew_point %></span>
             <span class="live-tile-unit">°F</span>
           </div>
-          <% if today_peaks[:dew_point_f] %>
-            <p class="live-tile-peak">Peak today <%= today_peaks[:dew_point_f] %>°F</p>
-          <% end %>
         </div>
+        <% if today_peaks[:dew_point_f] %>
+          <p class="live-tile-peak">Peak today <%= today_peaks[:dew_point_f] %>°F</p>
+        <% end %>
         <%= render Home::CurrentWeather::LiveSparklineComponent.new(
               series: hourly_ranges[:dew_point],
               metric: "dew_point",

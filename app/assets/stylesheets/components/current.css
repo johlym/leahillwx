@@ -98,6 +98,10 @@
   @apply flex flex-col gap-[0.55rem] min-h-full;
 }
 
+@utility live-tile-header {
+  @apply flex items-center justify-between gap-2 min-w-0;
+}
+
 @utility live-tile-label {
   @apply flex items-center gap-[0.4rem] text-muted text-xs
          uppercase tracking-[0.08em] whitespace-nowrap;
@@ -107,12 +111,16 @@
   }
 }
 
+@utility live-tile-source {
+  @apply text-muted text-[0.78rem] leading-[1.35] text-right truncate min-w-0;
+}
+
 @utility live-tile-body {
-  @apply flex flex-col gap-[0.3rem] min-w-0;
+  @apply flex flex-col gap-[0.3rem] min-w-0 flex-1;
 }
 
 @utility live-tile-body-fill {
-  @apply flex-1 min-h-0;
+  @apply min-h-0;
 }
 
 @utility live-tile-value {
@@ -156,7 +164,7 @@
 }
 
 @utility live-tile-split {
-  @apply flex items-stretch justify-between gap-4;
+  @apply flex flex-1 items-stretch justify-between gap-4 min-h-0;
 }
 
 @utility live-tile-main {
@@ -168,7 +176,7 @@
 }
 
 @utility live-tile-sparkline {
-  @apply relative mt-auto pt-2 h-[4.5rem] min-h-[4.5rem] shrink-0;
+  @apply relative pt-2 h-[4.5rem] min-h-[4.5rem] shrink-0;
   border-top: 1px dashed
     color-mix(in oklab, var(--color-border) 60%, transparent);
 

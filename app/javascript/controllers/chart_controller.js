@@ -340,12 +340,20 @@ export default class extends Controller {
     }
     if (options.yMin !== undefined && options.yMin !== null) scales.y.min = options.yMin
     if (options.yMax !== undefined && options.yMax !== null) scales.y.max = options.yMax
+    // Pad beyond the data min/max so stroke + tension curves at extrema
+    // aren't clipped by the chart area. Tick labels still use the true
+    // high/low via afterBuildTicks below.
     if (
       options.yMin !== undefined && options.yMin !== null &&
-      options.yMax !== undefined && options.yMax !== null &&
-      options.yMin === options.yMax
+      options.yMax !== undefined && options.yMax !== null
     ) {
-      const pad = Math.abs(options.yMin) > 0 ? Math.abs(options.yMin) * 0.05 : 0.5
+      const range = options.yMax - options.yMin
+      const pad =
+        range > 0
+          ? range * 0.1
+          : Math.abs(options.yMin) > 0
+            ? Math.abs(options.yMin) * 0.05
+            : 0.5
       scales.y.min = options.yMin - pad
       scales.y.max = options.yMax + pad
     }

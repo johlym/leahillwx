@@ -1,8 +1,11 @@
 <%= render Ui::CardComponent.new(padding: :default) do %>
   <div class="live-tile">
-    <div class="live-tile-label">
-      <i class="fa-solid fa-smog"></i>
-      <span>AQI</span>
+    <div class="live-tile-header">
+      <div class="live-tile-label">
+        <i class="fa-solid fa-smog"></i>
+        <span>AQI</span>
+      </div>
+      <p class="live-tile-source"><%= source_label %></p>
     </div>
     <div class="live-tile-body">
       <div class="live-tile-value">
@@ -17,9 +20,8 @@
           · <%= pm25_display %> µg/m³
         <% end %>
       </p>
-      <p class="live-tile-peak <%= "live-tile-stale" if stale? %>"><%= as_of_label %></p>
-      <p class="live-tile-meta live-tile-meta-tight"><%= source_label %></p>
     </div>
+    <p class="live-tile-peak <%= "live-tile-stale" if stale? %>"><%= as_of_label %></p>
     <%= render Home::CurrentWeather::LiveSparklineComponent.new(
           series: @sparkline,
           metric: "aqi",
