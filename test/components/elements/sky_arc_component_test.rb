@@ -26,6 +26,32 @@ class Elements::SkyArcComponentTest < ViewComponent::TestCase
     assert_selector ".sky-arc-legend-row", text: "Venus"
   end
 
+  test "alt/az projection keeps southern sky points above the horizon" do
+    component = Elements::SkyArcComponent.new(
+      bodies: [ {
+        key: "sun",
+        label: "Sun",
+        rise_at: Time.zone.parse("2026-07-18 05:00"),
+        set_at: Time.zone.parse("2026-07-18 21:00"),
+        samples: [
+          { "at" => "2026-07-18T05:00:00Z", "az_deg" => 90, "alt_deg" => 0 },
+          { "at" => "2026-07-18T13:00:00Z", "az_deg" => 180, "alt_deg" => 60 },
+          { "at" => "2026-07-18T21:00:00Z", "az_deg" => 270, "alt_deg" => 0 }
+        ]
+      } ]
+    )
+
+    points = component.path_points(component.bodies.first)
+    assert points.any?
+    # Horizon is y=100; sky is y < 100. Allow a tiny float epsilon on the rim.
+    points.each do |pt|
+      assert_operator pt[:y], :<=, 100.01, "expected y=#{pt[:y]} at x=#{pt[:x]} to stay on/above horizon"
+    end
+    # Transit (south / high altitude) should sit clearly above the horizon.
+    mid = points[1]
+    assert_operator mid[:y], :<, 90
+  end
+
   test "does not render without rise/set" do
     component = Elements::SkyArcComponent.new(bodies: [ { key: "mars", label: "Mars" } ])
     assert_not component.render?

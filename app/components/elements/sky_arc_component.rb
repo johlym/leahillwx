@@ -201,16 +201,28 @@ module Elements
       project_alt_az(az, alt, radius)
     end
 
-    # N-up zenith-distance projection onto the dome.
+    # Project alt/az onto the semicircle dome (horizon at y=100, sky above).
+    # Azimuth maps East → South → West onto θ ∈ [0, π]; altitude scales how
+    # far up the dome the point sits. Using sin(θ) for y keeps every point
+    # on or above the horizon (the prior N-up polar form put southern
+    # azimuths below the horizon line).
     def project_alt_az(az_deg, alt_deg, radius)
       clamped_alt = alt_deg.clamp(0.0, 90.0)
-      r = ((90.0 - clamped_alt) / 90.0) * radius
-      az = az_deg * Math::PI / 180.0
+      # E=90° → 0, S=180° → 90, W=270° → 180; clamp northern bearings to edges.
+      from_east = (az_deg.to_f % 360.0 - 90.0) % 360.0
+      from_east = from_east.clamp(0.0, 180.0)
+      theta = from_east * Math::PI / 180.0
+
+      # Zenith-distance scale: horizon on the outer arc, higher alt inward.
+      zd = (90.0 - clamped_alt) / 90.0
+      r = radius * (0.2 + 0.8 * zd)
+
       {
-        x: (100 + r * Math.sin(az)).round(2),
-        y: (100 - r * Math.cos(az)).round(2)
+        x: (100 - Math.cos(theta) * r).round(2),
+        y: (100 - Math.sin(theta) * r).round(2)
       }
     end
+
 
     def interpolate_sample(body)
       stamped = body.samples.filter_map do |sample|
