@@ -183,13 +183,35 @@ export default class extends Controller {
       const temperature = reading.temperature_f != null
         ? `<span class="soil-channel-number">${this.asInt(reading.temperature_f)}</span><span class="soil-channel-unit">°F</span>`
         : `<span class="soil-channel-na">N/A</span>`
+      const battery = this.renderSoilBattery(reading.battery)
 
       return `<div class="soil-channel">
         <span class="soil-channel-name">${name}</span>
         <span class="soil-channel-value">${moisture}</span>
         <span class="soil-channel-value">${temperature}</span>
+        <span class="soil-channel-battery">${battery}</span>
       </div>`
     }).join("")
+  }
+
+  renderSoilBattery(level) {
+    const icons = {
+      5: "fa-battery-full",
+      4: "fa-battery-half",
+      3: "fa-battery-low",
+      2: "fa-battery-exclamation",
+      1: "fa-battery-exclamation",
+    }
+    const icon = icons[level]
+    if (!icon) return ""
+
+    const critical = level <= 2
+    const style = critical
+      ? "--fa-primary-color: rgb(230, 99, 99); --fa-secondary-color: rgb(230, 99, 99); --fa-secondary-opacity: 1;"
+      : "--fa-primary-color: rgb(120, 230, 99); --fa-secondary-color: rgb(255, 255, 255); --fa-secondary-opacity: 1;"
+    const criticalClass = critical ? " soil-battery-critical" : ""
+
+    return `<i class="fa-duotone fa-solid ${icon}${criticalClass}" style="${style}" aria-label="Battery level ${level} of 5" title="Battery ${level}/5"></i>`
   }
 
   asInt(value) {

@@ -60,7 +60,7 @@ class Api::V1::WeatherMeasurementControllerTest < ActionDispatch::IntegrationTes
 
   test "create stores soil channels" do
     payload = measurement_payload(
-      soil: [ { channel: 1, moisture: 78.0, battery: 1.6 } ]
+      soil: [ { channel: 1, moisture: 78.0, battery: 5 } ]
     )
 
     assert_difference("WeatherMeasurement.count", 1) do
@@ -70,7 +70,7 @@ class Api::V1::WeatherMeasurementControllerTest < ActionDispatch::IntegrationTes
     assert_response :no_content
 
     measurement = WeatherMeasurement.order(:id).last
-    assert_equal [ { "channel" => 1, "moisture" => 78.0, "battery" => 1.6 } ], measurement.soil
+    assert_equal [ { "channel" => 1, "moisture" => 78.0, "battery" => 5 } ], measurement.soil
   end
 
   test "create succeeds without soil" do
@@ -84,7 +84,7 @@ class Api::V1::WeatherMeasurementControllerTest < ActionDispatch::IntegrationTes
 
   test "create rejects invalid soil channel" do
     payload = measurement_payload(
-      soil: [ { channel: 9, moisture: 78.0, battery: 1.6 } ]
+      soil: [ { channel: 9, moisture: 78.0, battery: 5 } ]
     )
 
     assert_no_difference("WeatherMeasurement.count") do

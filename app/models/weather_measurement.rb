@@ -37,6 +37,7 @@ class WeatherMeasurement < ApplicationRecord
   include HeadingToCompass
 
   MAX_SOIL_CHANNELS = 8
+  SOIL_BATTERY_LEVELS = (0..5).freeze
 
   after_create_commit :broadcast_update
   before_validation :normalize_soil
@@ -121,8 +122,9 @@ class WeatherMeasurement < ApplicationRecord
   end
 
   # Display-ready soil readings for SSR / ActionCable (temps in °F).
+  # Channels that share a friendly name are merged into one row.
   def soil_readings
-    Array(soil).filter_map do |entry|
+    readings = Array(soil).filter_map do |entry|
       next unless entry.is_a?(Hash)
 
       entry = entry.stringify_keys
@@ -137,9 +139,12 @@ class WeatherMeasurement < ApplicationRecord
       if entry["temperature"].is_a?(Numeric)
         reading["temperature_f"] = entry["temperature"].to_fahrenheit.round(0)
       end
-      reading["battery"] = entry["battery"].to_f.round(2) if entry["battery"].is_a?(Numeric)
+      battery = soil_battery_level(entry["battery"])
+      reading["battery"] = battery if battery&.positive?
       reading
     end
+
+    merge_soil_readings_by_name(readings)
   end
 
 
@@ -162,11 +167,13 @@ class WeatherMeasurement < ApplicationRecord
       normalized = { "channel" => hash["channel"] }
       normalized["moisture"] = hash["moisture"] unless hash["moisture"].nil?
       normalized["temperature"] = hash["temperature"] unless hash["temperature"].nil?
-      normalized["battery"] = hash["battery"] unless hash["battery"].nil?
+      unless hash["battery"].nil?
+        level = soil_battery_level(hash["battery"])
+        normalized["battery"] = level.nil? ? hash["battery"] : level
+      end
       normalized
     end
   end
-
 
   def soil_channels_are_valid
     return if soil.blank?
@@ -217,14 +224,53 @@ class WeatherMeasurement < ApplicationRecord
         errors.add(:soil, "entry must include moisture or temperature")
       end
 
-      if !battery.nil? && !battery.is_a?(Numeric)
-        errors.add(:soil, "battery must be a number")
-      elsif battery.is_a?(Numeric) && battery.negative?
-        errors.add(:soil, "battery must be greater than or equal to 0")
+      next if battery.nil?
+
+      level = soil_battery_level(battery)
+      unless level && SOIL_BATTERY_LEVELS.cover?(level)
+        errors.add(:soil, "battery must be an integer between 0 and 5")
       end
     end
   end
 
+  def soil_battery_level(value)
+    return nil if value.nil?
+    return nil unless value.is_a?(Numeric)
+    return nil unless value == value.to_i
+
+    value.to_i
+  end
+
+  # Collapse channels that share a display name into one reading.
+  def merge_soil_readings_by_name(readings)
+    order = []
+    grouped = readings.each_with_object({}) do |reading, hash|
+      name = reading["name"]
+      unless hash.key?(name)
+        order << name
+        hash[name] = []
+      end
+      hash[name] << reading
+    end
+
+    order.map do |name|
+      channels = grouped[name].sort_by { |reading| reading["channel"] }
+      merged = {
+        "channel" => channels.first["channel"],
+        "name" => name
+      }
+
+      moisture = channels.find { |reading| reading.key?("moisture") }&.fetch("moisture")
+      temperature_f = channels.find { |reading| reading.key?("temperature_f") }&.fetch("temperature_f")
+      batteries = channels.filter_map { |reading| reading["battery"] }
+
+      merged["moisture"] = moisture unless moisture.nil?
+      merged["temperature_f"] = temperature_f unless temperature_f.nil?
+      merged["battery"] = batteries.min if batteries.any?
+
+      merged
+    end
+  end
 
   def broadcast_update
     WeatherMeasurements::LiveUpdateBroadcast.call
