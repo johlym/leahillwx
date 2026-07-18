@@ -26,4 +26,3 @@ class DownloadNearestWildfireJob
     Rails.logger.warn("Nearest wildfire download failed: #{e.message}")
   end
 end
-

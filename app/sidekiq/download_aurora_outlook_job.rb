@@ -18,4 +18,3 @@ class DownloadAuroraOutlookJob
     Rails.logger.warn("Aurora outlook download failed: #{e.message}")
   end
 end
-

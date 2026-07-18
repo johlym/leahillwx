@@ -203,7 +203,7 @@ module Iss
       method = "n"
       gsto = gstime(epoch + 2_433_281.5)
 
-      [no, method, ainv, ao, con41, con42, cosio, cosio2, eccsq, omeosq, posq, rp, rteosq, sinio, gsto]
+      [ no, method, ainv, ao, con41, con42, cosio, cosio2, eccsq, omeosq, posq, rp, rteosq, sinio, gsto ]
     end
 
     def gstime(jdut1)
@@ -347,7 +347,7 @@ module Iss
       vz = sini * cossu
 
       mr = mrt * RADIUS_EARTH_KM
-      r = [mr * ux, mr * uy, mr * uz]
+      r = [ mr * ux, mr * uy, mr * uz ]
       v = [
         (mvt * ux + rvdot * vx) * vkmpersec,
         (mvt * uy + rvdot * vy) * vkmpersec,
@@ -356,7 +356,7 @@ module Iss
 
       raise_error!(6, "mrt #{mrt} is less than 1.0 indicating the satellite has decayed") if mrt < 1.0
 
-      [r, v]
+      [ r, v ]
     end
 
     def positive_mod(value, modulus)

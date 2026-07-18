@@ -49,4 +49,3 @@ class WaDnrWildfireClient
     }
   end
 end
-

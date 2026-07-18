@@ -30,4 +30,3 @@ class DownloadIssPassesJob
     Rails.logger.warn("ISS pass download failed: #{e.message}")
   end
 end
-
