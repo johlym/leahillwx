@@ -43,3 +43,5 @@ group :test do
   gem "cuprite"
   gem "simplecov", require: false
 end
+
+gem "astronoby", "~> 0.10.0"

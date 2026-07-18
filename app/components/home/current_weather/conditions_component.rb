@@ -1,7 +1,19 @@
 # frozen_string_literal: true
 
 class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
-  def initialize(current:, almanac:, today_forecast: nil, current_forecast: nil, today_peaks: {}, aqi: nil, hourly_ranges: {})
+  def initialize(
+    current:,
+    almanac:,
+    today_forecast: nil,
+    current_forecast: nil,
+    today_peaks: {},
+    aqi: nil,
+    hourly_ranges: {},
+    wildfire: nil,
+    aurora: nil,
+    planet_night: nil,
+    iss_pass: nil
+  )
     @current = current
     @almanac = almanac
     @today_forecast = today_forecast
@@ -9,9 +21,13 @@ class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
     @today_peaks = today_peaks || {}
     @aqi = aqi
     @hourly_ranges = hourly_ranges || {}
+    @wildfire = wildfire
+    @aurora = aurora
+    @planet_night = planet_night
+    @iss_pass = iss_pass
   end
 
-  attr_reader :today_peaks, :aqi, :hourly_ranges
+  attr_reader :today_peaks, :aqi, :hourly_ranges, :wildfire, :aurora, :planet_night, :iss_pass
 
   def season
     @almanac.season

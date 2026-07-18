@@ -10,6 +10,7 @@
 @import "./components/sky-arc";
 @import "./components/header";
 @import "./components/current";
+@import "./components/sky-hazards";
 @import "./components/forecast-hourly";
 @import "./components/forecast-grid";
 @import "./components/forecast-section";

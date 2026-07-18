@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_15_224925) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_18_204500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -65,6 +65,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_224925) do
     t.index ["source"], name: "index_aqis_on_source"
   end
 
+  create_table "aurora_snapshots", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "fetched_at", null: false
+    t.float "kp", null: false
+    t.float "kp_forecast_max_tonight"
+    t.float "local_ovation_pct"
+    t.string "odds_label"
+    t.string "status_label", null: false
+    t.datetime "updated_at", null: false
+    t.index ["fetched_at"], name: "index_aurora_snapshots_on_fetched_at"
+  end
+
   create_table "earthquakes", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.float "depth", null: false
@@ -89,6 +101,31 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_224925) do
     t.string "interval", default: "daily", null: false
     t.datetime "updated_at", null: false
     t.index ["interval", "created_at"], name: "index_forecasts_on_interval_and_created_at", order: { created_at: :desc }
+  end
+
+  create_table "iss_passes", force: :cascade do |t|
+    t.datetime "aos_at", null: false
+    t.float "aos_az", null: false
+    t.datetime "created_at", null: false
+    t.integer "duration_s", null: false
+    t.datetime "fetched_at", null: false
+    t.datetime "los_at", null: false
+    t.float "los_az", null: false
+    t.float "max_el", null: false
+    t.float "max_el_az", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "visible", default: false, null: false
+    t.index ["aos_at"], name: "index_iss_passes_on_aos_at"
+    t.index ["visible", "aos_at"], name: "index_iss_passes_on_visible_and_aos_at"
+  end
+
+  create_table "planet_nights", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "date", null: false
+    t.jsonb "planets", default: [], null: false
+    t.string "timezone", default: "America/Los_Angeles", null: false
+    t.datetime "updated_at", null: false
+    t.index ["date"], name: "index_planet_nights_on_date", unique: true
   end
 
   create_table "records", force: :cascade do |t|
@@ -218,6 +255,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_15_224925) do
     t.index ["reading_date_time"], name: "index_weather_measurements_on_reading_date_time", unique: true
     t.index ["temperature"], name: "index_weather_measurements_on_temperature"
     t.index ["wind_speed"], name: "index_weather_measurements_on_wind_speed"
+  end
+
+  create_table "wildfire_snapshots", force: :cascade do |t|
+    t.float "acres"
+    t.datetime "created_at", null: false
+    t.float "distance_mi", null: false
+    t.string "external_id"
+    t.datetime "fetched_at", null: false
+    t.float "lat", null: false
+    t.float "lon", null: false
+    t.string "name", null: false
+    t.float "percent_contained"
+    t.string "source", null: false
+    t.datetime "updated_at", null: false
+    t.string "url"
+    t.index ["fetched_at"], name: "index_wildfire_snapshots_on_fetched_at"
   end
 
   add_foreign_key "report_entries", "reports", on_delete: :cascade

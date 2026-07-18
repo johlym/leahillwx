@@ -8,6 +8,17 @@ module Almanac
     SUN = 10
     MOON = 301
 
+    # Planetary barycenters in DE440s (sufficient for naked-eye rise/set).
+    PLANET_BARYCENTERS = {
+      mercury: 1,
+      venus: 2,
+      mars: 4,
+      jupiter: 5,
+      saturn: 6
+    }.freeze
+
+    NAKED_EYE_PLANETS = PLANET_BARYCENTERS.keys.freeze
+
     def initialize(spk:, lat:, lon:)
       @spk = spk
       @lat = lat
@@ -56,10 +67,35 @@ module Almanac
       }
     end
 
+    def planet_position(body, jd)
+      naif_id = PLANET_BARYCENTERS[body]
+      raise ArgumentError, "Unknown planet: #{body}" unless naif_id
+
+      planet_state = @spk[SOLAR_SYSTEM_BARYCENTER, naif_id].state_at(jd)
+      earth_pos = earth_position(jd)
+
+      rel_pos = [
+        planet_state.position[0] - earth_pos[0],
+        planet_state.position[1] - earth_pos[1],
+        planet_state.position[2] - earth_pos[2]
+      ]
+
+      coords = cartesian_to_equatorial(rel_pos)
+      topo = equatorial_to_topocentric(coords[:ra], coords[:dec], jd)
+
+      {
+        azimuth: topo[:azimuth],
+        altitude: topo[:altitude],
+        ra: coords[:ra],
+        dec: coords[:dec]
+      }
+    end
+
     def position_for(body, jd)
       case body
       when :sun then sun_position(jd)
       when :moon then moon_position(jd)
+      when *NAKED_EYE_PLANETS then planet_position(body, jd)
       else raise ArgumentError, "Unknown body: #{body}"
       end
     end
@@ -76,6 +112,7 @@ module Almanac
         emb_state.position[2] + earth_offset.position[2]
       ]
     end
+
 
     def equatorial_to_topocentric(ra, dec, jd)
       t = (jd - 2451545.0) / 36525.0
