@@ -17,6 +17,11 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
+# Indexes
+#
+#  index_iss_passes_on_aos_at              (aos_at)
+#  index_iss_passes_on_visible_and_aos_at  (visible,aos_at)
+#
 class IssPass < ApplicationRecord
   validates :aos_at, :los_at, :aos_az, :los_az, :max_el, :max_el_az, :duration_s, :fetched_at, presence: true
 

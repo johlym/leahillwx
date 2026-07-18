@@ -11,6 +11,10 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
+# Indexes
+#
+#  index_planet_nights_on_date  (date) UNIQUE
+#
 class PlanetNight < ApplicationRecord
   validates :date, presence: true, uniqueness: true
   validates :timezone, presence: true
