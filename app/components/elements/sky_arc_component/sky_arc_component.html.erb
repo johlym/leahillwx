@@ -1,6 +1,7 @@
 <%#
   Coordinate system: viewBox 0 0 200 130. Horizon at y=100.
-  Body paths are alt/az projections (or time-linear fallback).
+  Each body has a fixed semicircle arc (rise left → set right). Glyphs
+  sit at time-progress along that arc (0° before rise, 180° after set).
 %>
 <div class="sky-arc" role="img" aria-label="Sky paths for <%= bodies.map(&:label).to_sentence %>">
   <svg viewBox="0 0 200 130" class="sky-arc-svg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
@@ -21,16 +22,13 @@
           stroke-width="1" />
 
     <% bodies.each do |body| %>
-      <% d = path_d(body) %>
-      <% if d.present? %>
-        <path d="<%= d %>"
-              fill="none"
-              style="stroke: <%= body.color %>"
-              stroke-width="<%= body.key == 'sun' ? 1.4 : 1 %>"
-              stroke-linecap="round"
-              stroke-dasharray="<%= body.key == 'sun' ? '4 2' : '2 3' %>"
-              opacity="0.85" />
-      <% end %>
+      <path d="<%= arc_d(body) %>"
+            fill="none"
+            style="stroke: <%= body.color %>"
+            stroke-width="<%= body.key == 'sun' ? 1.4 : 1 %>"
+            stroke-linecap="round"
+            stroke-dasharray="<%= body.key == 'sun' ? '4 2' : '2 3' %>"
+            opacity="0.85" />
 
       <% pt = current_point(body) %>
       <% body_class = [

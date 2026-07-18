@@ -27,7 +27,6 @@ class Home::CurrentWeather::SkyHazardsComponent < ViewComponent::Base
         label: planet["label"],
         rise_at: rise_at,
         set_at: set_at,
-        samples: planet["samples"] || [],
         direction: planet["direction"]
       }
     end

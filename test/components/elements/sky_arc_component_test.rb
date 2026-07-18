@@ -3,7 +3,7 @@
 require "test_helper"
 
 class Elements::SkyArcComponentTest < ViewComponent::TestCase
-  test "renders multi-body alt/az paths" do
+  test "renders multi-body semicircle arcs" do
     rise = Time.zone.parse("2026-07-18 04:00:00")
     set = Time.zone.parse("2026-07-18 16:00:00")
     bodies = [
@@ -11,12 +11,7 @@ class Elements::SkyArcComponentTest < ViewComponent::TestCase
         key: "venus",
         label: "Venus",
         rise_at: rise,
-        set_at: set,
-        samples: [
-          { "at" => rise.iso8601, "az_deg" => 90, "alt_deg" => 5 },
-          { "at" => (rise + 6.hours).iso8601, "az_deg" => 180, "alt_deg" => 40 },
-          { "at" => set.iso8601, "az_deg" => 270, "alt_deg" => 5 }
-        ]
+        set_at: set
       }
     ]
 
@@ -26,30 +21,41 @@ class Elements::SkyArcComponentTest < ViewComponent::TestCase
     assert_selector ".sky-arc-legend-row", text: "Venus"
   end
 
-  test "alt/az projection keeps southern sky points above the horizon" do
+  test "glyph parks at rise before dawn and at set after dusk" do
+    rise = Time.zone.parse("2026-07-18 06:00:00")
+    set = Time.zone.parse("2026-07-18 18:00:00")
+    body_attrs = { key: "sun", label: "Sun", rise_at: rise, set_at: set }
+
+    before = Elements::SkyArcComponent.new(bodies: [ body_attrs ], now: rise - 1.hour)
+    assert_in_delta 0.0, before.progress_for(before.bodies.first), 0.001
+    assert_in_delta 10.0, before.current_point(before.bodies.first)[:x], 0.1
+    assert_in_delta 100.0, before.current_point(before.bodies.first)[:y], 0.1
+
+    after = Elements::SkyArcComponent.new(bodies: [ body_attrs ], now: set + 1.hour)
+    assert_in_delta 1.0, after.progress_for(after.bodies.first), 0.001
+    assert_in_delta 190.0, after.current_point(after.bodies.first)[:x], 0.1
+    assert_in_delta 100.0, after.current_point(after.bodies.first)[:y], 0.1
+
+    mid = Elements::SkyArcComponent.new(bodies: [ body_attrs ], now: rise + 6.hours)
+    assert_in_delta 0.5, mid.progress_for(mid.bodies.first), 0.001
+    point = mid.current_point(mid.bodies.first)
+    assert_in_delta 100.0, point[:x], 0.1
+    assert_operator point[:y], :<, 20
+  end
+
+  test "arc path is a single semicircle not a closed polyline" do
     component = Elements::SkyArcComponent.new(
       bodies: [ {
-        key: "sun",
-        label: "Sun",
-        rise_at: Time.zone.parse("2026-07-18 05:00"),
-        set_at: Time.zone.parse("2026-07-18 21:00"),
-        samples: [
-          { "at" => "2026-07-18T05:00:00Z", "az_deg" => 90, "alt_deg" => 0 },
-          { "at" => "2026-07-18T13:00:00Z", "az_deg" => 180, "alt_deg" => 60 },
-          { "at" => "2026-07-18T21:00:00Z", "az_deg" => 270, "alt_deg" => 0 }
-        ]
+        key: "venus",
+        label: "Venus",
+        rise_at: Time.zone.parse("2026-07-18 09:00"),
+        set_at: Time.zone.parse("2026-07-18 22:00")
       } ]
     )
-
-    points = component.path_points(component.bodies.first)
-    assert points.any?
-    # Horizon is y=100; sky is y < 100. Allow a tiny float epsilon on the rim.
-    points.each do |pt|
-      assert_operator pt[:y], :<=, 100.01, "expected y=#{pt[:y]} at x=#{pt[:x]} to stay on/above horizon"
-    end
-    # Transit (south / high altitude) should sit clearly above the horizon.
-    mid = points[1]
-    assert_operator mid[:y], :<, 90
+    d = component.arc_d(component.bodies.first)
+    assert_match(/\AM [\d.]+ 100 A /, d)
+    assert_no_match(/ L /, d)
+    assert_no_match(/Z\z/i, d)
   end
 
   test "does not render without rise/set" do
