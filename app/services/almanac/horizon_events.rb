@@ -60,6 +60,19 @@ module Almanac
       find_transit(day_start, day_end, :moon)
     end
 
+    # Generic rise/set/transit for any body supported by BspPositions.
+    def rise(body, day_start, day_end, horizon_alt: 0.0)
+      find_horizon_crossing(day_start, day_end, body, horizon_alt, :rising)
+    end
+
+    def set(body, day_start, day_end, horizon_alt: 0.0)
+      find_horizon_crossing(day_start, day_end, body, horizon_alt, :setting)
+    end
+
+    def transit(body, day_start, day_end)
+      find_transit(day_start, day_end, body)
+    end
+
     private
 
     def find_horizon_crossing(day_start, day_end, body, horizon_alt, direction)

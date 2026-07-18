@@ -18,6 +18,12 @@ class RootController < ApplicationController
     @today_peaks = compute_today_peaks
     @hourly_ranges = WeatherData::LiveCardHourlyRanges.new.call
     @aqi = Aqi.latest
+    @wildfire = WildfireSnapshot.latest
+    @aurora = AuroraSnapshot.latest
+    @planet_night = ensure_planet_night
+    @iss_pass = IssPass.next_visible || IssPass.next_any
+
+    enqueue_sky_hazard_refreshes
   end
 
   def about
@@ -55,5 +61,28 @@ class RootController < ApplicationController
 
   def c_to_f(celsius)
     celsius * 9.0 / 5.0 + 32.0
+  end
+
+  def ensure_planet_night
+    night = PlanetNight.for_date(Time.zone.today)
+    return night if night
+
+    GeneratePlanetNightJob.perform_async(Time.zone.today.iso8601)
+    nil
+  end
+
+  def enqueue_sky_hazard_refreshes
+    if @wildfire.nil? || @wildfire.fetched_at < 30.minutes.ago
+      DownloadNearestWildfireJob.perform_async
+    end
+
+    if @aurora.nil? || @aurora.fetched_at < 15.minutes.ago
+      DownloadAuroraOutlookJob.perform_async
+    end
+
+    next_pass = IssPass.next_any
+    if next_pass.nil? || next_pass.fetched_at < 6.hours.ago
+      DownloadIssPassesJob.perform_async
+    end
   end
 end

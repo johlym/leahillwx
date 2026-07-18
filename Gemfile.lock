@@ -81,6 +81,10 @@ GEM
       activerecord (>= 6.0.0)
       activesupport (>= 6.0.0)
     ast (2.4.3)
+    astronoby (0.10.0)
+      ephem (~> 0.5)
+      iers (~> 0.1)
+      matrix (~> 0.4.2)
     barnes (1.0.1)
       json
       logger
@@ -154,6 +158,7 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.15.2)
       concurrent-ruby (~> 1.0)
+    iers (0.1.1)
     io-console (0.8.2)
     irb (1.18.0)
       pp (>= 0.6.0)
@@ -405,6 +410,7 @@ PLATFORMS
 
 DEPENDENCIES
   annotaterb
+  astronoby (~> 0.10.0)
   barnes (~> 1.0)
   bootsnap (~> 1.24)
   brakeman
@@ -453,6 +459,7 @@ CHECKSUMS
   addressable (2.9.0) sha256=7fdf6ac3660f7f4e867a0838be3f6cf722ace541dd97767fa42bc6cfa980c7af
   annotaterb (4.23.0) sha256=0fc59b1d40e07bec75d9d9b0cd479493631ce8901e4b59fefc561689f22b4600
   ast (2.4.3) sha256=954615157c1d6a382bc27d690d973195e79db7f55e9765ac7c481c60bdb4d383
+  astronoby (0.10.0) sha256=a12ea6f5273b41f813731b89a5eb4636c35340621603ed0c6d5799b219029287
   barnes (1.0.1) sha256=68d8d485038374c1ebda3d2ac942dce6ec15e63839abbfcd1c863af370933c8d
   base64 (0.3.0) sha256=27337aeabad6ffae05c265c450490628ef3ebd4b67be58257393227588f5a97b
   bigdecimal (4.1.2) sha256=53d217666027eab4280346fba98e7d5b66baaae1b9c3c1c0ffe89d48188a3fbd
@@ -485,6 +492,7 @@ CHECKSUMS
   globalid (1.4.0) sha256=037f12fbf1d9d7a014d501c2d5c77356fd4ddd96d7a7991d6700bba96706f427
   httparty (0.24.2) sha256=8fca6a54aa0c4aa4303a0fd33e5e2156175d6a5334f714263b458abd7fda9c38
   i18n (1.15.2) sha256=00f9eb62412fe593b2a65a97daa75300d37abb8f7202ec748e94b6d46a9dd1b5
+  iers (0.1.1) sha256=b1d633ca74ad20c9473561f2683ddd459e8d55835716acdac8a23d915952be66
   io-console (0.8.2) sha256=d6e3ae7a7cc7574f4b8893b4fca2162e57a825b223a177b7afa236c5ef9814cc
   irb (1.18.0) sha256=de9454a0703a54704b9811a5ef31a60c86949fbf4013fcf244fabc7c775248e3
   jbuilder (2.15.1) sha256=2430bec28fb0cebacb5875b1009cf9d8bc3c303ccb810c4c8b062a4b51457637

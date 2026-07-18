@@ -1,0 +1,45 @@
+/* Sky & nearby hazards strip under the live conditions cards. */
+
+@utility sky-hazards {
+  @apply relative isolate py-2 text-text;
+}
+
+@utility sky-hazards-inner {
+  @apply container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 pb-4;
+}
+
+@utility sky-hazards-header {
+  @apply mb-3;
+}
+
+@utility sky-hazards-title {
+  @apply font-condensed uppercase tracking-[0.08em] text-lg text-text-strong;
+}
+
+@utility sky-hazards-subtitle {
+  @apply text-muted text-sm mt-1;
+}
+
+@utility sky-hazards-strip {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3;
+}
+
+@utility sky-hazards-planet-list {
+  @apply mt-2 flex flex-col gap-1 text-[0.78rem] text-muted;
+
+  & li {
+    @apply flex flex-wrap items-baseline gap-x-2 gap-y-0.5;
+  }
+
+  & strong {
+    @apply text-text min-w-[4.5rem];
+  }
+}
+
+@utility sky-hazards-planet-times {
+  @apply font-mono text-text;
+}
+
+@utility sky-hazards-credits {
+  @apply mt-3 text-[0.7rem] text-muted;
+}

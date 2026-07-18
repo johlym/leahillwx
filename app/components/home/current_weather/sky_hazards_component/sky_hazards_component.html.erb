@@ -1,0 +1,127 @@
+<section class="sky-hazards" aria-label="Sky and nearby hazards">
+  <div class="sky-hazards-inner">
+    <header class="sky-hazards-header">
+      <h2 class="sky-hazards-title">Sky &amp; nearby hazards</h2>
+      <p class="sky-hazards-subtitle">Wildfire, planets tonight, aurora, and the next ISS pass for this station.</p>
+    </header>
+
+    <div class="sky-hazards-strip">
+      <%= render Ui::CardComponent.new(padding: :default) do %>
+        <div class="live-tile">
+          <div class="live-tile-label">
+            <i class="fa-regular fa-fire"></i>
+            <span>Nearest Wildfire</span>
+          </div>
+          <% if @wildfire %>
+            <div class="live-tile-body">
+              <div class="live-tile-value">
+                <span class="live-tile-number live-tile-number-sm"><%= wildfire_distance %></span>
+              </div>
+              <p class="live-tile-meta">
+                <% if @wildfire.url.present? %>
+                  <%= link_to @wildfire.name, @wildfire.url, target: "_blank", rel: "noopener" %>
+                <% else %>
+                  <%= @wildfire.name %>
+                <% end %>
+              </p>
+              <p class="live-tile-meta">
+                Contained <%= wildfire_containment %>
+                <% if @wildfire.acres %>
+                  · <%= number_with_precision(@wildfire.acres, precision: 0) %> acres
+                <% end %>
+              </p>
+            </div>
+          <% else %>
+            <p class="live-tile-meta">No active fires reported nearby.</p>
+          <% end %>
+        </div>
+      <% end %>
+
+      <%= render Ui::CardComponent.new(padding: :default) do %>
+        <div class="live-tile">
+          <div class="live-tile-label">
+            <i class="fa-regular fa-stars"></i>
+            <span>Planets Tonight</span>
+          </div>
+          <% if visible_planets.any? %>
+            <% if planet_bodies_for_arc.any? %>
+              <%= render Elements::SkyArcComponent.new(bodies: planet_bodies_for_arc) %>
+            <% end %>
+            <ul class="sky-hazards-planet-list">
+              <% visible_planets.each do |planet| %>
+                <li>
+                  <strong><%= planet["label"] %></strong>
+                  <span><%= planet["direction"] || "—" %></span>
+                  <span class="sky-hazards-planet-times">
+                    <%= format_planet_time(planet["rise_at"]) %> – <%= format_planet_time(planet["set_at"]) %>
+                  </span>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <p class="live-tile-meta">No naked-eye planets during civil night.</p>
+          <% end %>
+        </div>
+      <% end %>
+
+      <%= render Ui::CardComponent.new(padding: :default) do %>
+        <div class="live-tile">
+          <div class="live-tile-label">
+            <i class="fa-regular fa-sparkles"></i>
+            <span>Aurora</span>
+          </div>
+          <% if @aurora %>
+            <div class="live-tile-body">
+              <div class="live-tile-value">
+                <span class="live-tile-number"><%= @aurora.status_label %></span>
+              </div>
+              <p class="live-tile-meta">
+                Kp <%= number_with_precision(@aurora.kp, precision: 1) %>
+                <% if @aurora.local_ovation_pct %>
+                  · <%= @aurora.local_ovation_pct.round(0) %>% local
+                <% end %>
+              </p>
+              <p class="live-tile-meta"><%= @aurora.odds_label %></p>
+            </div>
+          <% else %>
+            <p class="live-tile-meta">Aurora outlook unavailable.</p>
+          <% end %>
+        </div>
+      <% end %>
+
+      <%= render Ui::CardComponent.new(padding: :default) do %>
+        <div class="live-tile">
+          <div class="live-tile-label">
+            <i class="fa-regular fa-satellite"></i>
+            <span>Next ISS Pass</span>
+          </div>
+          <% if @iss_pass %>
+            <div class="live-tile-body">
+              <div class="live-tile-value">
+                <span class="live-tile-number live-tile-number-sm"><%= iss_when %></span>
+              </div>
+              <p class="live-tile-meta">
+                <%= iss_countdown %>
+                · <%= iss_duration %>
+                <% unless @iss_pass.visible %>
+                  · geometric
+                <% end %>
+              </p>
+              <p class="live-tile-meta"><%= iss_direction_line %></p>
+            </div>
+          <% else %>
+            <p class="live-tile-meta">No ISS passes in the next day.</p>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <p class="sky-hazards-credits">
+      Sources:
+      WA DNR / NIFC,
+      NOAA SWPC,
+      CelesTrak,
+      local ephemeris (DE440s).
+    </p>
+  </div>
+</section>

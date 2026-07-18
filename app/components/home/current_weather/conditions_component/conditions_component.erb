@@ -221,3 +221,10 @@
     <% end %>
   </div>
 </div>
+
+<%= render Home::CurrentWeather::SkyHazardsComponent.new(
+      wildfire: wildfire,
+      aurora: aurora,
+      planet_night: planet_night,
+      iss_pass: iss_pass
+    ) %>

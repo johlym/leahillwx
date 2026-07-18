@@ -13,6 +13,26 @@ download_latest_earthquake_job:
   class: "DownloadLatestEarthquakeJob"
   description: "Download earthquake data every minute"
 
+download_nearest_wildfire_job:
+  cron: "*/30 * * * *"
+  class: "DownloadNearestWildfireJob"
+  description: "Refresh nearest wildfire snapshot every 30 minutes"
+
+download_aurora_outlook_job:
+  cron: "*/15 * * * *"
+  class: "DownloadAuroraOutlookJob"
+  description: "Refresh aurora outlook every 15 minutes"
+
+download_iss_passes_job:
+  cron: "15 */6 * * *"
+  class: "DownloadIssPassesJob"
+  description: "Refresh ISS TLE and upcoming passes every 6 hours"
+
+generate_planet_night_job:
+  cron: "20 10 * * *"
+  class: "GeneratePlanetNightJob"
+  description: "Generate naked-eye planet night outlook daily at 10:20 UTC (3:20 AM PT)"
+
 delete_old_forecasts_job:
   cron: "0 11 * * *"
   class: "DeleteOldForecastsJob"

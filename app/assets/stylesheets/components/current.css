@@ -138,6 +138,10 @@
   @apply text-[3.25rem];
 }
 
+@utility live-tile-number-sm {
+  @apply text-[1.65rem] leading-tight;
+}
+
 @utility live-tile-unit {
   @apply text-[1.15rem] text-muted tracking-[0.02em];
 }
