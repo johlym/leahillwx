@@ -101,9 +101,10 @@
                   "description": "Soil temperature (°C)"
                 },
                 "battery": {
-                  "type": "number",
-                  "format": "float",
-                  "description": "Soil sensor battery voltage"
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 5,
+                  "description": "Soil sensor battery level (0-5)"
                 }
               }
             }
@@ -142,7 +143,7 @@
             {
               "channel": 1,
               "moisture": 78.0,
-              "battery": 1.6
+              "battery": 5
             }
           ],
           "uv": 3,

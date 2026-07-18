@@ -62,18 +62,19 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
   test "accepts valid soil channels" do
     measurement = WeatherMeasurement.new(valid_attrs(
       soil: [
-        { "channel" => 1, "moisture" => 78.0, "battery" => 1.6 },
-        { "channel" => 2, "moisture" => 55.5, "battery" => 1.5 }
+        { "channel" => 1, "moisture" => 78.0, "battery" => 5 },
+        { "channel" => 2, "moisture" => 55.5, "battery" => 4 }
       ]
     ))
 
     assert measurement.valid?
     assert_equal 2, measurement.soil.size
     assert_equal 1, measurement.soil.first["channel"]
+    assert_equal 5, measurement.soil.first["battery"]
   end
 
   test "rejects more than 8 soil channels" do
-    soil = (1..9).map { |channel| { "channel" => channel, "moisture" => 50.0, "battery" => 1.5 } }
+    soil = (1..9).map { |channel| { "channel" => channel, "moisture" => 50.0, "battery" => 4 } }
     measurement = WeatherMeasurement.new(valid_attrs(soil: soil))
 
     assert_not measurement.valid?
@@ -83,8 +84,8 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
   test "rejects duplicate soil channels" do
     measurement = WeatherMeasurement.new(valid_attrs(
       soil: [
-        { "channel" => 1, "moisture" => 78.0, "battery" => 1.6 },
-        { "channel" => 1, "moisture" => 55.5, "battery" => 1.5 }
+        { "channel" => 1, "moisture" => 78.0, "battery" => 5 },
+        { "channel" => 1, "moisture" => 55.5, "battery" => 4 }
       ]
     ))
 
@@ -94,25 +95,43 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
 
   test "rejects out-of-range soil channel" do
     measurement = WeatherMeasurement.new(valid_attrs(
-      soil: [ { "channel" => 9, "moisture" => 78.0, "battery" => 1.6 } ]
+      soil: [ { "channel" => 9, "moisture" => 78.0, "battery" => 5 } ]
     ))
 
     assert_not measurement.valid?
     assert_includes measurement.errors[:soil], "channel must be an integer between 1 and 8"
   end
 
-  test "rejects non-numeric soil moisture or battery" do
+  test "rejects non-numeric soil moisture" do
     measurement = WeatherMeasurement.new(valid_attrs(
-      soil: [ { "channel" => 1, "moisture" => "wet", "battery" => 1.6 } ]
+      soil: [ { "channel" => 1, "moisture" => "wet", "battery" => 5 } ]
     ))
 
     assert_not measurement.valid?
     assert_includes measurement.errors[:soil], "moisture must be a number"
   end
 
+  test "rejects non-integer soil battery" do
+    measurement = WeatherMeasurement.new(valid_attrs(
+      soil: [ { "channel" => 1, "moisture" => 78.0, "battery" => 1.6 } ]
+    ))
+
+    assert_not measurement.valid?
+    assert_includes measurement.errors[:soil], "battery must be an integer between 0 and 5"
+  end
+
+  test "rejects out-of-range soil battery" do
+    measurement = WeatherMeasurement.new(valid_attrs(
+      soil: [ { "channel" => 1, "moisture" => 78.0, "battery" => 6 } ]
+    ))
+
+    assert_not measurement.valid?
+    assert_includes measurement.errors[:soil], "battery must be an integer between 0 and 5"
+  end
+
   test "accepts soil temperature without moisture" do
     measurement = WeatherMeasurement.new(valid_attrs(
-      soil: [ { "channel" => 1, "temperature" => 12.5, "battery" => 1.6 } ]
+      soil: [ { "channel" => 1, "temperature" => 12.5, "battery" => 5 } ]
     ))
 
     assert measurement.valid?
@@ -121,7 +140,7 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
 
   test "soil_readings converts temperature to fahrenheit" do
     measurement = WeatherMeasurement.new(valid_attrs(
-      soil: [ { "channel" => 1, "moisture" => 78.0, "temperature" => 10.0, "battery" => 1.6 } ]
+      soil: [ { "channel" => 1, "moisture" => 78.0, "temperature" => 10.0, "battery" => 5 } ]
     ))
 
     assert measurement.valid?
@@ -129,18 +148,86 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
     assert_equal 1, reading["channel"]
     assert_equal 78, reading["moisture"]
     assert_equal 50, reading["temperature_f"]
+    assert_equal 5, reading["battery"]
   end
 
   test "soil_readings includes friendly channel name" do
     SoilChannels.instance_variable_set(:@names, { 1 => "Raised bed" })
 
     measurement = WeatherMeasurement.new(valid_attrs(
-      soil: [ { "channel" => 1, "moisture" => 78.0, "battery" => 1.6 } ]
+      soil: [ { "channel" => 1, "moisture" => 78.0, "battery" => 5 } ]
     ))
 
     assert_equal "Raised bed", measurement.soil_readings.first["name"]
   ensure
     SoilChannels.reload!
+  end
+
+  test "soil_readings merges channels that share a friendly name" do
+    SoilChannels.instance_variable_set(:@names, { 4 => "Greenhouse", 5 => "Greenhouse" })
+
+    measurement = WeatherMeasurement.new(valid_attrs(
+      soil: [
+        { "channel" => 4, "moisture" => 62.0, "battery" => 5 },
+        { "channel" => 5, "temperature" => 10.0, "battery" => 3 }
+      ]
+    ))
+
+    assert measurement.valid?
+    readings = measurement.soil_readings
+    assert_equal 1, readings.size
+    reading = readings.first
+    assert_equal "Greenhouse", reading["name"]
+    assert_equal 4, reading["channel"]
+    assert_equal 62, reading["moisture"]
+    assert_equal 50, reading["temperature_f"]
+    assert_equal 3, reading["battery"]
+  ensure
+    SoilChannels.reload!
+  end
+
+  test "soil_readings keeps distinct names as separate rows" do
+    SoilChannels.instance_variable_set(:@names, { 1 => "Raised bed", 2 => "Tomato pots" })
+
+    measurement = WeatherMeasurement.new(valid_attrs(
+      soil: [
+        { "channel" => 1, "moisture" => 78.0, "battery" => 5 },
+        { "channel" => 2, "moisture" => 55.0, "battery" => 4 }
+      ]
+    ))
+
+    readings = measurement.soil_readings
+    assert_equal 2, readings.size
+    assert_equal [ "Raised bed", "Tomato pots" ], readings.map { |reading| reading["name"] }
+  ensure
+    SoilChannels.reload!
+  end
+
+  test "soil_readings prefers moisture from lower channel when both report it" do
+    SoilChannels.instance_variable_set(:@names, { 2 => "Bed", 3 => "Bed" })
+
+    measurement = WeatherMeasurement.new(valid_attrs(
+      soil: [
+        { "channel" => 3, "moisture" => 40.0, "battery" => 5 },
+        { "channel" => 2, "moisture" => 70.0, "battery" => 4 }
+      ]
+    ))
+
+    reading = measurement.soil_readings.first
+    assert_equal 70, reading["moisture"]
+    assert_equal 2, reading["channel"]
+    assert_equal 4, reading["battery"]
+  ensure
+    SoilChannels.reload!
+  end
+
+  test "soil_readings omits battery level 0" do
+    measurement = WeatherMeasurement.new(valid_attrs(
+      soil: [ { "channel" => 1, "moisture" => 78.0, "battery" => 0 } ]
+    ))
+
+    assert measurement.valid?
+    assert_nil measurement.soil_readings.first["battery"]
   end
 
   test "broadcast payload includes live sparkline series" do
