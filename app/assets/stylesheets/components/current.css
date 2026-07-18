@@ -321,7 +321,7 @@ html.is-live .live-sparkline-pulse:not([hidden])::after {
 }
 
 @utility soil-table-header {
-  @apply grid grid-cols-[2fr_1fr_1fr_auto] gap-x-2
+  @apply grid grid-cols-[2fr_1fr_1fr_1fr] gap-x-2
          text-muted text-[0.68rem] uppercase tracking-[0.08em]
          pb-[0.2rem] border-b border-border/50;
 
@@ -335,7 +335,7 @@ html.is-live .live-sparkline-pulse:not([hidden])::after {
 }
 
 @utility soil-channel {
-  @apply grid grid-cols-[2fr_1fr_1fr_auto] items-center gap-x-2
+  @apply grid grid-cols-[2fr_1fr_1fr_1fr] items-baseline gap-x-2
          py-[0.25rem] border-b border-border/40 last:border-b-0;
 
   & > :not(:first-child) {
@@ -356,35 +356,14 @@ html.is-live .live-sparkline-pulse:not([hidden])::after {
   @apply text-[1.2rem] font-medium;
 }
 
+@utility soil-channel-battery-number {
+  @apply text-[1rem];
+}
+
 @utility soil-channel-unit {
   @apply text-[0.72rem] text-muted tracking-[0.02em];
 }
 
 @utility soil-channel-na {
   @apply text-[0.85rem] text-muted tracking-[0.02em];
-}
-
-@utility soil-channel-battery {
-  @apply inline-flex items-center justify-center min-w-[1.25rem] text-[1rem] leading-none;
-}
-
-.soil-battery-critical {
-  animation: soil-battery-pulse 1s ease-in-out infinite;
-}
-
-@keyframes soil-battery-pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.35;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .soil-battery-critical {
-    animation: none;
-  }
 }

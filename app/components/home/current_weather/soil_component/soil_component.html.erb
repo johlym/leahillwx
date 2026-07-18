@@ -33,16 +33,11 @@
                     <span class="soil-channel-na">N/A</span>
                   <% end %>
                 </span>
-                <span class="soil-channel-battery">
-                  <% level = reading["battery"] %>
-                  <% icon = level && battery_icon_name(level) %>
-                  <% if icon %>
-                    <i
-                      class="fa-duotone fa-solid <%= icon %><%= " soil-battery-critical" if battery_critical?(level) %>"
-                      style="<%= battery_style(level) %>"
-                      aria-label="Battery level <%= level %> of 5"
-                      title="Battery <%= level %>/5"
-                    ></i>
+                <span class="soil-channel-value">
+                  <% if reading["battery"] %>
+                    <span class="soil-channel-number soil-channel-battery-number"><%= format("%.2f", reading["battery"]) %></span><span class="soil-channel-unit">V</span>
+                  <% else %>
+                    <span class="soil-channel-na">N/A</span>
                   <% end %>
                 </span>
               </div>
