@@ -18,6 +18,7 @@ class UpdateThirdPartyWeatherPlatformService
   CWOP_PORTS = [ 14580, 23 ].freeze
   CWOP_PASSCODE = "-1"
   CWOP_MIN_INTERVAL = 5.minutes
+  CWOP_SOCKET_TIMEOUT = 10
   CWOP_CACHE_KEY = "third_party_upload:cwop:last_sent_at"
 
   def initialize(weather_measurement, service, socket_factory: TCPSocket, cwop_lock_key: CWOP_CACHE_KEY)
@@ -190,14 +191,18 @@ class UpdateThirdPartyWeatherPlatformService
   end
 
   def update_cwop(measurement)
-    return unless claim_cwop_send_slot!
+    claimed = claim_cwop_send_slot!
+    return unless claimed
 
-    callsign = ENV.fetch("CWOP_CALLSIGN")
-    packet = build_cwop_packet(measurement, callsign)
-    send_cwop_packet(callsign, packet)
-  rescue StandardError
-    release_cwop_send_slot!
-    raise
+    begin
+      callsign = ENV.fetch("CWOP_CALLSIGN")
+      packet = build_cwop_packet(measurement, callsign)
+      send_cwop_packet(callsign, packet)
+    rescue StandardError
+      # Only release when this worker successfully claimed the slot.
+      release_cwop_send_slot!
+      raise
+    end
   end
 
   private
@@ -272,7 +277,8 @@ class UpdateThirdPartyWeatherPlatformService
 
   # Sum rain across a sliding window using the daily rain counter.
   # Handles midnight resets (counter drops) by treating the new value as
-  # post-reset accumulation. Uses the reading at/before window start as baseline.
+  # post-reset accumulation. Uses the reading at/before window start as baseline
+  # and prorates the first segment so pre-window rain is excluded.
   def accumulated_rain_inches(since:, through:)
     baseline = WeatherMeasurement
       .where(reading_date_time: ..since)
@@ -296,13 +302,20 @@ class UpdateThirdPartyWeatherPlatformService
     return 0.0 if series.size < 2
 
     total_mm = 0.0
-    series.each_cons(2) do |(_t0, rain0), (_t1, rain1)|
-      total_mm += if rain1 >= rain0
+    series.each_cons(2).with_index do |((t0, rain0), (t1, rain1)), index|
+      delta = if rain1 >= rain0
         rain1 - rain0
       else
         # Daily counter reset at midnight: rain1 is rain since midnight.
         rain1
       end
+
+      if index.zero? && baseline && t0 < since && t1 > since
+        span = (t1 - t0).to_f
+        delta *= ((t1 - since).to_f / span).clamp(0.0, 1.0) if span.positive?
+      end
+
+      total_mm += delta
     end
 
     total_mm / 25.4
@@ -314,8 +327,7 @@ class UpdateThirdPartyWeatherPlatformService
     CWOP_PORTS.each do |port|
       socket = nil
       begin
-        socket = @socket_factory.open(CWOP_HOST, port)
-        socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1) if socket.respond_to?(:setsockopt)
+        socket = open_cwop_socket(port)
         read_line(socket) # server banner
         socket.write("user #{callsign} pass #{CWOP_PASSCODE} vers #{SOFTWARE_TYPE} 1.0\r\n")
         read_line(socket) # login ack
@@ -331,6 +343,13 @@ class UpdateThirdPartyWeatherPlatformService
     end
 
     raise last_error if last_error
+  end
+
+  def open_cwop_socket(port)
+    socket = @socket_factory.open(CWOP_HOST, port, connect_timeout: CWOP_SOCKET_TIMEOUT)
+    socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1) if socket.respond_to?(:setsockopt)
+    socket.timeout = CWOP_SOCKET_TIMEOUT if socket.respond_to?(:timeout=)
+    socket
   end
 
   def read_line(socket)

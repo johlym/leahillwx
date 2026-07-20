@@ -41,15 +41,17 @@ class UpdateThirdPartyWeatherPlatformServiceTest < ActiveSupport::TestCase
   end
 
   class FakeSocketFactory
-    attr_reader :opens, :socket
+    attr_reader :opens, :socket, :open_options
 
     def initialize(socket)
       @socket = socket
       @opens = []
+      @open_options = []
     end
 
-    def open(host, port)
+    def open(host, port, **options)
       opens << [ host, port ]
+      open_options << options
       socket
     end
   end
@@ -235,6 +237,10 @@ class UpdateThirdPartyWeatherPlatformServiceTest < ActiveSupport::TestCase
     cwop_service(@measurement, socket_factory: factory).perform
 
     assert_equal [ [ "cwop.aprs.net", 14580 ] ], factory.opens
+    assert_equal(
+      [ { connect_timeout: UpdateThirdPartyWeatherPlatformService::CWOP_SOCKET_TIMEOUT } ],
+      factory.open_options
+    )
     assert_equal "user GW1125 pass -1 vers lhwx 1.0\r\n", socket.writes[0]
     packet = socket.writes[1]
     assert_match(/\AGW1125>APRS,TCPIP\*:@181200z/, packet)
@@ -242,6 +248,23 @@ class UpdateThirdPartyWeatherPlatformServiceTest < ActiveSupport::TestCase
     assert_includes packet, "h65"
     assert_includes packet, "b10132"
     assert socket.closed?
+  end
+
+  test "update_cwop does not release lock when claim raises" do
+    Sidekiq.redis do |conn|
+      conn.set(@cwop_lock_key, "other-worker", nx: true, ex: 300)
+    end
+
+    claim_calls = 0
+    service = cwop_service(@measurement)
+    service.define_singleton_method(:claim_cwop_send_slot!) do
+      claim_calls += 1
+      raise RedisClient::Error, "redis unavailable"
+    end
+
+    assert_raises(RedisClient::Error) { service.perform }
+    assert_equal 1, claim_calls
+    assert_equal "other-worker", Sidekiq.redis { |conn| conn.get(@cwop_lock_key) }
   end
 
   test "update_cwop throttles repeated sends within five minutes" do
@@ -295,6 +318,18 @@ class UpdateThirdPartyWeatherPlatformServiceTest < ActiveSupport::TestCase
     # Window is 11:30→12:30: 0.10 (before midnight) + 0.05 + 0.10 = 0.25" => r025
     packet = cwop_packet_for(latest)
     assert_match(/r025/, packet)
+  end
+
+  test "CWOP hour rain prorates baseline segment to exclude pre-window rain" do
+    WeatherMeasurement.delete_all
+    # Baseline an hour before the window; half of the first segment is pre-window.
+    create_reading_at(Time.utc(2026, 7, 18, 11, 0, 0), rain_day: 0.0)
+    create_reading_at(Time.utc(2026, 7, 18, 12, 0, 0), rain_day: 2.54) # +0.10" over 60m
+    latest = create_reading_at(Time.utc(2026, 7, 18, 12, 30, 0), rain_day: 5.08) # +0.10"
+
+    # Window 11:30→12:30: half of first 0.10" (0.05) + 0.10" = 0.15" => r015
+    packet = cwop_packet_for(latest)
+    assert_match(/r015/, packet)
   end
 
   test "CWOP rain fields are zero without prior history instead of using rain rate" do
