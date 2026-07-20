@@ -339,8 +339,8 @@ html.is-live .live-sparkline-pulse:not([hidden])::after {
 }
 
 @utility soil-channel {
-  @apply grid grid-cols-[2fr_1.25fr_1.25fr] items-start gap-x-2
-         py-[0.25rem] border-b border-border/40 last:border-b-0;
+  @apply grid grid-cols-[2fr_1.25fr_1.25fr] items-baseline gap-x-2
+         py-[0.2rem] border-b border-border/40 last:border-b-0;
 
   & > :not(:first-child) {
     @apply justify-self-center;
@@ -348,35 +348,35 @@ html.is-live .live-sparkline-pulse:not([hidden])::after {
 }
 
 @utility soil-channel-name {
-  @apply text-muted text-[0.78rem] tracking-[0.02em] min-w-0 truncate pt-[0.15rem];
+  @apply text-muted text-[0.78rem] tracking-[0.02em] min-w-0 truncate;
 }
 
 @utility soil-channel-metric {
-  @apply grid justify-items-center gap-[0.1rem];
+  @apply grid justify-items-center gap-[0.05rem];
 }
 
 @utility soil-channel-value {
   @apply inline-flex items-baseline justify-center gap-[0.1rem]
-         text-text-strong font-condensed tabular-nums leading-none;
+         text-text-strong text-[0.78rem] tracking-[0.02em] tabular-nums leading-none;
 }
 
 @utility soil-channel-number {
-  @apply text-[1.2rem] font-medium;
+  @apply text-[0.78rem] font-medium;
 }
 
 @utility soil-channel-battery {
   @apply inline-flex items-baseline justify-center gap-[0.1rem]
-         font-condensed tabular-nums leading-none text-muted;
+         text-[0.78rem] tracking-[0.02em] tabular-nums leading-none text-muted;
 }
 
 @utility soil-channel-battery-number {
-  @apply text-[0.85rem] font-medium;
+  @apply text-[0.78rem] font-medium;
 }
 
 @utility soil-channel-unit {
-  @apply text-[0.72rem] text-muted tracking-[0.02em];
+  @apply text-[0.78rem] text-muted tracking-[0.02em];
 }
 
 @utility soil-channel-na {
-  @apply text-[0.85rem] text-muted tracking-[0.02em];
+  @apply text-[0.78rem] text-muted tracking-[0.02em];
 }
