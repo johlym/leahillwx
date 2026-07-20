@@ -20,10 +20,11 @@ class UpdateThirdPartyWeatherPlatformService
   CWOP_MIN_INTERVAL = 5.minutes
   CWOP_CACHE_KEY = "third_party_upload:cwop:last_sent_at"
 
-  def initialize(weather_measurement, service, socket_factory: TCPSocket)
+  def initialize(weather_measurement, service, socket_factory: TCPSocket, cwop_lock_key: CWOP_CACHE_KEY)
     @weather_measurement = weather_measurement
     @service = service
     @socket_factory = socket_factory
+    @cwop_lock_key = cwop_lock_key
 
     raise ArgumentError, "Unsupported service: #{@service}" unless SUPPORTED_SERVICES.include?(@service)
   end
@@ -205,12 +206,12 @@ class UpdateThirdPartyWeatherPlatformService
   # Returns true when this caller owns the slot for CWOP_MIN_INTERVAL.
   def claim_cwop_send_slot!
     Sidekiq.redis do |conn|
-      conn.set(CWOP_CACHE_KEY, Time.current.to_f.to_s, nx: true, ex: CWOP_MIN_INTERVAL.to_i)
+      conn.set(@cwop_lock_key, Time.current.to_f.to_s, nx: true, ex: CWOP_MIN_INTERVAL.to_i)
     end
   end
 
   def release_cwop_send_slot!
-    Sidekiq.redis { |conn| conn.del(CWOP_CACHE_KEY) }
+    Sidekiq.redis { |conn| conn.del(@cwop_lock_key) }
   end
 
   def build_cwop_packet(measurement, callsign)

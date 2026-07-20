@@ -85,6 +85,8 @@ class UpdateThirdPartyWeatherPlatformServiceTest < ActiveSupport::TestCase
     ENV["LOCATION_LAT"] = "47.3073"
     ENV["LOCATION_LON"] = "-122.2285"
 
+    # Unique lock key per test so parallel test workers cannot clear each other's Redis claim.
+    @cwop_lock_key = "third_party_upload:cwop:test:#{SecureRandom.hex(16)}"
     clear_cwop_throttle!
   end
 
@@ -104,7 +106,18 @@ class UpdateThirdPartyWeatherPlatformServiceTest < ActiveSupport::TestCase
   end
 
   def clear_cwop_throttle!
-    Sidekiq.redis { |conn| conn.del(UpdateThirdPartyWeatherPlatformService::CWOP_CACHE_KEY) }
+    return if @cwop_lock_key.blank?
+
+    Sidekiq.redis { |conn| conn.del(@cwop_lock_key) }
+  end
+
+  def cwop_service(measurement, socket_factory: FakeSocketFactory.new(FakeSocket.new))
+    UpdateThirdPartyWeatherPlatformService.new(
+      measurement,
+      "cwop",
+      socket_factory: socket_factory,
+      cwop_lock_key: @cwop_lock_key
+    )
   end
 
   def create_reading_at(time, rain_day:, **overrides)
@@ -129,11 +142,7 @@ class UpdateThirdPartyWeatherPlatformServiceTest < ActiveSupport::TestCase
 
   def cwop_packet_for(measurement, socket_factory: FakeSocketFactory.new(FakeSocket.new))
     clear_cwop_throttle!
-    UpdateThirdPartyWeatherPlatformService.new(
-      measurement,
-      "cwop",
-      socket_factory: socket_factory
-    ).perform
+    cwop_service(measurement, socket_factory: socket_factory).perform
     socket_factory.socket.writes[1]
   end
 
@@ -223,11 +232,7 @@ class UpdateThirdPartyWeatherPlatformServiceTest < ActiveSupport::TestCase
     socket = FakeSocket.new
     factory = FakeSocketFactory.new(socket)
 
-    UpdateThirdPartyWeatherPlatformService.new(
-      @measurement,
-      "cwop",
-      socket_factory: factory
-    ).perform
+    cwop_service(@measurement, socket_factory: factory).perform
 
     assert_equal [ [ "cwop.aprs.net", 14580 ] ], factory.opens
     assert_equal "user GW1125 pass -1 vers lhwx 1.0\r\n", socket.writes[0]
@@ -242,11 +247,7 @@ class UpdateThirdPartyWeatherPlatformServiceTest < ActiveSupport::TestCase
   test "update_cwop throttles repeated sends within five minutes" do
     socket = FakeSocket.new
     factory = FakeSocketFactory.new(socket)
-    service = UpdateThirdPartyWeatherPlatformService.new(
-      @measurement,
-      "cwop",
-      socket_factory: factory
-    )
+    service = cwop_service(@measurement, socket_factory: factory)
 
     service.perform
     service.perform
@@ -263,11 +264,7 @@ class UpdateThirdPartyWeatherPlatformServiceTest < ActiveSupport::TestCase
         barrier.pop
         socket = FakeSocket.new
         factory = FakeSocketFactory.new(socket)
-        UpdateThirdPartyWeatherPlatformService.new(
-          @measurement,
-          "cwop",
-          socket_factory: factory
-        ).perform
+        cwop_service(@measurement, socket_factory: factory).perform
         results << factory.opens.size
       end
     end
