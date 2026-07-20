@@ -41,7 +41,7 @@ delete_old_forecasts_job:
 update_third_party_weather_platforms_job:
   cron: "*/15 * * * * *"
   class: "UpdateThirdPartyWeatherPlatformsJob"
-  description: "Update third-party platforms every 15 seconds (gated by SEND_WX; CWOP self-throttles to 5 minutes)"
+  description: "Update third-party platforms every 15 seconds (gated by SEND_WX; AWEKAS 5m, CWOP/WeatherCloud 10m self-throttle)"
 
 generate_report_job:
   cron: "1 8 * * *"

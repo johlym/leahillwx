@@ -5,11 +5,6 @@ class UpdateCwopJob
   sidekiq_options retry: false
 
   def perform(measurement_id)
-    return unless ENV["CWOP_CALLSIGN"].present? &&
-                  ENV["LOCATION_LAT"].present? &&
-                  ENV["LOCATION_LON"].present?
-
-    measurement = WeatherMeasurement.find(measurement_id)
-    UpdateThirdPartyWeatherPlatformService.new(measurement, "cwop").perform
+    ThirdPartyWeather::Cwop.call(measurement_id)
   end
 end

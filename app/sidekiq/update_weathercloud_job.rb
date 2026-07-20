@@ -5,9 +5,6 @@ class UpdateWeathercloudJob
   sidekiq_options retry: false
 
   def perform(measurement_id)
-    return unless ENV["WEATHERCLOUD_DEVICE_ID"].present? && ENV["WEATHERCLOUD_DEVICE_KEY"].present?
-
-    measurement = WeatherMeasurement.find(measurement_id)
-    UpdateThirdPartyWeatherPlatformService.new(measurement, "weathercloud").perform
+    ThirdPartyWeather::Weathercloud.call(measurement_id)
   end
 end
