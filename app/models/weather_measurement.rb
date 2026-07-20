@@ -156,7 +156,16 @@ class WeatherMeasurement < ApplicationRecord
       if entry["temperature"].is_a?(Numeric)
         reading["temperature_f"] = entry["temperature"].to_fahrenheit.round(0)
       end
-      reading["moisture_battery"] = entry["battery"].to_f.round(2) if entry["battery"].is_a?(Numeric)
+      if entry["battery"].is_a?(Numeric)
+        battery = entry["battery"].to_f.round(2)
+        # Moisture sensors own the battery column; legacy temp-only soil rows
+        # put voltage under Temp instead of beside Humidity N/A.
+        if reading.key?("moisture") || !reading.key?("temperature_f")
+          reading["moisture_battery"] = battery
+        else
+          reading["temperature_battery"] = battery
+        end
+      end
       reading
     end
   end
@@ -171,7 +180,8 @@ class WeatherMeasurement < ApplicationRecord
 
       reading = {
         "channel" => channel,
-        "name" => SoilChannels.name_for_temp_probe(channel)
+        "name" => SoilChannels.name_for_temp_probe(channel),
+        "from_temp_probe" => true
       }
       if entry["temperature"].is_a?(Numeric)
         reading["temperature_f"] = entry["temperature"].to_fahrenheit.round(0)
@@ -317,8 +327,9 @@ class WeatherMeasurement < ApplicationRecord
 
       moisture = channels.find { |reading| reading.key?("moisture") }&.fetch("moisture")
       moisture_battery = channels.find { |reading| reading.key?("moisture_battery") }&.fetch("moisture_battery")
-      temperature_f = channels.find { |reading| reading.key?("temperature_f") }&.fetch("temperature_f")
-      temperature_battery = channels.find { |reading| reading.key?("temperature_battery") }&.fetch("temperature_battery")
+      # Prefer dedicated temp_probes over legacy soil.temperature when both exist.
+      temperature_f = pick_merged_temperature_f(channels)
+      temperature_battery = pick_merged_temperature_battery(channels)
 
       merged["moisture"] = moisture unless moisture.nil?
       merged["moisture_battery"] = moisture_battery unless moisture_battery.nil?
@@ -327,6 +338,20 @@ class WeatherMeasurement < ApplicationRecord
 
       merged
     end
+  end
+
+  def pick_merged_temperature_f(channels)
+    probe = channels.find { |reading| reading["from_temp_probe"] && reading.key?("temperature_f") }
+    return probe["temperature_f"] if probe
+
+    channels.find { |reading| reading.key?("temperature_f") }&.fetch("temperature_f")
+  end
+
+  def pick_merged_temperature_battery(channels)
+    probe = channels.find { |reading| reading["from_temp_probe"] && reading.key?("temperature_battery") }
+    return probe["temperature_battery"] if probe
+
+    channels.find { |reading| reading.key?("temperature_battery") }&.fetch("temperature_battery")
   end
 
   def broadcast_update

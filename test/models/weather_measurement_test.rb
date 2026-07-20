@@ -152,6 +152,37 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
     assert_nil reading["temperature_battery"]
   end
 
+  test "legacy soil temperature-only battery appears under temp column" do
+    measurement = WeatherMeasurement.new(valid_attrs(
+      soil: [ { "channel" => 1, "temperature" => 10.0, "battery" => 1.6 } ]
+    ))
+
+    reading = measurement.soil_readings.first
+    assert_equal 50, reading["temperature_f"]
+    assert_equal 1.6, reading["temperature_battery"]
+    assert_nil reading["moisture"]
+    assert_nil reading["moisture_battery"]
+  end
+
+  test "soil_readings prefers temp_probe temperature over legacy soil temperature" do
+    SoilChannels.instance_variable_set(:@soil_names, { 1 => "Front Yard" })
+    SoilChannels.instance_variable_set(:@temp_probe_names, { 2 => "Front Yard" })
+
+    measurement = WeatherMeasurement.new(valid_attrs(
+      soil: [ { "channel" => 1, "moisture" => 62.0, "temperature" => 0.0, "battery" => 1.6 } ],
+      temp_probes: [ { "channel" => 2, "temperature" => 10.0, "battery" => 1.4 } ]
+    ))
+
+    reading = measurement.soil_readings.first
+    assert_equal "Front Yard", reading["name"]
+    assert_equal 62, reading["moisture"]
+    assert_equal 1.6, reading["moisture_battery"]
+    assert_equal 50, reading["temperature_f"]
+    assert_equal 1.4, reading["temperature_battery"]
+  ensure
+    SoilChannels.reload!
+  end
+
   test "accepts valid temp_probes" do
     measurement = WeatherMeasurement.new(valid_attrs(
       temp_probes: [
