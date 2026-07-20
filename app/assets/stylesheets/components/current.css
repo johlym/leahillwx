@@ -339,7 +339,7 @@ html.is-live .live-sparkline-pulse:not([hidden])::after {
 }
 
 @utility soil-channel {
-  @apply grid grid-cols-[2fr_1.25fr_1.25fr] items-baseline gap-x-2
+  @apply grid grid-cols-[2fr_1.25fr_1.25fr] items-start gap-x-2
          py-[0.2rem] border-b border-border/40 last:border-b-0;
 
   & > :not(:first-child) {
@@ -352,7 +352,7 @@ html.is-live .live-sparkline-pulse:not([hidden])::after {
 }
 
 @utility soil-channel-metric {
-  @apply grid justify-items-center gap-[0.2rem];
+  @apply grid justify-items-center gap-0;
 }
 
 @utility soil-channel-value {
@@ -365,7 +365,7 @@ html.is-live .live-sparkline-pulse:not([hidden])::after {
 }
 
 @utility soil-channel-battery {
-  @apply inline-flex items-baseline justify-center gap-[0.1rem]
+  @apply inline-flex items-baseline justify-center gap-[0.1rem] mt-[0.2rem]
          text-[0.78rem] tracking-[0.02em] tabular-nums leading-none text-muted;
 }
 
