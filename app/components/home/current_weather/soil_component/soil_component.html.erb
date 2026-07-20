@@ -28,7 +28,7 @@
                   </span>
                   <% if reading["moisture_battery"] %>
                     <span class="soil-channel-battery">
-                      <span class="soil-channel-number soil-channel-battery-number"><%= format("%.2f", reading["moisture_battery"]) %></span><span class="soil-channel-unit">V</span>
+                      <span class="soil-channel-battery-number"><%= format("%.2f", reading["moisture_battery"]) %></span><span class="soil-channel-unit">V</span>
                     </span>
                   <% elsif reading["moisture"] %>
                     <span class="soil-channel-battery soil-channel-na">—</span>
@@ -44,7 +44,7 @@
                   </span>
                   <% if reading["temperature_battery"] %>
                     <span class="soil-channel-battery">
-                      <span class="soil-channel-number soil-channel-battery-number"><%= format("%.2f", reading["temperature_battery"]) %></span><span class="soil-channel-unit">V</span>
+                      <span class="soil-channel-battery-number"><%= format("%.2f", reading["temperature_battery"]) %></span><span class="soil-channel-unit">V</span>
                     </span>
                   <% elsif reading["temperature_f"] %>
                     <span class="soil-channel-battery soil-channel-na">—</span>

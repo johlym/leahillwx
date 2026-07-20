@@ -193,7 +193,7 @@ export default class extends Controller {
     let batteryHtml = ""
     if (battery != null) {
       batteryHtml = `<span class="soil-channel-battery">
-        <span class="soil-channel-number soil-channel-battery-number">${this.asFixed2(battery)}</span><span class="soil-channel-unit">V</span>
+        <span class="soil-channel-battery-number">${this.asFixed2(battery)}</span><span class="soil-channel-unit">V</span>
       </span>`
     } else if (value != null) {
       batteryHtml = `<span class="soil-channel-battery soil-channel-na">—</span>`

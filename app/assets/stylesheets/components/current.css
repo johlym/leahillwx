@@ -366,7 +366,7 @@ html.is-live .live-sparkline-pulse:not([hidden])::after {
 
 @utility soil-channel-battery {
   @apply inline-flex items-baseline justify-center gap-[0.1rem] mt-[0.2rem]
-         text-[0.78rem] tracking-[0.02em] tabular-nums leading-none text-muted;
+         text-[0.78rem] font-normal tracking-[0.02em] tabular-nums leading-none text-muted;
 }
 
 @utility soil-channel-battery-number {
