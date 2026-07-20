@@ -12,6 +12,7 @@
 #  rain_rate         :float            not null
 #  reading_date_time :datetime         not null
 #  soil              :jsonb            not null
+#  temp_probes       :jsonb            not null
 #  temperature       :float            not null
 #  uv                :integer          not null
 #  uvi               :float            not null
@@ -40,6 +41,7 @@ class WeatherMeasurement < ApplicationRecord
 
   after_create_commit :broadcast_update
   before_validation :normalize_soil
+  before_validation :normalize_temp_probes
 
   # Validations
   # Are all the fields present?
@@ -53,6 +55,7 @@ class WeatherMeasurement < ApplicationRecord
   validates :barometer_abs, :barometer_rel, :gust_speed, :light, :rain_rate, :uvi, :wind_speed, numericality: { greater_than_or_equal_to: 0 }
 
   validate :soil_channels_are_valid
+  validate :temp_probes_are_valid
 
   # hectopascals (hPa) to inches of mercury (inHg)
   HPA_TO_INHG = 1.0 / 33.8638866667
@@ -128,9 +131,17 @@ class WeatherMeasurement < ApplicationRecord
   end
 
   # Display-ready soil readings for SSR / ActionCable (temps in °F).
-  # Channels that share a friendly name are merged into one row.
+  # Soil moisture and temp-probe channels that share a friendly name merge into one row.
   def soil_readings
-    readings = Array(soil).filter_map do |entry|
+    readings = soil_entry_readings + temp_probe_entry_readings
+    merge_soil_readings_by_name(readings)
+  end
+
+
+  private
+
+  def soil_entry_readings
+    Array(soil).filter_map do |entry|
       next unless entry.is_a?(Hash)
 
       entry = entry.stringify_keys
@@ -139,61 +150,102 @@ class WeatherMeasurement < ApplicationRecord
 
       reading = {
         "channel" => channel,
-        "name" => SoilChannels.name_for(channel)
+        "name" => SoilChannels.name_for_soil(channel)
       }
       reading["moisture"] = entry["moisture"].to_f.round(0) if entry["moisture"].is_a?(Numeric)
       if entry["temperature"].is_a?(Numeric)
         reading["temperature_f"] = entry["temperature"].to_fahrenheit.round(0)
       end
-      reading["battery"] = entry["battery"].to_f.round(2) if entry["battery"].is_a?(Numeric)
+      reading["moisture_battery"] = entry["battery"].to_f.round(2) if entry["battery"].is_a?(Numeric)
       reading
     end
-
-    merge_soil_readings_by_name(readings)
   end
 
+  def temp_probe_entry_readings
+    Array(temp_probes).filter_map do |entry|
+      next unless entry.is_a?(Hash)
 
-  private
+      entry = entry.stringify_keys
+      channel = Integer(entry["channel"], exception: false)
+      next unless channel
+
+      reading = {
+        "channel" => channel,
+        "name" => SoilChannels.name_for_temp_probe(channel)
+      }
+      if entry["temperature"].is_a?(Numeric)
+        reading["temperature_f"] = entry["temperature"].to_fahrenheit.round(0)
+      end
+      reading["temperature_battery"] = entry["battery"].to_f.round(2) if entry["battery"].is_a?(Numeric)
+      reading
+    end
+  end
 
   def normalize_soil
     return if soil.nil?
 
-    self.soil = Array(soil).map do |entry|
-      hash = case entry
-      when ActionController::Parameters then entry.to_unsafe_h
-      when Hash then entry
-      else
-        entry
-      end
+    self.soil = Array(soil).map { |entry| normalize_probe_entry(entry, %w[moisture temperature battery]) }
+  end
 
-      next hash unless hash.is_a?(Hash)
+  def normalize_temp_probes
+    return if temp_probes.nil?
 
-      hash = hash.stringify_keys
-      normalized = { "channel" => hash["channel"] }
-      normalized["moisture"] = hash["moisture"] unless hash["moisture"].nil?
-      normalized["temperature"] = hash["temperature"] unless hash["temperature"].nil?
-      normalized["battery"] = hash["battery"] unless hash["battery"].nil?
-      normalized
+    self.temp_probes = Array(temp_probes).map { |entry| normalize_probe_entry(entry, %w[temperature battery]) }
+  end
+
+  def normalize_probe_entry(entry, fields)
+    hash = case entry
+    when ActionController::Parameters then entry.to_unsafe_h
+    when Hash then entry
+    else
+      entry
     end
+
+    return hash unless hash.is_a?(Hash)
+
+    hash = hash.stringify_keys
+    normalized = { "channel" => hash["channel"] }
+    fields.each do |field|
+      normalized[field] = hash[field] unless hash[field].nil?
+    end
+    normalized
   end
 
   def soil_channels_are_valid
-    return if soil.blank?
+    validate_probe_array(
+      attribute: :soil,
+      entries: soil,
+      required_fields: [],
+      require_moisture_or_temperature: true
+    )
+  end
 
-    unless soil.is_a?(Array)
-      errors.add(:soil, "must be an array")
+  def temp_probes_are_valid
+    validate_probe_array(
+      attribute: :temp_probes,
+      entries: temp_probes,
+      required_fields: [ "temperature" ],
+      require_moisture_or_temperature: false
+    )
+  end
+
+  def validate_probe_array(attribute:, entries:, required_fields:, require_moisture_or_temperature:)
+    return if entries.blank?
+
+    unless entries.is_a?(Array)
+      errors.add(attribute, "must be an array")
       return
     end
 
-    if soil.size > MAX_SOIL_CHANNELS
-      errors.add(:soil, "cannot have more than #{MAX_SOIL_CHANNELS} entries")
+    if entries.size > MAX_SOIL_CHANNELS
+      errors.add(attribute, "cannot have more than #{MAX_SOIL_CHANNELS} entries")
     end
 
     seen_channels = []
 
-    soil.each_with_index do |entry, index|
+    entries.each_with_index do |entry, index|
       unless entry.is_a?(Hash)
-        errors.add(:soil, "entry at index #{index} must be an object")
+        errors.add(attribute, "entry at index #{index} must be an object")
         next
       end
 
@@ -204,9 +256,9 @@ class WeatherMeasurement < ApplicationRecord
       battery = entry["battery"]
 
       if channel.nil? || !(1..MAX_SOIL_CHANNELS).cover?(channel)
-        errors.add(:soil, "channel must be an integer between 1 and #{MAX_SOIL_CHANNELS}")
+        errors.add(attribute, "channel must be an integer between 1 and #{MAX_SOIL_CHANNELS}")
       elsif seen_channels.include?(channel)
-        errors.add(:soil, "channel #{channel} is duplicated")
+        errors.add(attribute, "channel #{channel} is duplicated")
       else
         seen_channels << channel
       end
@@ -214,22 +266,29 @@ class WeatherMeasurement < ApplicationRecord
       has_moisture = moisture.is_a?(Numeric)
       has_temperature = temperature.is_a?(Numeric)
 
-      if !moisture.nil? && !has_moisture
-        errors.add(:soil, "moisture must be a number")
+      if entry.key?("moisture") && !moisture.nil? && !has_moisture
+        errors.add(attribute, "moisture must be a number")
       end
 
       if !temperature.nil? && !has_temperature
-        errors.add(:soil, "temperature must be a number")
+        errors.add(attribute, "temperature must be a number")
       end
 
-      unless has_moisture || has_temperature
-        errors.add(:soil, "entry must include moisture or temperature")
+      if require_moisture_or_temperature && !has_moisture && !has_temperature
+        errors.add(attribute, "entry must include moisture or temperature")
+      end
+
+      required_fields.each do |field|
+        value = entry[field]
+        next if value.is_a?(Numeric)
+
+        errors.add(attribute, "#{field} must be a number") if value.nil? || !value.is_a?(Numeric)
       end
 
       if !battery.nil? && !battery.is_a?(Numeric)
-        errors.add(:soil, "battery must be a number")
+        errors.add(attribute, "battery must be a number")
       elsif battery.is_a?(Numeric) && battery.negative?
-        errors.add(:soil, "battery must be greater than or equal to 0")
+        errors.add(attribute, "battery must be greater than or equal to 0")
       end
     end
   end
@@ -248,18 +307,23 @@ class WeatherMeasurement < ApplicationRecord
 
     order.map do |name|
       channels = grouped[name].sort_by { |reading| reading["channel"] }
+      soil_side = channels.select { |reading| reading.key?("moisture") || reading.key?("moisture_battery") }
+      representative = (soil_side.presence || channels).first
+
       merged = {
-        "channel" => channels.first["channel"],
+        "channel" => representative["channel"],
         "name" => name
       }
 
       moisture = channels.find { |reading| reading.key?("moisture") }&.fetch("moisture")
+      moisture_battery = channels.find { |reading| reading.key?("moisture_battery") }&.fetch("moisture_battery")
       temperature_f = channels.find { |reading| reading.key?("temperature_f") }&.fetch("temperature_f")
-      batteries = channels.filter_map { |reading| reading["battery"] }
+      temperature_battery = channels.find { |reading| reading.key?("temperature_battery") }&.fetch("temperature_battery")
 
       merged["moisture"] = moisture unless moisture.nil?
+      merged["moisture_battery"] = moisture_battery unless moisture_battery.nil?
       merged["temperature_f"] = temperature_f unless temperature_f.nil?
-      merged["battery"] = batteries.min if batteries.any?
+      merged["temperature_battery"] = temperature_battery unless temperature_battery.nil?
 
       merged
     end

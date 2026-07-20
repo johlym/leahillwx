@@ -12,6 +12,7 @@
 #  rain_rate         :float            not null
 #  reading_date_time :datetime         not null
 #  soil              :jsonb            not null
+#  temp_probes       :jsonb            not null
 #  temperature       :float            not null
 #  uv                :integer          not null
 #  uvi               :float            not null
@@ -137,7 +138,7 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
     assert_equal 12.5, measurement.soil.first["temperature"]
   end
 
-  test "soil_readings converts temperature to fahrenheit" do
+  test "soil_readings converts legacy soil temperature to fahrenheit" do
     measurement = WeatherMeasurement.new(valid_attrs(
       soil: [ { "channel" => 1, "moisture" => 78.0, "temperature" => 10.0, "battery" => 1.6 } ]
     ))
@@ -147,11 +148,47 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
     assert_equal 1, reading["channel"]
     assert_equal 78, reading["moisture"]
     assert_equal 50, reading["temperature_f"]
-    assert_equal 1.6, reading["battery"]
+    assert_equal 1.6, reading["moisture_battery"]
+    assert_nil reading["temperature_battery"]
+  end
+
+  test "accepts valid temp_probes" do
+    measurement = WeatherMeasurement.new(valid_attrs(
+      temp_probes: [
+        { "channel" => 1, "temperature" => 12.5, "battery" => 1.55 },
+        { "channel" => 2, "temperature" => 11.0 }
+      ]
+    ))
+
+    assert measurement.valid?
+    assert_equal 2, measurement.temp_probes.size
+    assert_equal 12.5, measurement.temp_probes.first["temperature"]
+  end
+
+  test "rejects temp_probes without temperature" do
+    measurement = WeatherMeasurement.new(valid_attrs(
+      temp_probes: [ { "channel" => 1, "battery" => 1.55 } ]
+    ))
+
+    assert_not measurement.valid?
+    assert_includes measurement.errors[:temp_probes], "temperature must be a number"
+  end
+
+  test "rejects duplicate temp_probe channels" do
+    measurement = WeatherMeasurement.new(valid_attrs(
+      temp_probes: [
+        { "channel" => 1, "temperature" => 12.5 },
+        { "channel" => 1, "temperature" => 11.0 }
+      ]
+    ))
+
+    assert_not measurement.valid?
+    assert_includes measurement.errors[:temp_probes], "channel 1 is duplicated"
   end
 
   test "soil_readings includes friendly channel name" do
-    SoilChannels.instance_variable_set(:@names, { 1 => "Raised bed" })
+    SoilChannels.instance_variable_set(:@soil_names, { 1 => "Raised bed" })
+    SoilChannels.instance_variable_set(:@temp_probe_names, {})
 
     measurement = WeatherMeasurement.new(valid_attrs(
       soil: [ { "channel" => 1, "moisture" => 78.0, "battery" => 1.6 } ]
@@ -162,31 +199,32 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
     SoilChannels.reload!
   end
 
-  test "soil_readings merges channels that share a friendly name" do
-    SoilChannels.instance_variable_set(:@names, { 4 => "Greenhouse", 5 => "Greenhouse" })
+  test "soil_readings merges soil and temp_probe channels that share a friendly name" do
+    SoilChannels.instance_variable_set(:@soil_names, { 1 => "Front Yard" })
+    SoilChannels.instance_variable_set(:@temp_probe_names, { 2 => "Front Yard" })
 
     measurement = WeatherMeasurement.new(valid_attrs(
-      soil: [
-        { "channel" => 4, "moisture" => 62.0, "battery" => 1.6 },
-        { "channel" => 5, "temperature" => 10.0, "battery" => 1.4 }
-      ]
+      soil: [ { "channel" => 1, "moisture" => 62.0, "battery" => 1.6 } ],
+      temp_probes: [ { "channel" => 2, "temperature" => 10.0, "battery" => 1.4 } ]
     ))
 
     assert measurement.valid?
     readings = measurement.soil_readings
     assert_equal 1, readings.size
     reading = readings.first
-    assert_equal "Greenhouse", reading["name"]
-    assert_equal 4, reading["channel"]
+    assert_equal "Front Yard", reading["name"]
+    assert_equal 1, reading["channel"]
     assert_equal 62, reading["moisture"]
+    assert_equal 1.6, reading["moisture_battery"]
     assert_equal 50, reading["temperature_f"]
-    assert_equal 1.4, reading["battery"]
+    assert_equal 1.4, reading["temperature_battery"]
   ensure
     SoilChannels.reload!
   end
 
   test "soil_readings keeps distinct names as separate rows" do
-    SoilChannels.instance_variable_set(:@names, { 1 => "Raised bed", 2 => "Tomato pots" })
+    SoilChannels.instance_variable_set(:@soil_names, { 1 => "Raised bed", 2 => "Tomato pots" })
+    SoilChannels.instance_variable_set(:@temp_probe_names, {})
 
     measurement = WeatherMeasurement.new(valid_attrs(
       soil: [
@@ -202,8 +240,25 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
     SoilChannels.reload!
   end
 
+  test "soil_readings does not merge unconfigured soil and temp probe channel 1" do
+    SoilChannels.instance_variable_set(:@soil_names, {})
+    SoilChannels.instance_variable_set(:@temp_probe_names, {})
+
+    measurement = WeatherMeasurement.new(valid_attrs(
+      soil: [ { "channel" => 1, "moisture" => 70.0, "battery" => 1.6 } ],
+      temp_probes: [ { "channel" => 1, "temperature" => 10.0, "battery" => 1.5 } ]
+    ))
+
+    readings = measurement.soil_readings
+    assert_equal 2, readings.size
+    assert_equal [ "Ch 1", "Temp Ch 1" ], readings.map { |reading| reading["name"] }
+  ensure
+    SoilChannels.reload!
+  end
+
   test "soil_readings prefers moisture from lower channel when both report it" do
-    SoilChannels.instance_variable_set(:@names, { 2 => "Bed", 3 => "Bed" })
+    SoilChannels.instance_variable_set(:@soil_names, { 2 => "Bed", 3 => "Bed" })
+    SoilChannels.instance_variable_set(:@temp_probe_names, {})
 
     measurement = WeatherMeasurement.new(valid_attrs(
       soil: [
@@ -215,7 +270,7 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
     reading = measurement.soil_readings.first
     assert_equal 70, reading["moisture"]
     assert_equal 2, reading["channel"]
-    assert_equal 1.5, reading["battery"]
+    assert_equal 1.5, reading["moisture_battery"]
   ensure
     SoilChannels.reload!
   end

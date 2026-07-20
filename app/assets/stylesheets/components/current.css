@@ -319,13 +319,13 @@ html.is-live .live-sparkline-pulse:not([hidden])::after {
   box-shadow: 0 0 8px color-mix(in oklab, var(--color-text) 60%, transparent);
 }
 
-/* Soil table — sensor + humidity + temperature + battery. */
+/* Soil table — sensor + humidity/temp (each with its own battery). */
 @utility soil-table {
   @apply grid gap-[0.25rem] min-w-0;
 }
 
 @utility soil-table-header {
-  @apply grid grid-cols-[2fr_1fr_1fr_1fr] gap-x-2
+  @apply grid grid-cols-[2fr_1.25fr_1.25fr] gap-x-2
          text-muted text-[0.68rem] uppercase tracking-[0.08em]
          pb-[0.2rem] border-b border-border/50;
 
@@ -339,7 +339,7 @@ html.is-live .live-sparkline-pulse:not([hidden])::after {
 }
 
 @utility soil-channel {
-  @apply grid grid-cols-[2fr_1fr_1fr_1fr] items-baseline gap-x-2
+  @apply grid grid-cols-[2fr_1.25fr_1.25fr] items-start gap-x-2
          py-[0.25rem] border-b border-border/40 last:border-b-0;
 
   & > :not(:first-child) {
@@ -348,7 +348,11 @@ html.is-live .live-sparkline-pulse:not([hidden])::after {
 }
 
 @utility soil-channel-name {
-  @apply text-muted text-[0.78rem] tracking-[0.02em] min-w-0 truncate;
+  @apply text-muted text-[0.78rem] tracking-[0.02em] min-w-0 truncate pt-[0.15rem];
+}
+
+@utility soil-channel-metric {
+  @apply grid justify-items-center gap-[0.1rem];
 }
 
 @utility soil-channel-value {
@@ -360,8 +364,13 @@ html.is-live .live-sparkline-pulse:not([hidden])::after {
   @apply text-[1.2rem] font-medium;
 }
 
+@utility soil-channel-battery {
+  @apply inline-flex items-baseline justify-center gap-[0.1rem]
+         font-condensed tabular-nums leading-none text-muted;
+}
+
 @utility soil-channel-battery-number {
-  @apply text-[1rem];
+  @apply text-[0.85rem] font-medium;
 }
 
 @utility soil-channel-unit {

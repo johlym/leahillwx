@@ -11,7 +11,6 @@
           <span>Sensor</span>
           <span>Humidity</span>
           <span>Temp.</span>
-          <span>Batt.</span>
         </div>
 
         <div class="soil-channels" data-weather-update-target="soil">
@@ -19,25 +18,36 @@
             <% readings.each do |reading| %>
               <div class="soil-channel">
                 <span class="soil-channel-name"><%= reading["name"] %></span>
-                <span class="soil-channel-value">
-                  <% if reading["moisture"] %>
-                    <span class="soil-channel-number"><%= reading["moisture"] %></span><span class="soil-channel-unit">%</span>
-                  <% else %>
-                    <span class="soil-channel-na">N/A</span>
+                <span class="soil-channel-metric">
+                  <span class="soil-channel-value">
+                    <% if reading["moisture"] %>
+                      <span class="soil-channel-number"><%= reading["moisture"] %></span><span class="soil-channel-unit">%</span>
+                    <% else %>
+                      <span class="soil-channel-na">N/A</span>
+                    <% end %>
+                  </span>
+                  <% if reading["moisture_battery"] %>
+                    <span class="soil-channel-battery">
+                      <span class="soil-channel-number soil-channel-battery-number"><%= format("%.2f", reading["moisture_battery"]) %></span><span class="soil-channel-unit">V</span>
+                    </span>
+                  <% elsif reading["moisture"] %>
+                    <span class="soil-channel-battery soil-channel-na">—</span>
                   <% end %>
                 </span>
-                <span class="soil-channel-value">
-                  <% if reading["temperature_f"] %>
-                    <span class="soil-channel-number"><%= reading["temperature_f"] %></span><span class="soil-channel-unit">°F</span>
-                  <% else %>
-                    <span class="soil-channel-na">N/A</span>
-                  <% end %>
-                </span>
-                <span class="soil-channel-value">
-                  <% if reading["battery"] %>
-                    <span class="soil-channel-number soil-channel-battery-number"><%= format("%.2f", reading["battery"]) %></span><span class="soil-channel-unit">V</span>
-                  <% else %>
-                    <span class="soil-channel-na">N/A</span>
+                <span class="soil-channel-metric">
+                  <span class="soil-channel-value">
+                    <% if reading["temperature_f"] %>
+                      <span class="soil-channel-number"><%= reading["temperature_f"] %></span><span class="soil-channel-unit">°F</span>
+                    <% else %>
+                      <span class="soil-channel-na">N/A</span>
+                    <% end %>
+                  </span>
+                  <% if reading["temperature_battery"] %>
+                    <span class="soil-channel-battery">
+                      <span class="soil-channel-number soil-channel-battery-number"><%= format("%.2f", reading["temperature_battery"]) %></span><span class="soil-channel-unit">V</span>
+                    </span>
+                  <% elsif reading["temperature_f"] %>
+                    <span class="soil-channel-battery soil-channel-na">—</span>
                   <% end %>
                 </span>
               </div>

@@ -16,7 +16,8 @@ class BulkWriteMeasurementsJobTest < ActiveSupport::TestCase
       "uvi" => 3.0,
       "wind_dir" => 180,
       "wind_speed" => 1.2,
-      "soil" => []
+      "soil" => [],
+      "temp_probes" => []
     }.merge(overrides)
   end
 
