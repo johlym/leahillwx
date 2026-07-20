@@ -307,17 +307,39 @@ class UpdateThirdPartyWeatherPlatformServiceTest < ActiveSupport::TestCase
     assert_includes cwop_packet_for(humid_0), "h01"
   end
 
+  test "CWOP temperature uses fixed-width negative encoding" do
+    WeatherMeasurement.delete_all
+    # -25 C => -13 F; APRS field must be exactly three chars: "-13"
+    cold = create_reading_at(Time.utc(2026, 7, 18, 13, 0, 0), rain_day: 0.0, temperature: -25.0)
+
+    packet = cwop_packet_for(cold)
+    assert_match(/t-13/, packet)
+    assert_match(/t-13r/, packet)
+  end
+
   test "CWOP hour rain uses baseline before window and sums across midnight" do
     WeatherMeasurement.delete_all
-    # 11:30 previous "day" counter, then midnight reset, then more rain.
-    create_reading_at(Time.utc(2026, 7, 18, 11, 30, 0), rain_day: 5.08) # 0.20"
-    create_reading_at(Time.utc(2026, 7, 18, 11, 50, 0), rain_day: 7.62) # +0.10"
-    create_reading_at(Time.utc(2026, 7, 18, 12, 5, 0), rain_day: 1.27)  # reset + 0.05"
-    latest = create_reading_at(Time.utc(2026, 7, 18, 12, 30, 0), rain_day: 3.81) # +0.10"
+    # Times chosen so the drop crosses America/Los_Angeles midnight.
+    # 06:30 UTC = 23:30 PT previous evening; 07:10 UTC = 00:10 PT.
+    create_reading_at(Time.utc(2026, 7, 18, 6, 30, 0), rain_day: 5.08)
+    create_reading_at(Time.utc(2026, 7, 18, 6, 50, 0), rain_day: 7.62) # +0.10"
+    create_reading_at(Time.utc(2026, 7, 18, 7, 10, 0), rain_day: 1.27) # midnight reset + 0.05"
+    latest = create_reading_at(Time.utc(2026, 7, 18, 7, 30, 0), rain_day: 3.81) # +0.10"
 
-    # Window is 11:30→12:30: 0.10 (before midnight) + 0.05 + 0.10 = 0.25" => r025
+    # Window 06:30→07:30 UTC: 0.10 + 0.05 + 0.10 = 0.25" => r025
     packet = cwop_packet_for(latest)
     assert_match(/r025/, packet)
+  end
+
+  test "CWOP hour rain ignores same-day rain_day decreases" do
+    WeatherMeasurement.delete_all
+    create_reading_at(Time.utc(2026, 7, 18, 15, 0, 0), rain_day: 5.08)
+    create_reading_at(Time.utc(2026, 7, 18, 15, 20, 0), rain_day: 1.27) # glitch drop, same local day
+    latest = create_reading_at(Time.utc(2026, 7, 18, 15, 40, 0), rain_day: 2.54) # +0.05"
+
+    # Only the post-glitch increase counts: 0.05" => r005
+    packet = cwop_packet_for(latest)
+    assert_match(/r005/, packet)
   end
 
   test "CWOP hour rain prorates baseline segment to exclude pre-window rain" do
@@ -347,12 +369,13 @@ class UpdateThirdPartyWeatherPlatformServiceTest < ActiveSupport::TestCase
 
   test "CWOP 24h rain sums rolling window not just rain_day" do
     WeatherMeasurement.delete_all
-    create_reading_at(Time.utc(2026, 7, 17, 13, 0, 0), rain_day: 2.54)
-    create_reading_at(Time.utc(2026, 7, 17, 18, 0, 0), rain_day: 5.08) # +0.10 yesterday
-    create_reading_at(Time.utc(2026, 7, 18, 1, 0, 0), rain_day: 1.27)  # reset + 0.05
+    # Cross PT midnight between 06:50 UTC (23:50 PT) and 07:20 UTC (00:20 PT).
+    create_reading_at(Time.utc(2026, 7, 17, 12, 0, 0), rain_day: 2.54)
+    create_reading_at(Time.utc(2026, 7, 18, 6, 50, 0), rain_day: 5.08) # +0.10 before midnight
+    create_reading_at(Time.utc(2026, 7, 18, 7, 20, 0), rain_day: 1.27) # reset + 0.05
     latest = create_reading_at(Time.utc(2026, 7, 18, 12, 0, 0), rain_day: 2.54) # +0.05
 
-    # 24h window from 12:00 previous day: 0.10 + 0.05 + 0.05 = 0.20" => p020
+    # 24h window: 0.10 + 0.05 + 0.05 = 0.20" => p020
     packet = cwop_packet_for(latest)
     assert_match(/p020/, packet)
   end

@@ -230,7 +230,7 @@ class UpdateThirdPartyWeatherPlatformService
     wind_dir = format("%03d", measurement.wind_dir.round.clamp(0, 360) % 360)
     wind_speed = format("%03d", measurement.wind_speed_mph.round.clamp(0, 999))
     gust = format("%03d", measurement.gust_speed_mph.round.clamp(0, 999))
-    temp_f = format("%03d", measurement.temperature.to_fahrenheit.round.clamp(-99, 999))
+    temp_f = format_cwop_temperature(measurement.temperature.to_fahrenheit)
     rain_hour = format("%03d", (rain_last_hour_inches(measurement) * 100).round.clamp(0, 999))
     rain_24h = format("%03d", (rain_last_24h_inches(measurement) * 100).round.clamp(0, 999))
     rain_day = format("%03d", (measurement.rain_day_in * 100).round.clamp(0, 999))
@@ -240,6 +240,14 @@ class UpdateThirdPartyWeatherPlatformService
     weather = "#{wind_dir}/#{wind_speed}g#{gust}t#{temp_f}r#{rain_hour}p#{rain_24h}P#{rain_day}h#{humidity}b#{pressure}"
 
     "#{callsign}>APRS,TCPIP*:@#{timestamp}#{position}_#{weather}"
+  end
+
+  # APRS weather temperature is a fixed 3-character field: "068" or "-13".
+  def format_cwop_temperature(temp_f)
+    value = temp_f.round.clamp(-99, 999)
+    return format("-%02d", value.abs) if value.negative?
+
+    format("%03d", value)
   end
 
   # APRS encodes 100% RH as h00. True 0% cannot be represented, so use h01.
@@ -303,12 +311,7 @@ class UpdateThirdPartyWeatherPlatformService
 
     total_mm = 0.0
     series.each_cons(2).with_index do |((t0, rain0), (t1, rain1)), index|
-      delta = if rain1 >= rain0
-        rain1 - rain0
-      else
-        # Daily counter reset at midnight: rain1 is rain since midnight.
-        rain1
-      end
+      delta = rain_day_delta_mm(t0, rain0, t1, rain1)
 
       if index.zero? && baseline && t0 < since && t1 > since
         span = (t1 - t0).to_f
@@ -319,6 +322,19 @@ class UpdateThirdPartyWeatherPlatformService
     end
 
     total_mm / 25.4
+  end
+
+  # Only treat a rain_day drop as a midnight reset when local date changes.
+  # Same-day decreases are ignored as sensor glitches/corrections.
+  def rain_day_delta_mm(t0, rain0, t1, rain1)
+    return rain1 - rain0 if rain1 >= rain0
+    return rain1 if crossed_local_midnight?(t0, t1)
+
+    0.0
+  end
+
+  def crossed_local_midnight?(t0, t1)
+    t0.in_time_zone.to_date != t1.in_time_zone.to_date
   end
 
   def send_cwop_packet(callsign, packet)
