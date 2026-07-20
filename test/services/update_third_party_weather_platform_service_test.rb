@@ -85,8 +85,7 @@ class UpdateThirdPartyWeatherPlatformServiceTest < ActiveSupport::TestCase
     ENV["LOCATION_LAT"] = "47.3073"
     ENV["LOCATION_LON"] = "-122.2285"
 
-    @original_cache = Rails.cache
-    Rails.cache = ActiveSupport::Cache::MemoryStore.new
+    clear_cwop_throttle!
   end
 
   teardown do
@@ -101,7 +100,41 @@ class UpdateThirdPartyWeatherPlatformServiceTest < ActiveSupport::TestCase
       CWOP_CALLSIGN LOCATION_LAT LOCATION_LON
     ].each { |key| ENV.delete(key) }
 
-    Rails.cache = @original_cache
+    clear_cwop_throttle!
+  end
+
+  def clear_cwop_throttle!
+    Sidekiq.redis { |conn| conn.del(UpdateThirdPartyWeatherPlatformService::CWOP_CACHE_KEY) }
+  end
+
+  def create_reading_at(time, rain_day:, **overrides)
+    WeatherMeasurement.create!(
+      {
+        reading_date_time: time,
+        barometer_abs: 1013.2,
+        barometer_rel: 1015.0,
+        gust_speed: 2.0,
+        light: 100.0,
+        humidity: 50,
+        temperature: 18.0,
+        rain_day: rain_day,
+        rain_rate: 0.0,
+        uv: 1,
+        uvi: 1.0,
+        wind_dir: 90,
+        wind_speed: 1.0
+      }.merge(overrides)
+    )
+  end
+
+  def cwop_packet_for(measurement, socket_factory: FakeSocketFactory.new(FakeSocket.new))
+    clear_cwop_throttle!
+    UpdateThirdPartyWeatherPlatformService.new(
+      measurement,
+      "cwop",
+      socket_factory: socket_factory
+    ).perform
+    socket_factory.socket.writes[1]
   end
 
   test "rejects unsupported services" do
@@ -219,5 +252,76 @@ class UpdateThirdPartyWeatherPlatformServiceTest < ActiveSupport::TestCase
     service.perform
 
     assert_equal 1, factory.opens.size
+  end
+
+  test "update_cwop claim is atomic across concurrent callers" do
+    barrier = Queue.new
+    results = Queue.new
+
+    threads = 2.times.map do
+      Thread.new do
+        barrier.pop
+        socket = FakeSocket.new
+        factory = FakeSocketFactory.new(socket)
+        UpdateThirdPartyWeatherPlatformService.new(
+          @measurement,
+          "cwop",
+          socket_factory: factory
+        ).perform
+        results << factory.opens.size
+      end
+    end
+
+    2.times { barrier << true }
+    threads.each(&:join)
+
+    assert_equal 1, Array.new(2) { results.pop }.sum
+  end
+
+  test "CWOP humidity encodes 100 as h00 and 0 as h01" do
+    WeatherMeasurement.delete_all
+    humid_100 = create_reading_at(Time.utc(2026, 7, 18, 13, 0, 0), rain_day: 0.0, humidity: 100)
+    humid_0 = create_reading_at(Time.utc(2026, 7, 18, 13, 1, 0), rain_day: 0.0, humidity: 0)
+
+    assert_includes cwop_packet_for(humid_100), "h00"
+    assert_includes cwop_packet_for(humid_0), "h01"
+  end
+
+  test "CWOP hour rain uses baseline before window and sums across midnight" do
+    WeatherMeasurement.delete_all
+    # 11:30 previous "day" counter, then midnight reset, then more rain.
+    create_reading_at(Time.utc(2026, 7, 18, 11, 30, 0), rain_day: 5.08) # 0.20"
+    create_reading_at(Time.utc(2026, 7, 18, 11, 50, 0), rain_day: 7.62) # +0.10"
+    create_reading_at(Time.utc(2026, 7, 18, 12, 5, 0), rain_day: 1.27)  # reset + 0.05"
+    latest = create_reading_at(Time.utc(2026, 7, 18, 12, 30, 0), rain_day: 3.81) # +0.10"
+
+    # Window is 11:30→12:30: 0.10 (before midnight) + 0.05 + 0.10 = 0.25" => r025
+    packet = cwop_packet_for(latest)
+    assert_match(/r025/, packet)
+  end
+
+  test "CWOP rain fields are zero without prior history instead of using rain rate" do
+    WeatherMeasurement.delete_all
+    sparse = create_reading_at(
+      Time.utc(2026, 7, 18, 14, 0, 0),
+      rain_day: 12.7,
+      rain_rate: 25.4 # 1.0 in/hr — must not become r100
+    )
+
+    packet = cwop_packet_for(sparse)
+    assert_match(/r000/, packet)
+    assert_match(/p000/, packet)
+  end
+
+  test "CWOP 24h rain sums rolling window not just rain_day" do
+    WeatherMeasurement.delete_all
+    create_reading_at(Time.utc(2026, 7, 17, 13, 0, 0), rain_day: 2.54)
+    create_reading_at(Time.utc(2026, 7, 17, 18, 0, 0), rain_day: 5.08) # +0.10 yesterday
+    create_reading_at(Time.utc(2026, 7, 18, 1, 0, 0), rain_day: 1.27)  # reset + 0.05
+    latest = create_reading_at(Time.utc(2026, 7, 18, 12, 0, 0), rain_day: 2.54) # +0.05
+
+    # 24h window from 12:00 previous day: 0.10 + 0.05 + 0.05 = 0.20" => p020
+    packet = cwop_packet_for(latest)
+    assert_match(/p020/, packet)
   end
 end

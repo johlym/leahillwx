@@ -189,21 +189,28 @@ class UpdateThirdPartyWeatherPlatformService
   end
 
   def update_cwop(measurement)
-    return unless cwop_due?
+    return unless claim_cwop_send_slot!
 
     callsign = ENV.fetch("CWOP_CALLSIGN")
     packet = build_cwop_packet(measurement, callsign)
     send_cwop_packet(callsign, packet)
-    Rails.cache.write(CWOP_CACHE_KEY, Time.current.to_f, expires_in: CWOP_MIN_INTERVAL * 2)
+  rescue StandardError
+    release_cwop_send_slot!
+    raise
   end
 
   private
 
-  def cwop_due?
-    last_sent_at = Rails.cache.read(CWOP_CACHE_KEY)
-    return true if last_sent_at.blank?
+  # Atomically reserve the CWOP send window across Sidekiq processes.
+  # Returns true when this caller owns the slot for CWOP_MIN_INTERVAL.
+  def claim_cwop_send_slot!
+    Sidekiq.redis do |conn|
+      conn.set(CWOP_CACHE_KEY, Time.current.to_f.to_s, nx: true, ex: CWOP_MIN_INTERVAL.to_i)
+    end
+  end
 
-    Time.current.to_f - last_sent_at.to_f >= CWOP_MIN_INTERVAL.to_f
+  def release_cwop_send_slot!
+    Sidekiq.redis { |conn| conn.del(CWOP_CACHE_KEY) }
   end
 
   def build_cwop_packet(measurement, callsign)
@@ -221,12 +228,21 @@ class UpdateThirdPartyWeatherPlatformService
     rain_hour = format("%03d", (rain_last_hour_inches(measurement) * 100).round.clamp(0, 999))
     rain_24h = format("%03d", (rain_last_24h_inches(measurement) * 100).round.clamp(0, 999))
     rain_day = format("%03d", (measurement.rain_day_in * 100).round.clamp(0, 999))
-    humidity = format("%02d", measurement.humidity == 100 ? 0 : measurement.humidity.clamp(0, 99))
+    humidity = format_cwop_humidity(measurement.humidity)
     pressure = format("%05d", (measurement.barometer_abs * 10).round.clamp(0, 99_999))
 
     weather = "#{wind_dir}/#{wind_speed}g#{gust}t#{temp_f}r#{rain_hour}p#{rain_24h}P#{rain_day}h#{humidity}b#{pressure}"
 
     "#{callsign}>APRS,TCPIP*:@#{timestamp}#{position}_#{weather}"
+  end
+
+  # APRS encodes 100% RH as h00. True 0% cannot be represented, so use h01.
+  def format_cwop_humidity(humidity)
+    value = humidity.to_i
+    return "00" if value >= 100
+    return "01" if value <= 0
+
+    format("%02d", value)
   end
 
   def format_aprs_latitude(lat)
@@ -246,33 +262,48 @@ class UpdateThirdPartyWeatherPlatformService
   end
 
   def rain_last_hour_inches(measurement)
-    window_start = measurement.reading_date_time - 1.hour
-    earlier = WeatherMeasurement
-      .where(reading_date_time: window_start..measurement.reading_date_time)
-      .order(:reading_date_time)
-      .first
-
-    return measurement.rain_rate_in if earlier.nil? || earlier.id == measurement.id
-
-    delta_mm = measurement.rain_day - earlier.rain_day
-    delta_mm = 0.0 if delta_mm.negative? # day counter reset
-    delta_mm / 25.4
+    accumulated_rain_inches(since: measurement.reading_date_time - 1.hour, through: measurement)
   end
 
   def rain_last_24h_inches(measurement)
-    window_start = measurement.reading_date_time - 24.hours
-    readings = WeatherMeasurement
-      .where(reading_date_time: window_start..measurement.reading_date_time)
+    accumulated_rain_inches(since: measurement.reading_date_time - 24.hours, through: measurement)
+  end
+
+  # Sum rain across a sliding window using the daily rain counter.
+  # Handles midnight resets (counter drops) by treating the new value as
+  # post-reset accumulation. Uses the reading at/before window start as baseline.
+  def accumulated_rain_inches(since:, through:)
+    baseline = WeatherMeasurement
+      .where(reading_date_time: ..since)
+      .order(reading_date_time: :desc)
+      .limit(1)
+      .pick(:reading_date_time, :rain_day)
+
+    in_window = WeatherMeasurement
+      .where(reading_date_time: since..through.reading_date_time)
       .order(:reading_date_time)
       .pluck(:reading_date_time, :rain_day)
 
-    return measurement.rain_day_in if readings.size < 2
+    return 0.0 if in_window.empty?
+
+    series = []
+    series << baseline if baseline
+    in_window.each do |row|
+      series << row unless series.last == row
+    end
+
+    return 0.0 if series.size < 2
 
     total_mm = 0.0
-    readings.each_cons(2) do |(_t0, rain0), (_t1, rain1)|
-      delta = rain1 - rain0
-      total_mm += delta if delta.positive?
+    series.each_cons(2) do |(_t0, rain0), (_t1, rain1)|
+      total_mm += if rain1 >= rain0
+        rain1 - rain0
+      else
+        # Daily counter reset at midnight: rain1 is rain since midnight.
+        rain1
+      end
     end
+
     total_mm / 25.4
   end
 
