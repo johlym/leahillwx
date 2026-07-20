@@ -79,16 +79,20 @@
           "soil": {
             "type": "array",
             "maxItems": 8,
-            "description": "Soil moisture sensor readings (up to 8 channels)",
+            "description": "Soil moisture sensor readings (up to 8 channels). Temperature is optional/legacy; prefer temp_probes.",
             "items": {
               "type": "object",
               "required": ["channel"],
+              "anyOf": [
+                { "required": ["moisture"] },
+                { "required": ["temperature"] }
+              ],
               "properties": {
                 "channel": {
                   "type": "integer",
                   "minimum": 1,
                   "maximum": 8,
-                  "description": "Soil sensor channel number (1-8)"
+                  "description": "Soil moisture sensor channel number (1-8)"
                 },
                 "moisture": {
                   "type": "number",
@@ -98,12 +102,39 @@
                 "temperature": {
                   "type": "number",
                   "format": "float",
+                  "description": "Legacy soil temperature (°C); prefer temp_probes"
+                },
+                "battery": {
+                  "type": "number",
+                  "format": "float",
+                  "description": "Soil moisture sensor battery voltage (V)"
+                }
+              }
+            }
+          },
+          "temp_probes": {
+            "type": "array",
+            "maxItems": 8,
+            "description": "Soil temperature probe readings (up to 8 channels)",
+            "items": {
+              "type": "object",
+              "required": ["channel", "temperature"],
+              "properties": {
+                "channel": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 8,
+                  "description": "Temperature probe channel number (1-8)"
+                },
+                "temperature": {
+                  "type": "number",
+                  "format": "float",
                   "description": "Soil temperature (°C)"
                 },
                 "battery": {
                   "type": "number",
                   "format": "float",
-                  "description": "Soil sensor battery voltage (V)"
+                  "description": "Temperature probe battery voltage (V)"
                 }
               }
             }
@@ -143,6 +174,13 @@
               "channel": 1,
               "moisture": 78.0,
               "battery": 1.6
+            }
+          ],
+          "temp_probes": [
+            {
+              "channel": 2,
+              "temperature": 10.0,
+              "battery": 1.55
             }
           ],
           "uv": 3,

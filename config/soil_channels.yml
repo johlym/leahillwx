@@ -1,15 +1,23 @@
-# Friendly names for soil moisture/temperature channels (1–8).
-# Unnamed channels fall back to "Ch N" in the UI.
+# Friendly names for soil moisture / temperature probe groupings.
+# Unnamed channels fall back to "Ch N" (soil) or "Temp Ch N" (temp probes).
 #
-# Channels that share the same friendly name are merged into one Soil
-# table row (useful when one sensor reports humidity and another
-# reports temperature for the same location).
+# Each key is the single display name for a grouping. Groups may declare:
+#   soil: <channel 1–8>         # moisture sensor channel
+#   temp_probe: <channel 1–8>   # temperature probe channel
+# Either key may be omitted for moisture-only or temp-only rows.
 #
-# Example:
-# 1: Raised bed
-# 2: Tomato pots
-# 4: Greenhouse
-# 5: Greenhouse
-1: Veggie Bed
-2: Front Bed 1
-3: Back Bed 1
+# Example — humidity on soil ch 1 + temp probe ch 2 share one Soil card row:
+# Front Yard:
+#   soil: 1
+#   temp_probe: 2
+
+Veggie Bed:
+  soil: 1
+
+Front Yard:
+  soil: 2
+  temp_probe: 2
+
+Back Yard:
+  soil: 3
+  temp_probe: 1

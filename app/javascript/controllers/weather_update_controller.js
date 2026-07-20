@@ -177,23 +177,32 @@ export default class extends Controller {
 
     return readings.map((reading) => {
       const name = reading.name || `Ch ${reading.channel}`
-      const moisture = reading.moisture != null
-        ? `<span class="soil-channel-number">${this.asInt(reading.moisture)}</span><span class="soil-channel-unit">%</span>`
-        : `<span class="soil-channel-na">N/A</span>`
-      const temperature = reading.temperature_f != null
-        ? `<span class="soil-channel-number">${this.asInt(reading.temperature_f)}</span><span class="soil-channel-unit">°F</span>`
-        : `<span class="soil-channel-na">N/A</span>`
-      const battery = reading.battery != null
-        ? `<span class="soil-channel-number soil-channel-battery-number">${this.asFixed2(reading.battery)}</span><span class="soil-channel-unit">V</span>`
-        : `<span class="soil-channel-na">N/A</span>`
-
       return `<div class="soil-channel">
         <span class="soil-channel-name">${name}</span>
-        <span class="soil-channel-value">${moisture}</span>
-        <span class="soil-channel-value">${temperature}</span>
-        <span class="soil-channel-value">${battery}</span>
+        ${this.renderSoilMetric(reading.moisture, "%", reading.moisture_battery)}
+        ${this.renderSoilMetric(reading.temperature_f, "°F", reading.temperature_battery)}
       </div>`
     }).join("")
+  }
+
+  renderSoilMetric(value, unit, battery) {
+    const primary = value != null
+      ? `<span class="soil-channel-number">${this.asInt(value)}</span><span class="soil-channel-unit">${unit}</span>`
+      : `<span class="soil-channel-na">N/A</span>`
+
+    let batteryHtml = ""
+    if (battery != null) {
+      batteryHtml = `<span class="soil-channel-battery">
+        <span class="soil-channel-battery-number">${this.asFixed2(battery)}</span><span class="soil-channel-unit">V</span>
+      </span>`
+    } else if (value != null) {
+      batteryHtml = `<span class="soil-channel-battery soil-channel-na">—</span>`
+    }
+
+    return `<span class="soil-channel-metric">
+      <span class="soil-channel-value">${primary}</span>
+      ${batteryHtml}
+    </span>`
   }
 
   asInt(value) {

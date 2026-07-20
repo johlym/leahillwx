@@ -319,13 +319,13 @@ html.is-live .live-sparkline-pulse:not([hidden])::after {
   box-shadow: 0 0 8px color-mix(in oklab, var(--color-text) 60%, transparent);
 }
 
-/* Soil table — sensor + humidity + temperature + battery. */
+/* Soil table — sensor + humidity/temp (each with its own battery). */
 @utility soil-table {
   @apply grid gap-[0.25rem] min-w-0;
 }
 
 @utility soil-table-header {
-  @apply grid grid-cols-[2fr_1fr_1fr_1fr] gap-x-2
+  @apply grid grid-cols-[2fr_1.25fr_1.25fr] gap-x-2
          text-muted text-[0.68rem] uppercase tracking-[0.08em]
          pb-[0.2rem] border-b border-border/50;
 
@@ -339,8 +339,8 @@ html.is-live .live-sparkline-pulse:not([hidden])::after {
 }
 
 @utility soil-channel {
-  @apply grid grid-cols-[2fr_1fr_1fr_1fr] items-baseline gap-x-2
-         py-[0.25rem] border-b border-border/40 last:border-b-0;
+  @apply grid grid-cols-[2fr_1.25fr_1.25fr] items-start gap-x-2
+         py-[0.2rem] border-b border-border/40 last:border-b-0;
 
   & > :not(:first-child) {
     @apply justify-self-center;
@@ -351,23 +351,32 @@ html.is-live .live-sparkline-pulse:not([hidden])::after {
   @apply text-muted text-[0.78rem] tracking-[0.02em] min-w-0 truncate;
 }
 
+@utility soil-channel-metric {
+  @apply grid justify-items-center gap-0;
+}
+
 @utility soil-channel-value {
   @apply inline-flex items-baseline justify-center gap-[0.1rem]
-         text-text-strong font-condensed tabular-nums leading-none;
+         text-text-strong text-[0.78rem] tracking-[0.02em] tabular-nums leading-none;
 }
 
 @utility soil-channel-number {
-  @apply text-[1.2rem] font-medium;
+  @apply text-[0.78rem] font-bold;
+}
+
+@utility soil-channel-battery {
+  @apply inline-flex items-baseline justify-center gap-[0.1rem] mt-[0.2rem]
+         text-[0.78rem] font-normal tracking-[0.02em] tabular-nums leading-none text-muted;
 }
 
 @utility soil-channel-battery-number {
-  @apply text-[1rem];
+  @apply text-[0.78rem] font-normal;
 }
 
 @utility soil-channel-unit {
-  @apply text-[0.72rem] text-muted tracking-[0.02em];
+  @apply text-[0.78rem] text-muted tracking-[0.02em];
 }
 
 @utility soil-channel-na {
-  @apply text-[0.85rem] text-muted tracking-[0.02em];
+  @apply text-[0.78rem] text-muted tracking-[0.02em];
 }

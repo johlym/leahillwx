@@ -14,6 +14,7 @@
 #  rain_rate         :float            not null
 #  reading_date_time :datetime         not null
 #  soil              :jsonb            not null
+#  temp_probes       :jsonb            not null
 #  temperature       :float            not null
 #  uv                :integer          not null
 #  uvi               :float            not null

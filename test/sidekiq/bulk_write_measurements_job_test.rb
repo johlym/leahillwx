@@ -16,7 +16,8 @@ class BulkWriteMeasurementsJobTest < ActiveSupport::TestCase
       "uvi" => 3.0,
       "wind_dir" => 180,
       "wind_speed" => 1.2,
-      "soil" => []
+      "soil" => [],
+      "temp_probes" => []
     }.merge(overrides)
   end
 
@@ -26,6 +27,23 @@ class BulkWriteMeasurementsJobTest < ActiveSupport::TestCase
     assert_difference("WeatherMeasurement.count", 1) do
       BulkWriteMeasurementsJob.new.perform(payload)
     end
+  end
+
+  test "persists soil and temp_probes on bulk insert" do
+    payload = [
+      measurement_hash(
+        "soil" => [ { "channel" => 1, "moisture" => 78.0, "battery" => 1.6 } ],
+        "temp_probes" => [ { "channel" => 2, "temperature" => 10.0, "battery" => 1.55 } ]
+      )
+    ]
+
+    assert_difference("WeatherMeasurement.count", 1) do
+      BulkWriteMeasurementsJob.new.perform(payload)
+    end
+
+    measurement = WeatherMeasurement.order(:id).last
+    assert_equal [ { "channel" => 1, "moisture" => 78.0, "battery" => 1.6 } ], measurement.soil
+    assert_equal [ { "channel" => 2, "temperature" => 10.0, "battery" => 1.55 } ], measurement.temp_probes
   end
 
   test "skips duplicate timestamps by default" do
