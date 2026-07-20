@@ -53,6 +53,14 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
     }.merge(overrides)
   end
 
+  test "converts barometer from hPa to inHg" do
+    measurement = WeatherMeasurement.new(valid_attrs(barometer_abs: 1013.25, barometer_rel: 1015.0))
+
+    assert_in_delta 1013.25 / 33.8638866667, measurement.barometer_abs_inhg, 0.000001
+    assert_in_delta 1015.0 / 33.8638866667, measurement.barometer_rel_inhg, 0.000001
+    assert_in_delta measurement.barometer_abs_inhg, measurement.barometer_abs_mmhg, 0.000001
+  end
+
   test "accepts empty soil by default" do
     measurement = WeatherMeasurement.new(valid_attrs)
     assert measurement.valid?

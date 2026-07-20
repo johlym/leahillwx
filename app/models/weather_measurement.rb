@@ -54,13 +54,20 @@ class WeatherMeasurement < ApplicationRecord
 
   validate :soil_channels_are_valid
 
-  def barometer_abs_mmhg
-    barometer_abs * 3.38637526
+  # hectopascals (hPa) to inches of mercury (inHg)
+  HPA_TO_INHG = 1.0 / 33.8638866667
+
+  def barometer_abs_inhg
+    barometer_abs * HPA_TO_INHG
   end
 
-  def barometer_rel_mmhg
-    barometer_rel * 3.38637526
+  def barometer_rel_inhg
+    barometer_rel * HPA_TO_INHG
   end
+
+  # Deprecated aliases kept for callers that used the old misnamed helpers.
+  alias_method :barometer_abs_mmhg, :barometer_abs_inhg
+  alias_method :barometer_rel_mmhg, :barometer_rel_inhg
 
   # meters/second to miles/hour
   def gust_speed_mph
