@@ -1,13 +1,19 @@
+# frozen_string_literal: true
+
 class UpdateThirdPartyWeatherPlatformsJob
   include Sidekiq::Job
 
-  def perform(*args)
+  def perform(*_args)
     return if ENV["SEND_WX"] != "true"
-    wm = WeatherMeasurement.order(reading_date_time: :desc).first.id
-    UpdateWeatherUndergroundJob.perform_async(wm)
-    UpdatePwsWeatherJob.perform_async(wm)
-    UpdateAwekasJob.perform_async(wm)
-    UpdateWeathercloudJob.perform_async(wm)
-    UpdateCwopJob.perform_async(wm)
+
+    measurement = WeatherMeasurement.order(reading_date_time: :desc).first
+    return if measurement.nil?
+
+    measurement_id = measurement.id
+    UpdateWeatherUndergroundJob.perform_async(measurement_id)
+    UpdatePwsWeatherJob.perform_async(measurement_id)
+    UpdateAwekasJob.perform_async(measurement_id)
+    UpdateWeathercloudJob.perform_async(measurement_id)
+    UpdateCwopJob.perform_async(measurement_id)
   end
 end

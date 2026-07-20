@@ -1,3 +1,8 @@
+# frozen_string_literal: true
+
+require "digest"
+require "socket"
+
 class UpdateThirdPartyWeatherPlatformService
   SUPPORTED_SERVICES = [
     "weatherunderground",
@@ -7,9 +12,20 @@ class UpdateThirdPartyWeatherPlatformService
     "cwop"
   ].freeze
 
-  def initialize(weather_measurement, service)
+  SOFTWARE_TYPE = "lhwx"
+  HTTP_TIMEOUT = 10
+  CWOP_HOST = "cwop.aprs.net"
+  CWOP_PORTS = [ 14580, 23 ].freeze
+  CWOP_PASSCODE = "-1"
+  CWOP_MIN_INTERVAL = 5.minutes
+  CWOP_SOCKET_TIMEOUT = 10
+  CWOP_CACHE_KEY = "third_party_upload:cwop:last_sent_at"
+
+  def initialize(weather_measurement, service, socket_factory: TCPSocket, cwop_lock_key: CWOP_CACHE_KEY)
     @weather_measurement = weather_measurement
     @service = service
+    @socket_factory = socket_factory
+    @cwop_lock_key = cwop_lock_key
 
     raise ArgumentError, "Unsupported service: #{@service}" unless SUPPORTED_SERVICES.include?(@service)
   end
@@ -23,39 +39,30 @@ class UpdateThirdPartyWeatherPlatformService
   end
 
   def update_weatherunderground(measurement)
-    # TODO: Implement update_weatherunderground
-    # SAMPLE POST URL with data embedded: https://weatherstation.wunderground.com/weatherstation/updateweatherstation.php?ID=KCASANFR5&PASSWORD=XXXXXX&dateutc=2000-01-01+10%3A32%3A35&winddir=230&windspeedmph=12&windgustmph=12&tempf=70&rainin=0&baromin=29.1&dewptf=68.2&humidity=90&weather=&clouds=&softwaretype=vws%20versionxx&action=updateraw
-
     date_utc = measurement.reading_date_time.utc.strftime("%Y-%m-%d+%H:%M:%S")
-    wind_dir = measurement.wind_dir
-    wind_speed_mph = measurement.wind_speed_mph
-    wind_gust_mph = measurement.wind_gust_mph
-    temp_f = measurement.temperature_f
-    rain_in = measurement.rain_rate_in
-    barometer_in = measurement.barometer_abs_mmhg
-    humidity = measurement.humidity
-    dew_point_f = measurement.dew_point_f
 
     request_url = "https://weatherstation.wunderground.com/weatherstation/updateweatherstation.php"
     request_params = {
       ID: ENV["WU_STATION_ID"],
       PASSWORD: ENV["WU_STATION_KEY"],
       dateutc: date_utc,
-      winddir: wind_dir,
-      windspeedmph: wind_speed_mph,
-      windgustmph: wind_gust_mph,
-      tempf: temp_f,
-      rainin: rain_in,
-      baromin: barometer_in,
-      dewptf: dew_point_f,
-      humidity: humidity,
+      winddir: measurement.wind_dir,
+      windspeedmph: measurement.wind_speed_mph.round(2),
+      windgustmph: measurement.gust_speed_mph.round(2),
+      tempf: measurement.temperature.to_fahrenheit.round(2),
+      rainin: measurement.rain_rate_in.round(4),
+      dailyrainin: measurement.rain_day_in.round(4),
+      baromin: measurement.barometer_rel_inhg.round(3),
+      dewptf: measurement.dew_point.to_fahrenheit.round(2),
+      humidity: measurement.humidity,
       weather: "",
       clouds: "",
-      softwaretype: "lhwx",
+      softwaretype: SOFTWARE_TYPE,
       action: "updateraw"
-  }
-    wu_request = HTTParty.post(request_url, query: request_params)
-    Rails.logger.info "Weather Underground response: #{wu_request.body}"
+    }
+
+    response = HTTParty.post(request_url, query: request_params, timeout: HTTP_TIMEOUT)
+    Rails.logger.info "Weather Underground response: #{response.body}"
   end
 
   def update_pwsweather(measurement)
@@ -63,34 +70,27 @@ class UpdateThirdPartyWeatherPlatformService
     # Documentation: http://wiki.wunderground.com/index.php/PWS_-_Upload_Protocol
 
     date_utc = measurement.reading_date_time.utc.strftime("%Y-%m-%d+%H:%M:%S")
-    wind_dir = measurement.wind_dir
-    wind_speed_mph = measurement.wind_speed_mph
-    wind_gust_mph = measurement.wind_gust_mph
-    temp_f = measurement.temperature_f
-    rain_in = measurement.rain_rate_in
-    barometer_in = measurement.barometer_abs_mmhg
-    humidity = measurement.humidity
-    dew_point_f = measurement.dew_point_f
 
     request_url = "https://www.pwsweather.com/pwsupdate/pwsupdate.php"
     request_params = {
       ID: ENV["PWS_STATION_ID"],
       PASSWORD: ENV["PWS_STATION_KEY"],
       dateutc: date_utc,
-      winddir: wind_dir,
-      windspeedmph: wind_speed_mph,
-      windgustmph: wind_gust_mph,
-      tempf: temp_f,
-      rainin: rain_in,
-      baromin: barometer_in,
-      dewptf: dew_point_f,
-      humidity: humidity,
-      softwaretype: "lhwx",
+      winddir: measurement.wind_dir,
+      windspeedmph: measurement.wind_speed_mph.round(2),
+      windgustmph: measurement.gust_speed_mph.round(2),
+      tempf: measurement.temperature.to_fahrenheit.round(2),
+      rainin: measurement.rain_rate_in.round(4),
+      dailyrainin: measurement.rain_day_in.round(4),
+      baromin: measurement.barometer_rel_inhg.round(3),
+      dewptf: measurement.dew_point.to_fahrenheit.round(2),
+      humidity: measurement.humidity,
+      softwaretype: SOFTWARE_TYPE,
       action: "updateraw"
     }
 
-    pws_request = HTTParty.post(request_url, query: request_params)
-    Rails.logger.info "PWSWeather response: #{pws_request.body}"
+    response = HTTParty.post(request_url, query: request_params, timeout: HTTP_TIMEOUT)
+    Rails.logger.info "PWSWeather response: #{response.body}"
   end
 
   def update_awekas(measurement)
@@ -98,30 +98,25 @@ class UpdateThirdPartyWeatherPlatformService
     # Documentation: Based on weewx implementation at
     # https://github.com/weewx/weewx/blob/master/src/weewx/restx.py#L1608
 
-    # Convert password to MD5 hash
-    require "digest"
-    password_hash = Digest::MD5.hexdigest(ENV["AWEKAS_USERNAME"])
+    password_hash = Digest::MD5.hexdigest(ENV.fetch("AWEKAS_PASSWORD"))
 
-    # Format timestamp in UTC
     time_utc = measurement.reading_date_time.utc
     date_str = time_utc.strftime("%d.%m.%Y")
     time_str = time_utc.strftime("%H:%M")
 
-    # Get values in metric units (AWEKAS expects metric)
     temp_c = measurement.temperature
     humidity = measurement.humidity
     barometer_hpa = measurement.barometer_rel
-    daily_rain_mm = (measurement.rain_day * 10).round(1)  # mm * 10 as per AWEKAS spec
-    wind_speed_kmh = (measurement.wind_speed * 3.6).round(1)  # m/s to km/h
+    daily_rain_mm = (measurement.rain_day * 10).round(1) # mm * 10 as per AWEKAS spec
+    wind_speed_kmh = (measurement.wind_speed * 3.6).round(1) # m/s to km/h
     wind_dir = measurement.wind_dir
-    wind_gust_kmh = (measurement.gust_speed * 3.6).round(1)  # m/s to km/h
+    wind_gust_kmh = (measurement.gust_speed * 3.6).round(1) # m/s to km/h
     solar_radiation = measurement.light
     uv_index = measurement.uvi
-    rain_rate_mmh = (measurement.rain_rate * 10).round(1)  # mm/h * 10 as per AWEKAS spec
+    rain_rate_mmh = (measurement.rain_rate * 10).round(1) # mm/h * 10 as per AWEKAS spec
 
-    # Assemble values array in AWEKAS order
     values = [
-      ENV["AWEKAS_PASSWORD"],
+      ENV["AWEKAS_USERNAME"],
       password_hash,
       date_str,
       time_str,
@@ -131,29 +126,28 @@ class UpdateThirdPartyWeatherPlatformService
       daily_rain_mm,
       wind_speed_kmh,
       wind_dir,
-      "",  # weather condition
-      "",  # warning text
-      "",  # snow height
-      "en",  # language
-      "",  # tendency
+      "", # weather condition
+      "", # warning text
+      "", # snow height
+      "en", # language
+      "", # tendency
       wind_gust_kmh,
       solar_radiation,
       uv_index,
-      "",  # brightness in lux
-      "",  # sunshine hours
-      "",  # soil temperature
+      "", # brightness in lux
+      "", # sunshine hours
+      "", # soil temperature
       rain_rate_mmh,
-      "lhwx",  # software type
+      SOFTWARE_TYPE,
       ENV["LOCATION_LON"],
       ENV["LOCATION_LAT"]
     ]
 
-    # Join with semicolons
     val_string = values.join(";")
 
     request_url = "https://data.awekas.at/get.php"
-    awekas_request = HTTParty.get(request_url, query: { val: val_string })
-    Rails.logger.info "AWEKAS response: #{awekas_request.body}"
+    response = HTTParty.get(request_url, query: { val: val_string }, timeout: HTTP_TIMEOUT)
+    Rails.logger.info "AWEKAS response: #{response.body}"
   end
 
   def update_weathercloud(measurement)
@@ -162,57 +156,221 @@ class UpdateThirdPartyWeatherPlatformService
     # https://github.com/matthewwall/weewx-wcloud
     # Note: WeatherCloud expects values in metric with specific multipliers
 
-    # Base parameters (required)
-    request_url = "http://api.weathercloud.net/v01/set"
+    request_url = "https://api.weathercloud.net/v01/set"
     params = {
       wid: ENV["WEATHERCLOUD_DEVICE_ID"],
       key: ENV["WEATHERCLOUD_DEVICE_KEY"]
     }
 
-    # Temperature and humidity (C * 10, percent)
     params[:temp] = (measurement.temperature * 10).round(0) if measurement.temperature
     params[:hum] = measurement.humidity.round(0) if measurement.humidity
-    params[:tempin] = (measurement.temperature * 10).round(0) if measurement.temperature  # indoor not available, using outdoor
+    params[:tempin] = (measurement.temperature * 10).round(0) if measurement.temperature
 
-    # Wind (m/s * 10, degrees)
     params[:wspd] = (measurement.wind_speed * 10).round(0) if measurement.wind_speed
     params[:wdir] = measurement.wind_dir.round(0) if measurement.wind_dir
     params[:wspdhi] = (measurement.gust_speed * 10).round(0) if measurement.gust_speed
 
-    # Barometric pressure (hPa * 10)
     params[:bar] = (measurement.barometer_rel * 10).round(0) if measurement.barometer_rel
 
-    # Rain (mm * 10, mm/hr * 10)
     params[:rain] = (measurement.rain_day * 10).round(0) if measurement.rain_day
     params[:rainrate] = (measurement.rain_rate * 10).round(0) if measurement.rain_rate
 
-    # Solar and UV (W/m² * 10, index * 10)
     params[:solarrad] = (measurement.light * 10).round(0) if measurement.light
     params[:uvi] = (measurement.uvi * 10).round(0) if measurement.uvi
 
-    # Calculated values (C * 10)
     if measurement.dew_point
       params[:dew] = (measurement.dew_point * 10).round(0)
     end
 
     if measurement.feels_like
-      # WeatherCloud uses heat index for feels like
       params[:heat] = (measurement.feels_like * 10).round(0)
     end
 
-    wcloud_request = HTTParty.get(request_url, query: params)
-    Rails.logger.info "WeatherCloud response: #{wcloud_request.body}"
+    response = HTTParty.get(request_url, query: params, timeout: HTTP_TIMEOUT)
+    Rails.logger.info "WeatherCloud response: #{response.body}"
   end
 
-  def cwop(measurement)
-    # TODO: Implement cwop
+  def update_cwop(measurement)
+    claimed = claim_cwop_send_slot!
+    return unless claimed
+
+    begin
+      callsign = ENV.fetch("CWOP_CALLSIGN")
+      packet = build_cwop_packet(measurement, callsign)
+      send_cwop_packet(callsign, packet)
+    rescue StandardError
+      # Only release when this worker successfully claimed the slot.
+      release_cwop_send_slot!
+      raise
+    end
   end
 
-  def openweathermap(measurement)
-    # TODO: Implement openweathermap
+  private
+
+  # Atomically reserve the CWOP send window across Sidekiq processes.
+  # Returns true when this caller owns the slot for CWOP_MIN_INTERVAL.
+  def claim_cwop_send_slot!
+    Sidekiq.redis do |conn|
+      conn.set(@cwop_lock_key, Time.current.to_f.to_s, nx: true, ex: CWOP_MIN_INTERVAL.to_i)
+    end
   end
 
-  def metoffice(measurement)
-    # TODO: Implement metoffice
+  def release_cwop_send_slot!
+    Sidekiq.redis { |conn| conn.del(@cwop_lock_key) }
+  end
+
+  def build_cwop_packet(measurement, callsign)
+    lat = ENV.fetch("LOCATION_LAT").to_f
+    lon = ENV.fetch("LOCATION_LON").to_f
+    time_utc = measurement.reading_date_time.utc
+
+    timestamp = time_utc.strftime("%d%H%Mz")
+    position = "#{format_aprs_latitude(lat)}/#{format_aprs_longitude(lon)}"
+
+    wind_dir = format("%03d", measurement.wind_dir.round.clamp(0, 360) % 360)
+    wind_speed = format("%03d", measurement.wind_speed_mph.round.clamp(0, 999))
+    gust = format("%03d", measurement.gust_speed_mph.round.clamp(0, 999))
+    temp_f = format_cwop_temperature(measurement.temperature.to_fahrenheit)
+    rain_hour = format("%03d", (rain_last_hour_inches(measurement) * 100).round.clamp(0, 999))
+    rain_24h = format("%03d", (rain_last_24h_inches(measurement) * 100).round.clamp(0, 999))
+    rain_day = format("%03d", (measurement.rain_day_in * 100).round.clamp(0, 999))
+    humidity = format_cwop_humidity(measurement.humidity)
+    pressure = format("%05d", (measurement.barometer_abs * 10).round.clamp(0, 99_999))
+
+    weather = "#{wind_dir}/#{wind_speed}g#{gust}t#{temp_f}r#{rain_hour}p#{rain_24h}P#{rain_day}h#{humidity}b#{pressure}"
+
+    "#{callsign}>APRS,TCPIP*:@#{timestamp}#{position}_#{weather}"
+  end
+
+  # APRS weather temperature is a fixed 3-character field: "068" or "-13".
+  def format_cwop_temperature(temp_f)
+    value = temp_f.round.clamp(-99, 999)
+    return format("-%02d", value.abs) if value.negative?
+
+    format("%03d", value)
+  end
+
+  # APRS encodes 100% RH as h00. True 0% cannot be represented, so use h01.
+  def format_cwop_humidity(humidity)
+    value = humidity.to_i
+    return "00" if value >= 100
+    return "01" if value <= 0
+
+    format("%02d", value)
+  end
+
+  def format_aprs_latitude(lat)
+    hemisphere = lat >= 0 ? "N" : "S"
+    abs_lat = lat.abs
+    degrees = abs_lat.floor
+    minutes = (abs_lat - degrees) * 60.0
+    format("%02d%05.2f%s", degrees, minutes, hemisphere)
+  end
+
+  def format_aprs_longitude(lon)
+    hemisphere = lon >= 0 ? "E" : "W"
+    abs_lon = lon.abs
+    degrees = abs_lon.floor
+    minutes = (abs_lon - degrees) * 60.0
+    format("%03d%05.2f%s", degrees, minutes, hemisphere)
+  end
+
+  def rain_last_hour_inches(measurement)
+    accumulated_rain_inches(since: measurement.reading_date_time - 1.hour, through: measurement)
+  end
+
+  def rain_last_24h_inches(measurement)
+    accumulated_rain_inches(since: measurement.reading_date_time - 24.hours, through: measurement)
+  end
+
+  # Sum rain across a sliding window using the daily rain counter.
+  # Handles midnight resets (counter drops) by treating the new value as
+  # post-reset accumulation. Uses the reading at/before window start as baseline
+  # and prorates the first segment so pre-window rain is excluded.
+  def accumulated_rain_inches(since:, through:)
+    baseline = WeatherMeasurement
+      .where(reading_date_time: ..since)
+      .order(reading_date_time: :desc)
+      .limit(1)
+      .pick(:reading_date_time, :rain_day)
+
+    in_window = WeatherMeasurement
+      .where(reading_date_time: since..through.reading_date_time)
+      .order(:reading_date_time)
+      .pluck(:reading_date_time, :rain_day)
+
+    return 0.0 if in_window.empty?
+
+    series = []
+    series << baseline if baseline
+    in_window.each do |row|
+      series << row unless series.last == row
+    end
+
+    return 0.0 if series.size < 2
+
+    total_mm = 0.0
+    series.each_cons(2).with_index do |((t0, rain0), (t1, rain1)), index|
+      delta = rain_day_delta_mm(t0, rain0, t1, rain1)
+
+      if index.zero? && baseline && t0 < since && t1 > since
+        span = (t1 - t0).to_f
+        delta *= ((t1 - since).to_f / span).clamp(0.0, 1.0) if span.positive?
+      end
+
+      total_mm += delta
+    end
+
+    total_mm / 25.4
+  end
+
+  # Only treat a rain_day drop as a midnight reset when local date changes.
+  # Same-day decreases are ignored as sensor glitches/corrections.
+  def rain_day_delta_mm(t0, rain0, t1, rain1)
+    return rain1 - rain0 if rain1 >= rain0
+    return rain1 if crossed_local_midnight?(t0, t1)
+
+    0.0
+  end
+
+  def crossed_local_midnight?(t0, t1)
+    t0.in_time_zone.to_date != t1.in_time_zone.to_date
+  end
+
+  def send_cwop_packet(callsign, packet)
+    last_error = nil
+
+    CWOP_PORTS.each do |port|
+      socket = nil
+      begin
+        socket = open_cwop_socket(port)
+        read_line(socket) # server banner
+        socket.write("user #{callsign} pass #{CWOP_PASSCODE} vers #{SOFTWARE_TYPE} 1.0\r\n")
+        read_line(socket) # login ack
+        socket.write("#{packet}\r\n")
+        Rails.logger.info "CWOP packet sent via #{CWOP_HOST}:#{port}: #{packet}"
+        return
+      rescue StandardError => e
+        last_error = e
+        Rails.logger.warn "CWOP send via #{CWOP_HOST}:#{port} failed: #{e.message}"
+      ensure
+        socket&.close
+      end
+    end
+
+    raise last_error if last_error
+  end
+
+  def open_cwop_socket(port)
+    socket = @socket_factory.open(CWOP_HOST, port, connect_timeout: CWOP_SOCKET_TIMEOUT)
+    socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1) if socket.respond_to?(:setsockopt)
+    socket.timeout = CWOP_SOCKET_TIMEOUT if socket.respond_to?(:timeout=)
+    socket
+  end
+
+  def read_line(socket)
+    return unless socket.respond_to?(:gets)
+
+    socket.gets
   end
 end
