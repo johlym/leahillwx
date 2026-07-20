@@ -352,7 +352,7 @@ html.is-live .live-sparkline-pulse:not([hidden])::after {
 }
 
 @utility soil-channel-metric {
-  @apply grid justify-items-center gap-[0.05rem];
+  @apply grid justify-items-center gap-[0.2rem];
 }
 
 @utility soil-channel-value {
@@ -361,7 +361,7 @@ html.is-live .live-sparkline-pulse:not([hidden])::after {
 }
 
 @utility soil-channel-number {
-  @apply text-[0.78rem] font-medium;
+  @apply text-[0.78rem] font-bold;
 }
 
 @utility soil-channel-battery {
@@ -370,7 +370,7 @@ html.is-live .live-sparkline-pulse:not([hidden])::after {
 }
 
 @utility soil-channel-battery-number {
-  @apply text-[0.78rem] font-medium;
+  @apply text-[0.78rem] font-normal;
 }
 
 @utility soil-channel-unit {
