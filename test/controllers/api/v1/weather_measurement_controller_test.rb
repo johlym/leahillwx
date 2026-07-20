@@ -113,6 +113,30 @@ class Api::V1::WeatherMeasurementControllerTest < ActionDispatch::IntegrationTes
     assert_response :unprocessable_entity
   end
 
+  test "create rejects invalid temp_probe channel" do
+    payload = measurement_payload(
+      temp_probes: [ { channel: 9, temperature: 10.0, battery: 1.55 } ]
+    )
+
+    assert_no_difference("WeatherMeasurement.count") do
+      post api_v1_weather_measurement_url, params: payload, headers: auth_headers, as: :json
+    end
+
+    assert_response :unprocessable_entity
+  end
+
+  test "create rejects temp_probe without temperature" do
+    payload = measurement_payload(
+      temp_probes: [ { channel: 1, battery: 1.55 } ]
+    )
+
+    assert_no_difference("WeatherMeasurement.count") do
+      post api_v1_weather_measurement_url, params: payload, headers: auth_headers, as: :json
+    end
+
+    assert_response :unprocessable_entity
+  end
+
   test "create treats duplicate reading_date_time as success" do
     reading_at = Time.zone.parse("2026-06-01 12:00:00")
     WeatherMeasurement.create!(

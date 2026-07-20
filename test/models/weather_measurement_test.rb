@@ -183,6 +183,42 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
     SoilChannels.reload!
   end
 
+  test "soil_readings merges using committed site channel groupings" do
+    SoilChannels.config_path = Rails.root.join("config/soil_channels.yml")
+    SoilChannels.reload!
+
+    measurement = WeatherMeasurement.new(valid_attrs(
+      soil: [
+        { "channel" => 1, "moisture" => 70.0, "battery" => 1.6 },
+        { "channel" => 2, "moisture" => 55.0, "battery" => 1.58 },
+        { "channel" => 3, "moisture" => 40.0, "battery" => 1.5 }
+      ],
+      temp_probes: [
+        { "channel" => 1, "temperature" => 12.0, "battery" => 1.4 },
+        { "channel" => 2, "temperature" => 10.0, "battery" => 1.45 }
+      ]
+    ))
+
+    readings = measurement.soil_readings.index_by { |reading| reading["name"] }
+
+    assert_equal [ "Veggie Bed", "Front Yard", "Back Yard" ], measurement.soil_readings.map { |r| r["name"] }
+
+    assert_equal 70, readings["Veggie Bed"]["moisture"]
+    assert_nil readings["Veggie Bed"]["temperature_f"]
+
+    assert_equal 55, readings["Front Yard"]["moisture"]
+    assert_equal 50, readings["Front Yard"]["temperature_f"]
+    assert_equal 1.58, readings["Front Yard"]["moisture_battery"]
+    assert_equal 1.45, readings["Front Yard"]["temperature_battery"]
+
+    assert_equal 40, readings["Back Yard"]["moisture"]
+    assert_equal 54, readings["Back Yard"]["temperature_f"] # 12°C
+    assert_equal 1.4, readings["Back Yard"]["temperature_battery"]
+  ensure
+    SoilChannels.config_path = nil
+    SoilChannels.reload!
+  end
+
   test "accepts valid temp_probes" do
     measurement = WeatherMeasurement.new(valid_attrs(
       temp_probes: [

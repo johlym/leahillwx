@@ -83,6 +83,10 @@
             "items": {
               "type": "object",
               "required": ["channel"],
+              "anyOf": [
+                { "required": ["moisture"] },
+                { "required": ["temperature"] }
+              ],
               "properties": {
                 "channel": {
                   "type": "integer",

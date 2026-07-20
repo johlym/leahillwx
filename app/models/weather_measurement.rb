@@ -280,19 +280,12 @@ class WeatherMeasurement < ApplicationRecord
         errors.add(attribute, "moisture must be a number")
       end
 
-      if !temperature.nil? && !has_temperature
+      if !has_temperature && (!temperature.nil? || required_fields.include?("temperature"))
         errors.add(attribute, "temperature must be a number")
       end
 
       if require_moisture_or_temperature && !has_moisture && !has_temperature
         errors.add(attribute, "entry must include moisture or temperature")
-      end
-
-      required_fields.each do |field|
-        value = entry[field]
-        next if value.is_a?(Numeric)
-
-        errors.add(attribute, "#{field} must be a number") if value.nil? || !value.is_a?(Numeric)
       end
 
       if !battery.nil? && !battery.is_a?(Numeric)
