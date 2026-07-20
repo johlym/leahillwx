@@ -14,8 +14,10 @@
 Veggie Bed:
   soil: 1
 
-Front Bed 1:
+Front Yard:
   soil: 2
+  temp_probe: 2
 
-Back Bed 1:
+Back Yard:
   soil: 3
+  temp_probe: 1
