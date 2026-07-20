@@ -2,4 +2,4 @@ web: env RUBY_DEBUG_OPEN=true bin/rails server
 js: yarn build --watch
 css: yarn build:css --watch
 sidekiq: bundle exec sidekiq
-listener: ../listener/target/release/wxlistener -c ../listener/target/release/wxlistener.toml
+listener: ../listener/target/release/wxlistener -c ../listener/target/release/wxlistener.toml --debug-sensors
