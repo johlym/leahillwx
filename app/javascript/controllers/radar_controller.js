@@ -62,7 +62,6 @@ export default class extends Controller {
       maxZoom: 8,
     })
 
-    this.addStationMarker()
     this.addSiteMarkers()
 
     this.onZoom = () => this.syncMode()
@@ -279,18 +278,6 @@ export default class extends Controller {
   }
 
   // --- Markers / chrome -----------------------------------------------------
-
-  addStationMarker() {
-    const icon = L.divIcon({
-      className: "radar-marker",
-      html: '<span class="radar-marker-station" title="Weather station"></span>',
-      iconSize: [14, 14],
-      iconAnchor: [7, 7],
-    })
-    L.marker([this.latValue, this.lonValue], { icon, interactive: false, keyboard: false })
-      .addTo(this.map)
-      .bindTooltip("Lea Hill station", { direction: "top", offset: [0, -6] })
-  }
 
   addSiteMarkers() {
     this.sitesValue.forEach((site) => {

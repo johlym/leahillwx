@@ -47,6 +47,44 @@
   & .leaflet-control-attribution {
     @apply text-[0.6rem] leading-tight max-w-[70vw] sm:max-w-none;
     background: color-mix(in oklab, var(--color-bg) 80%, transparent) !important;
+    color: var(--color-muted);
+  }
+
+  /* Dark-theme Leaflet chrome (default zoom bar is white). */
+  & .leaflet-bar {
+    border: 1px solid var(--color-border);
+    border-radius: 0.45rem;
+    overflow: hidden;
+    box-shadow: none;
+    background: color-mix(in oklab, var(--color-bg) 88%, transparent);
+    backdrop-filter: blur(12px);
+  }
+
+  & .leaflet-bar a {
+    @apply text-text-strong;
+    background: transparent;
+    border-bottom-color: var(--color-border);
+    width: 2.5rem;
+    height: 2.5rem;
+    line-height: 2.5rem;
+    font-size: 1.15rem;
+  }
+
+  & .leaflet-bar a:hover,
+  & .leaflet-bar a:focus {
+    @apply text-text-strong;
+    background: var(--color-surface);
+  }
+
+  & .leaflet-bar a.leaflet-disabled {
+    @apply text-subtle;
+    background: transparent;
+  }
+
+  & .leaflet-touch .leaflet-bar a {
+    width: 2.75rem;
+    height: 2.75rem;
+    line-height: 2.75rem;
   }
 }
 
@@ -124,12 +162,6 @@
 /* Leaflet divIcon markers for station + radar sites. */
 @utility radar-marker {
   @apply flex items-center justify-center;
-}
-
-@utility radar-marker-station {
-  @apply w-3.5 h-3.5 rounded-full border-2 border-accent-contrast;
-  background: var(--color-accent);
-  box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-accent) 45%, transparent);
 }
 
 @utility radar-marker-site {
