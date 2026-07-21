@@ -21,7 +21,8 @@ class RadarSmokeTest < ApplicationSystemTestCase
     assert_selector "body.radar-page"
     assert_selector "[data-controller='radar']"
     assert_selector "[data-radar-target='map']"
-    assert_selector "button.radar-site-chip", text: "Composite"
+    # CSS uppercases chip labels; match case-insensitively on visible text.
+    assert_selector "button.radar-site-chip", text: /composite/i
     assert_selector "button.radar-site-chip", text: "ATX"
     assert_text "lhwx.org"
   end
@@ -44,7 +45,7 @@ class RadarSmokeTest < ApplicationSystemTestCase
     find("button.radar-site-chip", text: "ATX").click
     assert_selector "button.radar-site-chip.is-active[data-site-id='KATX'][aria-pressed='true']"
 
-    find("button.radar-site-chip", text: "Composite").click
+    find("button.radar-site-chip", text: /composite/i).click
     assert_selector "button.radar-site-chip.is-active[data-site-id=''][aria-pressed='true']"
   end
 end

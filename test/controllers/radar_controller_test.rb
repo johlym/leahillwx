@@ -55,11 +55,12 @@ class RadarControllerTest < ActionDispatch::IntegrationTest
 
   test "index uses the slim radar footer instead of the full site footer" do
     get radar_url
-    assert_select "footer.site-footer-radar"
+    assert_select "footer.site-footer.site-footer-radar"
     assert_select "footer.site-footer-radar a[href='https://mesonet.agron.iastate.edu/']"
     assert_select "footer.site-footer-radar a[href='https://www.rainviewer.com/']"
     assert_select "footer.site-footer-radar a[href='https://carto.com/attributions']"
-    assert_select ".site-footer", count: 0
+    assert_no_match(/Data is not guaranteed to be accurate/, response.body)
+    assert_no_match(/Measurement no\./, response.body)
   end
 
   test "header includes Radar nav link on desktop and mobile menus" do
