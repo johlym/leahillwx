@@ -1,10 +1,22 @@
 // Pure helpers for building radar tile frame lists (IEM + RainViewer).
 
 export const IEM_TILE_BASE = "https://mesonet{s}.agron.iastate.edu/cache/tile.py/1.0.0"
-export const IEM_SUBDOMAINS = "123"
+// Empty string hits mesonet.agron.iastate.edu; 1/2/3 are CDN aliases.
+export const IEM_SUBDOMAINS = ["", "1", "2", "3"]
 export const RAINVIEWER_API = "https://api.rainviewer.com/public/weather-maps.json"
 export const RIDGE_PRODUCT = "N0B"
 export const MOSAIC_LAYER = "nexrad-n0q"
+
+/** Primary dark basemap (CARTO). Avoid a/b/c/d letter subdomains — some
+ * resolvers only answer the apex basemaps.cartocdn.com host. */
+export const CARTO_DARK_URL = "https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+export const CARTO_ATTR =
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+
+/** Fallback dark basemap (Esri). Note z/y/x order. */
+export const ESRI_DARK_URL =
+  "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+export const ESRI_ATTR = "Tiles &copy; Esri"
 
 /** Relative mosaic offsets (minutes ago), oldest → newest, plus current. */
 export const MOSAIC_OFFSETS = [55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5, 0]

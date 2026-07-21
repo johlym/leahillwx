@@ -4,6 +4,10 @@ import {
   IEM_TILE_BASE,
   IEM_SUBDOMAINS,
   RAINVIEWER_API,
+  CARTO_DARK_URL,
+  CARTO_ATTR,
+  ESRI_DARK_URL,
+  ESRI_ATTR,
   buildMosaicFrames,
   buildRidgeFrames,
   buildRainviewerFrames,
@@ -41,6 +45,7 @@ export default class extends Controller {
     this.timer = null
     this.activeMode = null
     this.rainviewerCache = null
+    this.basemapErrors = 0
 
     this.map = L.map(this.mapTarget, {
       zoomControl: true,
@@ -50,11 +55,7 @@ export default class extends Controller {
       preferCanvas: true,
     })
 
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-      attribution: "&copy; OpenStreetMap &copy; CARTO",
-      subdomains: "abcd",
-      maxZoom: 11,
-    }).addTo(this.map)
+    this.addBasemap()
 
     this.map.fitBounds(boundsForRadius(this.latValue, this.lonValue, 200), {
       padding: [12, 12],
@@ -67,6 +68,11 @@ export default class extends Controller {
     this.onZoom = () => this.syncMode()
     this.map.on("zoomend", this.onZoom)
 
+    this.resizeObserver = new ResizeObserver(() => {
+      if (this.map) this.map.invalidateSize({ animate: false })
+    })
+    this.resizeObserver.observe(this.mapTarget)
+
     // Defer size fix until layout settles (mobile address-bar / flex shell).
     requestAnimationFrame(() => {
       this.map.invalidateSize()
@@ -76,6 +82,10 @@ export default class extends Controller {
 
   disconnect() {
     this.stopTimer()
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect()
+      this.resizeObserver = null
+    }
     if (this.map) {
       this.map.off("zoomend", this.onZoom)
       this.map.remove()
@@ -83,6 +93,30 @@ export default class extends Controller {
     }
     this.tileLayers = []
     this.siteMarkers.clear()
+  }
+
+  addBasemap() {
+    this.basemap = L.tileLayer(CARTO_DARK_URL, {
+      attribution: CARTO_ATTR,
+      maxZoom: 11,
+      crossOrigin: true,
+    })
+
+    this.basemap.on("tileerror", () => {
+      this.basemapErrors += 1
+      // After a handful of failures, swap to Esri dark gray once.
+      if (this.basemapErrors >= 4 && !this.basemapFallback) {
+        this.basemapFallback = true
+        if (this.map.hasLayer(this.basemap)) this.map.removeLayer(this.basemap)
+        L.tileLayer(ESRI_DARK_URL, {
+          attribution: ESRI_ATTR,
+          maxZoom: 11,
+          crossOrigin: true,
+        }).addTo(this.map)
+      }
+    })
+
+    this.basemap.addTo(this.map)
   }
 
   async bootstrap() {

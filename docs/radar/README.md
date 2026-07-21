@@ -66,6 +66,12 @@ The map fits an approximate **200-mile radius** around `LOCATION_LAT` / `LOCATIO
 
 Leaflet JS comes from the `leaflet` npm package (bundled by esbuild). Leaflet CSS is vendored at `app/assets/stylesheets/vendor/leaflet.css`.
 
+### Basemap notes
+
+- Primary basemap: CARTO Dark Matter via the **apex** host `basemaps.cartocdn.com` (letter subdomains like `a.basemaps.cartocdn.com` fail to resolve in some environments).
+- If CARTO tiles error repeatedly, the controller falls back once to Esri World Dark Gray.
+- Leaflet’s default `mix-blend-mode: plus-lighter` on tiles is overridden on this page so dark basemaps stay visible against the site palette.
+
 ## Local development
 
 ```bash

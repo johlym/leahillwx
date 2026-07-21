@@ -36,6 +36,14 @@
     @apply w-full h-full bg-bg font-sans;
   }
 
+  /* Leaflet 1.9 sets mix-blend-mode: plus-lighter on tiles, which can make
+     dark basemaps disappear against our palette backgrounds. */
+  & .leaflet-container img.leaflet-tile {
+    mix-blend-mode: normal !important;
+    max-width: none !important;
+    max-height: none !important;
+  }
+
   & .leaflet-control-attribution {
     @apply text-[0.6rem] leading-tight max-w-[70vw] sm:max-w-none;
     background: color-mix(in oklab, var(--color-bg) 80%, transparent) !important;

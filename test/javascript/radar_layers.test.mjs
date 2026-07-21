@@ -3,6 +3,8 @@ import { describe, it } from "node:test"
 import {
   MOSAIC_OFFSETS,
   RIDGE_PRODUCT,
+  CARTO_DARK_URL,
+  IEM_SUBDOMAINS,
   buildMosaicFrames,
   buildRidgeFrames,
   buildRainviewerFrames,
@@ -72,5 +74,16 @@ describe("toIemTimestamp / ridgeListUrl", () => {
       ridgeListUrl("RTX", date, date),
       /operation=list&radar=RTX&product=N0B&start=2026-07-21T04%3A40Z&end=2026-07-21T04%3A40Z/,
     )
+  })
+})
+
+describe("basemap / IEM hosts", () => {
+  it("uses apex CARTO host without letter subdomains", () => {
+    assert.match(CARTO_DARK_URL, /^https:\/\/basemaps\.cartocdn\.com\//)
+    assert.doesNotMatch(CARTO_DARK_URL, /\{s\}/)
+  })
+
+  it("includes the bare mesonet host in IEM subdomains", () => {
+    assert.deepEqual(IEM_SUBDOMAINS, ["", "1", "2", "3"])
   })
 })
