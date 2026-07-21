@@ -38,6 +38,10 @@
   <body class="site-body <%= yield(:body_class) %>" data-controller="weather-update">
     <%= render "layouts/shared/header" %>
     <main class="site-main"><%= yield %></main>
-    <%= render "layouts/shared/footer" %>
+    <% if content_for?(:footer) %>
+      <%= yield :footer %>
+    <% else %>
+      <%= render "layouts/shared/footer" %>
+    <% end %>
   </body>
 </html>

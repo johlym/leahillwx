@@ -1,0 +1,128 @@
+/* Full-viewport radar page — 100dvh shell, touch-friendly controls. */
+
+@utility radar-page {
+  @apply h-dvh max-h-dvh overflow-hidden;
+
+  /* Prefer small viewport height on mobile browsers with dynamic chrome. */
+  height: 100svh;
+  max-height: 100svh;
+
+  & .site-header {
+    @apply shrink-0 relative z-50;
+  }
+
+  /* Mobile menu overlays the map instead of expanding document height. */
+  & .site-header-mobile-menu {
+    @apply absolute inset-x-0 top-full z-50 shadow-lg;
+  }
+
+  & .site-main {
+    @apply min-h-0 flex-1 flex flex-col overflow-hidden;
+  }
+
+  & .site-footer-radar {
+    @apply shrink-0 mt-0 py-1.5 px-3 text-[0.65rem] leading-snug border-t border-border;
+  }
+}
+
+@utility radar-shell {
+  @apply relative flex-1 min-h-0 w-full;
+}
+
+@utility radar-map {
+  @apply absolute inset-0 z-0 w-full h-full bg-bg;
+}
+
+@utility radar-controls {
+  @apply absolute z-20 inset-x-2 bottom-2 sm:inset-x-auto sm:left-3 sm:right-auto sm:bottom-3
+         flex flex-col gap-2 pointer-events-none
+         max-w-[calc(100%-1rem)] sm:max-w-md;
+}
+
+@utility radar-controls-playback {
+  @apply pointer-events-auto flex items-center gap-2
+         rounded-[0.45rem] border border-border px-2 py-1.5
+         backdrop-blur-md;
+  background: color-mix(in oklab, var(--color-bg) 88%, transparent);
+}
+
+@utility radar-controls-sites {
+  @apply pointer-events-auto flex items-stretch gap-1 overflow-x-auto
+         overscroll-x-contain [-webkit-overflow-scrolling:touch]
+         rounded-[0.45rem] border border-border p-1
+         backdrop-blur-md;
+  background: color-mix(in oklab, var(--color-bg) 88%, transparent);
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility radar-control-btn {
+  @apply inline-flex items-center justify-center shrink-0
+         min-h-11 min-w-11 sm:min-h-10 sm:min-w-10
+         rounded-[0.35rem] border border-border bg-surface
+         text-text-strong cursor-pointer
+         touch-manipulation select-none;
+
+  &:hover {
+    @apply bg-bg-elevated;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
+@utility radar-timestamp {
+  @apply font-mono text-[0.75rem] sm:text-[0.8rem] text-muted
+         whitespace-nowrap truncate min-w-0;
+}
+
+@utility radar-site-chip {
+  @apply inline-flex items-center justify-center shrink-0
+         min-h-11 px-3 sm:min-h-9 sm:px-2.5
+         rounded-[0.3rem] border border-transparent
+         text-[0.75rem] sm:text-[0.7rem] font-medium uppercase tracking-[0.04em]
+         text-muted cursor-pointer touch-manipulation select-none
+         whitespace-nowrap;
+
+  &:hover {
+    @apply text-text-strong bg-surface;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 1px;
+  }
+
+  &.is-active {
+    @apply text-accent-strong border-border bg-surface;
+    background-color: color-mix(in oklab, var(--color-accent) 14%, transparent);
+  }
+}
+
+/* Leaflet divIcon markers for station + radar sites. */
+@utility radar-marker {
+  @apply flex items-center justify-center;
+}
+
+@utility radar-marker-site {
+  @apply min-w-11 min-h-11 sm:min-w-9 sm:min-h-9
+         flex items-center justify-center rounded-full
+         border border-border text-[0.65rem] font-semibold
+         text-text-strong cursor-pointer touch-manipulation
+         backdrop-blur-sm;
+  background: color-mix(in oklab, var(--color-bg-elevated) 90%, transparent);
+
+  &.is-active {
+    @apply text-accent-contrast border-accent;
+    background: var(--color-accent);
+  }
+}
+
+@utility radar-marker-site-label {
+  @apply px-1;
+}
