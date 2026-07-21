@@ -46,6 +46,7 @@ export default class extends Controller {
     this.activeMode = null
     this.rainviewerCache = null
     this.basemapErrors = 0
+    this.syncGeneration = 0
 
     this.map = L.map(this.mapTarget, {
       zoomControl: true,
@@ -64,7 +65,9 @@ export default class extends Controller {
 
     this.addSiteMarkers()
 
-    this.onZoom = () => this.syncMode()
+    this.onZoom = () => {
+      this.syncMode()
+    }
     this.map.on("zoomend", this.onZoom)
 
     this.resizeObserver = new ResizeObserver(() => {
@@ -80,6 +83,7 @@ export default class extends Controller {
   }
 
   disconnect() {
+    this.syncGeneration += 1
     this.stopTimer()
     if (this.resizeObserver) {
       this.resizeObserver.disconnect()
@@ -119,15 +123,7 @@ export default class extends Controller {
   }
 
   async bootstrap() {
-    try {
-      await this.syncMode({ force: true })
-      this.startTimer()
-    } catch (error) {
-      console.error("Radar bootstrap failed", error)
-      if (this.hasTimestampTarget) {
-        this.timestampTarget.textContent = "Radar unavailable"
-      }
-    }
+    await this.syncMode({ force: true })
   }
 
   // --- UI actions -----------------------------------------------------------
@@ -166,34 +162,52 @@ export default class extends Controller {
     const mode = this.resolveMode()
     if (!force && mode === this.activeMode && this.frames.length > 0) return
 
-    this.activeMode = mode
+    const generation = ++this.syncGeneration
     this.stopTimer()
     this.clearRadarLayers()
+    this.frames = []
 
-    if (mode === "ridge") {
-      const site = this.sitesValue.find((s) => s.id === this.selectedSiteId)
-      if (!site) {
-        this.selectedSiteId = null
-        this.updateSiteUi()
-        return this.syncMode({ force: true })
+    try {
+      let frames
+      if (mode === "ridge") {
+        const site = this.sitesValue.find((s) => s.id === this.selectedSiteId)
+        if (!site) {
+          this.selectedSiteId = null
+          this.updateSiteUi()
+          return this.syncMode({ force: true })
+        }
+        frames = await this.loadRidgeFrames(site.sector)
+      } else if (mode === "rainviewer") {
+        frames = await this.loadRainviewerFrames()
+      } else {
+        frames = buildMosaicFrames()
       }
-      this.frames = await this.loadRidgeFrames(site.sector)
-    } else if (mode === "rainviewer") {
-      this.frames = await this.loadRainviewerFrames()
-    } else {
-      this.frames = buildMosaicFrames()
+
+      if (generation !== this.syncGeneration || !this.map) return
+
+      if (frames.length === 0) {
+        this.activeMode = null
+        if (this.hasTimestampTarget) this.timestampTarget.textContent = "No frames"
+        return
+      }
+
+      this.activeMode = mode
+      this.frames = frames
+      this.frameIndex = this.frames.length - 1
+      this.tileLayers = this.frames.map((frame) => this.createFrameLayer(frame))
+      this.showFrame(this.frameIndex)
+
+      if (this.playing) this.startTimer()
+    } catch (error) {
+      if (generation !== this.syncGeneration || !this.map) return
+      console.error("Radar sync failed", error)
+      this.activeMode = null
+      this.frames = []
+      this.tileLayers = []
+      if (this.hasTimestampTarget) {
+        this.timestampTarget.textContent = "Radar unavailable"
+      }
     }
-
-    if (this.frames.length === 0) {
-      if (this.hasTimestampTarget) this.timestampTarget.textContent = "No frames"
-      return
-    }
-
-    this.frameIndex = this.frames.length - 1
-    this.tileLayers = this.frames.map((frame) => this.createFrameLayer(frame))
-    this.showFrame(this.frameIndex)
-
-    if (this.playing) this.startTimer()
   }
 
   async loadRidgeFrames(sector) {

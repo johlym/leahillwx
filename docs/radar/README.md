@@ -97,7 +97,7 @@ bin/rails test test/models/radar_site_test.rb test/controllers/radar_controller_
 bin/rails test:system TEST=test/system/radar_smoke_test.rb
 ```
 
-CI runs `yarn test:js` alongside the Rails test suite (see `.github/workflows/ci.yml`).
+CI runs `yarn test:js` in the unit-test job and `yarn build` / `yarn build:css` before system tests (see `.github/workflows/ci.yml`).
 
 ## Attribution
 
