@@ -59,6 +59,18 @@
   }
 }
 
+@utility radar-controls-tilts {
+  @apply pointer-events-auto flex items-center gap-1
+         rounded-[0.45rem] border border-border p-1 pl-2
+         backdrop-blur-md w-fit max-w-full;
+  background: color-mix(in oklab, var(--color-bg) 88%, transparent);
+}
+
+@utility radar-controls-label {
+  @apply shrink-0 px-1 text-[0.7rem] sm:text-[0.65rem] font-medium uppercase
+         tracking-[0.06em] text-muted whitespace-nowrap;
+}
+
 @utility radar-control-btn {
   @apply inline-flex items-center justify-center shrink-0
          min-h-11 min-w-11 sm:min-h-10 sm:min-w-10

@@ -8,7 +8,7 @@
     "node": "24.x"
   },
   "scripts": {
-    "build": "esbuild app/javascript/*.* --bundle --sourcemap --format=esm --outdir=app/assets/builds --public-path=/assets --loader:.png=file --loader:.svg=file",
+    "build": "node esbuild.config.mjs",
     "build:css": "npx @tailwindcss/cli -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --minify",
     "test:js": "node --test test/javascript/**/*.test.mjs"
   },
@@ -18,8 +18,10 @@
     "@tailwindcss/cli": "^4.1.18",
     "@tailwindcss/typography": "latest",
     "@tailwindplus/elements": "^1.0.0",
+    "buffer": "6.0.3",
     "chart.js": "^4.5.1",
     "leaflet": "^1.9.4",
+    "nexrad-level-3-data": "0.6.1",
     "tailwindcss": "^4.1.18"
   }
 }

@@ -3,6 +3,7 @@ import { describe, it } from "node:test"
 import {
   MOSAIC_OFFSETS,
   RIDGE_PRODUCT,
+  RIDGE_TILTS,
   CARTO_DARK_URL,
   IEM_SUBDOMAINS,
   buildMosaicFrames,
@@ -11,6 +12,7 @@ import {
   boundsForRadius,
   toIemTimestamp,
   ridgeListUrl,
+  ridgeProductForTilt,
 } from "../../app/javascript/controllers/helpers/radar_layers.js"
 
 describe("buildMosaicFrames", () => {
@@ -36,6 +38,24 @@ describe("buildRidgeFrames", () => {
     assert.equal(frames.length, 2)
     assert.equal(frames[0].layer, "ridge::ATX-N0B-202607210430")
     assert.equal(frames[1].layer, "ridge::ATX-N0B-202607210435")
+  })
+
+  it("accepts alternate tilt products", () => {
+    const frames = buildRidgeFrames("ATX", [{ ts: "2026-07-21T04:30Z" }], "N1B")
+    assert.equal(frames[0].layer, "ridge::ATX-N1B-202607210430")
+  })
+})
+
+describe("ridgeProductForTilt", () => {
+  it("maps display tilts to Level III products", () => {
+    assert.deepEqual(
+      RIDGE_TILTS.map((t) => t.degrees),
+      ["0.5", "1.0", "1.5"],
+    )
+    assert.equal(ridgeProductForTilt("0.5"), "N0B")
+    assert.equal(ridgeProductForTilt("1.0"), "NAB")
+    assert.equal(ridgeProductForTilt("1.5"), "N1B")
+    assert.equal(ridgeProductForTilt("9.9"), "N0B")
   })
 })
 
@@ -74,6 +94,7 @@ describe("toIemTimestamp / ridgeListUrl", () => {
       ridgeListUrl("RTX", date, date),
       /operation=list&radar=RTX&product=N0B&start=2026-07-21T04%3A40Z&end=2026-07-21T04%3A40Z/,
     )
+    assert.match(ridgeListUrl("RTX", date, date, "NAB"), /product=NAB/)
   })
 })
 

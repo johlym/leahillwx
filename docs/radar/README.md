@@ -14,7 +14,7 @@ The `/radar` route is a full-viewport live weather radar map for Lea Hill Weathe
 | Mode | Source | When |
 |---|---|---|
 | **Composite** (default) | Iowa Environmental Mesonet CONUS mosaic `nexrad-n0q` | Mid/high zoom, no site selected |
-| **Single site** | IEM RIDGE tiles for one NEXRAD (`N0B` base reflectivity) | User selects ATX / RTX / LGX |
+| **Single site** | Unidata Level III reflectivity (`N0B` / `NAB` / `N1B` tilts) plotted client-side | User selects ATX / RTX / LGX |
 | **Wide** | [RainViewer](https://www.rainviewer.com/) Weather Maps API | Zoom ≤ 6 and no site selected |
 
 ### Local NEXRAD sites
@@ -34,10 +34,10 @@ Site markers on the map mirror the chip control: click a marker to toggle that o
 ## Animation
 
 - **Mosaic:** ~55 minutes of history via `nexrad-n0q-m55m` … `m05m` plus current `nexrad-n0q` (5-minute steps).
-- **RIDGE:** recent volume scans from `https://mesonet.agron.iastate.edu/json/radar.py?operation=list&…`, rendered as `ridge::{SECTOR}-N0B-{YYYYMMDDHHMI}` TMS layers.
+- **Single site:** Unidata Level III objects from `https://unidata-nexrad-level3.s3.amazonaws.com` (`{SECTOR}_{PRODUCT}_{YYYY}_{MM}_{DD}_{HH}_{MI}_{SS}`), decoded in-browser and drawn as Leaflet image overlays at **1800×1800**. Tilt selector (site-only): `0.5°` → `N0B`, `1.0°` → `NAB` (~0.9°), `1.5°` → `N1B`. (IEM RIDGE tiles only archive `N0B`, so higher tilts cannot use that TMS path.) On `/radar` load, all local sites × tilts prefetch in the background into an in-memory cache so station/tilt switches can reuse frames without re-downloading.
 - **RainViewer:** ~2 hours from `https://api.rainviewer.com/public/weather-maps.json`.
 
-Playback controls: play/pause + timestamp (Pacific time). Default is autoplay.
+Playback controls: play/pause + timestamp (Pacific time). Default is autoplay. When a site is selected, a reflectivity tilt control appears between playback and the site chips.
 
 ## Default viewport
 

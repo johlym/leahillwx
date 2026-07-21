@@ -48,4 +48,19 @@ class RadarSmokeTest < ApplicationSystemTestCase
     find("button.radar-site-chip", text: /composite/i).click
     assert_selector "button.radar-site-chip.is-active[data-site-id=''][aria-pressed='true']"
   end
+
+  test "tilt selector appears only when a radar site is selected" do
+    visit radar_url
+
+    assert_selector "[data-radar-target='tiltControls'].hidden"
+    find("button.radar-site-chip", text: "ATX").click
+    assert_selector "[data-radar-target='tiltControls']:not(.hidden)"
+    assert_selector "button[data-radar-target='tiltChip'].is-active[data-tilt='0.5']"
+
+    find("button[data-radar-target='tiltChip'][data-tilt='1.5']").click
+    assert_selector "button[data-radar-target='tiltChip'].is-active[data-tilt='1.5']"
+
+    find("button.radar-site-chip", text: /composite/i).click
+    assert_selector "[data-radar-target='tiltControls'].hidden"
+  end
 end

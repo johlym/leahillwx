@@ -53,6 +53,15 @@ class RadarControllerTest < ActionDispatch::IntegrationTest
     assert_select "button.radar-site-chip[data-site-id='KLGX']", text: "LGX"
   end
 
+  test "index renders hidden tilt controls for single-site reflectivity" do
+    get radar_url
+    assert_select "[data-radar-target='tiltControls'].hidden"
+    assert_select "#radar-tilt-label", text: "Tilt"
+    assert_select "button[data-radar-target='tiltChip'][data-tilt='0.5']", text: "0.5°"
+    assert_select "button[data-radar-target='tiltChip'][data-tilt='1.0']", text: "1.0°"
+    assert_select "button[data-radar-target='tiltChip'][data-tilt='1.5']", text: "1.5°"
+  end
+
   test "index uses the slim radar footer instead of the full site footer" do
     get radar_url
     assert_select "footer.site-footer.site-footer-radar"
