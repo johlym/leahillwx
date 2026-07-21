@@ -18,5 +18,6 @@
 @import "./components/reports";
 @import "./components/records";
 @import "./components/almanac";
+@import "./components/radar";
 
 @import "./vendor/leaflet";
