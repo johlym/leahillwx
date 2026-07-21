@@ -193,7 +193,8 @@ export default class extends Controller {
 
       this.activeMode = mode
       this.frames = frames
-      this.frameIndex = this.frames.length - 1
+      // Oldest → newest; start at 0 so playback advances through time.
+      this.frameIndex = 0
       this.tileLayers = this.frames.map((frame) => this.createFrameLayer(frame))
       this.showFrame(this.frameIndex)
 
