@@ -21,3 +21,5 @@
 @import "./components/radar";
 
 @import "./vendor/leaflet";
+/* Unlayered; must follow vendor/leaflet so zoom-bar overrides win. */
+@import "./components/radar-leaflet";

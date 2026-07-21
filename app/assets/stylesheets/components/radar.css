@@ -31,61 +31,6 @@
 
 @utility radar-map {
   @apply absolute inset-0 z-0 w-full h-full bg-bg;
-
-  & .leaflet-container {
-    @apply w-full h-full bg-bg font-sans;
-  }
-
-  /* Leaflet 1.9 sets mix-blend-mode: plus-lighter on tiles, which can make
-     dark basemaps disappear against our palette backgrounds. */
-  & .leaflet-container img.leaflet-tile {
-    mix-blend-mode: normal !important;
-    max-width: none !important;
-    max-height: none !important;
-  }
-
-  & .leaflet-control-attribution {
-    @apply text-[0.6rem] leading-tight max-w-[70vw] sm:max-w-none;
-    background: color-mix(in oklab, var(--color-bg) 80%, transparent) !important;
-    color: var(--color-muted);
-  }
-
-  /* Dark-theme Leaflet chrome (default zoom bar is white). */
-  & .leaflet-bar {
-    border: 1px solid var(--color-border);
-    border-radius: 0.45rem;
-    overflow: hidden;
-    box-shadow: none;
-    background: color-mix(in oklab, var(--color-bg) 88%, transparent);
-    backdrop-filter: blur(12px);
-  }
-
-  & .leaflet-bar a {
-    @apply text-text-strong;
-    background: transparent;
-    border-bottom-color: var(--color-border);
-    width: 2.5rem;
-    height: 2.5rem;
-    line-height: 2.5rem;
-    font-size: 1.15rem;
-  }
-
-  & .leaflet-bar a:hover,
-  & .leaflet-bar a:focus {
-    @apply text-text-strong;
-    background: var(--color-surface);
-  }
-
-  & .leaflet-bar a.leaflet-disabled {
-    @apply text-subtle;
-    background: transparent;
-  }
-
-  & .leaflet-touch .leaflet-bar a {
-    width: 2.75rem;
-    height: 2.75rem;
-    line-height: 2.75rem;
-  }
 }
 
 @utility radar-controls {
