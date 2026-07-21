@@ -90,6 +90,9 @@ jobs:
         with:
           node-version-file: package.json
 
+      - name: Install JS dependencies
+        run: yarn install --frozen-lockfile
+
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -106,6 +109,9 @@ jobs:
           RAILS_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432
         run: bin/database_consistency
+
+      - name: Run JavaScript unit tests
+        run: yarn test:js
 
       - name: Run tests
         env:
