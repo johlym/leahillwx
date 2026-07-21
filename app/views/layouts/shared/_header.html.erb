@@ -21,6 +21,7 @@
 
     <div class="site-header-links">
       <%= link_to "Live",    root_path,    class: nav_link_classes(root_path) %>
+      <%= link_to "Radar",   radar_path,   class: nav_link_classes(radar_path) %>
       <%= link_to "Reports", reports_path, class: nav_link_classes(reports_path) %>
       <%= link_to "Records", records_path, class: nav_link_classes(records_path) %>
       <%= link_to "Graphs",  graphs_path,  class: nav_link_classes(graphs_path) %>
@@ -36,6 +37,7 @@
     <div class="site-header-mobile-links">
       <% [
            ["Live",    root_path],
+           ["Radar",   radar_path],
            ["Reports", reports_path],
            ["Records", records_path],
            ["Graphs",  graphs_path],

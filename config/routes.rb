@@ -51,6 +51,9 @@ Rails.application.routes.draw do
   get "almanac/available", to: "almanac#available", as: :available_almanac
   get "almanac/:year/:month_name", to: "almanac#show", as: :almanac_month
 
+  # Radar (full-viewport live map)
+  get "radar", to: "radar#index", as: :radar
+
   # Celestial routes (ephemeris API)
   get "celestial/sun", to: "celestial#sun"
   get "celestial/moon", to: "celestial#moon"

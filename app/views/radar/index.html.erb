@@ -1,0 +1,54 @@
+<% content_for :body_class, "radar-page" %>
+<% content_for :title, "Radar — Lea Hill Weather" %>
+<% content_for :footer do %>
+  <%= render "layouts/shared/footer_radar" %>
+<% end %>
+
+<div
+  class="radar-shell"
+  data-controller="radar"
+  data-radar-lat-value="<%= @lat %>"
+  data-radar-lon-value="<%= @lon %>"
+  data-radar-sites-value="<%= @radar_sites.to_json %>"
+  data-radar-wide-zoom-max-value="6">
+  <div class="radar-map" data-radar-target="map" role="application" aria-label="Live weather radar map"></div>
+
+  <div class="radar-controls" data-radar-target="controls">
+    <div class="radar-controls-playback" role="group" aria-label="Radar animation">
+      <button
+        type="button"
+        class="radar-control-btn"
+        data-radar-target="playPause"
+        data-action="click->radar#togglePlayback"
+        aria-label="Pause radar animation">
+        <i class="fa-solid fa-pause" aria-hidden="true" data-radar-target="pauseIcon"></i>
+        <i class="fa-solid fa-play hidden" aria-hidden="true" data-radar-target="playIcon"></i>
+      </button>
+      <span class="radar-timestamp" data-radar-target="timestamp" aria-live="polite">Loading…</span>
+    </div>
+
+    <div class="radar-controls-sites" role="group" aria-label="Radar source">
+      <button
+        type="button"
+        class="radar-site-chip is-active"
+        data-radar-target="siteChip"
+        data-site-id=""
+        data-action="click->radar#selectSite"
+        aria-pressed="true">
+        Composite
+      </button>
+      <% @radar_sites.each do |site| %>
+        <button
+          type="button"
+          class="radar-site-chip"
+          data-radar-target="siteChip"
+          data-site-id="<%= site.fetch(:id) %>"
+          data-action="click->radar#selectSite"
+          aria-pressed="false"
+          title="<%= site.fetch(:name) %> (<%= site.fetch(:id) %>)">
+          <%= site.fetch(:sector) %>
+        </button>
+      <% end %>
+    </div>
+  </div>
+</div>
