@@ -18,6 +18,7 @@
     "@tailwindcss/typography": "latest",
     "@tailwindplus/elements": "^1.0.0",
     "chart.js": "^4.5.1",
+    "leaflet": "^1.9.4",
     "tailwindcss": "^4.1.18"
   }
 }
