@@ -162,7 +162,7 @@ describe("resolvePreservedFrameIndex", () => {
     assert.equal(resolvePreservedFrameIndex(frames, frames[1]), 1)
   })
 
-  it("falls back to the latest frame at or before the prior time", () => {
+  it("falls back to the temporally closest frame", () => {
     const frames = [
       { id: "a", time: new Date("2026-07-22T12:00:00Z") },
       { id: "b", time: new Date("2026-07-22T12:10:00Z") },
@@ -174,6 +174,23 @@ describe("resolvePreservedFrameIndex", () => {
         time: new Date("2026-07-22T12:12:00Z"),
       }),
       1,
+    )
+  })
+
+  it("keeps nowcast playback from snapping back into past radar", () => {
+    const frames = [
+      { id: "past-1", time: new Date("2026-07-22T12:00:00Z"), isNowcast: false },
+      { id: "past-2", time: new Date("2026-07-22T12:10:00Z"), isNowcast: false },
+      { id: "nc-1", time: new Date("2026-07-22T12:20:00Z"), isNowcast: true },
+      { id: "nc-2", time: new Date("2026-07-22T12:30:00Z"), isNowcast: true },
+    ]
+    assert.equal(
+      resolvePreservedFrameIndex(frames, {
+        id: "nc-old",
+        time: new Date("2026-07-22T12:28:00Z"),
+        isNowcast: true,
+      }),
+      3,
     )
   })
 })

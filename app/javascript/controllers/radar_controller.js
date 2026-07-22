@@ -76,6 +76,7 @@ export default class extends Controller {
     this.librewxrCacheAt = 0
     this.alertsLayer = null
     this.alertPointMarkers = []
+    this.alertsGeneration = 0
     // sector:product → { frames } | { promise } for Level III reuse across sites/tilts
     this.level3Cache = new Map()
     this.basemapErrors = 0
@@ -125,6 +126,7 @@ export default class extends Controller {
 
   disconnect() {
     this.syncGeneration += 1
+    this.alertsGeneration += 1
     this.stopTimer()
     this.stopMetadataRefresh()
     this.stopAlertsRefresh()
@@ -242,6 +244,8 @@ export default class extends Controller {
       if (this.alertsEnabled) {
         this.syncAlerts({ force: true })
       } else {
+        // Invalidate in-flight fetches so a late response cannot re-render.
+        this.alertsGeneration += 1
         this.clearAlertsOverlay()
         this.clearAlertBanner()
       }
@@ -618,6 +622,7 @@ export default class extends Controller {
       return
     }
 
+    const generation = ++this.alertsGeneration
     try {
       const host = normalizeLibreWxrHost(this.librewxrHostValue)
       const response = await fetch(
@@ -625,9 +630,12 @@ export default class extends Controller {
       )
       if (!response.ok) throw new Error(`LibreWXR alerts HTTP ${response.status}`)
       const collection = await response.json()
+      // Drop stale responses when a newer fetch (or alerts-off) won the race.
+      if (generation !== this.alertsGeneration || !this.alertsEnabled || !this.map) return
       this.alertsFetchedAt = Date.now()
       this.renderAlerts(collection)
     } catch (error) {
+      if (generation !== this.alertsGeneration) return
       console.warn("LibreWXR alerts failed", error)
     }
   }

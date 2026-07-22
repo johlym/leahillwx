@@ -132,7 +132,8 @@ export function buildLibreWxrSatelliteFrames(api, { size = 256, tileHost } = {})
 
 /**
  * Pick a frame index after a metadata refresh so playback does not jump to 0.
- * Prefers an exact id match, otherwise the latest frame at or before the prior time.
+ * Prefers an exact id match, otherwise the temporally closest frame (past or nowcast).
+ * Ties prefer the later frame so nowcast playback does not snap backward into past radar.
  */
 export function resolvePreservedFrameIndex(frames, previousFrame) {
   if (!previousFrame || !Array.isArray(frames) || frames.length === 0) return 0
@@ -144,10 +145,15 @@ export function resolvePreservedFrameIndex(frames, previousFrame) {
   if (previousTime == null) return 0
 
   let best = 0
+  let bestDistance = Number.POSITIVE_INFINITY
   for (let i = 0; i < frames.length; i += 1) {
     const time = frames[i].time?.getTime?.()
-    if (time != null && time <= previousTime) best = i
-    else if (time != null && time > previousTime) break
+    if (time == null) continue
+    const distance = Math.abs(time - previousTime)
+    if (distance < bestDistance || (distance === bestDistance && i > best)) {
+      best = i
+      bestDistance = distance
+    }
   }
   return best
 }
