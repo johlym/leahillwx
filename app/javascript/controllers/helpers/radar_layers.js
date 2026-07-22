@@ -4,8 +4,24 @@ export const IEM_TILE_BASE = "https://mesonet{s}.agron.iastate.edu/cache/tile.py
 // Empty string hits mesonet.agron.iastate.edu; 1/2/3 are CDN aliases.
 export const IEM_SUBDOMAINS = ["", "1", "2", "3"]
 export const RAINVIEWER_API = "https://api.rainviewer.com/public/weather-maps.json"
+/** Default RIDGE product: super-res base reflectivity at ~0.5°. */
 export const RIDGE_PRODUCT = "N0B"
 export const MOSAIC_LAYER = "nexrad-n0q"
+
+/**
+ * Single-site reflectivity tilts (elevation angle → Level III product).
+ * Labels use common display degrees; NAB is officially ~0.9°.
+ */
+export const RIDGE_TILTS = [
+  { degrees: "0.5", product: "N0B", label: "0.5°" },
+  { degrees: "1.0", product: "NAB", label: "1.0°" },
+  { degrees: "1.5", product: "N1B", label: "1.5°" },
+]
+
+export function ridgeProductForTilt(degrees, fallback = RIDGE_PRODUCT) {
+  const match = RIDGE_TILTS.find((tilt) => tilt.degrees === String(degrees))
+  return match?.product || fallback
+}
 
 /** Primary dark basemap (CARTO). Avoid a/b/c/d letter subdomains — some
  * resolvers only answer the apex basemaps.cartocdn.com host. */

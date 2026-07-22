@@ -8,15 +8,18 @@ import {
   CARTO_ATTR,
   ESRI_DARK_URL,
   ESRI_ATTR,
+  RIDGE_PRODUCT,
+  RIDGE_TILTS,
   buildMosaicFrames,
-  buildRidgeFrames,
   buildRainviewerFrames,
   boundsForRadius,
-  ridgeListUrl,
+  ridgeProductForTilt,
 } from "./helpers/radar_layers"
+import { boundsForRadar, buildLevel3Frames } from "./helpers/level3_frames"
+import { shouldLimitRadarMemory } from "./helpers/level3_utils"
 
-// Full-viewport radar map: IEM mosaic (default), optional single-site RIDGE
-// (KATX/KRTX/KLGX), RainViewer at low zoom when no site is selected.
+// Full-viewport radar map: IEM mosaic (default), single-site Unidata Level III
+// tilts (KATX/KRTX/KLGX), RainViewer at low zoom when no site is selected.
 export default class extends Controller {
   static targets = [
     "map",
@@ -26,6 +29,8 @@ export default class extends Controller {
     "pauseIcon",
     "timestamp",
     "siteChip",
+    "tiltControls",
+    "tiltChip",
   ]
 
   static values = {
@@ -39,19 +44,26 @@ export default class extends Controller {
     this.playing = true
     this.frameIndex = 0
     this.selectedSiteId = null
+    this.selectedTilt = "0.5"
     this.frames = []
     this.tileLayers = []
     this.siteMarkers = new Map()
     this.timer = null
     this.activeMode = null
+    this.activeProduct = null
     this.rainviewerCache = null
+    // sector:product → { frames } | { promise } for Level III reuse across sites/tilts
+    this.level3Cache = new Map()
     this.basemapErrors = 0
     this.syncGeneration = 0
+    this.limitMemory = shouldLimitRadarMemory()
+    // High zoom × many tile layers OOMs mobile Safari; keep desktop detail.
+    this.mapMaxZoom = this.limitMemory ? 9 : 11
 
     this.map = L.map(this.mapTarget, {
       zoomControl: true,
       attributionControl: true,
-      maxZoom: 11,
+      maxZoom: this.mapMaxZoom,
       minZoom: 3,
       preferCanvas: true,
     })
@@ -60,15 +72,21 @@ export default class extends Controller {
 
     this.map.fitBounds(boundsForRadius(this.latValue, this.lonValue, 200), {
       padding: [12, 12],
-      maxZoom: 8,
+      maxZoom: Math.min(8, this.mapMaxZoom),
     })
 
     this.addSiteMarkers()
 
-    this.onZoom = () => {
-      this.syncMode()
+    this.onZoomStart = () => {
+      // Avoid animating (add/remove layers) while the user is pinching.
+      this.stopTimer()
     }
-    this.map.on("zoomend", this.onZoom)
+    this.onZoomEnd = () => {
+      this.syncMode()
+      if (this.playing) this.startTimer()
+    }
+    this.map.on("zoomstart", this.onZoomStart)
+    this.map.on("zoomend", this.onZoomEnd)
 
     this.resizeObserver = new ResizeObserver(() => {
       if (this.map) this.map.invalidateSize({ animate: false })
@@ -85,23 +103,27 @@ export default class extends Controller {
   disconnect() {
     this.syncGeneration += 1
     this.stopTimer()
+    this.clearRadarLayers()
+    this.disposeLevel3Cache()
     if (this.resizeObserver) {
       this.resizeObserver.disconnect()
       this.resizeObserver = null
     }
     if (this.map) {
-      this.map.off("zoomend", this.onZoom)
+      this.map.off("zoomstart", this.onZoomStart)
+      this.map.off("zoomend", this.onZoomEnd)
       this.map.remove()
       this.map = null
     }
-    this.tileLayers = []
     this.siteMarkers.clear()
   }
 
   addBasemap() {
     this.basemap = L.tileLayer(CARTO_DARK_URL, {
       attribution: CARTO_ATTR,
-      maxZoom: 11,
+      maxZoom: this.mapMaxZoom,
+      keepBuffer: this.limitMemory ? 1 : 2,
+      updateWhenZooming: false,
       crossOrigin: true,
     })
 
@@ -113,7 +135,9 @@ export default class extends Controller {
         if (this.map.hasLayer(this.basemap)) this.map.removeLayer(this.basemap)
         L.tileLayer(ESRI_DARK_URL, {
           attribution: ESRI_ATTR,
-          maxZoom: 11,
+          maxZoom: this.mapMaxZoom,
+          keepBuffer: this.limitMemory ? 1 : 2,
+          updateWhenZooming: false,
           crossOrigin: true,
         }).addTo(this.map)
       }
@@ -123,6 +147,9 @@ export default class extends Controller {
   }
 
   async bootstrap() {
+    // Desktop: warm site×tilt Level III in the background. Skip on mobile —
+    // prefetching ~9 products of 1800px canvases is a common tab-killer.
+    if (!this.limitMemory) this.prefetchAllRidgeFrames()
     await this.syncMode({ force: true })
   }
 
@@ -150,6 +177,14 @@ export default class extends Controller {
     this.syncMode({ force: true })
   }
 
+  selectTilt(event) {
+    const tilt = event.currentTarget.dataset.tilt
+    if (!tilt || tilt === this.selectedTilt) return
+    this.selectedTilt = tilt
+    this.updateTiltUi()
+    if (this.selectedSiteId) this.syncMode({ force: true })
+  }
+
   // --- Mode / frames --------------------------------------------------------
 
   resolveMode() {
@@ -158,25 +193,51 @@ export default class extends Controller {
     return "mosaic"
   }
 
+  ridgeProduct() {
+    return ridgeProductForTilt(this.selectedTilt, RIDGE_PRODUCT)
+  }
+
   async syncMode({ force = false } = {}) {
     const mode = this.resolveMode()
-    if (!force && mode === this.activeMode && this.frames.length > 0) return
+    const product = mode === "ridge" ? this.ridgeProduct() : null
+    if (
+      !force &&
+      mode === this.activeMode &&
+      product === this.activeProduct &&
+      this.frames.length > 0
+    ) {
+      return
+    }
 
     const generation = ++this.syncGeneration
     this.stopTimer()
     this.clearRadarLayers()
     this.frames = []
 
+    const site =
+      mode === "ridge"
+        ? this.sitesValue.find((s) => s.id === this.selectedSiteId)
+        : null
+    const cachedFrames =
+      mode === "ridge" && site
+        ? this.level3Cache.get(this.level3CacheKey(site.sector, product))?.frames
+        : null
+    // Empty arrays are valid cache hits (no usable scans for this product).
+    const cacheHit = Array.isArray(cachedFrames)
+
+    if (this.hasTimestampTarget && !cacheHit) {
+      this.timestampTarget.textContent = "Loading…"
+    }
+
     try {
       let frames
       if (mode === "ridge") {
-        const site = this.sitesValue.find((s) => s.id === this.selectedSiteId)
         if (!site) {
           this.selectedSiteId = null
           this.updateSiteUi()
           return this.syncMode({ force: true })
         }
-        frames = await this.loadRidgeFrames(site.sector)
+        frames = await this.loadRidgeFrames(site, product)
       } else if (mode === "rainviewer") {
         frames = await this.loadRainviewerFrames()
       } else {
@@ -187,11 +248,16 @@ export default class extends Controller {
 
       if (frames.length === 0) {
         this.activeMode = null
-        if (this.hasTimestampTarget) this.timestampTarget.textContent = "No frames"
+        this.activeProduct = null
+        if (this.hasTimestampTarget) {
+          this.timestampTarget.textContent =
+            mode === "ridge" ? `No frames for ${this.selectedTilt}°` : "No frames"
+        }
         return
       }
 
       this.activeMode = mode
+      this.activeProduct = product
       this.frames = frames
       // Oldest → newest; start at 0 so playback advances through time.
       this.frameIndex = 0
@@ -203,22 +269,100 @@ export default class extends Controller {
       if (generation !== this.syncGeneration || !this.map) return
       console.error("Radar sync failed", error)
       this.activeMode = null
+      this.activeProduct = null
       this.frames = []
-      this.tileLayers = []
+      this.clearRadarLayers()
       if (this.hasTimestampTarget) {
         this.timestampTarget.textContent = "Radar unavailable"
       }
     }
   }
 
-  async loadRidgeFrames(sector) {
-    const end = new Date()
-    const start = new Date(end.getTime() - 90 * 60_000)
-    const response = await fetch(ridgeListUrl(sector, start, end))
-    if (!response.ok) throw new Error(`IEM ridge list HTTP ${response.status}`)
-    const data = await response.json()
-    const scans = data.scans || []
-    return buildRidgeFrames(sector, scans)
+  level3CacheKey(sector, product) {
+    return `${sector}:${product}`
+  }
+
+  // Single-site tilts use Unidata Level III (IEM RIDGE tiles are N0B-only).
+  // Results are cached per sector+product so site/tilt switches reuse downloads
+  // (including empty lists when S3 listed no keys). All-load failures throw
+  // from buildLevel3Frames so the catch below drops the entry and syncMode
+  // can retry later instead of caching a poisoned [].
+  async loadRidgeFrames(site, product = this.ridgeProduct()) {
+    const key = this.level3CacheKey(site.sector, product)
+    const cached = this.level3Cache.get(key)
+    if (Array.isArray(cached?.frames)) return cached.frames
+    if (cached?.promise) return cached.promise
+
+    const promise = buildLevel3Frames(site.sector, product, site)
+      .then((frames) => {
+        const entry = this.level3Cache.get(key)
+        if (entry?.promise === promise) {
+          this.level3Cache.set(key, { frames })
+        } else {
+          // Cache was cleared (disconnect) while this load was in flight.
+          frames.forEach((frame) => {
+            if (frame?.kind === "level3" && frame.url?.startsWith("blob:")) {
+              URL.revokeObjectURL(frame.url)
+            }
+          })
+        }
+        return frames
+      })
+      .catch((error) => {
+        const entry = this.level3Cache.get(key)
+        if (entry?.promise === promise) this.level3Cache.delete(key)
+        throw error
+      })
+
+    this.level3Cache.set(key, { promise })
+    return promise
+  }
+
+  // Prefetch every local site × tilt on page load (background, low concurrency).
+  prefetchAllRidgeFrames() {
+    const jobs = []
+    this.sitesValue.forEach((site) => {
+      RIDGE_TILTS.forEach((tilt) => {
+        jobs.push({ site, product: tilt.product })
+      })
+    })
+    // Prefer default 0.5° (N0B) for each site first.
+    jobs.sort(
+      (a, b) =>
+        (a.product === RIDGE_PRODUCT ? 0 : 1) - (b.product === RIDGE_PRODUCT ? 0 : 1),
+    )
+
+    void this.runPrefetchQueue(jobs)
+  }
+
+  async runPrefetchQueue(jobs, concurrency = 1) {
+    let index = 0
+    const workers = Array.from({ length: concurrency }, async () => {
+      while (index < jobs.length && this.map) {
+        const job = jobs[index]
+        index += 1
+        try {
+          await this.loadRidgeFrames(job.site, job.product)
+        } catch (error) {
+          console.warn(
+            `Radar prefetch failed for ${job.site.sector} ${job.product}`,
+            error,
+          )
+        }
+      }
+    })
+    await Promise.all(workers)
+  }
+
+  disposeLevel3Cache() {
+    this.level3Cache.forEach((entry) => {
+      entry.frames?.forEach((frame) => {
+        if (frame?.kind === "level3" && frame.url?.startsWith("blob:")) {
+          URL.revokeObjectURL(frame.url)
+        }
+      })
+    })
+    this.level3Cache.clear()
   }
 
   async loadRainviewerFrames() {
@@ -231,11 +375,25 @@ export default class extends Controller {
   }
 
   createFrameLayer(frame) {
+    if (frame.kind === "level3") {
+      return L.imageOverlay(frame.url, boundsForRadar(frame.lat, frame.lon), {
+        opacity: 0,
+        interactive: false,
+        className: "radar-tile-layer",
+        zIndex: 200,
+      })
+    }
+
     const common = {
       opacity: 0,
       zIndex: 200,
-      maxZoom: 11,
-      maxNativeZoom: frame.kind === "rainviewer" ? 7 : 11,
+      maxZoom: this.mapMaxZoom,
+      // Opacity-0 layers used to stay mounted and still fetch tiles; keepBuffer
+      // low so a stray mount cannot balloon RAM on mobile.
+      keepBuffer: this.limitMemory ? 0 : 1,
+      updateWhenIdle: true,
+      updateWhenZooming: false,
+      maxNativeZoom: frame.kind === "rainviewer" ? 7 : this.mapMaxZoom,
       className: "radar-tile-layer",
     }
 
@@ -254,6 +412,8 @@ export default class extends Controller {
   }
 
   clearRadarLayers() {
+    // Only detach map layers. Level III blob URLs stay alive in level3Cache
+    // so tilt toggles can reuse them without re-downloading.
     this.tileLayers.forEach((layer) => {
       if (this.map && this.map.hasLayer(layer)) this.map.removeLayer(layer)
     })
@@ -261,13 +421,24 @@ export default class extends Controller {
   }
 
   showFrame(index) {
-    if (!this.frames.length) return
-    this.frameIndex = ((index % this.frames.length) + this.frames.length) % this.frames.length
+    if (!this.frames.length || !this.map) return
+    const nextIndex = ((index % this.frames.length) + this.frames.length) % this.frames.length
+    const nextLayer = this.tileLayers[nextIndex]
+    const prevLayer = this.tileLayers[this.frameIndex]
 
-    this.tileLayers.forEach((layer, i) => {
-      if (!this.map.hasLayer(layer)) layer.addTo(this.map)
-      layer.setOpacity(i === this.frameIndex ? 0.7 : 0)
-    })
+    // Mount only the active frame. Keeping every mosaic/Level III layer on the
+    // map at opacity 0 still loads tiles / decodes images and OOMs mobile tabs
+    // when zoomed in.
+    if (nextLayer) {
+      if (!this.map.hasLayer(nextLayer)) nextLayer.addTo(this.map)
+      nextLayer.setOpacity(0.7)
+    }
+
+    if (prevLayer && prevLayer !== nextLayer && this.map.hasLayer(prevLayer)) {
+      this.map.removeLayer(prevLayer)
+    }
+
+    this.frameIndex = nextIndex
 
     const frame = this.frames[this.frameIndex]
     if (this.hasTimestampTarget && frame) {
@@ -334,6 +505,22 @@ export default class extends Controller {
       const el = marker.getElement()?.querySelector(".radar-marker-site")
       if (el) el.classList.toggle("is-active", id === this.selectedSiteId)
     })
+
+    this.updateTiltUi()
+  }
+
+  updateTiltUi() {
+    if (this.hasTiltControlsTarget) {
+      this.tiltControlsTarget.classList.toggle("hidden", !this.selectedSiteId)
+    }
+
+    if (this.hasTiltChipTarget) {
+      this.tiltChipTargets.forEach((chip) => {
+        const active = chip.dataset.tilt === this.selectedTilt
+        chip.classList.toggle("is-active", active)
+        chip.setAttribute("aria-pressed", active ? "true" : "false")
+      })
+    }
   }
 
   updatePlaybackUi() {

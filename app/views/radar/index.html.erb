@@ -27,6 +27,41 @@
       <span class="radar-timestamp" data-radar-target="timestamp" aria-live="polite">Loading…</span>
     </div>
 
+    <div
+      class="radar-controls-tilts hidden"
+      data-radar-target="tiltControls"
+      role="group"
+      aria-labelledby="radar-tilt-label">
+      <span id="radar-tilt-label" class="radar-controls-label">Tilt</span>
+      <button
+        type="button"
+        class="radar-site-chip is-active"
+        data-radar-target="tiltChip"
+        data-tilt="0.5"
+        data-action="click->radar#selectTilt"
+        aria-pressed="true">
+        0.5°
+      </button>
+      <button
+        type="button"
+        class="radar-site-chip"
+        data-radar-target="tiltChip"
+        data-tilt="1.0"
+        data-action="click->radar#selectTilt"
+        aria-pressed="false">
+        1.0°
+      </button>
+      <button
+        type="button"
+        class="radar-site-chip"
+        data-radar-target="tiltChip"
+        data-tilt="1.5"
+        data-action="click->radar#selectTilt"
+        aria-pressed="false">
+        1.5°
+      </button>
+    </div>
+
     <div class="radar-controls-sites" role="group" aria-label="Radar source">
       <button
         type="button"
