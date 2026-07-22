@@ -106,7 +106,7 @@ export function buildLibreWxrSatelliteFrames(api, { size = 256, tileHost } = {})
     const time = new Date(frame.time * 1000)
     return {
       id: `lw-sat-${frame.time}`,
-      label: formatFrameTime(time),
+      label: `Past · ${formatFrameTime(time)}`,
       urlTemplate: `${host}${frame.path}/${size}/{z}/{x}/{y}/0/0_0.png`,
       time,
       kind: "librewxr-satellite",

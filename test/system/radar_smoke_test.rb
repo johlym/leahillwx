@@ -26,7 +26,7 @@ class RadarSmokeTest < ApplicationSystemTestCase
     assert_selector "button.radar-site-chip", text: "ATX"
     assert_selector "button[data-radar-target='layerChip']", text: /precip/i
     assert_selector "button[data-radar-target='layerChip']", text: /cloud/i
-    assert_selector "button[data-radar-target='optionChip']", text: /snow/i
+    assert_no_selector "button[data-option='snow']"
     assert_no_selector "button[data-option='arrows']"
     assert_no_selector "button[data-option='alerts']"
     assert_text "lhwx.org"

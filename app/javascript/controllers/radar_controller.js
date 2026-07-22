@@ -3,7 +3,6 @@ import L from "leaflet"
 import {
   LIBREWXR_DEFAULT_HOST,
   LIBREWXR_OPTIONS_SNOW,
-  LIBREWXR_OPTIONS_NOSNOW,
   LIBREWXR_MAX_NATIVE_ZOOM,
   LIBREWXR_METADATA_TTL_MS,
   LIBREWXR_ATTR,
@@ -39,7 +38,6 @@ export default class extends Controller {
     "tiltChip",
     "layerControls",
     "layerChip",
-    "optionChip",
   ]
 
   static values = {
@@ -55,7 +53,6 @@ export default class extends Controller {
     this.selectedSiteId = null
     this.selectedTilt = "0.5"
     this.compositeLayer = "precip" // precip | cloud
-    this.snowColorsEnabled = true
     this.frames = []
     this.tileLayers = []
     this.siteMarkers = new Map()
@@ -138,8 +135,7 @@ export default class extends Controller {
     this.pendingQuietRefresh = null
     this.zooming = false
     this.warmingFrames = false
-    this.revealingFrame = false
-    this.frameRevealToken += 1
+    this.cancelPendingFrameReveal()
     this.stopTimer()
     this.stopMetadataRefresh()
     this.clearRadarLayers()
@@ -191,7 +187,6 @@ export default class extends Controller {
 
   async bootstrap() {
     this.updateLayerUi()
-    this.updateOptionUi()
     // Level III single-site data loads on demand when a site (or non-default
     // tilt for a selected site) is chosen — not on initial composite load.
     await this.syncMode({ force: true })
@@ -236,17 +231,6 @@ export default class extends Controller {
     if (!layer || layer === this.compositeLayer || this.selectedSiteId) return
     this.compositeLayer = layer
     this.updateLayerUi()
-    this.updateOptionUi()
-    this.syncMode({ force: true })
-  }
-
-  toggleOption(event) {
-    const option = event.currentTarget.dataset.option
-    if (option !== "snow") return
-    if (this.selectedSiteId || this.compositeLayer !== "precip") return
-
-    this.snowColorsEnabled = !this.snowColorsEnabled
-    this.updateOptionUi()
     this.syncMode({ force: true })
   }
 
@@ -403,7 +387,9 @@ export default class extends Controller {
     if (!this.map || !frames?.length) return
 
     this.stopTimer()
-    this.frameRevealToken += 1
+    // Invalidate any in-flight reveal; must clear revealingFrame or playback
+    // stays stuck after precip↔cloud (and play/pause cannot recover).
+    this.cancelPendingFrameReveal()
     this.warmingFrames = false
     // Capture before replacing this.frames (quiet refresh keeps old list until now).
     const anchorFrame = preserve ? this.frames[this.frameIndex] : null
@@ -643,9 +629,15 @@ export default class extends Controller {
 
     return buildLibreWxrRadarFrames(api, {
       tileHost,
-      options: this.snowColorsEnabled ? LIBREWXR_OPTIONS_SNOW : LIBREWXR_OPTIONS_NOSNOW,
+      options: LIBREWXR_OPTIONS_SNOW,
       includeNowcast: true,
     })
+  }
+
+  /** Cancel an in-flight frame reveal and allow advances again. */
+  cancelPendingFrameReveal() {
+    this.frameRevealToken += 1
+    this.revealingFrame = false
   }
 
   startMetadataRefresh() {
@@ -739,17 +731,15 @@ export default class extends Controller {
     if (!this.map || !this.frames.length) return
     if (this.revealingFrame) return
 
-    this.revealingFrame = true
     const token = ++this.frameRevealToken
+    this.revealingFrame = true
     try {
       await this.applyFrame(nextIndex, { waitForLoad: true, token })
+      if (token === this.frameRevealToken && this.map) {
+        void this.prefetchUpcomingFrames(nextIndex, this.syncGeneration, 2)
+      }
     } finally {
       if (token === this.frameRevealToken) this.revealingFrame = false
-    }
-
-    // Prefetch a couple of frames ahead of the one we just revealed.
-    if (token === this.frameRevealToken && this.map) {
-      void this.prefetchUpcomingFrames(nextIndex, this.syncGeneration, 2)
     }
   }
 
@@ -882,7 +872,6 @@ export default class extends Controller {
 
     this.updateTiltUi()
     this.updateLayerUi()
-    this.updateOptionUi()
   }
 
   updateTiltUi() {
@@ -911,23 +900,6 @@ export default class extends Controller {
         chip.classList.toggle("is-active", active)
         chip.setAttribute("aria-pressed", active ? "true" : "false")
         chip.disabled = !compositeActive
-      })
-    }
-  }
-
-  updateOptionUi() {
-    const precipComposite = !this.selectedSiteId && this.compositeLayer === "precip"
-
-    if (this.hasOptionChipTarget) {
-      this.optionChipTargets.forEach((chip) => {
-        const option = chip.dataset.option
-        const enabled = precipComposite && option === "snow"
-        const active = enabled && this.snowColorsEnabled
-
-        chip.classList.toggle("is-active", active)
-        chip.setAttribute("aria-pressed", active ? "true" : "false")
-        chip.disabled = !enabled
-        chip.classList.toggle("is-disabled", !enabled)
       })
     }
   }

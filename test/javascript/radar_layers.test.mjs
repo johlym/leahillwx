@@ -121,6 +121,7 @@ describe("buildLibreWxrSatelliteFrames", () => {
 
     assert.equal(frames.length, 1)
     assert.equal(frames[0].kind, "librewxr-satellite")
+    assert.match(frames[0].label, /^Past · /)
     assert.equal(
       frames[0].urlTemplate,
       "https://api.librewxr.net/v2/satellite/1784725200/256/{z}/{x}/{y}/0/0_0.png",

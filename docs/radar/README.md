@@ -22,7 +22,7 @@ Composite tiles come from `LIBREWXR_API_BASE` (default `https://api.librewxr.net
 ### LibreWXR composite features
 
 - **Nowcast:** `radar.nowcast` frames appended after past radar (up to ~60 minutes when available)
-- **Snow colors:** `smooth_snow = 1_1` by default (per-pixel rain/snow); toggleable via **Snow**
+- **Snow colors:** always on (`smooth_snow = 1_1`, per-pixel rain/snow)
 - **Regional NWP:** server-side in LibreWXR (HRRR over CONUS, etc.) — no client work beyond attribution
 - **Color scheme:** LibreWXR scheme `6` (NEXRAD Level III), closest built-in match to the site rain ladder
 - **Performance:** only the active radar/satellite frame is mounted. First load freezes on the newest frame until it paints, then plays. Advances keep the previous frame up until the next one loads (no empty flashes; no opacity-0 layer stacking).
@@ -48,7 +48,7 @@ Single-site Level III uses a client-side rain palette (light green → white). S
 ## Animation
 
 - **LibreWXR precip:** past frames from `/public/weather-maps.json`, plus nowcast when present. Metadata refreshes every ~3 minutes.
-- **LibreWXR cloud:** hourly GMGSI VIS-over-LW satellite frames.
+- **LibreWXR cloud:** GMGSI infrared satellite frames from LibreWXR metadata (frame count varies; often only a couple of recent hours).
 - **Single site:** Unidata Level III objects from `https://unidata-nexrad-level3.s3.amazonaws.com` (`{SECTOR}_{PRODUCT}_{YYYY}_{MM}_{DD}_{HH}_{MI}_{SS}`), decoded in-browser and drawn as Leaflet image overlays (**1800×1800** on desktop, **900×900** on coarse/narrow viewports). Tilt selector (site-only): `0.5°` → `N0B`, `1.0°` → `NAB` (~0.9°), `1.5°` → `N1B`. Level III data loads on demand when a site is selected (or when a non-default tilt is chosen for that site) — not on initial composite load.
 
 Playback controls: play/pause + timestamp (Pacific time). Past frames are prefixed with `Past ·`; nowcast frames with `Future ·`. Default is autoplay.

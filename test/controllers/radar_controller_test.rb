@@ -74,7 +74,7 @@ class RadarControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-radar-target='layerControls']"
     assert_select "button[data-radar-target='layerChip'][data-layer='precip']", text: "Precip"
     assert_select "button[data-radar-target='layerChip'][data-layer='cloud']", text: "Cloud"
-    assert_select "button[data-radar-target='optionChip'][data-option='snow']", text: "Snow"
+    assert_select "button[data-option='snow']", count: 0
     assert_select "button[data-option='arrows']", count: 0
     assert_select "button[data-option='alerts']", count: 0
     assert_select "[data-radar-target='alertBanner']", count: 0
