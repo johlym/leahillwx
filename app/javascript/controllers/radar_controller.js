@@ -74,6 +74,8 @@ export default class extends Controller {
     this.activeCompositeLayer = null
     this.librewxrCache = null
     this.librewxrCacheAt = 0
+    this.librewxrFetchPromise = null
+    this.librewxrRefreshPromise = null
     this.alertsLayer = null
     this.alertPointMarkers = []
     this.alertsGeneration = 0
@@ -283,13 +285,24 @@ export default class extends Controller {
       return
     }
 
-    const previousFrame =
-      preserveFrame && this.frames.length > 0 ? this.frames[this.frameIndex] : null
+    // Quiet metadata refresh: keep composite layers mounted/animating until the
+    // replacement set is ready, then swap. Avoids a blank map every ~3 minutes.
+    const canPreserve =
+      preserveFrame &&
+      mode === "librewxr" &&
+      this.activeMode === "librewxr" &&
+      this.frames.length > 0 &&
+      this.tileLayers.length > 0
+
+    const previousFrame = canPreserve ? this.frames[this.frameIndex] : null
+    const previousLayers = canPreserve ? [...this.tileLayers] : null
 
     const generation = ++this.syncGeneration
-    this.stopTimer()
-    this.clearRadarLayers()
-    this.frames = []
+    if (!canPreserve) {
+      this.stopTimer()
+      this.clearRadarLayers()
+      this.frames = []
+    }
 
     const site =
       mode === "ridge"
@@ -303,7 +316,7 @@ export default class extends Controller {
     const cacheHit = Array.isArray(cachedFrames)
 
     // Quiet refresh: keep the current timestamp visible while new frames load.
-    if (!cacheHit && !preserveFrame) {
+    if (!cacheHit && !canPreserve) {
       this.setTimestamp("Loading…")
     }
 
@@ -324,6 +337,9 @@ export default class extends Controller {
       if (generation !== this.syncGeneration || !this.map) return
 
       if (frames.length === 0) {
+        this.stopTimer()
+        this.clearRadarLayers()
+        this.frames = []
         this.activeMode = null
         this.activeProduct = null
         this.activeCompositeLayer = null
@@ -334,18 +350,31 @@ export default class extends Controller {
         return
       }
 
+      this.stopTimer()
+      const nextLayers = frames.map((frame) => this.createFrameLayer(frame))
       this.activeMode = mode
       this.activeProduct = product
       this.activeCompositeLayer = compositeLayer
       this.frames = frames
       this.frameIndex = resolvePreservedFrameIndex(frames, previousFrame)
-      this.tileLayers = this.frames.map((frame) => this.createFrameLayer(frame))
+      this.tileLayers = nextLayers
       this.showFrame(this.frameIndex)
+
+      if (previousLayers) {
+        previousLayers.forEach((layer) => {
+          if (this.map && this.map.hasLayer(layer)) this.map.removeLayer(layer)
+        })
+      }
 
       if (this.playing) this.startTimer()
     } catch (error) {
       if (generation !== this.syncGeneration || !this.map) return
       console.error("Radar sync failed", error)
+      if (canPreserve) {
+        // Failed quiet refresh: leave the previous composite playing.
+        if (this.playing) this.startTimer()
+        return
+      }
       this.activeMode = null
       this.activeProduct = null
       this.activeCompositeLayer = null
@@ -462,11 +491,23 @@ export default class extends Controller {
       return this.librewxrCache
     }
 
+    // Share one in-flight request so concurrent callers cannot overwrite the
+    // cache out of order (last-write-wins by completion time).
+    if (this.librewxrFetchPromise) return this.librewxrFetchPromise
+
+    this.librewxrFetchPromise = this.loadLibreWxrMetadataJson().finally(() => {
+      this.librewxrFetchPromise = null
+    })
+    return this.librewxrFetchPromise
+  }
+
+  async loadLibreWxrMetadataJson() {
     const response = await fetch(librewxrMetadataUrl(this.librewxrHostValue))
     if (!response.ok) throw new Error(`LibreWXR HTTP ${response.status}`)
-    this.librewxrCache = await response.json()
-    this.librewxrCacheAt = now
-    return this.librewxrCache
+    const json = await response.json()
+    this.librewxrCache = json
+    this.librewxrCacheAt = Date.now()
+    return json
   }
 
   async loadLibreWxrFrames() {
@@ -487,7 +528,7 @@ export default class extends Controller {
   startMetadataRefresh() {
     this.stopMetadataRefresh()
     this.metadataTimer = window.setInterval(() => {
-      if (!this.map || this.selectedSiteId) return
+      if (!this.map || this.selectedSiteId || this.librewxrRefreshPromise) return
       void this.refreshLibreWxrFrames()
     }, LIBREWXR_METADATA_TTL_MS)
   }
@@ -501,6 +542,15 @@ export default class extends Controller {
 
   async refreshLibreWxrFrames() {
     if (this.resolveMode() !== "librewxr") return
+    if (this.librewxrRefreshPromise) return this.librewxrRefreshPromise
+
+    this.librewxrRefreshPromise = this.runLibreWxrRefresh().finally(() => {
+      this.librewxrRefreshPromise = null
+    })
+    return this.librewxrRefreshPromise
+  }
+
+  async runLibreWxrRefresh() {
     try {
       await this.fetchLibreWxrMetadata({ force: true })
       // User may have switched to a single-site tilt while metadata was in flight.
