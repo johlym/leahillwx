@@ -9,10 +9,20 @@ import {
   LEVEL3_RANGE_KM,
   boundsForRadar,
   dbzColor,
+  loadFramesWithConcurrency,
   parseLevel3KeyTime,
+  revokeLevel3FrameUrls,
 } from "./level3_utils"
 
-export { LEVEL3_PLOT_SIZE, LEVEL3_RANGE_KM, boundsForRadar, dbzColor, parseLevel3KeyTime }
+export {
+  LEVEL3_PLOT_SIZE,
+  LEVEL3_RANGE_KM,
+  boundsForRadar,
+  dbzColor,
+  loadFramesWithConcurrency,
+  parseLevel3KeyTime,
+  revokeLevel3FrameUrls,
+}
 
 export const LEVEL3_S3_BASE = "https://unidata-nexrad-level3.s3.amazonaws.com"
 
@@ -80,19 +90,18 @@ export async function loadLevel3Frame(key, { size = LEVEL3_PLOT_SIZE } = {}) {
 
 /**
  * Build oldest→newest frame list (metadata + rendered URLs).
+ * Individual scan failures are skipped so one bad S3 object does not
+ * blank the whole site/tilt; unexpected aborts revoke any blob URLs
+ * already created for this call.
  */
 export async function buildLevel3Frames(sector, product, site, opts = {}) {
   const keys = await listLevel3Keys(sector, product, opts)
   if (keys.length === 0) return []
 
   const sampled = sampleFrames(keys, opts.maxFrames ?? 18)
-  const frames = []
-  const concurrency = 3
-  for (let i = 0; i < sampled.length; i += concurrency) {
-    const batch = sampled.slice(i, i + concurrency)
-    const rendered = await Promise.all(batch.map((item) => loadLevel3Frame(item.key, opts)))
-    frames.push(...rendered)
-  }
+  const frames = await loadFramesWithConcurrency(sampled, (item) =>
+    loadLevel3Frame(item.key, opts),
+  )
 
   return frames.map((frame) => ({
     ...frame,

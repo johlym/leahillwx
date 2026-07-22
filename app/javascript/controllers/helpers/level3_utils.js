@@ -4,6 +4,45 @@ export const LEVEL3_RANGE_KM = 460
 /** Full native plot resolution (~248 nmi diameter at 0.25 mi/bin). */
 export const LEVEL3_PLOT_SIZE = 1800
 
+/**
+ * Load items in parallel batches; keep fulfilled results, skip rejects.
+ * On unexpected throw after some successes, revoke blob: URLs first.
+ * @template T, R
+ * @param {T[]} items
+ * @param {(item: T) => Promise<R>} loadFn
+ * @param {{ concurrency?: number }} [opts]
+ * @returns {Promise<R[]>}
+ */
+export async function loadFramesWithConcurrency(items, loadFn, { concurrency = 3 } = {}) {
+  const frames = []
+  try {
+    for (let i = 0; i < items.length; i += concurrency) {
+      const batch = items.slice(i, i + concurrency)
+      const settled = await Promise.allSettled(batch.map((item) => loadFn(item)))
+      for (const outcome of settled) {
+        if (outcome.status === "fulfilled") {
+          frames.push(outcome.value)
+        } else {
+          console.warn("Level III frame failed", outcome.reason)
+        }
+      }
+    }
+    return frames
+  } catch (error) {
+    revokeLevel3FrameUrls(frames)
+    throw error
+  }
+}
+
+/** Revoke blob object URLs created for Level III frames (best-effort). */
+export function revokeLevel3FrameUrls(frames) {
+  for (const frame of frames) {
+    if (typeof frame?.url === "string" && frame.url.startsWith("blob:")) {
+      URL.revokeObjectURL(frame.url)
+    }
+  }
+}
+
 export function parseLevel3KeyTime(key) {
   // ATX_NAB_2026_07_21_23_08_51
   const match = key.match(/_(\d{4})_(\d{2})_(\d{2})_(\d{2})_(\d{2})_(\d{2})$/)

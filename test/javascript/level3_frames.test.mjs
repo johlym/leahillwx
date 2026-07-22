@@ -4,7 +4,9 @@ import {
   LEVEL3_PLOT_SIZE,
   boundsForRadar,
   dbzColor,
+  loadFramesWithConcurrency,
   parseLevel3KeyTime,
+  revokeLevel3FrameUrls,
 } from "../../app/javascript/controllers/helpers/level3_utils.js"
 
 describe("LEVEL3_PLOT_SIZE", () => {
@@ -34,5 +36,72 @@ describe("dbzColor", () => {
     assert.equal(dbzColor(4), null)
     assert.match(dbzColor(25), /^rgba\(/)
     assert.match(dbzColor(55), /^rgba\(/)
+  })
+})
+
+describe("loadFramesWithConcurrency", () => {
+  it("keeps successful frames when some loads reject", async () => {
+    const frames = await loadFramesWithConcurrency(
+      ["a", "bad", "c", "d"],
+      async (key) => {
+        if (key === "bad") throw new Error("fetch failed")
+        return { id: key, url: `blob:${key}` }
+      },
+      { concurrency: 3 },
+    )
+
+    assert.deepEqual(
+      frames.map((f) => f.id),
+      ["a", "c", "d"],
+    )
+  })
+
+  it("revokes blob URLs already loaded when a later batch aborts", async () => {
+    const revoked = []
+    const originalRevoke = URL.revokeObjectURL
+    URL.revokeObjectURL = (url) => {
+      revoked.push(url)
+    }
+
+    try {
+      await assert.rejects(
+        () =>
+          loadFramesWithConcurrency(
+            ["a", "b", "c", "d"],
+            (key) => {
+              if (key === "d") throw new Error("unexpected abort")
+              return Promise.resolve({ id: key, url: `blob:${key}` })
+            },
+            { concurrency: 3 },
+          ),
+        /unexpected abort/,
+      )
+
+      assert.deepEqual(revoked.sort(), ["blob:a", "blob:b", "blob:c"])
+    } finally {
+      URL.revokeObjectURL = originalRevoke
+    }
+  })
+})
+
+describe("revokeLevel3FrameUrls", () => {
+  it("revokes blob URLs and ignores non-blob frames", () => {
+    const revoked = []
+    const originalRevoke = URL.revokeObjectURL
+    URL.revokeObjectURL = (url) => {
+      revoked.push(url)
+    }
+
+    try {
+      revokeLevel3FrameUrls([
+        { url: "blob:one" },
+        { url: "https://example.com/x.png" },
+        { url: "blob:two" },
+        {},
+      ])
+      assert.deepEqual(revoked, ["blob:one", "blob:two"])
+    } finally {
+      URL.revokeObjectURL = originalRevoke
+    }
   })
 })
