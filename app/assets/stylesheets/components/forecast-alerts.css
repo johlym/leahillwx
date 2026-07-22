@@ -1,12 +1,12 @@
-/* Homepage alert strip + /alerts detail page. */
+/* Header alert strip (above nav) + /alerts detail page. */
 
 @utility forecast-alerts-bar {
   @apply block border-b border-border no-underline
          transition-colors duration-150;
-  background: color-mix(in oklab, var(--color-accent) 12%, var(--color-bg));
+  background: transparent;
 
   &:hover {
-    background: color-mix(in oklab, var(--color-accent) 18%, var(--color-bg));
+    background: color-mix(in oklab, var(--color-bg) 55%, transparent);
   }
 
   &:focus-visible {
@@ -21,10 +21,9 @@
 }
 
 @utility forecast-alerts-bar-label {
-  @apply shrink-0 px-1.5 py-0.5 rounded-[0.25rem]
+  @apply shrink-0 px-0 py-0
          text-[0.65rem] font-semibold uppercase tracking-[0.08em]
-         text-accent-contrast;
-  background: var(--color-accent);
+         text-accent;
 }
 
 @utility forecast-alerts-bar-event {

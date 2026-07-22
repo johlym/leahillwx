@@ -1,4 +1,8 @@
 <header class="site-header" data-controller="mobile-menu">
+  <% if @weather_alerts.present? %>
+    <%= render Home::Forecast::AlertsBarComponent.new(alerts: @weather_alerts) %>
+  <% end %>
+
   <nav aria-label="Global" class="site-header-nav">
     <div class="site-header-brand-wrap" data-controller="connection-status">
       <a href="/" class="site-header-brand">

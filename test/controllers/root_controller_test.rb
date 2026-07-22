@@ -30,11 +30,12 @@ class RootControllerTest < ActionDispatch::IntegrationTest
     ]) do
       get root_url
       assert_response :success
-      assert_select "a.forecast-alerts-bar[href='#{alerts_path}']", text: /Heat Advisory/
-    assert_select "a.forecast-alerts-bar", text: /Until/
-    assert_select "a.forecast-alerts-bar", text: /Hot conditions/, count: 0
+      assert_select "header.site-header a.forecast-alerts-bar[href='#{alerts_path}']", text: /Heat Advisory/
+      assert_select "header.site-header a.forecast-alerts-bar", text: /Until/
+      assert_select "a.forecast-alerts-bar", text: /Hot conditions/, count: 0
     end
   end
+
 
   test "index enqueues forecast download when no forecast exists" do
     Forecast.delete_all
