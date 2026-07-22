@@ -76,34 +76,58 @@ class WeatherAlertTest < ActiveSupport::TestCase
     end
   end
 
-  test "for_homepage dedupes matching event names" do
+  test "active_nearby keeps distinct alerts that share a short event name" do
     stub_librewxr_fetch([
       WeatherAlert.new(
         event: "Heat Advisory",
+        title: "Heat Advisory for Seattle",
         starts_at: 1.hour.ago,
         ends_at: 2.hours.from_now,
-        source: "librewxr"
+        source: "librewxr",
+        uri: "urn:oid:seattle",
+        regions: [ "City of Seattle" ]
+      ),
+      WeatherAlert.new(
+        event: "Heat Advisory",
+        title: "Heat Advisory for Tacoma",
+        starts_at: 1.hour.ago,
+        ends_at: 3.hours.from_now,
+        source: "librewxr",
+        uri: "urn:oid:tacoma",
+        regions: [ "Lowlands of Pierce" ]
       )
     ]) do
-      openweather = ForecastParser::ForecastAlert.new(
-        sender_name: "NWS",
-        event: "Heat Advisory",
-        start: 1.hour.ago.to_i,
-        end: 2.hours.from_now.to_i,
-        description: "Duplicate",
-        tags: []
-      )
-
-      alerts = WeatherAlert.active_nearby(
-        lat: 47.3,
-        lon: -122.2,
-        forecast_alerts: [ openweather ]
-      )
-
-      assert_equal [ "Heat Advisory" ], alerts.map(&:event)
-      assert_equal "librewxr", alerts.first.source
+      alerts = WeatherAlert.active_nearby(lat: 47.3, lon: -122.2, forecast_alerts: [])
+      assert_equal 2, alerts.length
+      assert_equal [ "urn:oid:seattle", "urn:oid:tacoma" ], alerts.map(&:uri)
     end
   end
+
+  test "active_nearby dedupes alerts that share a uri" do
+    stub_librewxr_fetch([
+      WeatherAlert.new(
+        event: "Heat Advisory",
+        title: "Heat Advisory A",
+        starts_at: 1.hour.ago,
+        ends_at: 2.hours.from_now,
+        source: "librewxr",
+        uri: "urn:oid:same"
+      ),
+      WeatherAlert.new(
+        event: "Heat Advisory",
+        title: "Heat Advisory B",
+        starts_at: 1.hour.ago,
+        ends_at: 2.hours.from_now,
+        source: "librewxr",
+        uri: "urn:oid:same"
+      )
+    ]) do
+      alerts = WeatherAlert.active_nearby(lat: 47.3, lon: -122.2, forecast_alerts: [])
+      assert_equal 1, alerts.length
+      assert_equal "Heat Advisory A", alerts.first.title
+    end
+  end
+
 
   private
 

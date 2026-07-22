@@ -23,6 +23,55 @@ class LibreWxrAlertsClientTest < ActiveSupport::TestCase
     assert_empty LibreWxrAlertsClient.new(lat: 47.3, lon: nil).fetch
   end
 
+  test "coordinates_from_env ignores blank and non-numeric values" do
+    original_lat = ENV["LOCATION_LAT"]
+    original_lon = ENV["LOCATION_LON"]
+    begin
+      ENV["LOCATION_LAT"] = ""
+      ENV["LOCATION_LON"] = "-122.2"
+      assert_equal [ nil, nil ], LibreWxrAlertsClient.coordinates_from_env
+
+      ENV["LOCATION_LAT"] = "not-a-number"
+      ENV["LOCATION_LON"] = "-122.2"
+      assert_equal [ nil, nil ], LibreWxrAlertsClient.coordinates_from_env
+
+      ENV["LOCATION_LAT"] = "47.307"
+      ENV["LOCATION_LON"] = "-122.228"
+      assert_equal [ 47.307, -122.228 ], LibreWxrAlertsClient.coordinates_from_env
+    ensure
+      ENV["LOCATION_LAT"] = original_lat
+      ENV["LOCATION_LON"] = original_lon
+    end
+  end
+
+  test "normalize_host strips metadata path suffixes like the radar client" do
+    assert_equal(
+      "https://api.librewxr.net",
+      LibreWxrAlertsClient.normalize_host("https://api.librewxr.net/public/weather-maps.json")
+    )
+    assert_equal(
+      "https://radar.example.com",
+      LibreWxrAlertsClient.normalize_host("https://radar.example.com/")
+    )
+  end
+
+  test "fetch uses normalized host when LIBREWXR_API_BASE includes metadata path" do
+    captured_url = nil
+    HTTParty.define_singleton_method(:get) do |url, **_kwargs|
+      captured_url = url
+      FakeResponse.new(code: 200, body: { "features" => [] }.to_json)
+    end
+
+    LibreWxrAlertsClient.new(
+      lat: 47.3,
+      lon: -122.2,
+      host: "https://api.librewxr.net/public/weather-maps.json"
+    ).fetch
+
+    assert_equal "https://api.librewxr.net/v2/alerts?lat=47.3&lon=-122.2", captured_url
+  end
+
+
   test "maps LibreWXR features into WeatherAlert objects" do
     payload = {
       "type" => "FeatureCollection",

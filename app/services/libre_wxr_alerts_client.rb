@@ -9,11 +9,11 @@ class LibreWxrAlertsClient
   def initialize(lat:, lon:, host: ENV.fetch("LIBREWXR_API_BASE", DEFAULT_HOST))
     @lat = lat
     @lon = lon
-    @host = host.to_s.sub(%r{/+\z}, "").presence || DEFAULT_HOST
+    @host = self.class.normalize_host(host)
   end
 
   def fetch
-    return [] if @lat.nil? || @lon.nil?
+    return [] unless coordinates?
 
     Rails.cache.fetch(cache_key, expires_in: CACHE_TTL) do
       fetch_uncached
@@ -23,7 +23,35 @@ class LibreWxrAlertsClient
     []
   end
 
+  # Parse station coordinates from env. Blank / non-numeric values → [nil, nil]
+  # so we never query LibreWXR for (0.0, 0.0) from "".to_f.
+  def self.coordinates_from_env
+    lat_raw = ENV["LOCATION_LAT"].presence
+    lon_raw = ENV["LOCATION_LON"].presence
+    return [ nil, nil ] if lat_raw.blank? || lon_raw.blank?
+
+    lat = Float(lat_raw, exception: false)
+    lon = Float(lon_raw, exception: false)
+    return [ nil, nil ] if lat.nil? || lon.nil?
+
+    [ lat, lon ]
+  end
+
+  # Match radar JS normalizeLibreWxrHost: accept origin or full metadata URL.
+  def self.normalize_host(host)
+    trimmed = host.to_s.strip.sub(%r{/+\z}, "")
+    suffix = "/public/weather-maps.json"
+    if trimmed.end_with?(suffix)
+      trimmed = trimmed.delete_suffix(suffix)
+    end
+    trimmed.presence || DEFAULT_HOST
+  end
+
   private
+
+  def coordinates?
+    @lat.is_a?(Numeric) && @lon.is_a?(Numeric)
+  end
 
   def cache_key
     "librewxr_alerts/#{@host}/#{@lat.to_f.round(3)},#{@lon.to_f.round(3)}"

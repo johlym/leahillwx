@@ -5,9 +5,10 @@ class AlertsController < ApplicationController
     forecast_record = Forecast.latest
     forecast = ForecastParser.new(forecast_record || {}).parse
 
+    lat, lon = LibreWxrAlertsClient.coordinates_from_env
     @weather_alerts = WeatherAlert.active_nearby(
-      lat: ENV["LOCATION_LAT"]&.to_f,
-      lon: ENV["LOCATION_LON"]&.to_f,
+      lat: lat,
+      lon: lon,
       forecast_alerts: forecast&.alerts
     )
   end

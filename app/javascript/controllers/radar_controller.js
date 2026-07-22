@@ -95,6 +95,7 @@ export default class extends Controller {
       // Avoid animating (add/remove layers) while the user is pinching.
       this.zooming = true
       this.stopTimer()
+      this.cancelPendingFrameReveal()
     }
     this.onZoomEnd = () => {
       this.zooming = false
@@ -196,6 +197,8 @@ export default class extends Controller {
       this.startTimer()
     } else {
       this.stopTimer()
+      // Drop any in-flight reveal so a paused UI cannot still swap frames.
+      this.cancelPendingFrameReveal()
     }
   }
 
@@ -343,9 +346,9 @@ export default class extends Controller {
   /**
    * Apply a loaded frame set.
    * Initial loads: freeze on the newest frame until its tiles are ready, then
-   * start the loop. Frame advances keep the previous layer up until the next
-   * one has loaded so we never flash an empty radar pane.
-   * Quiet refreshes: preserve playback index and resume immediately.
+   * animate newest → older. Frame advances keep the previous layer up until the
+   * next one has loaded so we never flash an empty radar pane.
+   * Quiet refreshes: preserve playback index and resume after the new layer paints.
    */
   async commitFrameSet({
     frames,
@@ -375,20 +378,8 @@ export default class extends Controller {
     this.showFrame(this.frameIndex, { immediate: true })
     this.detachInactiveRadarLayers(this.frameIndex)
 
-    if (previousLayers) {
-      previousLayers.forEach((layer) => {
-        if (this.map && this.map.hasLayer(layer)) this.map.removeLayer(layer)
-      })
-    }
-
-    if (preserve) {
-      if (this.playing && !this.zooming) this.startTimer()
-      return
-    }
-
-    // Hold on the newest frame until it paints, then play. Do not mass-prefetch
-    // every frame first — that saturates the host connection pool and starves
-    // playback tile loads, leaving only the frozen frame visible.
+    // Wait for the mounted frame before tearing down the previous set so quiet
+    // refreshes do not blink to the basemap.
     this.warmingFrames = true
     await this.waitForLayerLoad(this.tileLayers[this.frameIndex])
     if (generation !== this.syncGeneration || !this.map) {
@@ -396,12 +387,19 @@ export default class extends Controller {
       return
     }
 
+    if (previousLayers) {
+      previousLayers.forEach((layer) => {
+        if (this.map && this.map.hasLayer(layer)) this.map.removeLayer(layer)
+      })
+    }
+
     this.warmingFrames = false
-    // Stay on the newest frame; the interval advances into the loop naturally.
     if (this.playing && !this.zooming) this.startTimer()
 
-    // Nudge the next couple of frames into cache without blocking playback.
-    void this.prefetchUpcomingFrames(this.frameIndex, generation, 2)
+    if (!preserve) {
+      // Prefetch older frames ahead of the newest→older loop.
+      void this.prefetchUpcomingFrames(this.frameIndex, generation, 2)
+    }
   }
 
   flushPendingQuietRefresh() {
@@ -462,7 +460,8 @@ export default class extends Controller {
 
     const urls = []
     for (let step = 1; step <= count; step += 1) {
-      const index = (fromIndex + step) % this.frames.length
+      // Playback steps newest → older (index decreases).
+      const index = (fromIndex - step + this.frames.length) % this.frames.length
       urls.push(...this.viewportUrlsForFrame(this.frames[index]))
     }
 
@@ -773,13 +772,14 @@ export default class extends Controller {
   }
 
   advanceFrame() {
-    if (this.warmingFrames || this.revealingFrame) return
-    this.showFrame(this.frameIndex + 1)
+    if (this.warmingFrames || this.revealingFrame || this.zooming || !this.playing) return
+    // Frames are oldest→newest; step backward so the loop plays newest → older.
+    this.showFrame(this.frameIndex - 1)
   }
 
   startTimer() {
     this.stopTimer()
-    if (!this.playing || this.warmingFrames || this.frames.length < 2) return
+    if (!this.playing || this.warmingFrames || this.zooming || this.frames.length < 2) return
     this.timer = window.setInterval(() => this.advanceFrame(), 500)
   }
 

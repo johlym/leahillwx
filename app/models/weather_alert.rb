@@ -68,7 +68,9 @@ class WeatherAlert
 
       from_open_weather(alert)
     end
-    (librewxr + openweather).select(&:active?).uniq(&:event)
+    # Deduplicate by stable identity (uri / full title+times), not the shortened
+    # event label — distinct regional advisories often share "Heat Advisory".
+    (librewxr + openweather).select(&:active?).uniq(&:identity_key)
   end
 
   # Back-compat alias used by RootController.
@@ -96,6 +98,19 @@ class WeatherAlert
     else source.to_s.presence || "Weather service"
     end
   end
+
+  def identity_key
+    return "uri:#{uri}" if uri.present?
+
+    [
+      source,
+      title,
+      starts_at&.to_i,
+      ends_at&.to_i,
+      regions.join(";")
+    ].join("|")
+  end
+
 
   def self.unix_time(value)
     return nil if value.blank?

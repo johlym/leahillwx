@@ -24,7 +24,7 @@ Composite tiles come from `LIBREWXR_API_BASE` (default `https://api.librewxr.net
 - **Snow colors:** always on (`smooth_snow = 1_1`, per-pixel rain/snow)
 - **Regional NWP:** server-side in LibreWXR (HRRR over CONUS, etc.) — no client work beyond attribution
 - **Color scheme:** LibreWXR scheme `6` (NEXRAD Level III) for composite tiles
-- **Performance:** only the active radar frame is mounted. First load freezes on the newest frame until it paints, then plays. Advances keep the previous frame up until the next one loads (no empty flashes; no opacity-0 layer stacking).
+- **Performance:** only the active radar frame is mounted. First load freezes on the newest frame until it paints, then plays newest → older. Advances keep the previous frame up until the next one loads (no empty flashes; no opacity-0 layer stacking).
 
 Weather alerts come from LibreWXR (NWS/WMO CAP near the station), merged with any
 active OpenWeather alerts. The homepage shows a compact bar (indicator, title,
