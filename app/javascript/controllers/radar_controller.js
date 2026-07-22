@@ -384,14 +384,13 @@ export default class extends Controller {
     await this.waitForLayerLoad(this.tileLayers[this.frameIndex])
     if (generation !== this.syncGeneration || !this.map) {
       this.warmingFrames = false
+      // Always detach the superseded set: an aborted quiet refresh otherwise
+      // leaves previousLayers on the map outside tileLayers (orphan stack).
+      this.removeMountedLayers(previousLayers)
       return
     }
 
-    if (previousLayers) {
-      previousLayers.forEach((layer) => {
-        if (this.map && this.map.hasLayer(layer)) this.map.removeLayer(layer)
-      })
-    }
+    this.removeMountedLayers(previousLayers)
 
     this.warmingFrames = false
     if (this.playing && !this.zooming) this.startTimer()
@@ -671,10 +670,15 @@ export default class extends Controller {
   clearRadarLayers() {
     // Only detach map layers. Level III blob URLs stay alive in level3Cache
     // so tilt toggles can reuse them without re-downloading.
-    this.tileLayers.forEach((layer) => {
-      if (this.map && this.map.hasLayer(layer)) this.map.removeLayer(layer)
-    })
+    this.removeMountedLayers(this.tileLayers)
     this.tileLayers = []
+  }
+
+  removeMountedLayers(layers) {
+    if (!layers?.length || !this.map) return
+    layers.forEach((layer) => {
+      if (this.map.hasLayer(layer)) this.map.removeLayer(layer)
+    })
   }
 
   showFrame(index, { immediate = false } = {}) {
