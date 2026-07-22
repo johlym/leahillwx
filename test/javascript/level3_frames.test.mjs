@@ -2,16 +2,62 @@ import assert from "node:assert/strict"
 import { describe, it } from "node:test"
 import {
   LEVEL3_PLOT_SIZE,
+  LEVEL3_PLOT_SIZE_MOBILE,
   boundsForRadar,
   dbzColor,
   loadFramesWithConcurrency,
   parseLevel3KeyTime,
+  preferredLevel3MaxFrames,
+  preferredLevel3PlotSize,
   revokeLevel3FrameUrls,
+  shouldLimitRadarMemory,
 } from "../../app/javascript/controllers/helpers/level3_utils.js"
 
 describe("LEVEL3_PLOT_SIZE", () => {
   it("uses full native 1800px resolution", () => {
     assert.equal(LEVEL3_PLOT_SIZE, 1800)
+  })
+})
+
+describe("shouldLimitRadarMemory / preferred Level III sizing", () => {
+  it("limits memory for coarse pointers and low deviceMemory", () => {
+    assert.equal(
+      shouldLimitRadarMemory({
+        matchMedia: () => ({ matches: false }),
+        navigator: { deviceMemory: 8 },
+      }),
+      false,
+    )
+    assert.equal(
+      shouldLimitRadarMemory({
+        matchMedia: (query) => ({ matches: query.includes("pointer: coarse") }),
+        navigator: {},
+      }),
+      true,
+    )
+    assert.equal(
+      shouldLimitRadarMemory({
+        matchMedia: () => ({ matches: false }),
+        navigator: { deviceMemory: 4 },
+      }),
+      true,
+    )
+  })
+
+  it("picks smaller plot size and fewer frames when limited", () => {
+    const limited = {
+      matchMedia: () => ({ matches: true }),
+      navigator: {},
+    }
+    assert.equal(preferredLevel3PlotSize(limited), LEVEL3_PLOT_SIZE_MOBILE)
+    assert.equal(preferredLevel3MaxFrames(limited), 12)
+    assert.equal(
+      preferredLevel3PlotSize({
+        matchMedia: () => ({ matches: false }),
+        navigator: { deviceMemory: 8 },
+      }),
+      LEVEL3_PLOT_SIZE,
+    )
   })
 })
 

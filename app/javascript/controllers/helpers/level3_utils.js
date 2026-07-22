@@ -4,6 +4,41 @@ export const LEVEL3_RANGE_KM = 460
 /** Full native plot resolution (~248 nmi diameter at 0.25 mi/bin). */
 export const LEVEL3_PLOT_SIZE = 1800
 
+/** Smaller canvas for coarse pointers / narrow viewports (¼ the pixels of 1800²). */
+export const LEVEL3_PLOT_SIZE_MOBILE = 900
+
+/** Default animation length; trimmed further on memory-constrained clients. */
+export const LEVEL3_MAX_FRAMES = 18
+export const LEVEL3_MAX_FRAMES_MOBILE = 12
+
+/**
+ * True when we should prefer lower radar memory/CPU (phones, low-RAM devices).
+ * @param {{ matchMedia?: Function, deviceMemory?: number }} [env]
+ */
+export function shouldLimitRadarMemory(env = globalThis) {
+  const deviceMemory = env.navigator?.deviceMemory
+  if (typeof deviceMemory === "number" && deviceMemory <= 4) return true
+
+  const matchMedia = env.matchMedia?.bind(env)
+  if (typeof matchMedia === "function") {
+    try {
+      if (matchMedia("(pointer: coarse)").matches) return true
+      if (matchMedia("(max-width: 640px)").matches) return true
+    } catch {
+      // ignore invalid matchMedia in tests / unusual hosts
+    }
+  }
+  return false
+}
+
+export function preferredLevel3PlotSize(env = globalThis) {
+  return shouldLimitRadarMemory(env) ? LEVEL3_PLOT_SIZE_MOBILE : LEVEL3_PLOT_SIZE
+}
+
+export function preferredLevel3MaxFrames(env = globalThis) {
+  return shouldLimitRadarMemory(env) ? LEVEL3_MAX_FRAMES_MOBILE : LEVEL3_MAX_FRAMES
+}
+
 /**
  * Load items in parallel batches; keep fulfilled results, skip rejects.
  * On unexpected throw after some successes, revoke blob: URLs first.

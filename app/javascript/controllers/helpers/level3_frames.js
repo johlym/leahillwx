@@ -11,6 +11,8 @@ import {
   dbzColor,
   loadFramesWithConcurrency,
   parseLevel3KeyTime,
+  preferredLevel3MaxFrames,
+  preferredLevel3PlotSize,
   revokeLevel3FrameUrls,
 } from "./level3_utils"
 
@@ -21,6 +23,8 @@ export {
   dbzColor,
   loadFramesWithConcurrency,
   parseLevel3KeyTime,
+  preferredLevel3MaxFrames,
+  preferredLevel3PlotSize,
   revokeLevel3FrameUrls,
 }
 
@@ -98,9 +102,11 @@ export async function buildLevel3Frames(sector, product, site, opts = {}) {
   const keys = await listLevel3Keys(sector, product, opts)
   if (keys.length === 0) return []
 
-  const sampled = sampleFrames(keys, opts.maxFrames ?? 18)
+  const size = opts.size ?? preferredLevel3PlotSize()
+  const maxFrames = opts.maxFrames ?? preferredLevel3MaxFrames()
+  const sampled = sampleFrames(keys, maxFrames)
   const frames = await loadFramesWithConcurrency(sampled, (item) =>
-    loadLevel3Frame(item.key, opts),
+    loadLevel3Frame(item.key, { ...opts, size }),
   )
 
   return frames.map((frame) => ({

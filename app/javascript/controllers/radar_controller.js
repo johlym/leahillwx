@@ -16,6 +16,7 @@ import {
   ridgeProductForTilt,
 } from "./helpers/radar_layers"
 import { boundsForRadar, buildLevel3Frames } from "./helpers/level3_frames"
+import { shouldLimitRadarMemory } from "./helpers/level3_utils"
 
 // Full-viewport radar map: IEM mosaic (default), single-site Unidata Level III
 // tilts (KATX/KRTX/KLGX), RainViewer at low zoom when no site is selected.
@@ -55,11 +56,14 @@ export default class extends Controller {
     this.level3Cache = new Map()
     this.basemapErrors = 0
     this.syncGeneration = 0
+    this.limitMemory = shouldLimitRadarMemory()
+    // High zoom × many tile layers OOMs mobile Safari; keep desktop detail.
+    this.mapMaxZoom = this.limitMemory ? 9 : 11
 
     this.map = L.map(this.mapTarget, {
       zoomControl: true,
       attributionControl: true,
-      maxZoom: 11,
+      maxZoom: this.mapMaxZoom,
       minZoom: 3,
       preferCanvas: true,
     })
@@ -68,15 +72,21 @@ export default class extends Controller {
 
     this.map.fitBounds(boundsForRadius(this.latValue, this.lonValue, 200), {
       padding: [12, 12],
-      maxZoom: 8,
+      maxZoom: Math.min(8, this.mapMaxZoom),
     })
 
     this.addSiteMarkers()
 
-    this.onZoom = () => {
-      this.syncMode()
+    this.onZoomStart = () => {
+      // Avoid animating (add/remove layers) while the user is pinching.
+      this.stopTimer()
     }
-    this.map.on("zoomend", this.onZoom)
+    this.onZoomEnd = () => {
+      this.syncMode()
+      if (this.playing) this.startTimer()
+    }
+    this.map.on("zoomstart", this.onZoomStart)
+    this.map.on("zoomend", this.onZoomEnd)
 
     this.resizeObserver = new ResizeObserver(() => {
       if (this.map) this.map.invalidateSize({ animate: false })
@@ -100,7 +110,8 @@ export default class extends Controller {
       this.resizeObserver = null
     }
     if (this.map) {
-      this.map.off("zoomend", this.onZoom)
+      this.map.off("zoomstart", this.onZoomStart)
+      this.map.off("zoomend", this.onZoomEnd)
       this.map.remove()
       this.map = null
     }
@@ -110,7 +121,9 @@ export default class extends Controller {
   addBasemap() {
     this.basemap = L.tileLayer(CARTO_DARK_URL, {
       attribution: CARTO_ATTR,
-      maxZoom: 11,
+      maxZoom: this.mapMaxZoom,
+      keepBuffer: this.limitMemory ? 1 : 2,
+      updateWhenZooming: false,
       crossOrigin: true,
     })
 
@@ -122,7 +135,9 @@ export default class extends Controller {
         if (this.map.hasLayer(this.basemap)) this.map.removeLayer(this.basemap)
         L.tileLayer(ESRI_DARK_URL, {
           attribution: ESRI_ATTR,
-          maxZoom: 11,
+          maxZoom: this.mapMaxZoom,
+          keepBuffer: this.limitMemory ? 1 : 2,
+          updateWhenZooming: false,
           crossOrigin: true,
         }).addTo(this.map)
       }
@@ -132,9 +147,9 @@ export default class extends Controller {
   }
 
   async bootstrap() {
-    // Warm all site×tilt Level III frames in the background so selecting a
-    // station (or changing tilt) can reuse cache without waiting on S3.
-    this.prefetchAllRidgeFrames()
+    // Desktop: warm site×tilt Level III in the background. Skip on mobile —
+    // prefetching ~9 products of 1800px canvases is a common tab-killer.
+    if (!this.limitMemory) this.prefetchAllRidgeFrames()
     await this.syncMode({ force: true })
   }
 
@@ -368,8 +383,13 @@ export default class extends Controller {
     const common = {
       opacity: 0,
       zIndex: 200,
-      maxZoom: 11,
-      maxNativeZoom: frame.kind === "rainviewer" ? 7 : 11,
+      maxZoom: this.mapMaxZoom,
+      // Opacity-0 layers used to stay mounted and still fetch tiles; keepBuffer
+      // low so a stray mount cannot balloon RAM on mobile.
+      keepBuffer: this.limitMemory ? 0 : 1,
+      updateWhenIdle: true,
+      updateWhenZooming: false,
+      maxNativeZoom: frame.kind === "rainviewer" ? 7 : this.mapMaxZoom,
       className: "radar-tile-layer",
     }
 
@@ -397,13 +417,24 @@ export default class extends Controller {
   }
 
   showFrame(index) {
-    if (!this.frames.length) return
-    this.frameIndex = ((index % this.frames.length) + this.frames.length) % this.frames.length
+    if (!this.frames.length || !this.map) return
+    const nextIndex = ((index % this.frames.length) + this.frames.length) % this.frames.length
+    const nextLayer = this.tileLayers[nextIndex]
+    const prevLayer = this.tileLayers[this.frameIndex]
 
-    this.tileLayers.forEach((layer, i) => {
-      if (!this.map.hasLayer(layer)) layer.addTo(this.map)
-      layer.setOpacity(i === this.frameIndex ? 0.7 : 0)
-    })
+    // Mount only the active frame. Keeping every mosaic/Level III layer on the
+    // map at opacity 0 still loads tiles / decodes images and OOMs mobile tabs
+    // when zoomed in.
+    if (nextLayer) {
+      if (!this.map.hasLayer(nextLayer)) nextLayer.addTo(this.map)
+      nextLayer.setOpacity(0.7)
+    }
+
+    if (prevLayer && prevLayer !== nextLayer && this.map.hasLayer(prevLayer)) {
+      this.map.removeLayer(prevLayer)
+    }
+
+    this.frameIndex = nextIndex
 
     const frame = this.frames[this.frameIndex]
     if (this.hasTimestampTarget && frame) {

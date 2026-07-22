@@ -34,10 +34,15 @@ Site markers on the map mirror the chip control: click a marker to toggle that o
 ## Animation
 
 - **Mosaic:** ~55 minutes of history via `nexrad-n0q-m55m` … `m05m` plus current `nexrad-n0q` (5-minute steps).
-- **Single site:** Unidata Level III objects from `https://unidata-nexrad-level3.s3.amazonaws.com` (`{SECTOR}_{PRODUCT}_{YYYY}_{MM}_{DD}_{HH}_{MI}_{SS}`), decoded in-browser and drawn as Leaflet image overlays at **1800×1800**. Tilt selector (site-only): `0.5°` → `N0B`, `1.0°` → `NAB` (~0.9°), `1.5°` → `N1B`. (IEM RIDGE tiles only archive `N0B`, so higher tilts cannot use that TMS path.) On `/radar` load, all local sites × tilts prefetch in the background into an in-memory cache so station/tilt switches can reuse frames without re-downloading.
+- **Single site:** Unidata Level III objects from `https://unidata-nexrad-level3.s3.amazonaws.com` (`{SECTOR}_{PRODUCT}_{YYYY}_{MM}_{DD}_{HH}_{MI}_{SS}`), decoded in-browser and drawn as Leaflet image overlays (**1800×1800** on desktop, **900×900** on coarse/narrow viewports). Tilt selector (site-only): `0.5°` → `N0B`, `1.0°` → `NAB` (~0.9°), `1.5°` → `N1B`. (IEM RIDGE tiles only archive `N0B`, so higher tilts cannot use that TMS path.) On desktop `/radar` load, all local sites × tilts prefetch in the background; mobile skips prefetch to avoid tab OOM.
 - **RainViewer:** ~2 hours from `https://api.rainviewer.com/public/weather-maps.json`.
 
 Playback controls: play/pause + timestamp (Pacific time). Default is autoplay. When a site is selected, a reflectivity tilt control appears between playback and the site chips.
+
+### Memory / zoom notes
+
+- Only the **active** animation frame is mounted on the map (inactive frames are detached). Mounting every mosaic/Level III layer at opacity 0 still fetched tiles / decoded images and crashed mobile Safari when zoomed in.
+- Mobile / coarse-pointer clients cap `maxZoom` at **9** (desktop **11**), use smaller Level III canvases, fewer frames, and skip background Level III prefetch.
 
 ## Default viewport
 
@@ -50,6 +55,7 @@ The map fits an approximate **200-mile radius** around `LOCATION_LAT` / `LOCATIO
 - Playback button and site chips use ≥44px touch targets on small screens.
 - Site chip row scrolls horizontally when needed.
 - Radar site markers use large tappable hit areas.
+- Zoom/memory caps above apply automatically via `shouldLimitRadarMemory()` (coarse pointer, narrow viewport, or `navigator.deviceMemory ≤ 4`).
 
 ## Code map
 
