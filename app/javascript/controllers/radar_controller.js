@@ -76,6 +76,8 @@ export default class extends Controller {
     this.librewxrCacheAt = 0
     this.librewxrFetchPromise = null
     this.librewxrRefreshPromise = null
+    this.pendingQuietRefresh = null
+    this.zooming = false
     this.alertsLayer = null
     this.alertPointMarkers = []
     this.alertsGeneration = 0
@@ -106,9 +108,13 @@ export default class extends Controller {
 
     this.onZoomStart = () => {
       // Avoid animating (add/remove layers) while the user is pinching.
+      this.zooming = true
       this.stopTimer()
     }
     this.onZoomEnd = () => {
+      this.zooming = false
+      // Quiet metadata refresh may have finished mid-pinch; apply the swap now.
+      this.flushPendingQuietRefresh()
       if (this.playing) this.startTimer()
     }
     this.map.on("zoomstart", this.onZoomStart)
@@ -129,6 +135,8 @@ export default class extends Controller {
   disconnect() {
     this.syncGeneration += 1
     this.alertsGeneration += 1
+    this.pendingQuietRefresh = null
+    this.zooming = false
     this.stopTimer()
     this.stopMetadataRefresh()
     this.stopAlertsRefresh()
@@ -294,11 +302,11 @@ export default class extends Controller {
       this.frames.length > 0 &&
       this.tileLayers.length > 0
 
-    const previousFrame = canPreserve ? this.frames[this.frameIndex] : null
     const previousLayers = canPreserve ? [...this.tileLayers] : null
 
     const generation = ++this.syncGeneration
     if (!canPreserve) {
+      this.pendingQuietRefresh = null
       this.stopTimer()
       this.clearRadarLayers()
       this.frames = []
@@ -337,6 +345,7 @@ export default class extends Controller {
       if (generation !== this.syncGeneration || !this.map) return
 
       if (frames.length === 0) {
+        this.pendingQuietRefresh = null
         this.stopTimer()
         this.clearRadarLayers()
         this.frames = []
@@ -350,29 +359,33 @@ export default class extends Controller {
         return
       }
 
-      this.stopTimer()
-      const nextLayers = frames.map((frame) => this.createFrameLayer(frame))
-      this.activeMode = mode
-      this.activeProduct = product
-      this.activeCompositeLayer = compositeLayer
-      this.frames = frames
-      this.frameIndex = resolvePreservedFrameIndex(frames, previousFrame)
-      this.tileLayers = nextLayers
-      this.showFrame(this.frameIndex)
-
-      if (previousLayers) {
-        previousLayers.forEach((layer) => {
-          if (this.map && this.map.hasLayer(layer)) this.map.removeLayer(layer)
-        })
+      // Defer quiet swaps during pinch-zoom so we do not add/remove tile layers mid-gesture.
+      if (canPreserve && this.zooming) {
+        this.pendingQuietRefresh = {
+          frames,
+          generation,
+          mode,
+          product,
+          compositeLayer,
+          previousLayers,
+        }
+        return
       }
 
-      if (this.playing) this.startTimer()
+      this.commitFrameSet({
+        frames,
+        mode,
+        product,
+        compositeLayer,
+        previousLayers,
+        preserve: canPreserve,
+      })
     } catch (error) {
       if (generation !== this.syncGeneration || !this.map) return
       console.error("Radar sync failed", error)
       if (canPreserve) {
         // Failed quiet refresh: leave the previous composite playing.
-        if (this.playing) this.startTimer()
+        if (this.playing && !this.zooming) this.startTimer()
         return
       }
       this.activeMode = null
@@ -386,6 +399,48 @@ export default class extends Controller {
           : "Radar unavailable",
       )
     }
+  }
+
+  /** Apply a loaded frame set, anchoring quiet refresh to the live playback index. */
+  commitFrameSet({ frames, mode, product, compositeLayer, previousLayers, preserve }) {
+    if (!this.map || !frames?.length) return
+
+    this.stopTimer()
+    // Read the anchor after the await so autoplay progress during the fetch is kept.
+    const anchorFrame = preserve ? this.frames[this.frameIndex] : null
+    const nextLayers = frames.map((frame) => this.createFrameLayer(frame))
+    this.activeMode = mode
+    this.activeProduct = product
+    this.activeCompositeLayer = compositeLayer
+    this.frames = frames
+    this.frameIndex = resolvePreservedFrameIndex(frames, anchorFrame)
+    this.tileLayers = nextLayers
+    this.showFrame(this.frameIndex)
+
+    if (previousLayers) {
+      previousLayers.forEach((layer) => {
+        if (this.map && this.map.hasLayer(layer)) this.map.removeLayer(layer)
+      })
+    }
+
+    if (this.playing && !this.zooming) this.startTimer()
+  }
+
+  flushPendingQuietRefresh() {
+    const pending = this.pendingQuietRefresh
+    if (!pending) return
+    this.pendingQuietRefresh = null
+    if (pending.generation !== this.syncGeneration || !this.map) return
+    if (this.resolveMode() !== "librewxr" || this.selectedSiteId) return
+
+    this.commitFrameSet({
+      frames: pending.frames,
+      mode: pending.mode,
+      product: pending.product,
+      compositeLayer: pending.compositeLayer,
+      previousLayers: pending.previousLayers,
+      preserve: true,
+    })
   }
 
   setTimestamp(text, { nowcast = false } = {}) {
