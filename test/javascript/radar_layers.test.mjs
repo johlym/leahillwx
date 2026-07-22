@@ -15,6 +15,7 @@ import {
   resolvePreservedFrameIndex,
   boundsForRadius,
   ridgeProductForTilt,
+  tileUrlsForViewport,
 } from "../../app/javascript/controllers/helpers/radar_layers.js"
 
 describe("ridgeProductForTilt", () => {
@@ -195,5 +196,46 @@ describe("basemap host", () => {
   it("uses apex CARTO host without letter subdomains", () => {
     assert.match(CARTO_DARK_URL, /^https:\/\/basemaps\.cartocdn\.com\//)
     assert.doesNotMatch(CARTO_DARK_URL, /\{s\}/)
+  })
+})
+
+describe("tileUrlsForViewport", () => {
+  it("expands the template for tiles covering the pixel bounds", () => {
+    const urls = tileUrlsForViewport(
+      "https://example.com/{z}/{x}/{y}/6/1_1.png",
+      {
+        zoom: 7,
+        pixelMinX: 256,
+        pixelMinY: 512,
+        pixelMaxX: 300,
+        pixelMaxY: 600,
+        tileSize: 256,
+        pad: 0,
+      },
+    )
+
+    assert.deepEqual(urls, [
+      "https://example.com/7/1/2/6/1_1.png",
+    ])
+  })
+
+  it("pads the tile range and strips retina placeholders", () => {
+    const urls = tileUrlsForViewport(
+      "https://example.com/{z}/{x}/{y}{r}.png",
+      {
+        zoom: 5,
+        pixelMinX: 0,
+        pixelMinY: 0,
+        pixelMaxX: 10,
+        pixelMaxY: 10,
+        tileSize: 256,
+        pad: 1,
+      },
+    )
+
+    assert.equal(urls.length, 9)
+    assert.ok(urls.includes("https://example.com/5/0/0.png"))
+    assert.ok(urls.includes("https://example.com/5/-1/-1.png"))
+    assert.ok(urls.every((url) => !url.includes("{r}")))
   })
 })

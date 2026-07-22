@@ -19,6 +19,8 @@ import {
   resolvePreservedFrameIndex,
   boundsForRadius,
   ridgeProductForTilt,
+  tileUrlsForViewport,
+  prefetchImages,
 } from "./helpers/radar_layers"
 import { boundsForRadar, buildLevel3Frames } from "./helpers/level3_frames"
 import { shouldLimitRadarMemory } from "./helpers/level3_utils"
@@ -69,6 +71,7 @@ export default class extends Controller {
     this.librewxrRefreshPromise = null
     this.pendingQuietRefresh = null
     this.zooming = false
+    this.warmingFrames = false
     // sector:product → { frames } | { promise } for Level III reuse across sites/tilts
     this.level3Cache = new Map()
     this.basemapErrors = 0
@@ -134,6 +137,7 @@ export default class extends Controller {
     this.syncGeneration += 1
     this.pendingQuietRefresh = null
     this.zooming = false
+    this.warmingFrames = false
     this.stopTimer()
     this.stopMetadataRefresh()
     this.clearRadarLayers()
@@ -381,7 +385,9 @@ export default class extends Controller {
 
   /**
    * Apply a loaded frame set.
-   * Initial loads: freeze on the newest frame, warm the rest, then animate from oldest.
+   * Initial loads: freeze on the newest frame (sole map layer), prefetch the rest
+   * into the HTTP cache off-map, then start animating from that frozen frame so
+   * the loop advances newest → oldest → … without a hard cut.
    * Quiet refreshes: preserve playback index and resume immediately.
    */
   async commitFrameSet({
@@ -396,6 +402,7 @@ export default class extends Controller {
     if (!this.map || !frames?.length) return
 
     this.stopTimer()
+    this.warmingFrames = false
     // Capture before replacing this.frames (quiet refresh keeps old list until now).
     const anchorFrame = preserve ? this.frames[this.frameIndex] : null
     const nextLayers = frames.map((frame) => this.createFrameLayer(frame))
@@ -408,6 +415,8 @@ export default class extends Controller {
       ? resolvePreservedFrameIndex(frames, anchorFrame)
       : frames.length - 1
     this.showFrame(this.frameIndex)
+    // Only the frozen/active frame may be on the map during the warm phase.
+    this.detachInactiveRadarLayers(this.frameIndex)
 
     if (previousLayers) {
       previousLayers.forEach((layer) => {
@@ -420,16 +429,22 @@ export default class extends Controller {
       return
     }
 
-    // Hold on the newest frame while its tiles load, then warm the rest of the loop.
+    this.warmingFrames = true
+    // Hold on the newest frame while its tiles load, then warm the rest off-map.
     await this.waitForLayerLoad(this.tileLayers[this.frameIndex])
-    if (generation !== this.syncGeneration || !this.map) return
+    if (generation !== this.syncGeneration || !this.map) {
+      this.warmingFrames = false
+      return
+    }
 
     await this.warmOfflineFrames(this.frameIndex, generation)
-    if (generation !== this.syncGeneration || !this.map) return
+    if (generation !== this.syncGeneration || !this.map) {
+      this.warmingFrames = false
+      return
+    }
 
-    // Animate oldest → newest once frames are cached.
-    this.frameIndex = 0
-    this.showFrame(this.frameIndex)
+    this.warmingFrames = false
+    // Stay on the newest frame; the interval advances into the loop naturally.
     if (this.playing && !this.zooming) this.startTimer()
   }
 
@@ -480,38 +495,58 @@ export default class extends Controller {
   }
 
   /**
-   * Prefetch inactive frames at opacity 0 while keeping the frozen frame visible.
-   * After warming, leave only the frozen frame mounted (mount-only-active modes)
-   * so drag/zoom stays cheap until animation starts.
+   * Warm inactive frames without mounting them on the map.
+   * Adding opacity-0 tile layers still paints/stacks and causes the
+   * "duplicate overlapping frames" flicker during load.
    */
-  async warmOfflineFrames(keepIndex, generation, concurrency = 2) {
-    if (!this.map || this.tileLayers.length < 2) return
+  async warmOfflineFrames(keepIndex, generation) {
+    if (!this.map || this.frames.length < 2) return
 
-    const indices = this.tileLayers
-      .map((_, index) => index)
-      .filter((index) => index !== keepIndex)
-    const detachAfterWarm = this.mountOnlyActiveFrame()
+    this.detachInactiveRadarLayers(keepIndex)
 
-    let cursor = 0
-    const workers = Array.from({ length: Math.min(concurrency, indices.length) }, async () => {
-      while (cursor < indices.length) {
-        if (generation !== this.syncGeneration || !this.map) return
-        const index = indices[cursor]
-        cursor += 1
-        const layer = this.tileLayers[index]
-        if (!layer) continue
+    const urls = []
+    for (let i = 0; i < this.frames.length; i += 1) {
+      if (i === keepIndex) continue
+      urls.push(...this.viewportUrlsForFrame(this.frames[i]))
+    }
 
-        layer.setOpacity(0)
-        if (!this.map.hasLayer(layer)) layer.addTo(this.map)
-        await this.waitForLayerLoad(layer, 5000)
-        if (generation !== this.syncGeneration || !this.map) return
-        if (detachAfterWarm && this.map.hasLayer(layer)) {
-          this.map.removeLayer(layer)
-        }
-      }
+    await prefetchImages(urls, {
+      concurrency: this.limitMemory ? 4 : 8,
+      timeoutMs: 4000,
+      isCancelled: () => generation !== this.syncGeneration || !this.map,
     })
 
-    await Promise.all(workers)
+    this.detachInactiveRadarLayers(keepIndex)
+  }
+
+  viewportUrlsForFrame(frame) {
+    if (!frame || !this.map) return []
+
+    // Level III frames are already decoded blob images — one URL covers the overlay.
+    if (frame.kind === "level3" && frame.url) return [ frame.url ]
+    if (!frame.urlTemplate) return []
+
+    const bounds = this.map.getPixelBounds()
+    if (!bounds) return []
+
+    return tileUrlsForViewport(frame.urlTemplate, {
+      zoom: Math.min(Math.round(this.map.getZoom()), this.mapMaxZoom),
+      pixelMinX: bounds.min.x,
+      pixelMinY: bounds.min.y,
+      pixelMaxX: bounds.max.x,
+      pixelMaxY: bounds.max.y,
+      tileSize: 256,
+      pad: 1,
+    })
+  }
+
+  detachInactiveRadarLayers(keepIndex) {
+    if (!this.map) return
+    this.tileLayers.forEach((layer, index) => {
+      if (!layer || index === keepIndex) return
+      if (this.map.hasLayer(layer)) this.map.removeLayer(layer)
+      if (typeof layer.setOpacity === "function") layer.setOpacity(0)
+    })
   }
 
   setTimestamp(text, { nowcast = false } = {}) {
@@ -731,7 +766,7 @@ export default class extends Controller {
     // Mount only the active frame. Keeping every LibreWXR tile layer at
     // opacity 0 still fetches/paints tiles and makes drag/zoom feel stuck.
     // Level III desktop can opacity-toggle decoded image overlays cheaply.
-    if (this.mountOnlyActiveFrame()) {
+    if (this.mountOnlyActiveFrame() || this.warmingFrames) {
       if (nextLayer) {
         if (!this.map.hasLayer(nextLayer)) nextLayer.addTo(this.map)
         nextLayer.setOpacity(0.7)
@@ -739,6 +774,7 @@ export default class extends Controller {
       if (prevLayer && prevLayer !== nextLayer && this.map.hasLayer(prevLayer)) {
         this.map.removeLayer(prevLayer)
       }
+      this.detachInactiveRadarLayers(nextIndex)
     } else {
       this.tileLayers.forEach((layer, i) => {
         if (!this.map.hasLayer(layer)) layer.addTo(this.map)
@@ -760,12 +796,13 @@ export default class extends Controller {
   }
 
   advanceFrame() {
+    if (this.warmingFrames) return
     this.showFrame(this.frameIndex + 1)
   }
 
   startTimer() {
     this.stopTimer()
-    if (!this.playing || this.frames.length < 2) return
+    if (!this.playing || this.warmingFrames || this.frames.length < 2) return
     this.timer = window.setInterval(() => this.advanceFrame(), 500)
   }
 

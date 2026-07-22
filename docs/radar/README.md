@@ -25,7 +25,7 @@ Composite tiles come from `LIBREWXR_API_BASE` (default `https://api.librewxr.net
 - **Snow colors:** `smooth_snow = 1_1` by default (per-pixel rain/snow); toggleable via **Snow**
 - **Regional NWP:** server-side in LibreWXR (HRRR over CONUS, etc.) — no client work beyond attribution
 - **Color scheme:** LibreWXR scheme `6` (NEXRAD Level III), closest built-in match to the site rain ladder
-- **Performance:** only the active radar/satellite frame is mounted (opacity-0 tile layers still fetch tiles and hurt drag/zoom)
+- **Performance:** only the active radar/satellite frame is mounted. On first load the newest frame stays frozen while other viewport tiles are prefetched off-map (never stacked at opacity 0), then animation starts from that frozen frame.
 
 Weather alerts come from LibreWXR (NWS/WMO CAP near the station), merged with any
 active OpenWeather alerts. The homepage shows a compact bar (indicator, title,

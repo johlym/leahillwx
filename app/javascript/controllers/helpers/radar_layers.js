@@ -166,3 +166,86 @@ export function formatFrameTime(date) {
     return date.toISOString()
   }
 }
+
+/**
+ * Expand a Leaflet-style tile URL template for the tiles covering a viewport.
+ * Used to warm radar frames in the HTTP cache without mounting map layers.
+ */
+export function tileUrlsForViewport(
+  urlTemplate,
+  {
+    zoom,
+    pixelMinX,
+    pixelMinY,
+    pixelMaxX,
+    pixelMaxY,
+    tileSize = 256,
+    pad = 1,
+  } = {},
+) {
+  if (!urlTemplate || zoom == null || Number.isNaN(Number(zoom))) return []
+
+  const minX = Math.floor(pixelMinX / tileSize) - pad
+  const maxX = Math.floor(pixelMaxX / tileSize) + pad
+  const minY = Math.floor(pixelMinY / tileSize) - pad
+  const maxY = Math.floor(pixelMaxY / tileSize) + pad
+  if (![ minX, maxX, minY, maxY ].every(Number.isFinite)) return []
+
+  const urls = []
+  for (let x = minX; x <= maxX; x += 1) {
+    for (let y = minY; y <= maxY; y += 1) {
+      urls.push(
+        urlTemplate
+          .replaceAll("{z}", String(zoom))
+          .replaceAll("{x}", String(x))
+          .replaceAll("{y}", String(y))
+          .replaceAll("{r}", ""),
+      )
+    }
+  }
+  return urls
+}
+
+/** Prefetch image URLs into the browser cache (no DOM / map attachment). */
+export async function prefetchImages(
+  urls,
+  { concurrency = 6, timeoutMs = 4000, isCancelled = null } = {},
+) {
+  const list = [ ...new Set((urls || []).filter(Boolean)) ]
+  if (list.length === 0) return
+
+  let cursor = 0
+  const workers = Array.from({ length: Math.min(concurrency, list.length) }, async () => {
+    while (cursor < list.length) {
+      if (isCancelled?.()) return
+      const url = list[cursor]
+      cursor += 1
+      await prefetchImage(url, timeoutMs)
+    }
+  })
+  await Promise.all(workers)
+}
+
+function prefetchImage(url, timeoutMs) {
+  return new Promise((resolve) => {
+    if (typeof Image === "undefined") {
+      resolve()
+      return
+    }
+
+    const img = new Image()
+    let settled = false
+    const done = () => {
+      if (settled) return
+      settled = true
+      window.clearTimeout?.(timer)
+      resolve()
+    }
+    const timer = typeof window !== "undefined"
+      ? window.setTimeout(done, timeoutMs)
+      : setTimeout(done, timeoutMs)
+    img.onload = done
+    img.onerror = done
+    img.src = url
+  })
+}
