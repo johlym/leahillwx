@@ -93,10 +93,9 @@ export default class extends Controller {
 
     this.addBasemap()
 
-    this.map.fitBounds(boundsForRadius(this.latValue, this.lonValue, 200), {
-      padding: [12, 12],
-      maxZoom: Math.min(8, this.mapMaxZoom),
-    })
+    // Zoom 7 matches LibreWXR regional tiles around the station
+    // (e.g. /v2/radar/.../256/7/21/43/...).
+    this.map.setView([ this.latValue, this.lonValue ], 7)
 
     this.addSiteMarkers()
 
@@ -193,9 +192,8 @@ export default class extends Controller {
   async bootstrap() {
     this.updateLayerUi()
     this.updateOptionUi()
-    // Desktop: warm site×tilt Level III in the background. Skip on mobile —
-    // prefetching ~9 products of 1800px canvases is a common tab-killer.
-    if (!this.limitMemory) this.prefetchAllRidgeFrames()
+    // Level III single-site data loads on demand when a site (or non-default
+    // tilt for a selected site) is chosen — not on initial composite load.
     await this.syncMode({ force: true })
     this.startMetadataRefresh()
   }
