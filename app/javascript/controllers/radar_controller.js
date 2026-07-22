@@ -474,10 +474,6 @@ export default class extends Controller {
       return Promise.resolve()
     }
 
-    if (typeof layer.isLoading === "function" && !layer.isLoading()) {
-      return Promise.resolve()
-    }
-
     return new Promise((resolve) => {
       let settled = false
       const done = () => {
@@ -489,8 +485,16 @@ export default class extends Controller {
       }
       const timer = window.setTimeout(done, timeoutMs)
       layer.once?.("load", done)
-      // If Leaflet already finished between the isLoading check and once().
-      if (typeof layer.isLoading === "function" && !layer.isLoading()) done()
+
+      // Do not trust a synchronous !isLoading() right after addTo — Leaflet
+      // reports idle before the first tile request is queued, which made us
+      // tear down the previous frame onto an empty next layer (a visible blink).
+      requestAnimationFrame(() => {
+        if (settled) return
+        const tileCount = layer._tiles ? Object.keys(layer._tiles).length : 0
+        const loading = typeof layer.isLoading === "function" ? layer.isLoading() : true
+        if (!loading && tileCount > 0) done()
+      })
     })
   }
 
@@ -755,32 +759,49 @@ export default class extends Controller {
     const nextLayer = this.tileLayers[nextIndex]
     const prevIndex = this.frameIndex
     const prevLayer = this.tileLayers[prevIndex]
+    const switching = nextIndex !== prevIndex && prevLayer && nextLayer && prevLayer !== nextLayer
 
     if (this.mountOnlyActiveFrame() || this.warmingFrames) {
       if (nextLayer) {
-        if (!this.map.hasLayer(nextLayer)) {
-          nextLayer.setOpacity(0)
-          nextLayer.addTo(this.map)
-        }
-        if (waitForLoad && nextIndex !== prevIndex) {
-          await this.waitForLayerLoad(nextLayer, 1500)
+        // Load the next frame underneath the current one, then drop the cover.
+        // That avoids a basemap blink between time slots.
+        if (switching) {
+          nextLayer.setOpacity(0.7)
+          if (typeof nextLayer.setZIndex === "function") nextLayer.setZIndex(190)
+          if (!this.map.hasLayer(nextLayer)) nextLayer.addTo(this.map)
+          if (typeof prevLayer.setZIndex === "function") prevLayer.setZIndex(210)
+          prevLayer.setOpacity(0.7)
+
+          if (waitForLoad) {
+            await this.waitForLayerLoad(nextLayer, 1500)
+            if (token != null && token !== this.frameRevealToken) return
+            if (!this.map) return
+          }
+
+          // One paint with both layers mounted (next under prev), then uncover.
+          await new Promise((resolve) => requestAnimationFrame(resolve))
           if (token != null && token !== this.frameRevealToken) return
           if (!this.map) return
+
+          if (typeof nextLayer.setZIndex === "function") nextLayer.setZIndex(200)
+          if (this.map.hasLayer(prevLayer)) this.map.removeLayer(prevLayer)
+          prevLayer.setOpacity(0)
+          if (typeof prevLayer.setZIndex === "function") prevLayer.setZIndex(200)
+        } else {
+          if (!this.map.hasLayer(nextLayer)) nextLayer.addTo(this.map)
+          nextLayer.setOpacity(0.7)
+          if (typeof nextLayer.setZIndex === "function") nextLayer.setZIndex(200)
         }
-        nextLayer.setOpacity(0.7)
-      }
-      if (
-        prevLayer &&
-        prevLayer !== nextLayer &&
-        this.map.hasLayer(prevLayer)
-      ) {
-        this.map.removeLayer(prevLayer)
       }
       this.detachInactiveRadarLayers(nextIndex)
     } else {
+      // Desktop Level III: keep every decoded overlay mounted and opacity-toggle.
       this.tileLayers.forEach((layer, i) => {
         if (!this.map.hasLayer(layer)) layer.addTo(this.map)
         layer.setOpacity(i === nextIndex ? 0.7 : 0)
+        if (typeof layer.setZIndex === "function") {
+          layer.setZIndex(i === nextIndex ? 210 : 200)
+        }
       })
     }
 
