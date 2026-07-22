@@ -1,0 +1,90 @@
+/* Header alert strip (above nav) + /alerts detail page. */
+
+@utility forecast-alerts-bar {
+  @apply block border-b border-border no-underline
+         transition-colors duration-150;
+  background: transparent;
+
+  &:hover {
+    background: color-mix(in oklab, var(--color-bg) 55%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+  }
+}
+
+@utility forecast-alerts-bar-inner {
+  @apply container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8
+         py-2 sm:py-2.5 flex items-center gap-2.5 sm:gap-3 min-w-0;
+}
+
+@utility forecast-alerts-bar-label {
+  @apply shrink-0 border border-accent px-1 py-0.5 rounded-lg
+         text-[0.65rem] font-semibold uppercase tracking-[0.08em]
+         text-accent;
+}
+
+@utility forecast-alerts-bar-event {
+  @apply min-w-0 flex-1 truncate m-0
+         text-[0.9rem] sm:text-[0.95rem] font-semibold text-text-strong leading-none;
+}
+
+@utility forecast-alerts-bar-meta {
+  @apply shrink-0 m-0 text-[0.7rem] sm:text-[0.75rem] text-muted whitespace-nowrap;
+}
+
+/* --- /alerts ---------------------------------------------------- */
+
+@utility alerts-page-list {
+  @apply flex flex-col gap-4;
+}
+
+@utility alerts-page-empty {
+  @apply m-0 text-muted;
+}
+
+@utility alerts-page-article {
+  @apply border border-border rounded-[0.35rem] px-4 py-4 sm:px-5 sm:py-5;
+  background: color-mix(in oklab, var(--color-accent) 6%, var(--color-bg));
+}
+
+@utility alerts-page-eyebrow {
+  @apply m-0 mb-2 flex flex-wrap items-center gap-2;
+}
+
+@utility alerts-page-badge {
+  @apply inline-flex items-center px-1.5 py-0.5 rounded-[0.25rem]
+         text-[0.65rem] font-semibold uppercase tracking-[0.08em]
+         text-accent-contrast;
+  background: var(--color-accent);
+}
+
+@utility alerts-page-severity {
+  @apply inline-flex items-center text-[0.7rem] font-medium text-muted uppercase tracking-[0.06em];
+}
+
+@utility alerts-page-title {
+  @apply m-0 text-[1.05rem] sm:text-[1.15rem] font-semibold text-text-strong leading-snug;
+}
+
+@utility alerts-page-meta {
+  @apply m-0 mt-2 flex flex-col gap-0.5 text-[0.8rem] text-muted;
+}
+
+@utility alerts-page-regions {
+  @apply m-0 mt-3 text-[0.8rem] text-text leading-snug;
+}
+
+@utility alerts-page-regions-label {
+  @apply font-semibold text-text-strong;
+}
+
+@utility alerts-page-body {
+  @apply m-0 mt-4 text-[0.85rem] sm:text-[0.9rem] text-text leading-relaxed whitespace-pre-wrap;
+}
+
+@utility alerts-page-source {
+  @apply m-0 mt-4 text-[0.7rem] text-muted;
+}

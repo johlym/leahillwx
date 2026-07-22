@@ -1,50 +1,21 @@
 import assert from "node:assert/strict"
 import { describe, it } from "node:test"
 import {
-  MOSAIC_OFFSETS,
   RIDGE_PRODUCT,
   RIDGE_TILTS,
   CARTO_DARK_URL,
-  IEM_SUBDOMAINS,
-  buildMosaicFrames,
-  buildRidgeFrames,
-  buildRainviewerFrames,
+  LIBREWXR_COLOR_SCHEME,
+  LIBREWXR_DEFAULT_HOST,
+  LIBREWXR_OPTIONS_SNOW,
+  normalizeLibreWxrHost,
+  resolveLibreWxrTileHost,
+  librewxrMetadataUrl,
+  buildLibreWxrRadarFrames,
+  resolvePreservedFrameIndex,
   boundsForRadius,
-  toIemTimestamp,
-  ridgeListUrl,
   ridgeProductForTilt,
+  tileUrlsForViewport,
 } from "../../app/javascript/controllers/helpers/radar_layers.js"
-
-describe("buildMosaicFrames", () => {
-  it("builds oldest-to-newest frames including current", () => {
-    const now = new Date("2026-07-21T12:00:00Z")
-    const frames = buildMosaicFrames(now)
-
-    assert.equal(frames.length, MOSAIC_OFFSETS.length)
-    assert.equal(frames[0].layer, "nexrad-n0q-m55m")
-    assert.equal(frames.at(-1).layer, "nexrad-n0q")
-    assert.equal(frames.at(-1).kind, "iem")
-  })
-})
-
-describe("buildRidgeFrames", () => {
-  it("uses N0B product and IEM timestamped layer names", () => {
-    const frames = buildRidgeFrames("ATX", [
-      { ts: "2026-07-21T04:30Z" },
-      { ts: "2026-07-21T04:35Z" },
-    ])
-
-    assert.equal(RIDGE_PRODUCT, "N0B")
-    assert.equal(frames.length, 2)
-    assert.equal(frames[0].layer, "ridge::ATX-N0B-202607210430")
-    assert.equal(frames[1].layer, "ridge::ATX-N0B-202607210435")
-  })
-
-  it("accepts alternate tilt products", () => {
-    const frames = buildRidgeFrames("ATX", [{ ts: "2026-07-21T04:30Z" }], "N1B")
-    assert.equal(frames[0].layer, "ridge::ATX-N1B-202607210430")
-  })
-})
 
 describe("ridgeProductForTilt", () => {
   it("maps display tilts to Level III products", () => {
@@ -52,6 +23,7 @@ describe("ridgeProductForTilt", () => {
       RIDGE_TILTS.map((t) => t.degrees),
       ["0.5", "1.0", "1.5"],
     )
+    assert.equal(RIDGE_PRODUCT, "N0B")
     assert.equal(ridgeProductForTilt("0.5"), "N0B")
     assert.equal(ridgeProductForTilt("1.0"), "NAB")
     assert.equal(ridgeProductForTilt("1.5"), "N1B")
@@ -59,21 +31,123 @@ describe("ridgeProductForTilt", () => {
   })
 })
 
-describe("buildRainviewerFrames", () => {
-  it("builds tile URL templates from weather-maps.json", () => {
-    const frames = buildRainviewerFrames({
-      host: "https://tilecache.rainviewer.com",
+describe("LibreWXR URL helpers", () => {
+  it("normalizes host and metadata URLs", () => {
+    assert.equal(normalizeLibreWxrHost("https://api.librewxr.net/"), LIBREWXR_DEFAULT_HOST)
+    assert.equal(
+      normalizeLibreWxrHost("https://api.librewxr.net/public/weather-maps.json"),
+      LIBREWXR_DEFAULT_HOST,
+    )
+    assert.equal(
+      librewxrMetadataUrl("https://radar.example.com"),
+      "https://radar.example.com/public/weather-maps.json",
+    )
+  })
+})
+
+describe("buildLibreWxrRadarFrames", () => {
+  it("builds past and nowcast tile URL templates with snow colors", () => {
+    const frames = buildLibreWxrRadarFrames({
+      host: "https://api.librewxr.net",
       radar: {
-        past: [{ time: 1784601600, path: "/v2/radar/abc123" }],
+        past: [{ time: 1784601600, path: "/v2/radar/1784601600" }],
+        nowcast: [{ time: 1784602200, path: "/v2/radar/1784602200" }],
       },
     })
+
+    assert.equal(frames.length, 2)
+    assert.equal(frames[0].kind, "librewxr")
+    assert.equal(frames[0].isNowcast, false)
+    assert.equal(
+      frames[0].urlTemplate,
+      `https://api.librewxr.net/v2/radar/1784601600/256/{z}/{x}/{y}/${LIBREWXR_COLOR_SCHEME}/${LIBREWXR_OPTIONS_SNOW}.png`,
+    )
+    assert.equal(frames[1].isNowcast, true)
+    assert.match(frames[0].label, /^Past · /)
+    assert.match(frames[1].label, /^Future · /)
+    assert.match(frames[1].urlTemplate, /1784602200/)
+    assert.doesNotMatch(frames[0].urlTemplate, /arrows=/)
+  })
+
+  it("omits nowcast when disabled", () => {
+    const frames = buildLibreWxrRadarFrames(
+      {
+        host: "https://api.librewxr.net",
+        radar: {
+          past: [{ time: 1784601600, path: "/v2/radar/1784601600" }],
+          nowcast: [{ time: 1784602200, path: "/v2/radar/1784602200" }],
+        },
+      },
+      { includeNowcast: false, options: "1_0" },
+    )
 
     assert.equal(frames.length, 1)
     assert.equal(
       frames[0].urlTemplate,
-      "https://tilecache.rainviewer.com/v2/radar/abc123/256/{z}/{x}/{y}/2/1_1.png",
+      "https://api.librewxr.net/v2/radar/1784601600/256/{z}/{x}/{y}/6/1_0.png",
     )
-    assert.equal(frames[0].kind, "rainviewer")
+  })
+
+  it("prefers configured tileHost over metadata host", () => {
+    assert.equal(
+      resolveLibreWxrTileHost({ host: "https://api.librewxr.net" }, "https://radar.example.com"),
+      "https://radar.example.com",
+    )
+
+    const frames = buildLibreWxrRadarFrames(
+      {
+        host: "https://api.librewxr.net",
+        radar: { past: [{ time: 1784601600, path: "/v2/radar/1784601600" }] },
+      },
+      { tileHost: "https://radar.example.com/" },
+    )
+
+    assert.equal(
+      frames[0].urlTemplate,
+      "https://radar.example.com/v2/radar/1784601600/256/{z}/{x}/{y}/6/1_1.png",
+    )
+  })
+})
+
+describe("resolvePreservedFrameIndex", () => {
+  it("keeps the same frame id when still present", () => {
+    const frames = [
+      { id: "a", time: new Date("2026-07-22T12:00:00Z") },
+      { id: "b", time: new Date("2026-07-22T12:10:00Z") },
+    ]
+    assert.equal(resolvePreservedFrameIndex(frames, frames[1]), 1)
+  })
+
+  it("falls back to the temporally closest frame", () => {
+    const frames = [
+      { id: "a", time: new Date("2026-07-22T12:00:00Z") },
+      { id: "b", time: new Date("2026-07-22T12:10:00Z") },
+      { id: "c", time: new Date("2026-07-22T12:20:00Z") },
+    ]
+    assert.equal(
+      resolvePreservedFrameIndex(frames, {
+        id: "gone",
+        time: new Date("2026-07-22T12:12:00Z"),
+      }),
+      1,
+    )
+  })
+
+  it("keeps nowcast playback from snapping back into past radar", () => {
+    const frames = [
+      { id: "past-1", time: new Date("2026-07-22T12:00:00Z"), isNowcast: false },
+      { id: "past-2", time: new Date("2026-07-22T12:10:00Z"), isNowcast: false },
+      { id: "nc-1", time: new Date("2026-07-22T12:20:00Z"), isNowcast: true },
+      { id: "nc-2", time: new Date("2026-07-22T12:30:00Z"), isNowcast: true },
+    ]
+    assert.equal(
+      resolvePreservedFrameIndex(frames, {
+        id: "nc-old",
+        time: new Date("2026-07-22T12:28:00Z"),
+        isNowcast: true,
+      }),
+      3,
+    )
   })
 })
 
@@ -86,25 +160,50 @@ describe("boundsForRadius", () => {
   })
 })
 
-describe("toIemTimestamp / ridgeListUrl", () => {
-  it("formats UTC minute stamps for IEM APIs", () => {
-    const date = new Date("2026-07-21T04:40:12Z")
-    assert.equal(toIemTimestamp(date), "202607210440")
-    assert.match(
-      ridgeListUrl("RTX", date, date),
-      /operation=list&radar=RTX&product=N0B&start=2026-07-21T04%3A40Z&end=2026-07-21T04%3A40Z/,
-    )
-    assert.match(ridgeListUrl("RTX", date, date, "NAB"), /product=NAB/)
-  })
-})
-
-describe("basemap / IEM hosts", () => {
+describe("basemap host", () => {
   it("uses apex CARTO host without letter subdomains", () => {
     assert.match(CARTO_DARK_URL, /^https:\/\/basemaps\.cartocdn\.com\//)
     assert.doesNotMatch(CARTO_DARK_URL, /\{s\}/)
   })
+})
 
-  it("includes the bare mesonet host in IEM subdomains", () => {
-    assert.deepEqual(IEM_SUBDOMAINS, ["", "1", "2", "3"])
+describe("tileUrlsForViewport", () => {
+  it("expands the template for tiles covering the pixel bounds", () => {
+    const urls = tileUrlsForViewport(
+      "https://example.com/{z}/{x}/{y}/6/1_1.png",
+      {
+        zoom: 7,
+        pixelMinX: 256,
+        pixelMinY: 512,
+        pixelMaxX: 300,
+        pixelMaxY: 600,
+        tileSize: 256,
+        pad: 0,
+      },
+    )
+
+    assert.deepEqual(urls, [
+      "https://example.com/7/1/2/6/1_1.png",
+    ])
+  })
+
+  it("pads the tile range and strips retina placeholders", () => {
+    const urls = tileUrlsForViewport(
+      "https://example.com/{z}/{x}/{y}{r}.png",
+      {
+        zoom: 5,
+        pixelMinX: 0,
+        pixelMinY: 0,
+        pixelMaxX: 10,
+        pixelMaxY: 10,
+        tileSize: 256,
+        pad: 1,
+      },
+    )
+
+    assert.equal(urls.length, 9)
+    assert.ok(urls.includes("https://example.com/5/0/0.png"))
+    assert.ok(urls.includes("https://example.com/5/-1/-1.png"))
+    assert.ok(urls.every((url) => !url.includes("{r}")))
   })
 })

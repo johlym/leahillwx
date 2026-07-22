@@ -1,12 +1,15 @@
-// Pure helpers for building radar tile frame lists (IEM + RainViewer).
+// Pure helpers for building LibreWXR radar frame lists.
 
-export const IEM_TILE_BASE = "https://mesonet{s}.agron.iastate.edu/cache/tile.py/1.0.0"
-// Empty string hits mesonet.agron.iastate.edu; 1/2/3 are CDN aliases.
-export const IEM_SUBDOMAINS = ["", "1", "2", "3"]
-export const RAINVIEWER_API = "https://api.rainviewer.com/public/weather-maps.json"
+export const LIBREWXR_DEFAULT_HOST = "https://api.librewxr.net"
+/** NEXRAD Level III scheme — closest built-in match to the site rain ladder. */
+export const LIBREWXR_COLOR_SCHEME = 6
+export const LIBREWXR_OPTIONS_SNOW = "1_1"
+export const LIBREWXR_OPTIONS_NOSNOW = "1_0"
+export const LIBREWXR_MAX_NATIVE_ZOOM = 12
+export const LIBREWXR_METADATA_TTL_MS = 3 * 60 * 1000
+
 /** Default RIDGE product: super-res base reflectivity at ~0.5°. */
 export const RIDGE_PRODUCT = "N0B"
-export const MOSAIC_LAYER = "nexrad-n0q"
 
 /**
  * Single-site reflectivity tilts (elevation angle → Level III product).
@@ -34,64 +37,90 @@ export const ESRI_DARK_URL =
   "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
 export const ESRI_ATTR = "Tiles &copy; Esri"
 
-/** Relative mosaic offsets (minutes ago), oldest → newest, plus current. */
-export const MOSAIC_OFFSETS = [55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5, 0]
+export const LIBREWXR_ATTR =
+  'Radar &copy; <a href="https://librewxr.net/">LibreWXR</a> (MRMS/NOAA, NWP)'
 
-/**
- * Build IEM CONUS mosaic animation frames (nexrad-n0q + mXXm).
- * @returns {{ id: string, label: string, layer: string, time: Date|null }[]}
- */
-export function buildMosaicFrames(now = new Date()) {
-  return MOSAIC_OFFSETS.map((offset) => {
-    const layer = offset === 0 ? MOSAIC_LAYER : `${MOSAIC_LAYER}-m${String(offset).padStart(2, "0")}m`
-    const time = new Date(now.getTime() - offset * 60_000)
-    return {
-      id: `mosaic-${offset}`,
-      label: formatFrameTime(time),
-      layer,
-      time,
-      kind: "iem",
-    }
-  })
+/** Normalize a configured LibreWXR base (host or full metadata URL) to origin. */
+export function normalizeLibreWxrHost(base = LIBREWXR_DEFAULT_HOST) {
+  const trimmed = String(base || LIBREWXR_DEFAULT_HOST).trim().replace(/\/$/, "")
+  if (trimmed.endsWith("/public/weather-maps.json")) {
+    return trimmed.slice(0, -"/public/weather-maps.json".length) || LIBREWXR_DEFAULT_HOST
+  }
+  return trimmed || LIBREWXR_DEFAULT_HOST
+}
+
+export function librewxrMetadataUrl(base = LIBREWXR_DEFAULT_HOST) {
+  return `${normalizeLibreWxrHost(base)}/public/weather-maps.json`
 }
 
 /**
- * Build IEM RIDGE single-site frames from /json/radar.py list response.
- * @param {string} sector e.g. "ATX"
- * @param {{ ts: string }[]} scans
+ * Prefer the app-configured LibreWXR origin for tile URLs so custom hosts
+ * are not overridden by the `host` field inside weather-maps.json.
  */
-export function buildRidgeFrames(sector, scans, product = RIDGE_PRODUCT) {
-  return scans.map((scan) => {
-    const time = new Date(scan.ts.endsWith("Z") ? scan.ts : `${scan.ts}Z`)
-    const stamp = toIemTimestamp(time)
-    return {
-      id: `ridge-${sector}-${stamp}`,
-      label: formatFrameTime(time),
-      layer: `ridge::${sector}-${product}-${stamp}`,
-      time,
-      kind: "iem",
-    }
-  })
+export function resolveLibreWxrTileHost(api, tileHost) {
+  return normalizeLibreWxrHost(tileHost || api?.host || LIBREWXR_DEFAULT_HOST)
 }
 
 /**
- * Build RainViewer frames from weather-maps.json payload.
- * @param {{ host: string, radar?: { past?: { time: number, path: string }[] } }} api
+ * Build LibreWXR radar frames (past + optional nowcast) from weather-maps.json.
+ * @param {{ host?: string, radar?: { past?: { time: number, path: string }[], nowcast?: { time: number, path: string }[] } }} api
  */
-export function buildRainviewerFrames(api, { size = 256, color = 2, options = "1_1" } = {}) {
-  const host = api.host?.replace(/\/$/, "") || "https://tilecache.rainviewer.com"
+export function buildLibreWxrRadarFrames(
+  api,
+  {
+    size = 256,
+    color = LIBREWXR_COLOR_SCHEME,
+    options = LIBREWXR_OPTIONS_SNOW,
+    includeNowcast = true,
+    tileHost,
+  } = {},
+) {
+  const host = resolveLibreWxrTileHost(api, tileHost)
   const past = api.radar?.past || []
-  return past.map((frame) => {
+  const nowcast = includeNowcast ? api.radar?.nowcast || [] : []
+
+  const toFrame = (frame, isNowcast) => {
     const time = new Date(frame.time * 1000)
+    const timeLabel = formatFrameTime(time)
     return {
-      id: `rv-${frame.time}`,
-      label: formatFrameTime(time),
-      // Leaflet template; RainViewer path already includes /v2/radar/...
+      id: `lw-${isNowcast ? "nc" : "past"}-${frame.time}`,
+      label: isNowcast ? `Future · ${timeLabel}` : `Past · ${timeLabel}`,
       urlTemplate: `${host}${frame.path}/${size}/{z}/{x}/{y}/${color}/${options}.png`,
       time,
-      kind: "rainviewer",
+      kind: "librewxr",
+      isNowcast,
     }
-  })
+  }
+
+  return [...past.map((frame) => toFrame(frame, false)), ...nowcast.map((frame) => toFrame(frame, true))]
+}
+
+/**
+ * Pick a frame index after a metadata refresh so playback does not jump to 0.
+ * Prefers an exact id match, otherwise the temporally closest frame (past or nowcast).
+ * Ties prefer the later frame so nowcast playback does not snap backward into past radar.
+ */
+export function resolvePreservedFrameIndex(frames, previousFrame) {
+  if (!previousFrame || !Array.isArray(frames) || frames.length === 0) return 0
+
+  const byId = frames.findIndex((frame) => frame.id === previousFrame.id)
+  if (byId >= 0) return byId
+
+  const previousTime = previousFrame.time?.getTime?.()
+  if (previousTime == null) return 0
+
+  let best = 0
+  let bestDistance = Number.POSITIVE_INFINITY
+  for (let i = 0; i < frames.length; i += 1) {
+    const time = frames[i].time?.getTime?.()
+    if (time == null) continue
+    const distance = Math.abs(time - previousTime)
+    if (distance < bestDistance || (distance === bestDistance && i > best)) {
+      best = i
+      bestDistance = distance
+    }
+  }
+  return best
 }
 
 /** Bounds roughly covering `radiusMiles` around a point. */
@@ -102,15 +131,6 @@ export function boundsForRadius(lat, lon, radiusMiles = 200) {
     [lat - latDelta, lon - lonDelta],
     [lat + latDelta, lon + lonDelta],
   ]
-}
-
-export function toIemTimestamp(date) {
-  const y = date.getUTCFullYear()
-  const m = String(date.getUTCMonth() + 1).padStart(2, "0")
-  const d = String(date.getUTCDate()).padStart(2, "0")
-  const h = String(date.getUTCHours()).padStart(2, "0")
-  const mi = String(date.getUTCMinutes()).padStart(2, "0")
-  return `${y}${m}${d}${h}${mi}`
 }
 
 export function formatFrameTime(date) {
@@ -127,22 +147,85 @@ export function formatFrameTime(date) {
   }
 }
 
-export function ridgeListUrl(sector, start, end, product = RIDGE_PRODUCT) {
-  const params = new URLSearchParams({
-    operation: "list",
-    radar: sector,
-    product,
-    start: toIsoMinute(start),
-    end: toIsoMinute(end),
-  })
-  return `https://mesonet.agron.iastate.edu/json/radar.py?${params}`
+/**
+ * Expand a Leaflet-style tile URL template for the tiles covering a viewport.
+ * Used to warm radar frames in the HTTP cache without mounting map layers.
+ */
+export function tileUrlsForViewport(
+  urlTemplate,
+  {
+    zoom,
+    pixelMinX,
+    pixelMinY,
+    pixelMaxX,
+    pixelMaxY,
+    tileSize = 256,
+    pad = 1,
+  } = {},
+) {
+  if (!urlTemplate || zoom == null || Number.isNaN(Number(zoom))) return []
+
+  const minX = Math.floor(pixelMinX / tileSize) - pad
+  const maxX = Math.floor(pixelMaxX / tileSize) + pad
+  const minY = Math.floor(pixelMinY / tileSize) - pad
+  const maxY = Math.floor(pixelMaxY / tileSize) + pad
+  if (![ minX, maxX, minY, maxY ].every(Number.isFinite)) return []
+
+  const urls = []
+  for (let x = minX; x <= maxX; x += 1) {
+    for (let y = minY; y <= maxY; y += 1) {
+      urls.push(
+        urlTemplate
+          .replaceAll("{z}", String(zoom))
+          .replaceAll("{x}", String(x))
+          .replaceAll("{y}", String(y))
+          .replaceAll("{r}", ""),
+      )
+    }
+  }
+  return urls
 }
 
-function toIsoMinute(date) {
-  const y = date.getUTCFullYear()
-  const m = String(date.getUTCMonth() + 1).padStart(2, "0")
-  const d = String(date.getUTCDate()).padStart(2, "0")
-  const h = String(date.getUTCHours()).padStart(2, "0")
-  const mi = String(date.getUTCMinutes()).padStart(2, "0")
-  return `${y}-${m}-${d}T${h}:${mi}Z`
+/** Prefetch image URLs into the browser cache (no DOM / map attachment). */
+export async function prefetchImages(
+  urls,
+  { concurrency = 6, timeoutMs = 4000, isCancelled = null } = {},
+) {
+  const list = [ ...new Set((urls || []).filter(Boolean)) ]
+  if (list.length === 0) return
+
+  let cursor = 0
+  const workers = Array.from({ length: Math.min(concurrency, list.length) }, async () => {
+    while (cursor < list.length) {
+      if (isCancelled?.()) return
+      const url = list[cursor]
+      cursor += 1
+      await prefetchImage(url, timeoutMs)
+    }
+  })
+  await Promise.all(workers)
+}
+
+function prefetchImage(url, timeoutMs) {
+  return new Promise((resolve) => {
+    if (typeof Image === "undefined") {
+      resolve()
+      return
+    }
+
+    const img = new Image()
+    let settled = false
+    const done = () => {
+      if (settled) return
+      settled = true
+      window.clearTimeout?.(timer)
+      resolve()
+    }
+    const timer = typeof window !== "undefined"
+      ? window.setTimeout(done, timeoutMs)
+      : setTimeout(done, timeoutMs)
+    img.onload = done
+    img.onerror = done
+    img.src = url
+  })
 }

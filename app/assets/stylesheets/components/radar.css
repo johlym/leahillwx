@@ -66,6 +66,13 @@
   background: color-mix(in oklab, var(--color-bg) 88%, transparent);
 }
 
+@utility radar-controls-layers {
+  @apply pointer-events-auto flex items-center gap-1
+         rounded-[0.45rem] border border-border p-1 pl-2
+         backdrop-blur-md w-fit max-w-full;
+  background: color-mix(in oklab, var(--color-bg) 88%, transparent);
+}
+
 @utility radar-controls-label {
   @apply shrink-0 px-1 text-[0.7rem] sm:text-[0.65rem] font-medium uppercase
          tracking-[0.06em] text-muted whitespace-nowrap;
@@ -91,6 +98,10 @@
 @utility radar-timestamp {
   @apply font-mono text-[0.75rem] sm:text-[0.8rem] text-muted
          whitespace-nowrap truncate min-w-0;
+
+  &.is-nowcast {
+    @apply text-accent-strong;
+  }
 }
 
 @utility radar-site-chip {
@@ -113,6 +124,11 @@
   &.is-active {
     @apply text-accent-strong border-border bg-surface;
     background-color: color-mix(in oklab, var(--color-accent) 14%, transparent);
+  }
+
+  &.is-disabled,
+  &:disabled {
+    @apply opacity-45 cursor-not-allowed;
   }
 }
 

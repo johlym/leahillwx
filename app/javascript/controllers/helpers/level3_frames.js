@@ -142,7 +142,9 @@ export function plotReflectivity(data, { size = LEVEL3_PLOT_SIZE } = {}) {
   packet.radials.forEach((radial) => {
     const startAngle = radial.startAngle * (Math.PI / 180)
     const endAngle = startAngle + radial.angleDelta * (Math.PI / 180)
-    let maxDownsample = 0
+    // null = no pooled bins yet; 0 is a real dBZ sample (grey), so do not
+    // use 0 as the empty sentinel or empty radials paint a spurious ring.
+    let maxDownsample = null
     let lastRemainder = 0
 
     for (let idx = 0; idx < maxBin; idx += 1) {
@@ -154,20 +156,20 @@ export function plotReflectivity(data, { size = LEVEL3_PLOT_SIZE } = {}) {
         const remainder = idx % scale
         if (remainder < lastRemainder) {
           sample = maxDownsample
-          maxDownsample = 0
+          maxDownsample = null
         }
-        maxDownsample = Math.max(bin, maxDownsample)
+        maxDownsample = maxDownsample == null ? bin : Math.max(bin, maxDownsample)
         lastRemainder = remainder
       } else {
         sample = bin
       }
 
-      if (sample == null || sample < 5) continue
+      if (sample == null || !dbzColor(sample)) continue
       strokeDbzArc(ctx, sample, (idx + packet.firstBin) / scale, startAngle, endAngle)
     }
 
     // Downsampling only emits on remainder wrap; flush the final pooled bin.
-    if (scale !== 1 && maxDownsample >= 5) {
+    if (scale !== 1 && maxDownsample != null && dbzColor(maxDownsample)) {
       strokeDbzArc(ctx, maxDownsample, (maxBin + packet.firstBin) / scale, startAngle, endAngle)
     }
   })

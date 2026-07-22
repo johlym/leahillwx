@@ -14,6 +14,7 @@
 @import "./components/forecast-hourly";
 @import "./components/forecast-grid";
 @import "./components/forecast-section";
+@import "./components/forecast-alerts";
 @import "./components/earthquakes";
 @import "./components/reports";
 @import "./components/records";

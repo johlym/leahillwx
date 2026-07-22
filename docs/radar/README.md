@@ -6,16 +6,29 @@ The `/radar` route is a full-viewport live weather radar map for Lea Hill Weathe
 
 - Stock site header (with a **Radar** nav link)
 - Full-bleed Leaflet map filling the remaining viewport
-- Compact attribution footer (IEM, RainViewer, OpenStreetMap, CARTO)
+- Compact attribution footer (LibreWXR, NEXRAD/Unidata, OpenStreetMap, CARTO)
 - No page scroll: the shell is locked to `100svh` / `100dvh`
 
-## Data sources (keyless)
+## Data sources
 
 | Mode | Source | When |
 |---|---|---|
-| **Composite** (default) | Iowa Environmental Mesonet CONUS mosaic `nexrad-n0q` | Mid/high zoom, no site selected |
+| **Composite precip** (default) | [LibreWXR](https://librewxr.net/) radar tiles (MRMS/NOAA + regional NWP / ECMWF fill) | No site selected |
 | **Single site** | Unidata Level III reflectivity (`N0B` / `NAB` / `N1B` tilts) plotted client-side | User selects ATX / RTX / LGX |
-| **Wide** | [RainViewer](https://www.rainviewer.com/) Weather Maps API | Zoom ≤ 6 and no site selected |
+
+Composite tiles come from `LIBREWXR_API_BASE` (default `https://api.librewxr.net`). The browser talks to LibreWXR directly (no Rails proxy).
+
+### LibreWXR composite features
+
+- **Nowcast:** `radar.nowcast` frames appended after past radar (up to ~60 minutes when available)
+- **Snow colors:** always on (`smooth_snow = 1_1`, per-pixel rain/snow)
+- **Regional NWP:** server-side in LibreWXR (HRRR over CONUS, etc.) — no client work beyond attribution
+- **Color scheme:** LibreWXR scheme `6` (NEXRAD Level III) for composite tiles
+- **Performance:** only the active radar frame is mounted. First load freezes on the newest frame until it paints, then plays newest → older. Advances keep the previous frame up until the next one loads (no empty flashes; no opacity-0 layer stacking).
+
+Weather alerts come from LibreWXR (NWS/WMO CAP near the station), merged with any
+active OpenWeather alerts. The homepage shows a compact bar (indicator, title,
+expiry) linking to `/alerts` for the full text. Alerts are not shown on `/radar`.
 
 ### Local NEXRAD sites
 
@@ -25,29 +38,28 @@ The `/radar` route is a full-viewport live weather radar map for Lea Hill Weathe
 | KRTX | RTX | Portland | Southern approaches |
 | KLGX | LGX | Langley Hill | Coastal / Pacific inbound |
 
-Only **one** RIDGE site is active at a time (never stacked). Selecting the active site again, or **Composite**, returns to the mosaic.
+Only **one** site is active at a time (never stacked). Selecting the active site again, or **Composite**, returns to LibreWXR.
 
 Site markers on the map mirror the chip control: click a marker to toggle that overlay.
 
-> **Note:** IEM’s realtime single-site product for these radars is `N0B` (super-res base reflectivity). Older `N0Q` listings are empty for current scans.
+Single-site Level III uses a client-side NWS-style reflectivity palette (−30 → 75 dBZ; ND transparent). Snow blues on the composite come from LibreWXR (`smooth_snow`); Level III reflectivity products do not encode precip type.
 
 ## Animation
 
-- **Mosaic:** ~55 minutes of history via `nexrad-n0q-m55m` … `m05m` plus current `nexrad-n0q` (5-minute steps).
-- **Single site:** Unidata Level III objects from `https://unidata-nexrad-level3.s3.amazonaws.com` (`{SECTOR}_{PRODUCT}_{YYYY}_{MM}_{DD}_{HH}_{MI}_{SS}`), decoded in-browser and drawn as Leaflet image overlays (**1800×1800** on desktop, **900×900** on coarse/narrow viewports). Tilt selector (site-only): `0.5°` → `N0B`, `1.0°` → `NAB` (~0.9°), `1.5°` → `N1B`. (IEM RIDGE tiles only archive `N0B`, so higher tilts cannot use that TMS path.) On desktop `/radar` load, all local sites × tilts prefetch in the background; mobile skips prefetch to avoid tab OOM.
-- **RainViewer:** ~2 hours from `https://api.rainviewer.com/public/weather-maps.json`.
+- **LibreWXR precip:** past frames from `/public/weather-maps.json`, plus nowcast when present. Metadata refreshes every ~3 minutes.
+- **Single site:** Unidata Level III objects from `https://unidata-nexrad-level3.s3.amazonaws.com` (`{SECTOR}_{PRODUCT}_{YYYY}_{MM}_{DD}_{HH}_{MI}_{SS}`), decoded in-browser and drawn as Leaflet image overlays (**1800×1800** on desktop, **900×900** on coarse/narrow viewports). Tilt selector (site-only): `0.5°` → `N0B`, `1.0°` → `NAB` (~0.9°), `1.5°` → `N1B`. Level III data loads on demand when a site is selected (or when a non-default tilt is chosen for that site) — not on initial composite load.
 
-Playback controls: play/pause + timestamp (Pacific time). Default is autoplay. When a site is selected, a reflectivity tilt control appears between playback and the site chips.
+Playback controls: play/pause + timestamp (Pacific time). Past frames are prefixed with `Past ·`; nowcast frames with `Future ·`. Default is autoplay.
 
 ### Memory / zoom notes
 
-- **Composite** (mosaic / RainViewer) keeps animation frames mounted and opacity-toggles between them so Leaflet does not re-fetch tiles every frame.
-- **Single-site Level III** on memory-limited clients mounts only the **active** image overlay (inactive frames are detached). Keeping every large canvas mounted at opacity 0 OOMs mobile Safari when zoomed in; desktop still opacity-toggles.
-- Mobile / coarse-pointer clients cap `maxZoom` at **9** (desktop **11**), use smaller Level III canvases, fewer frames, and skip background Level III prefetch.
+- **Composite** (LibreWXR) keeps animation frames mounted and opacity-toggles between them so Leaflet does not re-fetch tiles every frame. `maxNativeZoom` is **12**.
+- **Single-site Level III** on memory-limited clients mounts only the **active** image overlay (inactive frames are detached).
+- Mobile / coarse-pointer clients cap `maxZoom` at **9** (desktop **11**), use smaller Level III canvases, and fewer frames.
 
 ## Default viewport
 
-The map fits an approximate **200-mile radius** around `LOCATION_LAT` / `LOCATION_LON` (required env vars; see `env.sample`).
+The map opens at **zoom 7** centered on `LOCATION_LAT` / `LOCATION_LON` (required env vars; see `env.sample`), matching LibreWXR regional radar tile scale.
 
 ## Mobile / small screens
 
@@ -84,6 +96,7 @@ Leaflet JS comes from the `leaflet` npm package (bundled by esbuild). Leaflet CS
 ```bash
 # Env
 cp env.sample .env   # set LOCATION_LAT / LOCATION_LON
+# optional: LIBREWXR_API_BASE=https://api.librewxr.net
 
 # Assets
 yarn build
@@ -94,7 +107,7 @@ bin/rails server
 # open http://localhost:3000/radar
 ```
 
-External tile/JSON hosts must be reachable from the browser (no server-side proxy).
+External LibreWXR / Unidata hosts must be reachable from the browser (no server-side proxy).
 
 ## Tests
 
@@ -110,6 +123,6 @@ CI runs `yarn test:js` in the unit-test job and `yarn build` / `yarn build:css` 
 
 Required attributions are shown in the slim footer and Leaflet attribution control:
 
-- Radar data © [Iowa Environmental Mesonet](https://mesonet.agron.iastate.edu/)
-- Radar © [RainViewer](https://www.rainviewer.com/)
+- Radar © [LibreWXR](https://librewxr.net/) (MRMS/NOAA, HRRR/NWP)
+- Single-site NEXRAD / [Unidata](https://registry.opendata.aws/noaa-nexrad/)
 - Map © [OpenStreetMap](https://www.openstreetmap.org/copyright) © [CARTO](https://carto.com/attributions)

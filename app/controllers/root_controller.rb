@@ -14,6 +14,12 @@ class RootController < ApplicationController
     end
 
     @forecast = ForecastParser.new(forecast_record || {}).parse
+    lat, lon = LibreWxrAlertsClient.coordinates_from_env
+    @weather_alerts = WeatherAlert.for_homepage(
+      lat: lat,
+      lon: lon,
+      forecast_alerts: @forecast&.alerts
+    )
     @earthquakes = Earthquake.last(5).reverse
     @today_peaks = compute_today_peaks
     @hourly_ranges = WeatherData::LiveCardHourlyRanges.new.call

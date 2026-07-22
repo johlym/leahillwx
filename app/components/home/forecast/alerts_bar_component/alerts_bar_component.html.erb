@@ -1,0 +1,11 @@
+<%= link_to alerts_path,
+            class: "forecast-alerts-bar",
+            aria: { label: "View all weather alerts" } do %>
+  <div class="forecast-alerts-bar-inner">
+    <span class="forecast-alerts-bar-label"><%= indicator_label %></span>
+    <span class="forecast-alerts-bar-event"><%= event_label(primary_alert) %></span>
+    <% if ends_label(primary_alert) %>
+      <span class="forecast-alerts-bar-meta">Until <%= ends_label(primary_alert) %></span>
+    <% end %>
+  </div>
+<% end %>

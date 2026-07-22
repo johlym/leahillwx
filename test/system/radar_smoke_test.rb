@@ -24,7 +24,12 @@ class RadarSmokeTest < ApplicationSystemTestCase
     # CSS uppercases chip labels; match case-insensitively on visible text.
     assert_selector "button.radar-site-chip", text: /composite/i
     assert_selector "button.radar-site-chip", text: "ATX"
+    assert_no_selector "button[data-layer='cloud']"
+    assert_no_selector "button[data-option='snow']"
+    assert_no_selector "button[data-option='arrows']"
+    assert_no_selector "button[data-option='alerts']"
     assert_text "lhwx.org"
+    assert_text "LibreWXR"
   end
 
   test "radar page is usable at a phone-sized viewport" do
