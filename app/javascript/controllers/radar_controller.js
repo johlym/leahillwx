@@ -17,7 +17,6 @@ import {
   buildLibreWxrRadarFrames,
   buildLibreWxrSatelliteFrames,
   resolvePreservedFrameIndex,
-  boundsForRadius,
   ridgeProductForTilt,
   tileUrlsForViewport,
   prefetchImages,
@@ -591,42 +590,6 @@ export default class extends Controller {
 
     this.level3Cache.set(key, { promise })
     return promise
-  }
-
-  // Prefetch every local site × tilt on page load (background, low concurrency).
-  prefetchAllRidgeFrames() {
-    const jobs = []
-    this.sitesValue.forEach((site) => {
-      RIDGE_TILTS.forEach((tilt) => {
-        jobs.push({ site, product: tilt.product })
-      })
-    })
-    // Prefer default 0.5° (N0B) for each site first.
-    jobs.sort(
-      (a, b) =>
-        (a.product === RIDGE_PRODUCT ? 0 : 1) - (b.product === RIDGE_PRODUCT ? 0 : 1),
-    )
-
-    void this.runPrefetchQueue(jobs)
-  }
-
-  async runPrefetchQueue(jobs, concurrency = 1) {
-    let index = 0
-    const workers = Array.from({ length: concurrency }, async () => {
-      while (index < jobs.length && this.map) {
-        const job = jobs[index]
-        index += 1
-        try {
-          await this.loadRidgeFrames(job.site, job.product)
-        } catch (error) {
-          console.warn(
-            `Radar prefetch failed for ${job.site.sector} ${job.product}`,
-            error,
-          )
-        }
-      }
-    })
-    await Promise.all(workers)
   }
 
   disposeLevel3Cache() {

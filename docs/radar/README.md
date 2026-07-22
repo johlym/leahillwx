@@ -49,7 +49,7 @@ Single-site Level III uses a client-side rain palette (light green → white). S
 
 - **LibreWXR precip:** past frames from `/public/weather-maps.json`, plus nowcast when present. Metadata refreshes every ~3 minutes.
 - **LibreWXR cloud:** hourly GMGSI VIS-over-LW satellite frames.
-- **Single site:** Unidata Level III objects from `https://unidata-nexrad-level3.s3.amazonaws.com` (`{SECTOR}_{PRODUCT}_{YYYY}_{MM}_{DD}_{HH}_{MI}_{SS}`), decoded in-browser and drawn as Leaflet image overlays (**1800×1800** on desktop, **900×900** on coarse/narrow viewports). Tilt selector (site-only): `0.5°` → `N0B`, `1.0°` → `NAB` (~0.9°), `1.5°` → `N1B`. On desktop `/radar` load, all local sites × tilts prefetch in the background; mobile skips prefetch to avoid tab OOM.
+- **Single site:** Unidata Level III objects from `https://unidata-nexrad-level3.s3.amazonaws.com` (`{SECTOR}_{PRODUCT}_{YYYY}_{MM}_{DD}_{HH}_{MI}_{SS}`), decoded in-browser and drawn as Leaflet image overlays (**1800×1800** on desktop, **900×900** on coarse/narrow viewports). Tilt selector (site-only): `0.5°` → `N0B`, `1.0°` → `NAB` (~0.9°), `1.5°` → `N1B`. Level III data loads on demand when a site is selected (or when a non-default tilt is chosen for that site) — not on initial composite load.
 
 Playback controls: play/pause + timestamp (Pacific time). Nowcast timestamps are prefixed with `Nowcast ·`. Default is autoplay.
 
@@ -57,11 +57,11 @@ Playback controls: play/pause + timestamp (Pacific time). Nowcast timestamps are
 
 - **Composite** (LibreWXR) keeps animation frames mounted and opacity-toggles between them so Leaflet does not re-fetch tiles every frame. `maxNativeZoom` is **12**.
 - **Single-site Level III** on memory-limited clients mounts only the **active** image overlay (inactive frames are detached).
-- Mobile / coarse-pointer clients cap `maxZoom` at **9** (desktop **11**), use smaller Level III canvases, fewer frames, and skip background Level III prefetch.
+- Mobile / coarse-pointer clients cap `maxZoom` at **9** (desktop **11**), use smaller Level III canvases, and fewer frames.
 
 ## Default viewport
 
-The map fits an approximate **200-mile radius** around `LOCATION_LAT` / `LOCATION_LON` (required env vars; see `env.sample`).
+The map opens at **zoom 7** centered on `LOCATION_LAT` / `LOCATION_LON` (required env vars; see `env.sample`), matching LibreWXR regional radar tile scale.
 
 ## Mobile / small screens
 
