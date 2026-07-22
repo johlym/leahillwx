@@ -1,50 +1,22 @@
 import assert from "node:assert/strict"
 import { describe, it } from "node:test"
 import {
-  MOSAIC_OFFSETS,
   RIDGE_PRODUCT,
   RIDGE_TILTS,
   CARTO_DARK_URL,
-  IEM_SUBDOMAINS,
-  buildMosaicFrames,
-  buildRidgeFrames,
-  buildRainviewerFrames,
+  LIBREWXR_COLOR_SCHEME,
+  LIBREWXR_DEFAULT_HOST,
+  LIBREWXR_OPTIONS_SNOW,
+  normalizeLibreWxrHost,
+  librewxrMetadataUrl,
+  librewxrAlertsUrl,
+  buildLibreWxrRadarFrames,
+  buildLibreWxrSatelliteFrames,
   boundsForRadius,
-  toIemTimestamp,
-  ridgeListUrl,
   ridgeProductForTilt,
+  alertPathStyle,
+  alertPopupHtml,
 } from "../../app/javascript/controllers/helpers/radar_layers.js"
-
-describe("buildMosaicFrames", () => {
-  it("builds oldest-to-newest frames including current", () => {
-    const now = new Date("2026-07-21T12:00:00Z")
-    const frames = buildMosaicFrames(now)
-
-    assert.equal(frames.length, MOSAIC_OFFSETS.length)
-    assert.equal(frames[0].layer, "nexrad-n0q-m55m")
-    assert.equal(frames.at(-1).layer, "nexrad-n0q")
-    assert.equal(frames.at(-1).kind, "iem")
-  })
-})
-
-describe("buildRidgeFrames", () => {
-  it("uses N0B product and IEM timestamped layer names", () => {
-    const frames = buildRidgeFrames("ATX", [
-      { ts: "2026-07-21T04:30Z" },
-      { ts: "2026-07-21T04:35Z" },
-    ])
-
-    assert.equal(RIDGE_PRODUCT, "N0B")
-    assert.equal(frames.length, 2)
-    assert.equal(frames[0].layer, "ridge::ATX-N0B-202607210430")
-    assert.equal(frames[1].layer, "ridge::ATX-N0B-202607210435")
-  })
-
-  it("accepts alternate tilt products", () => {
-    const frames = buildRidgeFrames("ATX", [{ ts: "2026-07-21T04:30Z" }], "N1B")
-    assert.equal(frames[0].layer, "ridge::ATX-N1B-202607210430")
-  })
-})
 
 describe("ridgeProductForTilt", () => {
   it("maps display tilts to Level III products", () => {
@@ -52,6 +24,7 @@ describe("ridgeProductForTilt", () => {
       RIDGE_TILTS.map((t) => t.degrees),
       ["0.5", "1.0", "1.5"],
     )
+    assert.equal(RIDGE_PRODUCT, "N0B")
     assert.equal(ridgeProductForTilt("0.5"), "N0B")
     assert.equal(ridgeProductForTilt("1.0"), "NAB")
     assert.equal(ridgeProductForTilt("1.5"), "N1B")
@@ -59,21 +32,104 @@ describe("ridgeProductForTilt", () => {
   })
 })
 
-describe("buildRainviewerFrames", () => {
-  it("builds tile URL templates from weather-maps.json", () => {
-    const frames = buildRainviewerFrames({
-      host: "https://tilecache.rainviewer.com",
+describe("LibreWXR URL helpers", () => {
+  it("normalizes host and metadata URLs", () => {
+    assert.equal(normalizeLibreWxrHost("https://api.librewxr.net/"), LIBREWXR_DEFAULT_HOST)
+    assert.equal(
+      normalizeLibreWxrHost("https://api.librewxr.net/public/weather-maps.json"),
+      LIBREWXR_DEFAULT_HOST,
+    )
+    assert.equal(
+      librewxrMetadataUrl("https://radar.example.com"),
+      "https://radar.example.com/public/weather-maps.json",
+    )
+  })
+
+  it("builds alerts URLs for point and bbox queries", () => {
+    assert.equal(
+      librewxrAlertsUrl(LIBREWXR_DEFAULT_HOST, { lat: 47.3, lon: -122.2 }),
+      "https://api.librewxr.net/v2/alerts?lat=47.3&lon=-122.2",
+    )
+    assert.equal(
+      librewxrAlertsUrl(LIBREWXR_DEFAULT_HOST, { bbox: "-123,46,-121,48" }),
+      "https://api.librewxr.net/v2/alerts?bbox=-123%2C46%2C-121%2C48",
+    )
+  })
+})
+
+describe("buildLibreWxrRadarFrames", () => {
+  it("builds past and nowcast tile URL templates with snow and arrows", () => {
+    const frames = buildLibreWxrRadarFrames({
+      host: "https://api.librewxr.net",
       radar: {
-        past: [{ time: 1784601600, path: "/v2/radar/abc123" }],
+        past: [{ time: 1784601600, path: "/v2/radar/1784601600" }],
+        nowcast: [{ time: 1784602200, path: "/v2/radar/1784602200" }],
       },
     })
+
+    assert.equal(frames.length, 2)
+    assert.equal(frames[0].kind, "librewxr")
+    assert.equal(frames[0].isNowcast, false)
+    assert.equal(
+      frames[0].urlTemplate,
+      `https://api.librewxr.net/v2/radar/1784601600/256/{z}/{x}/{y}/${LIBREWXR_COLOR_SCHEME}/${LIBREWXR_OPTIONS_SNOW}.png?arrows=light`,
+    )
+    assert.equal(frames[1].isNowcast, true)
+    assert.match(frames[1].label, /^Nowcast · /)
+    assert.match(frames[1].urlTemplate, /1784602200/)
+  })
+
+  it("omits nowcast and arrows when disabled", () => {
+    const frames = buildLibreWxrRadarFrames(
+      {
+        host: "https://api.librewxr.net",
+        radar: {
+          past: [{ time: 1784601600, path: "/v2/radar/1784601600" }],
+          nowcast: [{ time: 1784602200, path: "/v2/radar/1784602200" }],
+        },
+      },
+      { includeNowcast: false, arrows: null, options: "1_0" },
+    )
 
     assert.equal(frames.length, 1)
     assert.equal(
       frames[0].urlTemplate,
-      "https://tilecache.rainviewer.com/v2/radar/abc123/256/{z}/{x}/{y}/2/1_1.png",
+      "https://api.librewxr.net/v2/radar/1784601600/256/{z}/{x}/{y}/6/1_0.png",
     )
-    assert.equal(frames[0].kind, "rainviewer")
+  })
+})
+
+describe("buildLibreWxrSatelliteFrames", () => {
+  it("builds GMGSI satellite tile templates", () => {
+    const frames = buildLibreWxrSatelliteFrames({
+      host: "https://api.librewxr.net",
+      satellite: {
+        infrared: [{ time: 1784725200, path: "/v2/satellite/1784725200" }],
+      },
+    })
+
+    assert.equal(frames.length, 1)
+    assert.equal(frames[0].kind, "librewxr-satellite")
+    assert.equal(
+      frames[0].urlTemplate,
+      "https://api.librewxr.net/v2/satellite/1784725200/256/{z}/{x}/{y}/0/0_0.png",
+    )
+  })
+})
+
+describe("alert helpers", () => {
+  it("styles severities and escapes popup HTML", () => {
+    assert.equal(alertPathStyle("Extreme").color, "#f43f5e")
+    assert.equal(alertPathStyle("Moderate").color, "#eab308")
+    const html = alertPopupHtml({
+      title: 'Heat <Advisory>',
+      severity: "Moderate",
+      description: "Stay cool & hydrated",
+      expires: 1784759400,
+    })
+    assert.match(html, /Heat &lt;Advisory&gt;/)
+    assert.match(html, /Stay cool &amp; hydrated/)
+    assert.match(html, /Severity: Moderate/)
   })
 })
 
@@ -86,25 +142,9 @@ describe("boundsForRadius", () => {
   })
 })
 
-describe("toIemTimestamp / ridgeListUrl", () => {
-  it("formats UTC minute stamps for IEM APIs", () => {
-    const date = new Date("2026-07-21T04:40:12Z")
-    assert.equal(toIemTimestamp(date), "202607210440")
-    assert.match(
-      ridgeListUrl("RTX", date, date),
-      /operation=list&radar=RTX&product=N0B&start=2026-07-21T04%3A40Z&end=2026-07-21T04%3A40Z/,
-    )
-    assert.match(ridgeListUrl("RTX", date, date, "NAB"), /product=NAB/)
-  })
-})
-
-describe("basemap / IEM hosts", () => {
+describe("basemap host", () => {
   it("uses apex CARTO host without letter subdomains", () => {
     assert.match(CARTO_DARK_URL, /^https:\/\/basemaps\.cartocdn\.com\//)
     assert.doesNotMatch(CARTO_DARK_URL, /\{s\}/)
-  })
-
-  it("includes the bare mesonet host in IEM subdomains", () => {
-    assert.deepEqual(IEM_SUBDOMAINS, ["", "1", "2", "3"])
   })
 })

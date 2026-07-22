@@ -1,12 +1,16 @@
-// Pure helpers for building radar tile frame lists (IEM + RainViewer).
+// Pure helpers for building LibreWXR radar / satellite frame lists.
 
-export const IEM_TILE_BASE = "https://mesonet{s}.agron.iastate.edu/cache/tile.py/1.0.0"
-// Empty string hits mesonet.agron.iastate.edu; 1/2/3 are CDN aliases.
-export const IEM_SUBDOMAINS = ["", "1", "2", "3"]
-export const RAINVIEWER_API = "https://api.rainviewer.com/public/weather-maps.json"
+export const LIBREWXR_DEFAULT_HOST = "https://api.librewxr.net"
+/** NEXRAD Level III scheme — closest built-in match to the site rain ladder. */
+export const LIBREWXR_COLOR_SCHEME = 6
+export const LIBREWXR_OPTIONS_SNOW = "1_1"
+export const LIBREWXR_OPTIONS_NOSNOW = "1_0"
+export const LIBREWXR_MAX_NATIVE_ZOOM = 12
+export const LIBREWXR_METADATA_TTL_MS = 3 * 60 * 1000
+export const LIBREWXR_ALERTS_TTL_MS = 5 * 60 * 1000
+
 /** Default RIDGE product: super-res base reflectivity at ~0.5°. */
 export const RIDGE_PRODUCT = "N0B"
-export const MOSAIC_LAYER = "nexrad-n0q"
 
 /**
  * Single-site reflectivity tilts (elevation angle → Level III product).
@@ -34,62 +38,85 @@ export const ESRI_DARK_URL =
   "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
 export const ESRI_ATTR = "Tiles &copy; Esri"
 
-/** Relative mosaic offsets (minutes ago), oldest → newest, plus current. */
-export const MOSAIC_OFFSETS = [55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5, 0]
+export const LIBREWXR_ATTR =
+  'Radar & satellite &copy; <a href="https://librewxr.net/">LibreWXR</a> (MRMS/NOAA, NWP)'
 
-/**
- * Build IEM CONUS mosaic animation frames (nexrad-n0q + mXXm).
- * @returns {{ id: string, label: string, layer: string, time: Date|null }[]}
- */
-export function buildMosaicFrames(now = new Date()) {
-  return MOSAIC_OFFSETS.map((offset) => {
-    const layer = offset === 0 ? MOSAIC_LAYER : `${MOSAIC_LAYER}-m${String(offset).padStart(2, "0")}m`
-    const time = new Date(now.getTime() - offset * 60_000)
-    return {
-      id: `mosaic-${offset}`,
-      label: formatFrameTime(time),
-      layer,
-      time,
-      kind: "iem",
-    }
-  })
+/** Normalize a configured LibreWXR base (host or full metadata URL) to origin. */
+export function normalizeLibreWxrHost(base = LIBREWXR_DEFAULT_HOST) {
+  const trimmed = String(base || LIBREWXR_DEFAULT_HOST).trim().replace(/\/$/, "")
+  if (trimmed.endsWith("/public/weather-maps.json")) {
+    return trimmed.slice(0, -"/public/weather-maps.json".length) || LIBREWXR_DEFAULT_HOST
+  }
+  return trimmed || LIBREWXR_DEFAULT_HOST
+}
+
+export function librewxrMetadataUrl(base = LIBREWXR_DEFAULT_HOST) {
+  return `${normalizeLibreWxrHost(base)}/public/weather-maps.json`
+}
+
+export function librewxrAlertsUrl(base, { lat, lon, bbox } = {}) {
+  const host = normalizeLibreWxrHost(base)
+  const url = new URL(`${host}/v2/alerts`)
+  if (bbox) {
+    url.searchParams.set("bbox", bbox)
+  } else if (lat != null && lon != null) {
+    url.searchParams.set("lat", String(lat))
+    url.searchParams.set("lon", String(lon))
+  }
+  return url.toString()
 }
 
 /**
- * Build IEM RIDGE single-site frames from /json/radar.py list response.
- * @param {string} sector e.g. "ATX"
- * @param {{ ts: string }[]} scans
+ * Build LibreWXR radar frames (past + optional nowcast) from weather-maps.json.
+ * @param {{ host?: string, radar?: { past?: { time: number, path: string }[], nowcast?: { time: number, path: string }[] } }} api
  */
-export function buildRidgeFrames(sector, scans, product = RIDGE_PRODUCT) {
-  return scans.map((scan) => {
-    const time = new Date(scan.ts.endsWith("Z") ? scan.ts : `${scan.ts}Z`)
-    const stamp = toIemTimestamp(time)
-    return {
-      id: `ridge-${sector}-${stamp}`,
-      label: formatFrameTime(time),
-      layer: `ridge::${sector}-${product}-${stamp}`,
-      time,
-      kind: "iem",
-    }
-  })
-}
-
-/**
- * Build RainViewer frames from weather-maps.json payload.
- * @param {{ host: string, radar?: { past?: { time: number, path: string }[] } }} api
- */
-export function buildRainviewerFrames(api, { size = 256, color = 2, options = "1_1" } = {}) {
-  const host = api.host?.replace(/\/$/, "") || "https://tilecache.rainviewer.com"
+export function buildLibreWxrRadarFrames(
+  api,
+  {
+    size = 256,
+    color = LIBREWXR_COLOR_SCHEME,
+    options = LIBREWXR_OPTIONS_SNOW,
+    arrows = "light",
+    includeNowcast = true,
+  } = {},
+) {
+  const host = normalizeLibreWxrHost(api.host || LIBREWXR_DEFAULT_HOST)
   const past = api.radar?.past || []
-  return past.map((frame) => {
+  const nowcast = includeNowcast ? api.radar?.nowcast || [] : []
+  const arrowQs = arrows ? `?arrows=${encodeURIComponent(arrows)}` : ""
+
+  const toFrame = (frame, isNowcast) => {
+    const time = new Date(frame.time * 1000)
+    const timeLabel = formatFrameTime(time)
+    return {
+      id: `lw-${isNowcast ? "nc" : "past"}-${frame.time}`,
+      label: isNowcast ? `Nowcast · ${timeLabel}` : timeLabel,
+      urlTemplate: `${host}${frame.path}/${size}/{z}/{x}/{y}/${color}/${options}.png${arrowQs}`,
+      time,
+      kind: "librewxr",
+      isNowcast,
+    }
+  }
+
+  return [...past.map((frame) => toFrame(frame, false)), ...nowcast.map((frame) => toFrame(frame, true))]
+}
+
+/**
+ * Build LibreWXR GMGSI satellite frames from weather-maps.json.
+ * @param {{ host?: string, satellite?: { infrared?: { time: number, path: string }[] } }} api
+ */
+export function buildLibreWxrSatelliteFrames(api, { size = 256 } = {}) {
+  const host = normalizeLibreWxrHost(api.host || LIBREWXR_DEFAULT_HOST)
+  const frames = api.satellite?.infrared || []
+  return frames.map((frame) => {
     const time = new Date(frame.time * 1000)
     return {
-      id: `rv-${frame.time}`,
+      id: `lw-sat-${frame.time}`,
       label: formatFrameTime(time),
-      // Leaflet template; RainViewer path already includes /v2/radar/...
-      urlTemplate: `${host}${frame.path}/${size}/{z}/{x}/{y}/${color}/${options}.png`,
+      urlTemplate: `${host}${frame.path}/${size}/{z}/{x}/{y}/0/0_0.png`,
       time,
-      kind: "rainviewer",
+      kind: "librewxr-satellite",
+      isNowcast: false,
     }
   })
 }
@@ -102,15 +129,6 @@ export function boundsForRadius(lat, lon, radiusMiles = 200) {
     [lat - latDelta, lon - lonDelta],
     [lat + latDelta, lon + lonDelta],
   ]
-}
-
-export function toIemTimestamp(date) {
-  const y = date.getUTCFullYear()
-  const m = String(date.getUTCMonth() + 1).padStart(2, "0")
-  const d = String(date.getUTCDate()).padStart(2, "0")
-  const h = String(date.getUTCHours()).padStart(2, "0")
-  const mi = String(date.getUTCMinutes()).padStart(2, "0")
-  return `${y}${m}${d}${h}${mi}`
 }
 
 export function formatFrameTime(date) {
@@ -127,22 +145,41 @@ export function formatFrameTime(date) {
   }
 }
 
-export function ridgeListUrl(sector, start, end, product = RIDGE_PRODUCT) {
-  const params = new URLSearchParams({
-    operation: "list",
-    radar: sector,
-    product,
-    start: toIsoMinute(start),
-    end: toIsoMinute(end),
-  })
-  return `https://mesonet.agron.iastate.edu/json/radar.py?${params}`
+/** Severity → Leaflet path style for alert polygons. */
+export function alertPathStyle(severity) {
+  const key = String(severity || "").toLowerCase()
+  if (key === "extreme") {
+    return { color: "#f43f5e", fillColor: "#f43f5e", fillOpacity: 0.22, weight: 2 }
+  }
+  if (key === "severe") {
+    return { color: "#f97316", fillColor: "#f97316", fillOpacity: 0.2, weight: 2 }
+  }
+  if (key === "moderate") {
+    return { color: "#eab308", fillColor: "#eab308", fillOpacity: 0.18, weight: 2 }
+  }
+  return { color: "#38bdf8", fillColor: "#38bdf8", fillOpacity: 0.15, weight: 1.5 }
 }
 
-function toIsoMinute(date) {
-  const y = date.getUTCFullYear()
-  const m = String(date.getUTCMonth() + 1).padStart(2, "0")
-  const d = String(date.getUTCDate()).padStart(2, "0")
-  const h = String(date.getUTCHours()).padStart(2, "0")
-  const mi = String(date.getUTCMinutes()).padStart(2, "0")
-  return `${y}-${m}-${d}T${h}:${mi}Z`
+export function alertPopupHtml(properties = {}) {
+  const title = escapeHtml(properties.title || properties.event || "Weather alert")
+  const severity = escapeHtml(properties.severity || "Unknown")
+  const description = escapeHtml(properties.description || "").replace(/\n/g, "<br>")
+  const expires = properties.expires
+    ? escapeHtml(formatFrameTime(new Date(properties.expires * 1000)))
+    : null
+  const parts = [
+    `<strong>${title}</strong>`,
+    `<div class="radar-alert-meta">Severity: ${severity}</div>`,
+  ]
+  if (expires) parts.push(`<div class="radar-alert-meta">Expires: ${expires}</div>`)
+  if (description) parts.push(`<div class="radar-alert-body">${description}</div>`)
+  return parts.join("")
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
 }

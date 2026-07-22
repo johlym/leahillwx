@@ -79,10 +79,14 @@ describe("boundsForRadar", () => {
 })
 
 describe("dbzColor", () => {
-  it("skips weak returns and colors stronger echoes", () => {
+  it("skips weak returns and follows the rain ladder", () => {
     assert.equal(dbzColor(4), null)
-    assert.match(dbzColor(25), /^rgba\(/)
-    assert.match(dbzColor(55), /^rgba\(/)
+    assert.equal(dbzColor(10), "rgba(144, 238, 144, 0.85)") // light green
+    assert.equal(dbzColor(30), "rgba(0, 100, 0, 0.85)") // dark green
+    assert.equal(dbzColor(42), "rgba(255, 140, 0, 0.85)") // orange
+    assert.equal(dbzColor(52), "rgba(140, 0, 0, 0.9)") // dark red
+    assert.equal(dbzColor(60), "rgba(160, 0, 200, 0.9)") // purple
+    assert.equal(dbzColor(70), "rgba(255, 255, 255, 0.95)") // white
   })
 })
 

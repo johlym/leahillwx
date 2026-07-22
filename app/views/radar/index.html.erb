@@ -10,10 +10,17 @@
   data-radar-lat-value="<%= @lat %>"
   data-radar-lon-value="<%= @lon %>"
   data-radar-sites-value="<%= @radar_sites.to_json %>"
-  data-radar-wide-zoom-max-value="6">
+  data-radar-librewxr-host-value="<%= @librewxr_host %>">
   <div class="radar-map" data-radar-target="map" role="application" aria-label="Live weather radar map"></div>
 
   <div class="radar-controls" data-radar-target="controls">
+    <div
+      class="radar-alert-banner hidden"
+      data-radar-target="alertBanner"
+      role="status"
+      aria-live="polite"
+      hidden></div>
+
     <div class="radar-controls-playback" role="group" aria-label="Radar animation">
       <button
         type="button"
@@ -25,6 +32,65 @@
         <i class="fa-solid fa-play hidden" aria-hidden="true" data-radar-target="playIcon"></i>
       </button>
       <span class="radar-timestamp" data-radar-target="timestamp" aria-live="polite">Loading…</span>
+    </div>
+
+    <div
+      class="radar-controls-layers"
+      data-radar-target="layerControls"
+      role="group"
+      aria-labelledby="radar-layer-label">
+      <span id="radar-layer-label" class="radar-controls-label">Layer</span>
+      <button
+        type="button"
+        class="radar-site-chip is-active"
+        data-radar-target="layerChip"
+        data-layer="precip"
+        data-action="click->radar#selectLayer"
+        aria-pressed="true">
+        Precip
+      </button>
+      <button
+        type="button"
+        class="radar-site-chip"
+        data-radar-target="layerChip"
+        data-layer="cloud"
+        data-action="click->radar#selectLayer"
+        aria-pressed="false">
+        Cloud
+      </button>
+    </div>
+
+    <div class="radar-controls-options" role="group" aria-label="Radar options">
+      <button
+        type="button"
+        class="radar-site-chip is-active"
+        data-radar-target="optionChip"
+        data-option="arrows"
+        data-action="click->radar#toggleOption"
+        aria-pressed="true"
+        title="Show storm motion arrows">
+        Arrows
+      </button>
+      <button
+        type="button"
+        class="radar-site-chip is-active"
+        data-radar-target="optionChip"
+        data-option="snow"
+        data-action="click->radar#toggleOption"
+        aria-pressed="true"
+        title="Color snow separately from rain">
+        Snow
+      </button>
+      <button
+        type="button"
+        class="radar-site-chip is-active"
+        data-radar-target="optionChip"
+        data-option="alerts"
+        data-action="click->radar#toggleOption"
+        aria-pressed="true"
+        title="Show weather alerts">
+        Alerts
+      </button>
     </div>
 
     <div

@@ -1,25 +1,34 @@
 import { Controller } from "@hotwired/stimulus"
 import L from "leaflet"
 import {
-  IEM_TILE_BASE,
-  IEM_SUBDOMAINS,
-  RAINVIEWER_API,
+  LIBREWXR_DEFAULT_HOST,
+  LIBREWXR_OPTIONS_SNOW,
+  LIBREWXR_OPTIONS_NOSNOW,
+  LIBREWXR_MAX_NATIVE_ZOOM,
+  LIBREWXR_METADATA_TTL_MS,
+  LIBREWXR_ALERTS_TTL_MS,
+  LIBREWXR_ATTR,
   CARTO_DARK_URL,
   CARTO_ATTR,
   ESRI_DARK_URL,
   ESRI_ATTR,
   RIDGE_PRODUCT,
   RIDGE_TILTS,
-  buildMosaicFrames,
-  buildRainviewerFrames,
+  normalizeLibreWxrHost,
+  librewxrMetadataUrl,
+  librewxrAlertsUrl,
+  buildLibreWxrRadarFrames,
+  buildLibreWxrSatelliteFrames,
   boundsForRadius,
   ridgeProductForTilt,
+  alertPathStyle,
+  alertPopupHtml,
 } from "./helpers/radar_layers"
 import { boundsForRadar, buildLevel3Frames } from "./helpers/level3_frames"
 import { shouldLimitRadarMemory } from "./helpers/level3_utils"
 
-// Full-viewport radar map: IEM mosaic (default), single-site Unidata Level III
-// tilts (KATX/KRTX/KLGX), RainViewer at low zoom when no site is selected.
+// Full-viewport radar map: LibreWXR composite (precip / cloud / nowcast),
+// single-site Unidata Level III tilts (KATX/KRTX/KLGX), alerts overlay.
 export default class extends Controller {
   static targets = [
     "map",
@@ -31,13 +40,17 @@ export default class extends Controller {
     "siteChip",
     "tiltControls",
     "tiltChip",
+    "layerControls",
+    "layerChip",
+    "optionChip",
+    "alertBanner",
   ]
 
   static values = {
     lat: Number,
     lon: Number,
     sites: { type: Array, default: [] },
-    wideZoomMax: { type: Number, default: 6 },
+    librewxrHost: { type: String, default: LIBREWXR_DEFAULT_HOST },
   }
 
   connect() {
@@ -45,20 +58,30 @@ export default class extends Controller {
     this.frameIndex = 0
     this.selectedSiteId = null
     this.selectedTilt = "0.5"
+    this.compositeLayer = "precip" // precip | cloud
+    this.arrowsEnabled = true
+    this.snowColorsEnabled = true
+    this.alertsEnabled = true
     this.frames = []
     this.tileLayers = []
     this.siteMarkers = new Map()
     this.timer = null
+    this.metadataTimer = null
+    this.alertsTimer = null
     this.activeMode = null
     this.activeProduct = null
-    this.rainviewerCache = null
+    this.activeCompositeLayer = null
+    this.librewxrCache = null
+    this.librewxrCacheAt = 0
+    this.alertsLayer = null
+    this.alertPointMarkers = []
     // sector:product → { frames } | { promise } for Level III reuse across sites/tilts
     this.level3Cache = new Map()
     this.basemapErrors = 0
     this.syncGeneration = 0
     this.limitMemory = shouldLimitRadarMemory()
     // High zoom × many tile layers OOMs mobile Safari; keep desktop detail.
-    this.mapMaxZoom = this.limitMemory ? 9 : 11
+    this.mapMaxZoom = this.limitMemory ? 9 : Math.min(11, LIBREWXR_MAX_NATIVE_ZOOM)
 
     this.map = L.map(this.mapTarget, {
       zoomControl: true,
@@ -82,7 +105,6 @@ export default class extends Controller {
       this.stopTimer()
     }
     this.onZoomEnd = () => {
-      this.syncMode()
       if (this.playing) this.startTimer()
     }
     this.map.on("zoomstart", this.onZoomStart)
@@ -103,7 +125,10 @@ export default class extends Controller {
   disconnect() {
     this.syncGeneration += 1
     this.stopTimer()
+    this.stopMetadataRefresh()
+    this.stopAlertsRefresh()
     this.clearRadarLayers()
+    this.clearAlertsOverlay()
     this.disposeLevel3Cache()
     if (this.resizeObserver) {
       this.resizeObserver.disconnect()
@@ -147,10 +172,15 @@ export default class extends Controller {
   }
 
   async bootstrap() {
+    this.updateLayerUi()
+    this.updateOptionUi()
     // Desktop: warm site×tilt Level III in the background. Skip on mobile —
     // prefetching ~9 products of 1800px canvases is a common tab-killer.
     if (!this.limitMemory) this.prefetchAllRidgeFrames()
     await this.syncMode({ force: true })
+    this.startMetadataRefresh()
+    this.syncAlerts()
+    this.startAlertsRefresh()
   }
 
   // --- UI actions -----------------------------------------------------------
@@ -174,6 +204,7 @@ export default class extends Controller {
       this.selectedSiteId = siteId || null
     }
     this.updateSiteUi()
+    this.updateLayerUi()
     this.syncMode({ force: true })
   }
 
@@ -185,12 +216,48 @@ export default class extends Controller {
     if (this.selectedSiteId) this.syncMode({ force: true })
   }
 
+  selectLayer(event) {
+    const layer = event.currentTarget.dataset.layer
+    if (!layer || layer === this.compositeLayer || this.selectedSiteId) return
+    this.compositeLayer = layer
+    this.updateLayerUi()
+    this.updateOptionUi()
+    this.syncMode({ force: true })
+  }
+
+  toggleOption(event) {
+    const option = event.currentTarget.dataset.option
+    if (!option) return
+
+    if (option === "arrows") {
+      if (this.selectedSiteId || this.compositeLayer !== "precip") return
+      this.arrowsEnabled = !this.arrowsEnabled
+    } else if (option === "snow") {
+      if (this.selectedSiteId || this.compositeLayer !== "precip") return
+      this.snowColorsEnabled = !this.snowColorsEnabled
+    } else if (option === "alerts") {
+      this.alertsEnabled = !this.alertsEnabled
+      this.updateOptionUi()
+      if (this.alertsEnabled) {
+        this.syncAlerts({ force: true })
+      } else {
+        this.clearAlertsOverlay()
+        this.clearAlertBanner()
+      }
+      return
+    } else {
+      return
+    }
+
+    this.updateOptionUi()
+    if (!this.selectedSiteId) this.syncMode({ force: true })
+  }
+
   // --- Mode / frames --------------------------------------------------------
 
   resolveMode() {
     if (this.selectedSiteId) return "ridge"
-    if (this.map && this.map.getZoom() <= this.wideZoomMaxValue) return "rainviewer"
-    return "mosaic"
+    return "librewxr"
   }
 
   ridgeProduct() {
@@ -200,10 +267,12 @@ export default class extends Controller {
   async syncMode({ force = false } = {}) {
     const mode = this.resolveMode()
     const product = mode === "ridge" ? this.ridgeProduct() : null
+    const compositeLayer = mode === "librewxr" ? this.compositeLayer : null
     if (
       !force &&
       mode === this.activeMode &&
       product === this.activeProduct &&
+      compositeLayer === this.activeCompositeLayer &&
       this.frames.length > 0
     ) {
       return
@@ -235,13 +304,12 @@ export default class extends Controller {
         if (!site) {
           this.selectedSiteId = null
           this.updateSiteUi()
+          this.updateLayerUi()
           return this.syncMode({ force: true })
         }
         frames = await this.loadRidgeFrames(site, product)
-      } else if (mode === "rainviewer") {
-        frames = await this.loadRainviewerFrames()
       } else {
-        frames = buildMosaicFrames()
+        frames = await this.loadLibreWxrFrames()
       }
 
       if (generation !== this.syncGeneration || !this.map) return
@@ -249,15 +317,19 @@ export default class extends Controller {
       if (frames.length === 0) {
         this.activeMode = null
         this.activeProduct = null
+        this.activeCompositeLayer = null
         if (this.hasTimestampTarget) {
-          this.timestampTarget.textContent =
-            mode === "ridge" ? `No frames for ${this.selectedTilt}°` : "No frames"
+          let message = "No frames"
+          if (mode === "ridge") message = `No frames for ${this.selectedTilt}°`
+          else if (this.compositeLayer === "cloud") message = "Cloud unavailable"
+          this.timestampTarget.textContent = message
         }
         return
       }
 
       this.activeMode = mode
       this.activeProduct = product
+      this.activeCompositeLayer = compositeLayer
       this.frames = frames
       // Oldest → newest; start at 0 so playback advances through time.
       this.frameIndex = 0
@@ -270,10 +342,14 @@ export default class extends Controller {
       console.error("Radar sync failed", error)
       this.activeMode = null
       this.activeProduct = null
+      this.activeCompositeLayer = null
       this.frames = []
       this.clearRadarLayers()
       if (this.hasTimestampTarget) {
-        this.timestampTarget.textContent = "Radar unavailable"
+        this.timestampTarget.textContent =
+          this.compositeLayer === "cloud" && mode === "librewxr"
+            ? "Cloud unavailable"
+            : "Radar unavailable"
       }
     }
   }
@@ -282,7 +358,7 @@ export default class extends Controller {
     return `${sector}:${product}`
   }
 
-  // Single-site tilts use Unidata Level III (IEM RIDGE tiles are N0B-only).
+  // Single-site tilts use Unidata Level III.
   // Results are cached per sector+product so site/tilt switches reuse downloads
   // (including empty lists when S3 listed no keys). All-load failures throw
   // from buildLevel3Frames so the catch below drops the entry and syncMode
@@ -365,13 +441,59 @@ export default class extends Controller {
     this.level3Cache.clear()
   }
 
-  async loadRainviewerFrames() {
-    if (!this.rainviewerCache) {
-      const response = await fetch(RAINVIEWER_API)
-      if (!response.ok) throw new Error(`RainViewer HTTP ${response.status}`)
-      this.rainviewerCache = await response.json()
+  async fetchLibreWxrMetadata({ force = false } = {}) {
+    const now = Date.now()
+    if (
+      !force &&
+      this.librewxrCache &&
+      now - this.librewxrCacheAt < LIBREWXR_METADATA_TTL_MS
+    ) {
+      return this.librewxrCache
     }
-    return buildRainviewerFrames(this.rainviewerCache)
+
+    const response = await fetch(librewxrMetadataUrl(this.librewxrHostValue))
+    if (!response.ok) throw new Error(`LibreWXR HTTP ${response.status}`)
+    this.librewxrCache = await response.json()
+    this.librewxrCacheAt = now
+    return this.librewxrCache
+  }
+
+  async loadLibreWxrFrames() {
+    const api = await this.fetchLibreWxrMetadata()
+    if (this.compositeLayer === "cloud") {
+      return buildLibreWxrSatelliteFrames(api)
+    }
+
+    return buildLibreWxrRadarFrames(api, {
+      options: this.snowColorsEnabled ? LIBREWXR_OPTIONS_SNOW : LIBREWXR_OPTIONS_NOSNOW,
+      arrows: this.arrowsEnabled ? "light" : null,
+      includeNowcast: true,
+    })
+  }
+
+  startMetadataRefresh() {
+    this.stopMetadataRefresh()
+    this.metadataTimer = window.setInterval(() => {
+      if (!this.map || this.selectedSiteId) return
+      void this.refreshLibreWxrFrames()
+    }, LIBREWXR_METADATA_TTL_MS)
+  }
+
+  stopMetadataRefresh() {
+    if (this.metadataTimer) {
+      window.clearInterval(this.metadataTimer)
+      this.metadataTimer = null
+    }
+  }
+
+  async refreshLibreWxrFrames() {
+    if (this.resolveMode() !== "librewxr") return
+    try {
+      await this.fetchLibreWxrMetadata({ force: true })
+      await this.syncMode({ force: true })
+    } catch (error) {
+      console.warn("LibreWXR metadata refresh failed", error)
+    }
   }
 
   createFrameLayer(frame) {
@@ -393,22 +515,12 @@ export default class extends Controller {
       keepBuffer: this.limitMemory ? 0 : 1,
       updateWhenIdle: true,
       updateWhenZooming: false,
-      maxNativeZoom: frame.kind === "rainviewer" ? 7 : this.mapMaxZoom,
+      maxNativeZoom: LIBREWXR_MAX_NATIVE_ZOOM,
       className: "radar-tile-layer",
+      attribution: LIBREWXR_ATTR,
     }
 
-    if (frame.kind === "rainviewer") {
-      return L.tileLayer(frame.urlTemplate, {
-        ...common,
-        attribution: 'Radar &copy; <a href="https://www.rainviewer.com/">RainViewer</a>',
-      })
-    }
-
-    return L.tileLayer(`${IEM_TILE_BASE}/${frame.layer}/{z}/{x}/{y}.png`, {
-      ...common,
-      subdomains: IEM_SUBDOMAINS,
-      attribution: 'Radar data &copy; <a href="https://mesonet.agron.iastate.edu/">IEM</a>',
-    })
+    return L.tileLayer(frame.urlTemplate, common)
   }
 
   clearRadarLayers() {
@@ -426,7 +538,7 @@ export default class extends Controller {
     const nextLayer = this.tileLayers[nextIndex]
     const prevLayer = this.tileLayers[this.frameIndex]
 
-    // Tile layers (mosaic / RainViewer): keep mounted and opacity-toggle.
+    // Tile layers (LibreWXR): keep mounted and opacity-toggle.
     // Detaching each frame forces Leaflet to re-fetch tiles every 500ms and
     // flickers the composite loop. Level III on memory-limited clients still
     // mounts only the active imageOverlay — many 900–1800px canvases at once
@@ -451,6 +563,7 @@ export default class extends Controller {
     const frame = this.frames[this.frameIndex]
     if (this.hasTimestampTarget && frame) {
       this.timestampTarget.textContent = frame.label
+      this.timestampTarget.classList.toggle("is-nowcast", Boolean(frame.isNowcast))
     }
   }
 
@@ -475,6 +588,120 @@ export default class extends Controller {
     }
   }
 
+  // --- Alerts ---------------------------------------------------------------
+
+  startAlertsRefresh() {
+    this.stopAlertsRefresh()
+    this.alertsTimer = window.setInterval(() => {
+      if (this.alertsEnabled) void this.syncAlerts({ force: true })
+    }, LIBREWXR_ALERTS_TTL_MS)
+  }
+
+  stopAlertsRefresh() {
+    if (this.alertsTimer) {
+      window.clearInterval(this.alertsTimer)
+      this.alertsTimer = null
+    }
+  }
+
+  async syncAlerts({ force = false } = {}) {
+    if (!this.alertsEnabled || !this.map) return
+    if (!force && this.alertsFetchedAt && Date.now() - this.alertsFetchedAt < LIBREWXR_ALERTS_TTL_MS) {
+      return
+    }
+
+    try {
+      const host = normalizeLibreWxrHost(this.librewxrHostValue)
+      const response = await fetch(
+        librewxrAlertsUrl(host, { lat: this.latValue, lon: this.lonValue }),
+      )
+      if (!response.ok) throw new Error(`LibreWXR alerts HTTP ${response.status}`)
+      const collection = await response.json()
+      this.alertsFetchedAt = Date.now()
+      this.renderAlerts(collection)
+    } catch (error) {
+      console.warn("LibreWXR alerts failed", error)
+    }
+  }
+
+  renderAlerts(collection) {
+    this.clearAlertsOverlay()
+    if (!this.alertsEnabled || !this.map) return
+
+    const features = Array.isArray(collection?.features) ? collection.features : []
+    const withGeometry = features.filter((feature) => feature?.geometry)
+    const withoutGeometry = features.filter((feature) => feature && !feature.geometry)
+
+    if (withGeometry.length > 0) {
+      this.alertsLayer = L.geoJSON(
+        { type: "FeatureCollection", features: withGeometry },
+        {
+          style: (feature) => alertPathStyle(feature?.properties?.severity),
+          onEachFeature: (feature, layer) => {
+            layer.bindPopup(alertPopupHtml(feature.properties || {}), {
+              maxWidth: 320,
+              className: "radar-alert-popup",
+            })
+          },
+        },
+      ).addTo(this.map)
+    }
+
+    withoutGeometry.forEach((feature, index) => {
+      const marker = L.circleMarker([this.latValue, this.lonValue], {
+        radius: 8 + index,
+        color: alertPathStyle(feature.properties?.severity).color,
+        fillColor: alertPathStyle(feature.properties?.severity).fillColor,
+        fillOpacity: 0.55,
+        weight: 2,
+        className: "radar-alert-point",
+      })
+        .addTo(this.map)
+        .bindPopup(alertPopupHtml(feature.properties || {}), {
+          maxWidth: 320,
+          className: "radar-alert-popup",
+        })
+      this.alertPointMarkers.push(marker)
+    })
+
+    this.updateAlertBanner(features)
+  }
+
+  updateAlertBanner(features) {
+    if (!this.hasAlertBannerTarget) return
+    if (!this.alertsEnabled || features.length === 0) {
+      this.clearAlertBanner()
+      return
+    }
+
+    const titles = features
+      .map((feature) => feature.properties?.title || feature.properties?.event)
+      .filter(Boolean)
+    const first = titles[0] || "Weather alert"
+    const extra = titles.length > 1 ? ` (+${titles.length - 1} more)` : ""
+    this.alertBannerTarget.textContent = `${first}${extra}`
+    this.alertBannerTarget.classList.remove("hidden")
+    this.alertBannerTarget.hidden = false
+  }
+
+  clearAlertBanner() {
+    if (!this.hasAlertBannerTarget) return
+    this.alertBannerTarget.textContent = ""
+    this.alertBannerTarget.classList.add("hidden")
+    this.alertBannerTarget.hidden = true
+  }
+
+  clearAlertsOverlay() {
+    if (this.alertsLayer && this.map) {
+      this.map.removeLayer(this.alertsLayer)
+    }
+    this.alertsLayer = null
+    this.alertPointMarkers.forEach((marker) => {
+      if (this.map && this.map.hasLayer(marker)) this.map.removeLayer(marker)
+    })
+    this.alertPointMarkers = []
+  }
+
   // --- Markers / chrome -----------------------------------------------------
 
   addSiteMarkers() {
@@ -496,6 +723,7 @@ export default class extends Controller {
           this.selectedSiteId = site.id
         }
         this.updateSiteUi()
+        this.updateLayerUi()
         this.syncMode({ force: true })
       })
 
@@ -519,6 +747,8 @@ export default class extends Controller {
     })
 
     this.updateTiltUi()
+    this.updateLayerUi()
+    this.updateOptionUi()
   }
 
   updateTiltUi() {
@@ -531,6 +761,50 @@ export default class extends Controller {
         const active = chip.dataset.tilt === this.selectedTilt
         chip.classList.toggle("is-active", active)
         chip.setAttribute("aria-pressed", active ? "true" : "false")
+      })
+    }
+  }
+
+  updateLayerUi() {
+    const compositeActive = !this.selectedSiteId
+    if (this.hasLayerControlsTarget) {
+      this.layerControlsTarget.classList.toggle("hidden", !compositeActive)
+    }
+
+    if (this.hasLayerChipTarget) {
+      this.layerChipTargets.forEach((chip) => {
+        const active = compositeActive && chip.dataset.layer === this.compositeLayer
+        chip.classList.toggle("is-active", active)
+        chip.setAttribute("aria-pressed", active ? "true" : "false")
+        chip.disabled = !compositeActive
+      })
+    }
+  }
+
+  updateOptionUi() {
+    const precipComposite = !this.selectedSiteId && this.compositeLayer === "precip"
+
+    if (this.hasOptionChipTarget) {
+      this.optionChipTargets.forEach((chip) => {
+        const option = chip.dataset.option
+        let active = false
+        let enabled = true
+
+        if (option === "arrows") {
+          active = this.arrowsEnabled
+          enabled = precipComposite
+        } else if (option === "snow") {
+          active = this.snowColorsEnabled
+          enabled = precipComposite
+        } else if (option === "alerts") {
+          active = this.alertsEnabled
+          enabled = true
+        }
+
+        chip.classList.toggle("is-active", active && enabled)
+        chip.setAttribute("aria-pressed", active && enabled ? "true" : "false")
+        chip.disabled = !enabled
+        chip.classList.toggle("is-disabled", !enabled)
       })
     }
   }
