@@ -64,7 +64,8 @@ describe("buildLibreWxrRadarFrames", () => {
       `https://api.librewxr.net/v2/radar/1784601600/256/{z}/{x}/{y}/${LIBREWXR_COLOR_SCHEME}/${LIBREWXR_OPTIONS_SNOW}.png`,
     )
     assert.equal(frames[1].isNowcast, true)
-    assert.match(frames[1].label, /^Nowcast · /)
+    assert.match(frames[0].label, /^Past · /)
+    assert.match(frames[1].label, /^Future · /)
     assert.match(frames[1].urlTemplate, /1784602200/)
     assert.doesNotMatch(frames[0].urlTemplate, /arrows=/)
   })

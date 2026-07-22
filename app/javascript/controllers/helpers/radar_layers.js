@@ -84,7 +84,7 @@ export function buildLibreWxrRadarFrames(
     const timeLabel = formatFrameTime(time)
     return {
       id: `lw-${isNowcast ? "nc" : "past"}-${frame.time}`,
-      label: isNowcast ? `Nowcast · ${timeLabel}` : timeLabel,
+      label: isNowcast ? `Future · ${timeLabel}` : `Past · ${timeLabel}`,
       urlTemplate: `${host}${frame.path}/${size}/{z}/{x}/{y}/${color}/${options}.png`,
       time,
       kind: "librewxr",

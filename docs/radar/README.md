@@ -51,7 +51,7 @@ Single-site Level III uses a client-side rain palette (light green → white). S
 - **LibreWXR cloud:** hourly GMGSI VIS-over-LW satellite frames.
 - **Single site:** Unidata Level III objects from `https://unidata-nexrad-level3.s3.amazonaws.com` (`{SECTOR}_{PRODUCT}_{YYYY}_{MM}_{DD}_{HH}_{MI}_{SS}`), decoded in-browser and drawn as Leaflet image overlays (**1800×1800** on desktop, **900×900** on coarse/narrow viewports). Tilt selector (site-only): `0.5°` → `N0B`, `1.0°` → `NAB` (~0.9°), `1.5°` → `N1B`. Level III data loads on demand when a site is selected (or when a non-default tilt is chosen for that site) — not on initial composite load.
 
-Playback controls: play/pause + timestamp (Pacific time). Nowcast timestamps are prefixed with `Nowcast ·`. Default is autoplay.
+Playback controls: play/pause + timestamp (Pacific time). Past frames are prefixed with `Past ·`; nowcast frames with `Future ·`. Default is autoplay.
 
 ### Memory / zoom notes
 
