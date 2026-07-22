@@ -163,16 +163,25 @@ export function plotReflectivity(data, { size = LEVEL3_PLOT_SIZE } = {}) {
       }
 
       if (sample == null || sample < 5) continue
-      const color = dbzColor(sample)
-      if (!color) continue
-      ctx.beginPath()
-      ctx.strokeStyle = color
-      ctx.arc(0, 0, (idx + packet.firstBin) / scale, startAngle, endAngle)
-      ctx.stroke()
+      strokeDbzArc(ctx, sample, (idx + packet.firstBin) / scale, startAngle, endAngle)
+    }
+
+    // Downsampling only emits on remainder wrap; flush the final pooled bin.
+    if (scale !== 1 && maxDownsample >= 5) {
+      strokeDbzArc(ctx, maxDownsample, (maxBin + packet.firstBin) / scale, startAngle, endAngle)
     }
   })
 
   return canvas
+}
+
+function strokeDbzArc(ctx, sample, radius, startAngle, endAngle) {
+  const color = dbzColor(sample)
+  if (!color) return
+  ctx.beginPath()
+  ctx.strokeStyle = color
+  ctx.arc(0, 0, radius, startAngle, endAngle)
+  ctx.stroke()
 }
 
 function sampleFrames(frames, maxFrames) {
