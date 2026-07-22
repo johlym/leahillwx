@@ -2,7 +2,7 @@
   <div class="forecast-alerts-bar-inner">
     <span class="forecast-alerts-bar-label">Alert</span>
     <div class="forecast-alerts-bar-body">
-      <p class="forecast-alerts-bar-event"><%= primary_alert.event %></p>
+      <p class="forecast-alerts-bar-event"><%= event_label(primary_alert) %></p>
       <% if ends_label(primary_alert) %>
         <p class="forecast-alerts-bar-meta">Until <%= ends_label(primary_alert) %></p>
       <% end %>

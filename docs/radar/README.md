@@ -27,7 +27,8 @@ Composite tiles come from `LIBREWXR_API_BASE` (default `https://api.librewxr.net
 - **Color scheme:** LibreWXR scheme `6` (NEXRAD Level III), closest built-in match to the site rain ladder
 - **Performance:** only the active radar/satellite frame is mounted (opacity-0 tile layers still fetch tiles and hurt drag/zoom)
 
-Weather alerts from OpenWeather are shown on the homepage, not on `/radar`.
+Weather alerts on the homepage come from LibreWXR (NWS/WMO CAP near the station),
+merged with any active OpenWeather alerts. Alerts are not shown on `/radar`.
 
 ### Local NEXRAD sites
 

@@ -14,6 +14,11 @@ class RootController < ApplicationController
     end
 
     @forecast = ForecastParser.new(forecast_record || {}).parse
+    @weather_alerts = WeatherAlert.for_homepage(
+      lat: ENV["LOCATION_LAT"]&.to_f,
+      lon: ENV["LOCATION_LON"]&.to_f,
+      forecast_alerts: @forecast&.alerts
+    )
     @earthquakes = Earthquake.last(5).reverse
     @today_peaks = compute_today_peaks
     @hourly_ranges = WeatherData::LiveCardHourlyRanges.new.call

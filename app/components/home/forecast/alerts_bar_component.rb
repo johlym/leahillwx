@@ -2,7 +2,7 @@
 
 class Home::Forecast::AlertsBarComponent < ViewComponent::Base
   def initialize(alerts:)
-    @alerts = Array(alerts).select(&:active?)
+    @alerts = Array(alerts).select { |alert| alert.respond_to?(:active?) ? alert.active? : true }
   end
 
   def render?
@@ -18,8 +18,13 @@ class Home::Forecast::AlertsBarComponent < ViewComponent::Base
   end
 
   def ends_label(alert)
-    return nil unless alert.end_time
+    ends_at = alert.respond_to?(:end_time) ? alert.end_time : alert.try(:ends_at)
+    return nil unless ends_at
 
-    alert.end_time.in_time_zone("America/Los_Angeles").strftime("%-I:%M %p %Z")
+    ends_at.in_time_zone("America/Los_Angeles").strftime("%-I:%M %p %Z")
+  end
+
+  def event_label(alert)
+    alert.try(:event).presence || alert.try(:title).presence || "Weather alert"
   end
 end

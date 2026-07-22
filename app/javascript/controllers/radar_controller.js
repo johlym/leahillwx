@@ -349,13 +349,14 @@ export default class extends Controller {
         return
       }
 
-      this.commitFrameSet({
+      await this.commitFrameSet({
         frames,
         mode,
         product,
         compositeLayer,
         previousLayers,
         preserve: canPreserve,
+        generation,
       })
     } catch (error) {
       if (generation !== this.syncGeneration || !this.map) return
@@ -378,20 +379,34 @@ export default class extends Controller {
     }
   }
 
-  /** Apply a loaded frame set, anchoring quiet refresh to the live playback index. */
-  commitFrameSet({ frames, mode, product, compositeLayer, previousLayers, preserve }) {
+  /**
+   * Apply a loaded frame set.
+   * Initial loads: freeze on the newest frame, warm the rest, then animate from oldest.
+   * Quiet refreshes: preserve playback index and resume immediately.
+   */
+  async commitFrameSet({
+    frames,
+    mode,
+    product,
+    compositeLayer,
+    previousLayers,
+    preserve,
+    generation = this.syncGeneration,
+  }) {
     if (!this.map || !frames?.length) return
 
     this.stopTimer()
-    // Read the anchor after the await so autoplay progress during the fetch is kept.
+    // Capture before replacing this.frames (quiet refresh keeps old list until now).
     const anchorFrame = preserve ? this.frames[this.frameIndex] : null
     const nextLayers = frames.map((frame) => this.createFrameLayer(frame))
     this.activeMode = mode
     this.activeProduct = product
     this.activeCompositeLayer = compositeLayer
     this.frames = frames
-    this.frameIndex = resolvePreservedFrameIndex(frames, anchorFrame)
     this.tileLayers = nextLayers
+    this.frameIndex = preserve
+      ? resolvePreservedFrameIndex(frames, anchorFrame)
+      : frames.length - 1
     this.showFrame(this.frameIndex)
 
     if (previousLayers) {
@@ -400,6 +415,21 @@ export default class extends Controller {
       })
     }
 
+    if (preserve) {
+      if (this.playing && !this.zooming) this.startTimer()
+      return
+    }
+
+    // Hold on the newest frame while its tiles load, then warm the rest of the loop.
+    await this.waitForLayerLoad(this.tileLayers[this.frameIndex])
+    if (generation !== this.syncGeneration || !this.map) return
+
+    await this.warmOfflineFrames(this.frameIndex, generation)
+    if (generation !== this.syncGeneration || !this.map) return
+
+    // Animate oldest → newest once frames are cached.
+    this.frameIndex = 0
+    this.showFrame(this.frameIndex)
     if (this.playing && !this.zooming) this.startTimer()
   }
 
@@ -410,14 +440,78 @@ export default class extends Controller {
     if (pending.generation !== this.syncGeneration || !this.map) return
     if (this.resolveMode() !== "librewxr" || this.selectedSiteId) return
 
-    this.commitFrameSet({
+    void this.commitFrameSet({
       frames: pending.frames,
       mode: pending.mode,
       product: pending.product,
       compositeLayer: pending.compositeLayer,
       previousLayers: pending.previousLayers,
       preserve: true,
+      generation: pending.generation,
     })
+  }
+
+  waitForLayerLoad(layer, timeoutMs = 8000) {
+    if (!layer || !this.map) return Promise.resolve()
+
+    // Level III image overlays are already decoded blobs — no wait needed.
+    if (typeof layer.setUrl === "function" && layer._url?.startsWith?.("blob:")) {
+      return Promise.resolve()
+    }
+
+    if (typeof layer.isLoading === "function" && !layer.isLoading()) {
+      return Promise.resolve()
+    }
+
+    return new Promise((resolve) => {
+      let settled = false
+      const done = () => {
+        if (settled) return
+        settled = true
+        layer.off?.("load", done)
+        window.clearTimeout(timer)
+        resolve()
+      }
+      const timer = window.setTimeout(done, timeoutMs)
+      layer.once?.("load", done)
+      // If Leaflet already finished between the isLoading check and once().
+      if (typeof layer.isLoading === "function" && !layer.isLoading()) done()
+    })
+  }
+
+  /**
+   * Prefetch inactive frames at opacity 0 while keeping the frozen frame visible.
+   * After warming, leave only the frozen frame mounted (mount-only-active modes)
+   * so drag/zoom stays cheap until animation starts.
+   */
+  async warmOfflineFrames(keepIndex, generation, concurrency = 2) {
+    if (!this.map || this.tileLayers.length < 2) return
+
+    const indices = this.tileLayers
+      .map((_, index) => index)
+      .filter((index) => index !== keepIndex)
+    const detachAfterWarm = this.mountOnlyActiveFrame()
+
+    let cursor = 0
+    const workers = Array.from({ length: Math.min(concurrency, indices.length) }, async () => {
+      while (cursor < indices.length) {
+        if (generation !== this.syncGeneration || !this.map) return
+        const index = indices[cursor]
+        cursor += 1
+        const layer = this.tileLayers[index]
+        if (!layer) continue
+
+        layer.setOpacity(0)
+        if (!this.map.hasLayer(layer)) layer.addTo(this.map)
+        await this.waitForLayerLoad(layer, 5000)
+        if (generation !== this.syncGeneration || !this.map) return
+        if (detachAfterWarm && this.map.hasLayer(layer)) {
+          this.map.removeLayer(layer)
+        }
+      }
+    })
+
+    await Promise.all(workers)
   }
 
   setTimestamp(text, { nowcast = false } = {}) {
