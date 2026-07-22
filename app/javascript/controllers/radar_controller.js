@@ -72,6 +72,8 @@ export default class extends Controller {
     this.pendingQuietRefresh = null
     this.zooming = false
     this.warmingFrames = false
+    this.frameRevealToken = 0
+    this.revealingFrame = false
     // sector:product → { frames } | { promise } for Level III reuse across sites/tilts
     this.level3Cache = new Map()
     this.basemapErrors = 0
@@ -138,6 +140,8 @@ export default class extends Controller {
     this.pendingQuietRefresh = null
     this.zooming = false
     this.warmingFrames = false
+    this.revealingFrame = false
+    this.frameRevealToken += 1
     this.stopTimer()
     this.stopMetadataRefresh()
     this.clearRadarLayers()
@@ -385,9 +389,9 @@ export default class extends Controller {
 
   /**
    * Apply a loaded frame set.
-   * Initial loads: freeze on the newest frame (sole map layer), prefetch the rest
-   * into the HTTP cache off-map, then start animating from that frozen frame so
-   * the loop advances newest → oldest → … without a hard cut.
+   * Initial loads: freeze on the newest frame until its tiles are ready, then
+   * start the loop. Frame advances keep the previous layer up until the next
+   * one has loaded so we never flash an empty radar pane.
    * Quiet refreshes: preserve playback index and resume immediately.
    */
   async commitFrameSet({
@@ -402,6 +406,7 @@ export default class extends Controller {
     if (!this.map || !frames?.length) return
 
     this.stopTimer()
+    this.frameRevealToken += 1
     this.warmingFrames = false
     // Capture before replacing this.frames (quiet refresh keeps old list until now).
     const anchorFrame = preserve ? this.frames[this.frameIndex] : null
@@ -414,8 +419,7 @@ export default class extends Controller {
     this.frameIndex = preserve
       ? resolvePreservedFrameIndex(frames, anchorFrame)
       : frames.length - 1
-    this.showFrame(this.frameIndex)
-    // Only the frozen/active frame may be on the map during the warm phase.
+    this.showFrame(this.frameIndex, { immediate: true })
     this.detachInactiveRadarLayers(this.frameIndex)
 
     if (previousLayers) {
@@ -429,15 +433,11 @@ export default class extends Controller {
       return
     }
 
+    // Hold on the newest frame until it paints, then play. Do not mass-prefetch
+    // every frame first — that saturates the host connection pool and starves
+    // playback tile loads, leaving only the frozen frame visible.
     this.warmingFrames = true
-    // Hold on the newest frame while its tiles load, then warm the rest off-map.
     await this.waitForLayerLoad(this.tileLayers[this.frameIndex])
-    if (generation !== this.syncGeneration || !this.map) {
-      this.warmingFrames = false
-      return
-    }
-
-    await this.warmOfflineFrames(this.frameIndex, generation)
     if (generation !== this.syncGeneration || !this.map) {
       this.warmingFrames = false
       return
@@ -446,6 +446,9 @@ export default class extends Controller {
     this.warmingFrames = false
     // Stay on the newest frame; the interval advances into the loop naturally.
     if (this.playing && !this.zooming) this.startTimer()
+
+    // Nudge the next couple of frames into cache without blocking playback.
+    void this.prefetchUpcomingFrames(this.frameIndex, generation, 2)
   }
 
   flushPendingQuietRefresh() {
@@ -495,28 +498,23 @@ export default class extends Controller {
   }
 
   /**
-   * Warm inactive frames without mounting them on the map.
-   * Adding opacity-0 tile layers still paints/stacks and causes the
-   * "duplicate overlapping frames" flicker during load.
+   * Prefetch a few upcoming frames off-map (HTTP cache only).
+   * Kept small so we do not starve the active layer's tile requests.
    */
-  async warmOfflineFrames(keepIndex, generation) {
-    if (!this.map || this.frames.length < 2) return
-
-    this.detachInactiveRadarLayers(keepIndex)
+  async prefetchUpcomingFrames(fromIndex, generation, count = 2) {
+    if (!this.map || this.frames.length < 2 || count < 1) return
 
     const urls = []
-    for (let i = 0; i < this.frames.length; i += 1) {
-      if (i === keepIndex) continue
-      urls.push(...this.viewportUrlsForFrame(this.frames[i]))
+    for (let step = 1; step <= count; step += 1) {
+      const index = (fromIndex + step) % this.frames.length
+      urls.push(...this.viewportUrlsForFrame(this.frames[index]))
     }
 
     await prefetchImages(urls, {
-      concurrency: this.limitMemory ? 4 : 8,
-      timeoutMs: 4000,
+      concurrency: 4,
+      timeoutMs: 2500,
       isCancelled: () => generation !== this.syncGeneration || !this.map,
     })
-
-    this.detachInactiveRadarLayers(keepIndex)
   }
 
   viewportUrlsForFrame(frame) {
@@ -536,7 +534,7 @@ export default class extends Controller {
       pixelMaxX: bounds.max.x,
       pixelMaxY: bounds.max.y,
       tileSize: 256,
-      pad: 1,
+      pad: 0,
     })
   }
 
@@ -738,7 +736,9 @@ export default class extends Controller {
       maxZoom: this.mapMaxZoom,
       // Only the active frame is mounted; keep the tile buffer tiny for drag/zoom.
       keepBuffer: 0,
-      updateWhenIdle: true,
+      // Load as soon as the layer is mounted — updateWhenIdle delayed first paint
+      // when frames are swapped every 500ms.
+      updateWhenIdle: false,
       updateWhenZooming: false,
       maxNativeZoom: LIBREWXR_MAX_NATIVE_ZOOM,
       className: "radar-tile-layer",
@@ -757,21 +757,62 @@ export default class extends Controller {
     this.tileLayers = []
   }
 
-  showFrame(index) {
+  showFrame(index, { immediate = false } = {}) {
     if (!this.frames.length || !this.map) return
     const nextIndex = ((index % this.frames.length) + this.frames.length) % this.frames.length
-    const nextLayer = this.tileLayers[nextIndex]
-    const prevLayer = this.tileLayers[this.frameIndex]
 
-    // Mount only the active frame. Keeping every LibreWXR tile layer at
-    // opacity 0 still fetches/paints tiles and makes drag/zoom feel stuck.
-    // Level III desktop can opacity-toggle decoded image overlays cheaply.
+    if (immediate || !this.mountOnlyActiveFrame()) {
+      this.applyFrame(nextIndex, { waitForLoad: false })
+      return
+    }
+
+    // Async reveal: keep the current frame visible until the next one loads.
+    void this.revealFrame(nextIndex)
+  }
+
+  async revealFrame(nextIndex) {
+    if (!this.map || !this.frames.length) return
+    if (this.revealingFrame) return
+
+    this.revealingFrame = true
+    const token = ++this.frameRevealToken
+    try {
+      await this.applyFrame(nextIndex, { waitForLoad: true, token })
+    } finally {
+      if (token === this.frameRevealToken) this.revealingFrame = false
+    }
+
+    // Prefetch a couple of frames ahead of the one we just revealed.
+    if (token === this.frameRevealToken && this.map) {
+      void this.prefetchUpcomingFrames(nextIndex, this.syncGeneration, 2)
+    }
+  }
+
+  async applyFrame(nextIndex, { waitForLoad = false, token = null } = {}) {
+    if (!this.map || !this.frames.length) return
+
+    const nextLayer = this.tileLayers[nextIndex]
+    const prevIndex = this.frameIndex
+    const prevLayer = this.tileLayers[prevIndex]
+
     if (this.mountOnlyActiveFrame() || this.warmingFrames) {
       if (nextLayer) {
-        if (!this.map.hasLayer(nextLayer)) nextLayer.addTo(this.map)
+        if (!this.map.hasLayer(nextLayer)) {
+          nextLayer.setOpacity(0)
+          nextLayer.addTo(this.map)
+        }
+        if (waitForLoad && nextIndex !== prevIndex) {
+          await this.waitForLayerLoad(nextLayer, 1500)
+          if (token != null && token !== this.frameRevealToken) return
+          if (!this.map) return
+        }
         nextLayer.setOpacity(0.7)
       }
-      if (prevLayer && prevLayer !== nextLayer && this.map.hasLayer(prevLayer)) {
+      if (
+        prevLayer &&
+        prevLayer !== nextLayer &&
+        this.map.hasLayer(prevLayer)
+      ) {
         this.map.removeLayer(prevLayer)
       }
       this.detachInactiveRadarLayers(nextIndex)
@@ -796,7 +837,7 @@ export default class extends Controller {
   }
 
   advanceFrame() {
-    if (this.warmingFrames) return
+    if (this.warmingFrames || this.revealingFrame) return
     this.showFrame(this.frameIndex + 1)
   }
 
