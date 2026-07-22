@@ -426,16 +426,24 @@ export default class extends Controller {
     const nextLayer = this.tileLayers[nextIndex]
     const prevLayer = this.tileLayers[this.frameIndex]
 
-    // Mount only the active frame. Keeping every mosaic/Level III layer on the
-    // map at opacity 0 still loads tiles / decodes images and OOMs mobile tabs
-    // when zoomed in.
-    if (nextLayer) {
-      if (!this.map.hasLayer(nextLayer)) nextLayer.addTo(this.map)
-      nextLayer.setOpacity(0.7)
-    }
-
-    if (prevLayer && prevLayer !== nextLayer && this.map.hasLayer(prevLayer)) {
-      this.map.removeLayer(prevLayer)
+    // Tile layers (mosaic / RainViewer): keep mounted and opacity-toggle.
+    // Detaching each frame forces Leaflet to re-fetch tiles every 500ms and
+    // flickers the composite loop. Level III on memory-limited clients still
+    // mounts only the active imageOverlay — many 900–1800px canvases at once
+    // OOMs mobile Safari when zoomed in.
+    if (this.mountOnlyActiveFrame()) {
+      if (nextLayer) {
+        if (!this.map.hasLayer(nextLayer)) nextLayer.addTo(this.map)
+        nextLayer.setOpacity(0.7)
+      }
+      if (prevLayer && prevLayer !== nextLayer && this.map.hasLayer(prevLayer)) {
+        this.map.removeLayer(prevLayer)
+      }
+    } else {
+      this.tileLayers.forEach((layer, i) => {
+        if (!this.map.hasLayer(layer)) layer.addTo(this.map)
+        layer.setOpacity(i === nextIndex ? 0.7 : 0)
+      })
     }
 
     this.frameIndex = nextIndex
@@ -444,6 +452,10 @@ export default class extends Controller {
     if (this.hasTimestampTarget && frame) {
       this.timestampTarget.textContent = frame.label
     }
+  }
+
+  mountOnlyActiveFrame() {
+    return this.limitMemory && this.activeMode === "ridge"
   }
 
   advanceFrame() {

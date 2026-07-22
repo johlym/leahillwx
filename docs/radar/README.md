@@ -41,7 +41,8 @@ Playback controls: play/pause + timestamp (Pacific time). Default is autoplay. W
 
 ### Memory / zoom notes
 
-- Only the **active** animation frame is mounted on the map (inactive frames are detached). Mounting every mosaic/Level III layer at opacity 0 still fetched tiles / decoded images and crashed mobile Safari when zoomed in.
+- **Composite** (mosaic / RainViewer) keeps animation frames mounted and opacity-toggles between them so Leaflet does not re-fetch tiles every frame.
+- **Single-site Level III** on memory-limited clients mounts only the **active** image overlay (inactive frames are detached). Keeping every large canvas mounted at opacity 0 OOMs mobile Safari when zoomed in; desktop still opacity-toggles.
 - Mobile / coarse-pointer clients cap `maxZoom` at **9** (desktop **11**), use smaller Level III canvases, fewer frames, and skip background Level III prefetch.
 
 ## Default viewport
