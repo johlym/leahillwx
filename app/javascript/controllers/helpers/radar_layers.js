@@ -38,7 +38,7 @@ export const ESRI_DARK_URL =
 export const ESRI_ATTR = "Tiles &copy; Esri"
 
 export const LIBREWXR_ATTR =
-  'Radar & satellite &copy; <a href="https://librewxr.net/">LibreWXR</a> (MRMS/NOAA, NWP)'
+  'Radar &copy; <a href="https://librewxr.net/">LibreWXR</a> (MRMS/NOAA, NWP)'
 
 /** Normalize a configured LibreWXR base (host or full metadata URL) to origin. */
 export function normalizeLibreWxrHost(base = LIBREWXR_DEFAULT_HOST) {
@@ -93,26 +93,6 @@ export function buildLibreWxrRadarFrames(
   }
 
   return [...past.map((frame) => toFrame(frame, false)), ...nowcast.map((frame) => toFrame(frame, true))]
-}
-
-/**
- * Build LibreWXR GMGSI satellite frames from weather-maps.json.
- * @param {{ host?: string, satellite?: { infrared?: { time: number, path: string }[] } }} api
- */
-export function buildLibreWxrSatelliteFrames(api, { size = 256, tileHost } = {}) {
-  const host = resolveLibreWxrTileHost(api, tileHost)
-  const frames = api.satellite?.infrared || []
-  return frames.map((frame) => {
-    const time = new Date(frame.time * 1000)
-    return {
-      id: `lw-sat-${frame.time}`,
-      label: `Past · ${formatFrameTime(time)}`,
-      urlTemplate: `${host}${frame.path}/${size}/{z}/{x}/{y}/0/0_0.png`,
-      time,
-      kind: "librewxr-satellite",
-      isNowcast: false,
-    }
-  })
 }
 
 /**

@@ -69,11 +69,10 @@ class RadarControllerTest < ActionDispatch::IntegrationTest
     assert_select "button.radar-site-chip[data-site-id='KLGX']", text: "LGX"
   end
 
-  test "index renders layer chips for LibreWXR composite" do
+  test "index omits removed composite layer and option chips" do
     get radar_url
-    assert_select "[data-radar-target='layerControls']"
-    assert_select "button[data-radar-target='layerChip'][data-layer='precip']", text: "Precip"
-    assert_select "button[data-radar-target='layerChip'][data-layer='cloud']", text: "Cloud"
+    assert_select "[data-radar-target='layerControls']", count: 0
+    assert_select "button[data-layer='cloud']", count: 0
     assert_select "button[data-option='snow']", count: 0
     assert_select "button[data-option='arrows']", count: 0
     assert_select "button[data-option='alerts']", count: 0

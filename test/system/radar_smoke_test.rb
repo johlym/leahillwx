@@ -24,8 +24,7 @@ class RadarSmokeTest < ApplicationSystemTestCase
     # CSS uppercases chip labels; match case-insensitively on visible text.
     assert_selector "button.radar-site-chip", text: /composite/i
     assert_selector "button.radar-site-chip", text: "ATX"
-    assert_selector "button[data-radar-target='layerChip']", text: /precip/i
-    assert_selector "button[data-radar-target='layerChip']", text: /cloud/i
+    assert_no_selector "button[data-layer='cloud']"
     assert_no_selector "button[data-option='snow']"
     assert_no_selector "button[data-option='arrows']"
     assert_no_selector "button[data-option='alerts']"
@@ -63,24 +62,11 @@ class RadarSmokeTest < ApplicationSystemTestCase
     find("button.radar-site-chip", text: "ATX").click
     assert_selector "[data-radar-target='tiltControls']:not(.hidden)"
     assert_selector "button[data-radar-target='tiltChip'].is-active[data-tilt='0.5']"
-    assert_selector "[data-radar-target='layerControls'].hidden", visible: :hidden
 
     find("button[data-radar-target='tiltChip'][data-tilt='1.5']").click
     assert_selector "button[data-radar-target='tiltChip'].is-active[data-tilt='1.5']"
 
     find("button.radar-site-chip", text: /composite/i).click
     assert_selector "[data-radar-target='tiltControls'].hidden", visible: :hidden
-    assert_selector "[data-radar-target='layerControls']:not(.hidden)"
-  end
-
-  test "precip and cloud layer chips toggle pressed state" do
-    visit radar_url
-
-    find("button[data-radar-target='layerChip'][data-layer='cloud']").click
-    assert_selector "button[data-radar-target='layerChip'][data-layer='cloud'].is-active[aria-pressed='true']"
-    assert_selector "button[data-radar-target='layerChip'][data-layer='precip']:not(.is-active)"
-
-    find("button[data-radar-target='layerChip'][data-layer='precip']").click
-    assert_selector "button[data-radar-target='layerChip'][data-layer='precip'].is-active[aria-pressed='true']"
   end
 end

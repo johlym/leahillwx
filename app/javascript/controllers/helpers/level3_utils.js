@@ -12,6 +12,36 @@ export const LEVEL3_MAX_FRAMES = 18
 export const LEVEL3_MAX_FRAMES_MOBILE = 12
 
 /**
+ * NWS-style reflectivity ladder (5 dBZ steps), matching the HVY / MOD / LGT / VLGT
+ * legend. Each entry is the color for [dbz, next) — ND / below -30 is transparent.
+ * Colors are approximate RGB sampled from the standard NWS scale.
+ */
+export const DBZ_PALETTE = [
+  { dbz: -30, rgba: "rgba(170, 210, 230, 0.75)" }, // pale cyan — VLGT
+  { dbz: -25, rgba: "rgba(210, 170, 210, 0.75)" }, // lavender
+  { dbz: -20, rgba: "rgba(150, 90, 170, 0.8)" }, // muted purple
+  { dbz: -15, rgba: "rgba(110, 40, 120, 0.8)" }, // dark plum
+  { dbz: -10, rgba: "rgba(200, 180, 140, 0.8)" }, // light tan
+  { dbz: -5, rgba: "rgba(150, 145, 95, 0.8)" }, // olive grey/tan
+  { dbz: 0, rgba: "rgba(95, 95, 95, 0.75)" }, // dark grey
+  { dbz: 5, rgba: "rgba(90, 235, 245, 0.85)" }, // light cyan — LGT
+  { dbz: 10, rgba: "rgba(40, 160, 255, 0.85)" }, // sky blue
+  { dbz: 15, rgba: "rgba(0, 0, 255, 0.85)" }, // blue
+  { dbz: 20, rgba: "rgba(0, 255, 0, 0.85)" }, // bright lime green
+  { dbz: 25, rgba: "rgba(0, 200, 0, 0.85)" }, // medium green
+  { dbz: 30, rgba: "rgba(0, 140, 0, 0.85)" }, // dark green
+  { dbz: 35, rgba: "rgba(255, 255, 0, 0.85)" }, // yellow — MOD
+  { dbz: 40, rgba: "rgba(255, 200, 0, 0.85)" }, // golden yellow
+  { dbz: 45, rgba: "rgba(255, 140, 0, 0.85)" }, // orange
+  { dbz: 50, rgba: "rgba(255, 80, 80, 0.9)" }, // light red
+  { dbz: 55, rgba: "rgba(255, 0, 0, 0.9)" }, // red
+  { dbz: 60, rgba: "rgba(180, 0, 0, 0.9)" }, // deep red
+  { dbz: 65, rgba: "rgba(255, 0, 200, 0.95)" }, // magenta — HVY
+  { dbz: 70, rgba: "rgba(150, 0, 255, 0.95)" }, // purple
+  { dbz: 75, rgba: "rgba(255, 255, 255, 0.95)" }, // white
+]
+
+/**
  * True when we should prefer lower radar memory/CPU (phones, low-RAM devices).
  * @param {{ matchMedia?: Function, deviceMemory?: number }} [env]
  */
@@ -107,19 +137,16 @@ export function boundsForRadar(lat, lon, rangeKm = LEVEL3_RANGE_KM) {
 }
 
 /**
- * Rain reflectivity ladder (lowest → highest):
- * light green, green, dark green, yellow, orange, red, dark red, purple, white.
- * Single-site Level III is reflectivity-only — snow blues come from LibreWXR composite.
+ * Map a reflectivity sample to an RGBA color.
+ * ND / missing / below -30 dBZ → transparent (null).
  */
 export function dbzColor(dbz) {
-  if (dbz == null || dbz < 5) return null
-  if (dbz < 15) return "rgba(144, 238, 144, 0.85)" // light green
-  if (dbz < 25) return "rgba(34, 180, 34, 0.85)" // green
-  if (dbz < 35) return "rgba(0, 100, 0, 0.85)" // dark green
-  if (dbz < 40) return "rgba(255, 230, 0, 0.85)" // yellow
-  if (dbz < 45) return "rgba(255, 140, 0, 0.85)" // orange
-  if (dbz < 50) return "rgba(220, 20, 20, 0.85)" // red
-  if (dbz < 55) return "rgba(140, 0, 0, 0.9)" // dark red
-  if (dbz < 65) return "rgba(160, 0, 200, 0.9)" // purple
-  return "rgba(255, 255, 255, 0.95)" // white
+  if (dbz == null || Number.isNaN(dbz) || dbz < -30) return null
+
+  let color = DBZ_PALETTE[0].rgba
+  for (const step of DBZ_PALETTE) {
+    if (dbz >= step.dbz) color = step.rgba
+    else break
+  }
+  return color
 }

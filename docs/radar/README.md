@@ -13,8 +13,7 @@ The `/radar` route is a full-viewport live weather radar map for Lea Hill Weathe
 
 | Mode | Source | When |
 |---|---|---|
-| **Composite precip** (default) | [LibreWXR](https://librewxr.net/) radar tiles (MRMS/NOAA + regional NWP / ECMWF fill) | No site selected, Layer = Precip |
-| **Composite cloud** | LibreWXR GMGSI satellite (`satellite.infrared`) | No site selected, Layer = Cloud |
+| **Composite precip** (default) | [LibreWXR](https://librewxr.net/) radar tiles (MRMS/NOAA + regional NWP / ECMWF fill) | No site selected |
 | **Single site** | Unidata Level III reflectivity (`N0B` / `NAB` / `N1B` tilts) plotted client-side | User selects ATX / RTX / LGX |
 
 Composite tiles come from `LIBREWXR_API_BASE` (default `https://api.librewxr.net`). The browser talks to LibreWXR directly (no Rails proxy).
@@ -24,8 +23,8 @@ Composite tiles come from `LIBREWXR_API_BASE` (default `https://api.librewxr.net
 - **Nowcast:** `radar.nowcast` frames appended after past radar (up to ~60 minutes when available)
 - **Snow colors:** always on (`smooth_snow = 1_1`, per-pixel rain/snow)
 - **Regional NWP:** server-side in LibreWXR (HRRR over CONUS, etc.) — no client work beyond attribution
-- **Color scheme:** LibreWXR scheme `6` (NEXRAD Level III), closest built-in match to the site rain ladder
-- **Performance:** only the active radar/satellite frame is mounted. First load freezes on the newest frame until it paints, then plays. Advances keep the previous frame up until the next one loads (no empty flashes; no opacity-0 layer stacking).
+- **Color scheme:** LibreWXR scheme `6` (NEXRAD Level III) for composite tiles
+- **Performance:** only the active radar frame is mounted. First load freezes on the newest frame until it paints, then plays. Advances keep the previous frame up until the next one loads (no empty flashes; no opacity-0 layer stacking).
 
 Weather alerts come from LibreWXR (NWS/WMO CAP near the station), merged with any
 active OpenWeather alerts. The homepage shows a compact bar (indicator, title,
@@ -43,12 +42,11 @@ Only **one** site is active at a time (never stacked). Selecting the active site
 
 Site markers on the map mirror the chip control: click a marker to toggle that overlay.
 
-Single-site Level III uses a client-side rain palette (light green → white). Snow blues are LibreWXR composite-only (reflectivity products do not encode precip type).
+Single-site Level III uses a client-side NWS-style reflectivity palette (−30 → 75 dBZ; ND transparent). Snow blues on the composite come from LibreWXR (`smooth_snow`); Level III reflectivity products do not encode precip type.
 
 ## Animation
 
 - **LibreWXR precip:** past frames from `/public/weather-maps.json`, plus nowcast when present. Metadata refreshes every ~3 minutes.
-- **LibreWXR cloud:** GMGSI infrared satellite frames from LibreWXR metadata (frame count varies; often only a couple of recent hours).
 - **Single site:** Unidata Level III objects from `https://unidata-nexrad-level3.s3.amazonaws.com` (`{SECTOR}_{PRODUCT}_{YYYY}_{MM}_{DD}_{HH}_{MI}_{SS}`), decoded in-browser and drawn as Leaflet image overlays (**1800×1800** on desktop, **900×900** on coarse/narrow viewports). Tilt selector (site-only): `0.5°` → `N0B`, `1.0°` → `NAB` (~0.9°), `1.5°` → `N1B`. Level III data loads on demand when a site is selected (or when a non-default tilt is chosen for that site) — not on initial composite load.
 
 Playback controls: play/pause + timestamp (Pacific time). Past frames are prefixed with `Past ·`; nowcast frames with `Future ·`. Default is autoplay.
@@ -125,6 +123,6 @@ CI runs `yarn test:js` in the unit-test job and `yarn build` / `yarn build:css` 
 
 Required attributions are shown in the slim footer and Leaflet attribution control:
 
-- Radar & satellite © [LibreWXR](https://librewxr.net/) (MRMS/NOAA, HRRR/NWP)
+- Radar © [LibreWXR](https://librewxr.net/) (MRMS/NOAA, HRRR/NWP)
 - Single-site NEXRAD / [Unidata](https://registry.opendata.aws/noaa-nexrad/)
 - Map © [OpenStreetMap](https://www.openstreetmap.org/copyright) © [CARTO](https://carto.com/attributions)

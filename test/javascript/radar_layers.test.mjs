@@ -11,7 +11,6 @@ import {
   resolveLibreWxrTileHost,
   librewxrMetadataUrl,
   buildLibreWxrRadarFrames,
-  buildLibreWxrSatelliteFrames,
   resolvePreservedFrameIndex,
   boundsForRadius,
   ridgeProductForTilt,
@@ -107,39 +106,6 @@ describe("buildLibreWxrRadarFrames", () => {
       frames[0].urlTemplate,
       "https://radar.example.com/v2/radar/1784601600/256/{z}/{x}/{y}/6/1_1.png",
     )
-  })
-})
-
-describe("buildLibreWxrSatelliteFrames", () => {
-  it("builds GMGSI satellite tile templates", () => {
-    const frames = buildLibreWxrSatelliteFrames({
-      host: "https://api.librewxr.net",
-      satellite: {
-        infrared: [{ time: 1784725200, path: "/v2/satellite/1784725200" }],
-      },
-    })
-
-    assert.equal(frames.length, 1)
-    assert.equal(frames[0].kind, "librewxr-satellite")
-    assert.match(frames[0].label, /^Past · /)
-    assert.equal(
-      frames[0].urlTemplate,
-      "https://api.librewxr.net/v2/satellite/1784725200/256/{z}/{x}/{y}/0/0_0.png",
-    )
-  })
-
-  it("uses configured tileHost for satellite tiles", () => {
-    const frames = buildLibreWxrSatelliteFrames(
-      {
-        host: "https://api.librewxr.net",
-        satellite: {
-          infrared: [{ time: 1784725200, path: "/v2/satellite/1784725200" }],
-        },
-      },
-      { tileHost: "https://radar.example.com" },
-    )
-
-    assert.match(frames[0].urlTemplate, /^https:\/\/radar\.example\.com\//)
   })
 })
 

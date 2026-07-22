@@ -14,7 +14,6 @@ import {
   RIDGE_TILTS,
   librewxrMetadataUrl,
   buildLibreWxrRadarFrames,
-  buildLibreWxrSatelliteFrames,
   resolvePreservedFrameIndex,
   ridgeProductForTilt,
   tileUrlsForViewport,
@@ -23,7 +22,7 @@ import {
 import { boundsForRadar, buildLevel3Frames } from "./helpers/level3_frames"
 import { shouldLimitRadarMemory } from "./helpers/level3_utils"
 
-// Full-viewport radar map: LibreWXR composite (precip / cloud / nowcast),
+// Full-viewport radar map: LibreWXR composite precip (+ nowcast),
 // single-site Unidata Level III tilts (KATX/KRTX/KLGX).
 export default class extends Controller {
   static targets = [
@@ -36,8 +35,6 @@ export default class extends Controller {
     "siteChip",
     "tiltControls",
     "tiltChip",
-    "layerControls",
-    "layerChip",
   ]
 
   static values = {
@@ -52,7 +49,6 @@ export default class extends Controller {
     this.frameIndex = 0
     this.selectedSiteId = null
     this.selectedTilt = "0.5"
-    this.compositeLayer = "precip" // precip | cloud
     this.frames = []
     this.tileLayers = []
     this.siteMarkers = new Map()
@@ -60,7 +56,6 @@ export default class extends Controller {
     this.metadataTimer = null
     this.activeMode = null
     this.activeProduct = null
-    this.activeCompositeLayer = null
     this.librewxrCache = null
     this.librewxrCacheAt = 0
     this.librewxrFetchPromise = null
@@ -186,7 +181,6 @@ export default class extends Controller {
   }
 
   async bootstrap() {
-    this.updateLayerUi()
     // Level III single-site data loads on demand when a site (or non-default
     // tilt for a selected site) is chosen — not on initial composite load.
     await this.syncMode({ force: true })
@@ -214,7 +208,6 @@ export default class extends Controller {
       this.selectedSiteId = siteId || null
     }
     this.updateSiteUi()
-    this.updateLayerUi()
     this.syncMode({ force: true })
   }
 
@@ -224,14 +217,6 @@ export default class extends Controller {
     this.selectedTilt = tilt
     this.updateTiltUi()
     if (this.selectedSiteId) this.syncMode({ force: true })
-  }
-
-  selectLayer(event) {
-    const layer = event.currentTarget.dataset.layer
-    if (!layer || layer === this.compositeLayer || this.selectedSiteId) return
-    this.compositeLayer = layer
-    this.updateLayerUi()
-    this.syncMode({ force: true })
   }
 
   // --- Mode / frames --------------------------------------------------------
@@ -248,12 +233,10 @@ export default class extends Controller {
   async syncMode({ force = false, preserveFrame = false } = {}) {
     const mode = this.resolveMode()
     const product = mode === "ridge" ? this.ridgeProduct() : null
-    const compositeLayer = mode === "librewxr" ? this.compositeLayer : null
     if (
       !force &&
       mode === this.activeMode &&
       product === this.activeProduct &&
-      compositeLayer === this.activeCompositeLayer &&
       this.frames.length > 0
     ) {
       return
@@ -300,7 +283,6 @@ export default class extends Controller {
         if (!site) {
           this.selectedSiteId = null
           this.updateSiteUi()
-          this.updateLayerUi()
           return this.syncMode({ force: true })
         }
         frames = await this.loadRidgeFrames(site, product)
@@ -317,10 +299,7 @@ export default class extends Controller {
         this.frames = []
         this.activeMode = null
         this.activeProduct = null
-        this.activeCompositeLayer = null
-        let message = "No frames"
-        if (mode === "ridge") message = `No frames for ${this.selectedTilt}°`
-        else if (this.compositeLayer === "cloud") message = "Cloud unavailable"
+        const message = mode === "ridge" ? `No frames for ${this.selectedTilt}°` : "No frames"
         this.setTimestamp(message)
         return
       }
@@ -332,7 +311,6 @@ export default class extends Controller {
           generation,
           mode,
           product,
-          compositeLayer,
           previousLayers,
         }
         return
@@ -342,7 +320,6 @@ export default class extends Controller {
         frames,
         mode,
         product,
-        compositeLayer,
         previousLayers,
         preserve: canPreserve,
         generation,
@@ -357,14 +334,9 @@ export default class extends Controller {
       }
       this.activeMode = null
       this.activeProduct = null
-      this.activeCompositeLayer = null
       this.frames = []
       this.clearRadarLayers()
-      this.setTimestamp(
-        this.compositeLayer === "cloud" && mode === "librewxr"
-          ? "Cloud unavailable"
-          : "Radar unavailable",
-      )
+      this.setTimestamp("Radar unavailable")
     }
   }
 
@@ -379,7 +351,6 @@ export default class extends Controller {
     frames,
     mode,
     product,
-    compositeLayer,
     previousLayers,
     preserve,
     generation = this.syncGeneration,
@@ -388,7 +359,7 @@ export default class extends Controller {
 
     this.stopTimer()
     // Invalidate any in-flight reveal; must clear revealingFrame or playback
-    // stays stuck after precip↔cloud (and play/pause cannot recover).
+    // stays stuck after a mode swap (and play/pause cannot recover).
     this.cancelPendingFrameReveal()
     this.warmingFrames = false
     // Capture before replacing this.frames (quiet refresh keeps old list until now).
@@ -396,7 +367,6 @@ export default class extends Controller {
     const nextLayers = frames.map((frame) => this.createFrameLayer(frame))
     this.activeMode = mode
     this.activeProduct = product
-    this.activeCompositeLayer = compositeLayer
     this.frames = frames
     this.tileLayers = nextLayers
     this.frameIndex = preserve
@@ -445,7 +415,6 @@ export default class extends Controller {
       frames: pending.frames,
       mode: pending.mode,
       product: pending.product,
-      compositeLayer: pending.compositeLayer,
       previousLayers: pending.previousLayers,
       preserve: true,
       generation: pending.generation,
@@ -622,13 +591,8 @@ export default class extends Controller {
 
   async loadLibreWxrFrames() {
     const api = await this.fetchLibreWxrMetadata()
-    const tileHost = this.librewxrHostValue
-    if (this.compositeLayer === "cloud") {
-      return buildLibreWxrSatelliteFrames(api, { tileHost })
-    }
-
     return buildLibreWxrRadarFrames(api, {
-      tileHost,
+      tileHost: this.librewxrHostValue,
       options: LIBREWXR_OPTIONS_SNOW,
       includeNowcast: true,
     })
@@ -847,7 +811,6 @@ export default class extends Controller {
           this.selectedSiteId = site.id
         }
         this.updateSiteUi()
-        this.updateLayerUi()
         this.syncMode({ force: true })
       })
 
@@ -871,7 +834,6 @@ export default class extends Controller {
     })
 
     this.updateTiltUi()
-    this.updateLayerUi()
   }
 
   updateTiltUi() {
@@ -884,22 +846,6 @@ export default class extends Controller {
         const active = chip.dataset.tilt === this.selectedTilt
         chip.classList.toggle("is-active", active)
         chip.setAttribute("aria-pressed", active ? "true" : "false")
-      })
-    }
-  }
-
-  updateLayerUi() {
-    const compositeActive = !this.selectedSiteId
-    if (this.hasLayerControlsTarget) {
-      this.layerControlsTarget.classList.toggle("hidden", !compositeActive)
-    }
-
-    if (this.hasLayerChipTarget) {
-      this.layerChipTargets.forEach((chip) => {
-        const active = compositeActive && chip.dataset.layer === this.compositeLayer
-        chip.classList.toggle("is-active", active)
-        chip.setAttribute("aria-pressed", active ? "true" : "false")
-        chip.disabled = !compositeActive
       })
     }
   }

@@ -79,14 +79,17 @@ describe("boundsForRadar", () => {
 })
 
 describe("dbzColor", () => {
-  it("skips weak returns and follows the rain ladder", () => {
-    assert.equal(dbzColor(4), null)
-    assert.equal(dbzColor(10), "rgba(144, 238, 144, 0.85)") // light green
-    assert.equal(dbzColor(30), "rgba(0, 100, 0, 0.85)") // dark green
-    assert.equal(dbzColor(42), "rgba(255, 140, 0, 0.85)") // orange
-    assert.equal(dbzColor(52), "rgba(140, 0, 0, 0.9)") // dark red
-    assert.equal(dbzColor(60), "rgba(160, 0, 200, 0.9)") // purple
-    assert.equal(dbzColor(70), "rgba(255, 255, 255, 0.95)") // white
+  it("maps the NWS reflectivity ladder and keeps ND transparent", () => {
+    assert.equal(dbzColor(null), null)
+    assert.equal(dbzColor(-31), null)
+    assert.equal(dbzColor(-30), "rgba(170, 210, 230, 0.75)") // VLGT pale cyan
+    assert.equal(dbzColor(5), "rgba(90, 235, 245, 0.85)") // LGT light cyan
+    assert.equal(dbzColor(20), "rgba(0, 255, 0, 0.85)") // lime green
+    assert.equal(dbzColor(35), "rgba(255, 255, 0, 0.85)") // MOD yellow
+    assert.equal(dbzColor(45), "rgba(255, 140, 0, 0.85)") // orange
+    assert.equal(dbzColor(60), "rgba(180, 0, 0, 0.9)") // deep red
+    assert.equal(dbzColor(70), "rgba(150, 0, 255, 0.95)") // HVY purple
+    assert.equal(dbzColor(80), "rgba(255, 255, 255, 0.95)") // white
   })
 })
 

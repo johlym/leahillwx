@@ -162,12 +162,12 @@ export function plotReflectivity(data, { size = LEVEL3_PLOT_SIZE } = {}) {
         sample = bin
       }
 
-      if (sample == null || sample < 5) continue
+      if (sample == null || !dbzColor(sample)) continue
       strokeDbzArc(ctx, sample, (idx + packet.firstBin) / scale, startAngle, endAngle)
     }
 
     // Downsampling only emits on remainder wrap; flush the final pooled bin.
-    if (scale !== 1 && maxDownsample >= 5) {
+    if (scale !== 1 && dbzColor(maxDownsample)) {
       strokeDbzArc(ctx, maxDownsample, (maxBin + packet.firstBin) / scale, startAngle, endAngle)
     }
   })
