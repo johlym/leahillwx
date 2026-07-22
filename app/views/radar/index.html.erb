@@ -14,13 +14,6 @@
   <div class="radar-map" data-radar-target="map" role="application" aria-label="Live weather radar map"></div>
 
   <div class="radar-controls" data-radar-target="controls">
-    <div
-      class="radar-alert-banner hidden"
-      data-radar-target="alertBanner"
-      role="status"
-      aria-live="polite"
-      hidden></div>
-
     <div class="radar-controls-playback" role="group" aria-label="Radar animation">
       <button
         type="button"
@@ -58,19 +51,6 @@
         aria-pressed="false">
         Cloud
       </button>
-    </div>
-
-    <div class="radar-controls-options" role="group" aria-label="Radar options">
-      <button
-        type="button"
-        class="radar-site-chip is-active"
-        data-radar-target="optionChip"
-        data-option="arrows"
-        data-action="click->radar#toggleOption"
-        aria-pressed="true"
-        title="Show storm motion arrows">
-        Arrows
-      </button>
       <button
         type="button"
         class="radar-site-chip is-active"
@@ -80,16 +60,6 @@
         aria-pressed="true"
         title="Color snow separately from rain">
         Snow
-      </button>
-      <button
-        type="button"
-        class="radar-site-chip is-active"
-        data-radar-target="optionChip"
-        data-option="alerts"
-        data-action="click->radar#toggleOption"
-        aria-pressed="true"
-        title="Show weather alerts">
-        Alerts
       </button>
     </div>
 

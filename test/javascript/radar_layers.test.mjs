@@ -10,14 +10,11 @@ import {
   normalizeLibreWxrHost,
   resolveLibreWxrTileHost,
   librewxrMetadataUrl,
-  librewxrAlertsUrl,
   buildLibreWxrRadarFrames,
   buildLibreWxrSatelliteFrames,
   resolvePreservedFrameIndex,
   boundsForRadius,
   ridgeProductForTilt,
-  alertPathStyle,
-  alertPopupHtml,
 } from "../../app/javascript/controllers/helpers/radar_layers.js"
 
 describe("ridgeProductForTilt", () => {
@@ -46,21 +43,10 @@ describe("LibreWXR URL helpers", () => {
       "https://radar.example.com/public/weather-maps.json",
     )
   })
-
-  it("builds alerts URLs for point and bbox queries", () => {
-    assert.equal(
-      librewxrAlertsUrl(LIBREWXR_DEFAULT_HOST, { lat: 47.3, lon: -122.2 }),
-      "https://api.librewxr.net/v2/alerts?lat=47.3&lon=-122.2",
-    )
-    assert.equal(
-      librewxrAlertsUrl(LIBREWXR_DEFAULT_HOST, { bbox: "-123,46,-121,48" }),
-      "https://api.librewxr.net/v2/alerts?bbox=-123%2C46%2C-121%2C48",
-    )
-  })
 })
 
 describe("buildLibreWxrRadarFrames", () => {
-  it("builds past and nowcast tile URL templates with snow and arrows", () => {
+  it("builds past and nowcast tile URL templates with snow colors", () => {
     const frames = buildLibreWxrRadarFrames({
       host: "https://api.librewxr.net",
       radar: {
@@ -74,14 +60,15 @@ describe("buildLibreWxrRadarFrames", () => {
     assert.equal(frames[0].isNowcast, false)
     assert.equal(
       frames[0].urlTemplate,
-      `https://api.librewxr.net/v2/radar/1784601600/256/{z}/{x}/{y}/${LIBREWXR_COLOR_SCHEME}/${LIBREWXR_OPTIONS_SNOW}.png?arrows=light`,
+      `https://api.librewxr.net/v2/radar/1784601600/256/{z}/{x}/{y}/${LIBREWXR_COLOR_SCHEME}/${LIBREWXR_OPTIONS_SNOW}.png`,
     )
     assert.equal(frames[1].isNowcast, true)
     assert.match(frames[1].label, /^Nowcast · /)
     assert.match(frames[1].urlTemplate, /1784602200/)
+    assert.doesNotMatch(frames[0].urlTemplate, /arrows=/)
   })
 
-  it("omits nowcast and arrows when disabled", () => {
+  it("omits nowcast when disabled", () => {
     const frames = buildLibreWxrRadarFrames(
       {
         host: "https://api.librewxr.net",
@@ -90,7 +77,7 @@ describe("buildLibreWxrRadarFrames", () => {
           nowcast: [{ time: 1784602200, path: "/v2/radar/1784602200" }],
         },
       },
-      { includeNowcast: false, arrows: null, options: "1_0" },
+      { includeNowcast: false, options: "1_0" },
     )
 
     assert.equal(frames.length, 1)
@@ -111,7 +98,7 @@ describe("buildLibreWxrRadarFrames", () => {
         host: "https://api.librewxr.net",
         radar: { past: [{ time: 1784601600, path: "/v2/radar/1784601600" }] },
       },
-      { tileHost: "https://radar.example.com/", arrows: null },
+      { tileHost: "https://radar.example.com/" },
     )
 
     assert.equal(
@@ -192,22 +179,6 @@ describe("resolvePreservedFrameIndex", () => {
       }),
       3,
     )
-  })
-})
-
-describe("alert helpers", () => {
-  it("styles severities and escapes popup HTML", () => {
-    assert.equal(alertPathStyle("Extreme").color, "#f43f5e")
-    assert.equal(alertPathStyle("Moderate").color, "#eab308")
-    const html = alertPopupHtml({
-      title: 'Heat <Advisory>',
-      severity: "Moderate",
-      description: "Stay cool & hydrated",
-      expires: 1784759400,
-    })
-    assert.match(html, /Heat &lt;Advisory&gt;/)
-    assert.match(html, /Stay cool &amp; hydrated/)
-    assert.match(html, /Severity: Moderate/)
   })
 })
 

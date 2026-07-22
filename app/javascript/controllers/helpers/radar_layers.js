@@ -7,7 +7,6 @@ export const LIBREWXR_OPTIONS_SNOW = "1_1"
 export const LIBREWXR_OPTIONS_NOSNOW = "1_0"
 export const LIBREWXR_MAX_NATIVE_ZOOM = 12
 export const LIBREWXR_METADATA_TTL_MS = 3 * 60 * 1000
-export const LIBREWXR_ALERTS_TTL_MS = 5 * 60 * 1000
 
 /** Default RIDGE product: super-res base reflectivity at ~0.5°. */
 export const RIDGE_PRODUCT = "N0B"
@@ -54,18 +53,6 @@ export function librewxrMetadataUrl(base = LIBREWXR_DEFAULT_HOST) {
   return `${normalizeLibreWxrHost(base)}/public/weather-maps.json`
 }
 
-export function librewxrAlertsUrl(base, { lat, lon, bbox } = {}) {
-  const host = normalizeLibreWxrHost(base)
-  const url = new URL(`${host}/v2/alerts`)
-  if (bbox) {
-    url.searchParams.set("bbox", bbox)
-  } else if (lat != null && lon != null) {
-    url.searchParams.set("lat", String(lat))
-    url.searchParams.set("lon", String(lon))
-  }
-  return url.toString()
-}
-
 /**
  * Prefer the app-configured LibreWXR origin for tile URLs so custom hosts
  * are not overridden by the `host` field inside weather-maps.json.
@@ -84,7 +71,6 @@ export function buildLibreWxrRadarFrames(
     size = 256,
     color = LIBREWXR_COLOR_SCHEME,
     options = LIBREWXR_OPTIONS_SNOW,
-    arrows = "light",
     includeNowcast = true,
     tileHost,
   } = {},
@@ -92,7 +78,6 @@ export function buildLibreWxrRadarFrames(
   const host = resolveLibreWxrTileHost(api, tileHost)
   const past = api.radar?.past || []
   const nowcast = includeNowcast ? api.radar?.nowcast || [] : []
-  const arrowQs = arrows ? `?arrows=${encodeURIComponent(arrows)}` : ""
 
   const toFrame = (frame, isNowcast) => {
     const time = new Date(frame.time * 1000)
@@ -100,7 +85,7 @@ export function buildLibreWxrRadarFrames(
     return {
       id: `lw-${isNowcast ? "nc" : "past"}-${frame.time}`,
       label: isNowcast ? `Nowcast · ${timeLabel}` : timeLabel,
-      urlTemplate: `${host}${frame.path}/${size}/{z}/{x}/{y}/${color}/${options}.png${arrowQs}`,
+      urlTemplate: `${host}${frame.path}/${size}/{z}/{x}/{y}/${color}/${options}.png`,
       time,
       kind: "librewxr",
       isNowcast,
@@ -180,43 +165,4 @@ export function formatFrameTime(date) {
   } catch {
     return date.toISOString()
   }
-}
-
-/** Severity → Leaflet path style for alert polygons. */
-export function alertPathStyle(severity) {
-  const key = String(severity || "").toLowerCase()
-  if (key === "extreme") {
-    return { color: "#f43f5e", fillColor: "#f43f5e", fillOpacity: 0.22, weight: 2 }
-  }
-  if (key === "severe") {
-    return { color: "#f97316", fillColor: "#f97316", fillOpacity: 0.2, weight: 2 }
-  }
-  if (key === "moderate") {
-    return { color: "#eab308", fillColor: "#eab308", fillOpacity: 0.18, weight: 2 }
-  }
-  return { color: "#38bdf8", fillColor: "#38bdf8", fillOpacity: 0.15, weight: 1.5 }
-}
-
-export function alertPopupHtml(properties = {}) {
-  const title = escapeHtml(properties.title || properties.event || "Weather alert")
-  const severity = escapeHtml(properties.severity || "Unknown")
-  const description = escapeHtml(properties.description || "").replace(/\n/g, "<br>")
-  const expires = properties.expires
-    ? escapeHtml(formatFrameTime(new Date(properties.expires * 1000)))
-    : null
-  const parts = [
-    `<strong>${title}</strong>`,
-    `<div class="radar-alert-meta">Severity: ${severity}</div>`,
-  ]
-  if (expires) parts.push(`<div class="radar-alert-meta">Expires: ${expires}</div>`)
-  if (description) parts.push(`<div class="radar-alert-body">${description}</div>`)
-  return parts.join("")
-}
-
-function escapeHtml(value) {
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
 }

@@ -91,29 +91,3 @@
   height: 30px !important;
   font-size: 22px !important;
 }
-
-.radar-map .radar-alert-popup .leaflet-popup-content-wrapper {
-  background: color-mix(in oklab, var(--color-bg) 94%, transparent);
-  color: var(--color-text-strong);
-  border: 1px solid var(--color-border);
-  border-radius: 0.35rem;
-  box-shadow: none;
-}
-
-.radar-map .radar-alert-popup .leaflet-popup-tip {
-  background: color-mix(in oklab, var(--color-bg) 94%, transparent);
-}
-
-.radar-map .radar-alert-popup .radar-alert-meta {
-  margin-top: 0.35rem;
-  font-size: 0.7rem;
-  color: var(--color-muted);
-}
-
-.radar-map .radar-alert-popup .radar-alert-body {
-  margin-top: 0.5rem;
-  font-size: 0.75rem;
-  line-height: 1.35;
-  max-height: 12rem;
-  overflow: auto;
-}

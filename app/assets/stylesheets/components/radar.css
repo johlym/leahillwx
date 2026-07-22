@@ -73,26 +73,6 @@
   background: color-mix(in oklab, var(--color-bg) 88%, transparent);
 }
 
-@utility radar-controls-options {
-  @apply pointer-events-auto flex items-stretch gap-1 overflow-x-auto
-         overscroll-x-contain [-webkit-overflow-scrolling:touch]
-         rounded-[0.45rem] border border-border p-1
-         backdrop-blur-md w-fit max-w-full;
-  background: color-mix(in oklab, var(--color-bg) 88%, transparent);
-  scrollbar-width: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-}
-
-@utility radar-alert-banner {
-  @apply pointer-events-auto rounded-[0.45rem] border border-border
-         px-2.5 py-1.5 text-[0.7rem] sm:text-[0.75rem] leading-snug
-         text-text-strong backdrop-blur-md max-w-full truncate;
-  background: color-mix(in oklab, var(--color-accent) 18%, var(--color-bg));
-}
-
 @utility radar-controls-label {
   @apply shrink-0 px-1 text-[0.7rem] sm:text-[0.65rem] font-medium uppercase
          tracking-[0.06em] text-muted whitespace-nowrap;

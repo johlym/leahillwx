@@ -6,7 +6,6 @@ import {
   LIBREWXR_OPTIONS_NOSNOW,
   LIBREWXR_MAX_NATIVE_ZOOM,
   LIBREWXR_METADATA_TTL_MS,
-  LIBREWXR_ALERTS_TTL_MS,
   LIBREWXR_ATTR,
   CARTO_DARK_URL,
   CARTO_ATTR,
@@ -14,22 +13,18 @@ import {
   ESRI_ATTR,
   RIDGE_PRODUCT,
   RIDGE_TILTS,
-  normalizeLibreWxrHost,
   librewxrMetadataUrl,
-  librewxrAlertsUrl,
   buildLibreWxrRadarFrames,
   buildLibreWxrSatelliteFrames,
   resolvePreservedFrameIndex,
   boundsForRadius,
   ridgeProductForTilt,
-  alertPathStyle,
-  alertPopupHtml,
 } from "./helpers/radar_layers"
 import { boundsForRadar, buildLevel3Frames } from "./helpers/level3_frames"
 import { shouldLimitRadarMemory } from "./helpers/level3_utils"
 
 // Full-viewport radar map: LibreWXR composite (precip / cloud / nowcast),
-// single-site Unidata Level III tilts (KATX/KRTX/KLGX), alerts overlay.
+// single-site Unidata Level III tilts (KATX/KRTX/KLGX).
 export default class extends Controller {
   static targets = [
     "map",
@@ -44,7 +39,6 @@ export default class extends Controller {
     "layerControls",
     "layerChip",
     "optionChip",
-    "alertBanner",
   ]
 
   static values = {
@@ -60,15 +54,12 @@ export default class extends Controller {
     this.selectedSiteId = null
     this.selectedTilt = "0.5"
     this.compositeLayer = "precip" // precip | cloud
-    this.arrowsEnabled = true
     this.snowColorsEnabled = true
-    this.alertsEnabled = true
     this.frames = []
     this.tileLayers = []
     this.siteMarkers = new Map()
     this.timer = null
     this.metadataTimer = null
-    this.alertsTimer = null
     this.activeMode = null
     this.activeProduct = null
     this.activeCompositeLayer = null
@@ -78,9 +69,6 @@ export default class extends Controller {
     this.librewxrRefreshPromise = null
     this.pendingQuietRefresh = null
     this.zooming = false
-    this.alertsLayer = null
-    this.alertPointMarkers = []
-    this.alertsGeneration = 0
     // sector:product → { frames } | { promise } for Level III reuse across sites/tilts
     this.level3Cache = new Map()
     this.basemapErrors = 0
@@ -95,6 +83,8 @@ export default class extends Controller {
       maxZoom: this.mapMaxZoom,
       minZoom: 3,
       preferCanvas: true,
+      // Skip CSS fade on tile panes — cheaper while dragging/zooming.
+      fadeAnimation: false,
     })
 
     this.addBasemap()
@@ -117,8 +107,16 @@ export default class extends Controller {
       this.flushPendingQuietRefresh()
       if (this.playing) this.startTimer()
     }
+    this.onDragStart = () => {
+      this.stopTimer()
+    }
+    this.onDragEnd = () => {
+      if (this.playing && !this.zooming) this.startTimer()
+    }
     this.map.on("zoomstart", this.onZoomStart)
     this.map.on("zoomend", this.onZoomEnd)
+    this.map.on("dragstart", this.onDragStart)
+    this.map.on("dragend", this.onDragEnd)
 
     this.resizeObserver = new ResizeObserver(() => {
       if (this.map) this.map.invalidateSize({ animate: false })
@@ -134,14 +132,11 @@ export default class extends Controller {
 
   disconnect() {
     this.syncGeneration += 1
-    this.alertsGeneration += 1
     this.pendingQuietRefresh = null
     this.zooming = false
     this.stopTimer()
     this.stopMetadataRefresh()
-    this.stopAlertsRefresh()
     this.clearRadarLayers()
-    this.clearAlertsOverlay()
     this.disposeLevel3Cache()
     if (this.resizeObserver) {
       this.resizeObserver.disconnect()
@@ -150,6 +145,8 @@ export default class extends Controller {
     if (this.map) {
       this.map.off("zoomstart", this.onZoomStart)
       this.map.off("zoomend", this.onZoomEnd)
+      this.map.off("dragstart", this.onDragStart)
+      this.map.off("dragend", this.onDragEnd)
       this.map.remove()
       this.map = null
     }
@@ -160,7 +157,8 @@ export default class extends Controller {
     this.basemap = L.tileLayer(CARTO_DARK_URL, {
       attribution: CARTO_ATTR,
       maxZoom: this.mapMaxZoom,
-      keepBuffer: this.limitMemory ? 1 : 2,
+      keepBuffer: 1,
+      updateWhenIdle: true,
       updateWhenZooming: false,
       crossOrigin: true,
     })
@@ -174,7 +172,8 @@ export default class extends Controller {
         L.tileLayer(ESRI_DARK_URL, {
           attribution: ESRI_ATTR,
           maxZoom: this.mapMaxZoom,
-          keepBuffer: this.limitMemory ? 1 : 2,
+          keepBuffer: 1,
+          updateWhenIdle: true,
           updateWhenZooming: false,
           crossOrigin: true,
         }).addTo(this.map)
@@ -192,8 +191,6 @@ export default class extends Controller {
     if (!this.limitMemory) this.prefetchAllRidgeFrames()
     await this.syncMode({ force: true })
     this.startMetadataRefresh()
-    this.syncAlerts()
-    this.startAlertsRefresh()
   }
 
   // --- UI actions -----------------------------------------------------------
@@ -240,32 +237,12 @@ export default class extends Controller {
 
   toggleOption(event) {
     const option = event.currentTarget.dataset.option
-    if (!option) return
+    if (option !== "snow") return
+    if (this.selectedSiteId || this.compositeLayer !== "precip") return
 
-    if (option === "arrows") {
-      if (this.selectedSiteId || this.compositeLayer !== "precip") return
-      this.arrowsEnabled = !this.arrowsEnabled
-    } else if (option === "snow") {
-      if (this.selectedSiteId || this.compositeLayer !== "precip") return
-      this.snowColorsEnabled = !this.snowColorsEnabled
-    } else if (option === "alerts") {
-      this.alertsEnabled = !this.alertsEnabled
-      this.updateOptionUi()
-      if (this.alertsEnabled) {
-        this.syncAlerts({ force: true })
-      } else {
-        // Invalidate in-flight fetches so a late response cannot re-render.
-        this.alertsGeneration += 1
-        this.clearAlertsOverlay()
-        this.clearAlertBanner()
-      }
-      return
-    } else {
-      return
-    }
-
+    this.snowColorsEnabled = !this.snowColorsEnabled
     this.updateOptionUi()
-    if (!this.selectedSiteId) this.syncMode({ force: true })
+    this.syncMode({ force: true })
   }
 
   // --- Mode / frames --------------------------------------------------------
@@ -575,7 +552,6 @@ export default class extends Controller {
     return buildLibreWxrRadarFrames(api, {
       tileHost,
       options: this.snowColorsEnabled ? LIBREWXR_OPTIONS_SNOW : LIBREWXR_OPTIONS_NOSNOW,
-      arrows: this.arrowsEnabled ? "light" : null,
       includeNowcast: true,
     })
   }
@@ -631,9 +607,8 @@ export default class extends Controller {
       opacity: 0,
       zIndex: 200,
       maxZoom: this.mapMaxZoom,
-      // Opacity-0 layers used to stay mounted and still fetch tiles; keepBuffer
-      // low so a stray mount cannot balloon RAM on mobile.
-      keepBuffer: this.limitMemory ? 0 : 1,
+      // Only the active frame is mounted; keep the tile buffer tiny for drag/zoom.
+      keepBuffer: 0,
       updateWhenIdle: true,
       updateWhenZooming: false,
       maxNativeZoom: LIBREWXR_MAX_NATIVE_ZOOM,
@@ -659,11 +634,9 @@ export default class extends Controller {
     const nextLayer = this.tileLayers[nextIndex]
     const prevLayer = this.tileLayers[this.frameIndex]
 
-    // Tile layers (LibreWXR): keep mounted and opacity-toggle.
-    // Detaching each frame forces Leaflet to re-fetch tiles every 500ms and
-    // flickers the composite loop. Level III on memory-limited clients still
-    // mounts only the active imageOverlay — many 900–1800px canvases at once
-    // OOMs mobile Safari when zoomed in.
+    // Mount only the active frame. Keeping every LibreWXR tile layer at
+    // opacity 0 still fetches/paints tiles and makes drag/zoom feel stuck.
+    // Level III desktop can opacity-toggle decoded image overlays cheaply.
     if (this.mountOnlyActiveFrame()) {
       if (nextLayer) {
         if (!this.map.hasLayer(nextLayer)) nextLayer.addTo(this.map)
@@ -688,6 +661,7 @@ export default class extends Controller {
   }
 
   mountOnlyActiveFrame() {
+    if (this.activeMode === "librewxr") return true
     return this.limitMemory && this.activeMode === "ridge"
   }
 
@@ -706,124 +680,6 @@ export default class extends Controller {
       window.clearInterval(this.timer)
       this.timer = null
     }
-  }
-
-  // --- Alerts ---------------------------------------------------------------
-
-  startAlertsRefresh() {
-    this.stopAlertsRefresh()
-    this.alertsTimer = window.setInterval(() => {
-      if (this.alertsEnabled) void this.syncAlerts({ force: true })
-    }, LIBREWXR_ALERTS_TTL_MS)
-  }
-
-  stopAlertsRefresh() {
-    if (this.alertsTimer) {
-      window.clearInterval(this.alertsTimer)
-      this.alertsTimer = null
-    }
-  }
-
-  async syncAlerts({ force = false } = {}) {
-    if (!this.alertsEnabled || !this.map) return
-    if (!force && this.alertsFetchedAt && Date.now() - this.alertsFetchedAt < LIBREWXR_ALERTS_TTL_MS) {
-      return
-    }
-
-    const generation = ++this.alertsGeneration
-    try {
-      const host = normalizeLibreWxrHost(this.librewxrHostValue)
-      const response = await fetch(
-        librewxrAlertsUrl(host, { lat: this.latValue, lon: this.lonValue }),
-      )
-      if (!response.ok) throw new Error(`LibreWXR alerts HTTP ${response.status}`)
-      const collection = await response.json()
-      // Drop stale responses when a newer fetch (or alerts-off) won the race.
-      if (generation !== this.alertsGeneration || !this.alertsEnabled || !this.map) return
-      this.alertsFetchedAt = Date.now()
-      this.renderAlerts(collection)
-    } catch (error) {
-      if (generation !== this.alertsGeneration) return
-      console.warn("LibreWXR alerts failed", error)
-    }
-  }
-
-  renderAlerts(collection) {
-    this.clearAlertsOverlay()
-    if (!this.alertsEnabled || !this.map) return
-
-    const features = Array.isArray(collection?.features) ? collection.features : []
-    const withGeometry = features.filter((feature) => feature?.geometry)
-    const withoutGeometry = features.filter((feature) => feature && !feature.geometry)
-
-    if (withGeometry.length > 0) {
-      this.alertsLayer = L.geoJSON(
-        { type: "FeatureCollection", features: withGeometry },
-        {
-          style: (feature) => alertPathStyle(feature?.properties?.severity),
-          onEachFeature: (feature, layer) => {
-            layer.bindPopup(alertPopupHtml(feature.properties || {}), {
-              maxWidth: 320,
-              className: "radar-alert-popup",
-            })
-          },
-        },
-      ).addTo(this.map)
-    }
-
-    withoutGeometry.forEach((feature, index) => {
-      const marker = L.circleMarker([this.latValue, this.lonValue], {
-        radius: 8 + index,
-        color: alertPathStyle(feature.properties?.severity).color,
-        fillColor: alertPathStyle(feature.properties?.severity).fillColor,
-        fillOpacity: 0.55,
-        weight: 2,
-        className: "radar-alert-point",
-      })
-        .addTo(this.map)
-        .bindPopup(alertPopupHtml(feature.properties || {}), {
-          maxWidth: 320,
-          className: "radar-alert-popup",
-        })
-      this.alertPointMarkers.push(marker)
-    })
-
-    this.updateAlertBanner(features)
-  }
-
-  updateAlertBanner(features) {
-    if (!this.hasAlertBannerTarget) return
-    if (!this.alertsEnabled || features.length === 0) {
-      this.clearAlertBanner()
-      return
-    }
-
-    const titles = features
-      .map((feature) => feature.properties?.title || feature.properties?.event)
-      .filter(Boolean)
-    const first = titles[0] || "Weather alert"
-    const extra = titles.length > 1 ? ` (+${titles.length - 1} more)` : ""
-    this.alertBannerTarget.textContent = `${first}${extra}`
-    this.alertBannerTarget.classList.remove("hidden")
-    this.alertBannerTarget.hidden = false
-  }
-
-  clearAlertBanner() {
-    if (!this.hasAlertBannerTarget) return
-    this.alertBannerTarget.textContent = ""
-    this.alertBannerTarget.classList.add("hidden")
-    this.alertBannerTarget.hidden = true
-  }
-
-  clearAlertsOverlay() {
-    if (this.alertsLayer && this.map) {
-      this.map.removeLayer(this.alertsLayer)
-    }
-    this.alertsLayer = null
-    this.alertPointMarkers.forEach((marker) => {
-      if (this.map && this.map.hasLayer(marker)) this.map.removeLayer(marker)
-    })
-    this.alertPointMarkers = []
   }
 
   // --- Markers / chrome -----------------------------------------------------
@@ -911,22 +767,11 @@ export default class extends Controller {
     if (this.hasOptionChipTarget) {
       this.optionChipTargets.forEach((chip) => {
         const option = chip.dataset.option
-        let active = false
-        let enabled = true
+        const enabled = precipComposite && option === "snow"
+        const active = enabled && this.snowColorsEnabled
 
-        if (option === "arrows") {
-          active = this.arrowsEnabled
-          enabled = precipComposite
-        } else if (option === "snow") {
-          active = this.snowColorsEnabled
-          enabled = precipComposite
-        } else if (option === "alerts") {
-          active = this.alertsEnabled
-          enabled = true
-        }
-
-        chip.classList.toggle("is-active", active && enabled)
-        chip.setAttribute("aria-pressed", active && enabled ? "true" : "false")
+        chip.classList.toggle("is-active", active)
+        chip.setAttribute("aria-pressed", active ? "true" : "false")
         chip.disabled = !enabled
         chip.classList.toggle("is-disabled", !enabled)
       })

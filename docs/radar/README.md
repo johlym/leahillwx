@@ -23,10 +23,11 @@ Composite tiles come from `LIBREWXR_API_BASE` (default `https://api.librewxr.net
 
 - **Nowcast:** `radar.nowcast` frames appended after past radar (up to ~60 minutes when available)
 - **Snow colors:** `smooth_snow = 1_1` by default (per-pixel rain/snow); toggleable via **Snow**
-- **Motion arrows:** `?arrows=light` on precip tiles (dark basemap); toggleable via **Arrows**
-- **Weather alerts:** `/v2/alerts?lat=&lon=` GeoJSON overlay + banner; toggleable via **Alerts**
 - **Regional NWP:** server-side in LibreWXR (HRRR over CONUS, etc.) — no client work beyond attribution
 - **Color scheme:** LibreWXR scheme `6` (NEXRAD Level III), closest built-in match to the site rain ladder
+- **Performance:** only the active radar/satellite frame is mounted (opacity-0 tile layers still fetch tiles and hurt drag/zoom)
+
+Weather alerts from OpenWeather are shown on the homepage, not on `/radar`.
 
 ### Local NEXRAD sites
 

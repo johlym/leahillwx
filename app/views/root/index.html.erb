@@ -1,5 +1,7 @@
 <%= turbo_stream_from "weather_measurements" %>
 
+<%= render Home::Forecast::AlertsBarComponent.new(alerts: @forecast&.alerts) %>
+
 <%= render Home::CurrentWeather::ConditionsComponent.new(
   current: @current,
   almanac: @almanac,
