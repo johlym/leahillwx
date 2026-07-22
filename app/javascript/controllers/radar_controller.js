@@ -503,6 +503,9 @@ export default class extends Controller {
     if (this.resolveMode() !== "librewxr") return
     try {
       await this.fetchLibreWxrMetadata({ force: true })
+      // User may have switched to a single-site tilt while metadata was in flight.
+      // Do not force syncMode in ridge mode — that tears down Level III playback.
+      if (!this.map || this.resolveMode() !== "librewxr" || this.selectedSiteId) return
       await this.syncMode({ force: true, preserveFrame: true })
     } catch (error) {
       console.warn("LibreWXR metadata refresh failed", error)
