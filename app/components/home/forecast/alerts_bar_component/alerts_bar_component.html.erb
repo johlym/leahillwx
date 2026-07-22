@@ -1,17 +1,11 @@
-<section class="forecast-alerts-bar" aria-label="Weather alerts" role="region">
+<%= link_to alerts_path,
+            class: "forecast-alerts-bar",
+            aria: { label: "View all weather alerts" } do %>
   <div class="forecast-alerts-bar-inner">
-    <span class="forecast-alerts-bar-label">Alert</span>
-    <div class="forecast-alerts-bar-body">
-      <p class="forecast-alerts-bar-event"><%= event_label(primary_alert) %></p>
-      <% if ends_label(primary_alert) %>
-        <p class="forecast-alerts-bar-meta">Until <%= ends_label(primary_alert) %></p>
-      <% end %>
-      <% if primary_alert.description.present? %>
-        <p class="forecast-alerts-bar-desc"><%= truncate(primary_alert.description, length: 220) %></p>
-      <% end %>
-      <% if extra_count.positive? %>
-        <p class="forecast-alerts-bar-more">+<%= extra_count %> more active <%= "alert".pluralize(extra_count) %></p>
-      <% end %>
-    </div>
+    <span class="forecast-alerts-bar-label"><%= indicator_label %></span>
+    <span class="forecast-alerts-bar-event"><%= event_label(primary_alert) %></span>
+    <% if ends_label(primary_alert) %>
+      <span class="forecast-alerts-bar-meta">Until <%= ends_label(primary_alert) %></span>
+    <% end %>
   </div>
-</section>
+<% end %>

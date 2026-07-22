@@ -30,7 +30,9 @@ class RootControllerTest < ActionDispatch::IntegrationTest
     ]) do
       get root_url
       assert_response :success
-      assert_select ".forecast-alerts-bar", text: /Heat Advisory/
+      assert_select "a.forecast-alerts-bar[href='#{alerts_path}']", text: /Heat Advisory/
+    assert_select "a.forecast-alerts-bar", text: /Until/
+    assert_select "a.forecast-alerts-bar", text: /Hot conditions/, count: 0
     end
   end
 

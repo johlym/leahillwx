@@ -17,7 +17,7 @@ class Home::Forecast::AlertsBarComponentTest < ViewComponent::TestCase
     assert_no_text "Heat Advisory"
   end
 
-  test "renders active alert event and until time" do
+  test "renders compact bar with indicator, title, and expiry linking to alerts" do
     alert = ForecastParser::ForecastAlert.new(
       sender_name: "NWS Seattle",
       event: "Heat Advisory",
@@ -30,11 +30,12 @@ class Home::Forecast::AlertsBarComponentTest < ViewComponent::TestCase
     render_inline(Home::Forecast::AlertsBarComponent.new(alerts: [ alert ]))
     assert_text "Alert"
     assert_text "Heat Advisory"
-    assert_text "Hot conditions expected"
     assert_text(/Until/i)
+    assert_no_text "Hot conditions expected"
+    assert_selector "a.forecast-alerts-bar[href='/alerts']"
   end
 
-  test "mentions additional active alerts" do
+  test "shows alert count in indicator when multiple are active" do
     alerts = [
       ForecastParser::ForecastAlert.new(
         sender_name: "NWS",
@@ -55,6 +56,8 @@ class Home::Forecast::AlertsBarComponentTest < ViewComponent::TestCase
     ]
 
     render_inline(Home::Forecast::AlertsBarComponent.new(alerts: alerts))
-    assert_text "+1 more active alert"
+    assert_text "2 Alerts"
+    assert_text "Heat Advisory"
+    assert_no_text "+1 more"
   end
 end

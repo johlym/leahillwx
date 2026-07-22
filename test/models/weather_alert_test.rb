@@ -9,17 +9,26 @@ class WeatherAlertTest < ActiveSupport::TestCase
         "title" => "Heat Advisory issued July 22 at 3:12PM PDT until July 22 at 11:00PM PDT by NWS Seattle WA",
         "description" => "Hot conditions expected.",
         "time" => 1.hour.ago.to_i,
-        "expires" => 2.hours.from_now.to_i
+        "expires" => 2.hours.from_now.to_i,
+        "severity" => "Moderate",
+        "regions" => [ "City of Seattle; Eastside" ],
+        "uri" => "urn:oid:example"
       }
     }
 
     alert = WeatherAlert.from_librewxr(feature)
     assert_equal "Heat Advisory", alert.event
+    assert_match(/Heat Advisory issued/, alert.title)
     assert_equal "Hot conditions expected.", alert.description
     assert_equal "librewxr", alert.source
+    assert_equal "Moderate", alert.severity
+    assert_equal [ "City of Seattle", "Eastside" ], alert.regions
+    assert_equal "urn:oid:example", alert.uri
     assert alert.active?
     assert_equal alert.ends_at, alert.end_time
   end
+
+
 
   test "active? is false after expiry" do
     alert = WeatherAlert.new(
@@ -57,7 +66,7 @@ class WeatherAlertTest < ActiveSupport::TestCase
         tags: []
       )
 
-      alerts = WeatherAlert.for_homepage(
+      alerts = WeatherAlert.active_nearby(
         lat: 47.3,
         lon: -122.2,
         forecast_alerts: [ openweather, expired ]
@@ -85,7 +94,7 @@ class WeatherAlertTest < ActiveSupport::TestCase
         tags: []
       )
 
-      alerts = WeatherAlert.for_homepage(
+      alerts = WeatherAlert.active_nearby(
         lat: 47.3,
         lon: -122.2,
         forecast_alerts: [ openweather ]

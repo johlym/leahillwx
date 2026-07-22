@@ -13,10 +13,6 @@ class Home::Forecast::AlertsBarComponent < ViewComponent::Base
     @alerts.first
   end
 
-  def extra_count
-    [ @alerts.length - 1, 0 ].max
-  end
-
   def ends_label(alert)
     ends_at = alert.respond_to?(:end_time) ? alert.end_time : alert.try(:ends_at)
     return nil unless ends_at
@@ -26,5 +22,10 @@ class Home::Forecast::AlertsBarComponent < ViewComponent::Base
 
   def event_label(alert)
     alert.try(:event).presence || alert.try(:title).presence || "Weather alert"
+  end
+
+  def indicator_label
+    count = @alerts.length
+    count > 1 ? "#{count} Alerts" : "Alert"
   end
 end

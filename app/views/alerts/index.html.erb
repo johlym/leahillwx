@@ -1,0 +1,62 @@
+<% content_for :title, "Weather Alerts — Lea Hill Weather" %>
+
+<div class="primary-container">
+  <%= render Ui::SectionHeaderComponent.new(
+        title: "Weather Alerts",
+        subtitle: "Active watches, warnings, and advisories near Lea Hill."
+      ) %>
+
+  <% if @weather_alerts.empty? %>
+    <%= render Ui::CardComponent.new(padding: :loose) do %>
+      <p class="alerts-page-empty">No active weather alerts near this station.</p>
+    <% end %>
+  <% else %>
+    <div class="alerts-page-list">
+      <% @weather_alerts.each do |alert| %>
+        <article class="alerts-page-article">
+          <p class="alerts-page-eyebrow">
+            <span class="alerts-page-badge"><%= alert.event %></span>
+            <% if alert.severity.present? %>
+              <span class="alerts-page-severity"><%= alert.severity %></span>
+            <% end %>
+          </p>
+
+          <h2 class="alerts-page-title"><%= alert.title %></h2>
+
+          <div class="alerts-page-meta">
+            <% if alert.starts_at %>
+              <p>Issued <%= alert.starts_at.in_time_zone("America/Los_Angeles").strftime("%b %-d, %Y %-I:%M %p %Z") %></p>
+            <% end %>
+            <% if alert.ends_at %>
+              <p>Expires <%= alert.ends_at.in_time_zone("America/Los_Angeles").strftime("%b %-d, %Y %-I:%M %p %Z") %></p>
+            <% end %>
+            <% if alert.sender_name.present? %>
+              <p>Sender <%= alert.sender_name %></p>
+            <% end %>
+            <% if alert.tags.any? %>
+              <p>Tags <%= alert.tags.join(", ") %></p>
+            <% end %>
+          </div>
+
+          <% if alert.regions.any? %>
+            <p class="alerts-page-regions">
+              <span class="alerts-page-regions-label">Areas:</span>
+              <%= alert.regions.join("; ") %>
+            </p>
+          <% end %>
+
+          <% if alert.description.present? %>
+            <div class="alerts-page-body"><%= alert.description %></div>
+          <% end %>
+
+          <p class="alerts-page-source">
+            Source: <%= alert.source_label %>
+            <% if alert.uri.present? %>
+              · <%= alert.uri %>
+            <% end %>
+          </p>
+        </article>
+      <% end %>
+    </div>
+  <% end %>
+</div>
