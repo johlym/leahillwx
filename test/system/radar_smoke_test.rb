@@ -52,7 +52,8 @@ class RadarSmokeTest < ApplicationSystemTestCase
   test "tilt selector appears only when a radar site is selected" do
     visit radar_url
 
-    assert_selector "[data-radar-target='tiltControls'].hidden"
+    # Capybara ignores hidden nodes by default; assert the controls exist but are not shown.
+    assert_selector "[data-radar-target='tiltControls'].hidden", visible: :hidden
     find("button.radar-site-chip", text: "ATX").click
     assert_selector "[data-radar-target='tiltControls']:not(.hidden)"
     assert_selector "button[data-radar-target='tiltChip'].is-active[data-tilt='0.5']"
@@ -61,6 +62,6 @@ class RadarSmokeTest < ApplicationSystemTestCase
     assert_selector "button[data-radar-target='tiltChip'].is-active[data-tilt='1.5']"
 
     find("button.radar-site-chip", text: /composite/i).click
-    assert_selector "[data-radar-target='tiltControls'].hidden"
+    assert_selector "[data-radar-target='tiltControls'].hidden", visible: :hidden
   end
 end
