@@ -222,7 +222,8 @@ export default class extends Controller {
       mode === "ridge" && site
         ? this.level3Cache.get(this.level3CacheKey(site.sector, product))?.frames
         : null
-    const cacheHit = Array.isArray(cachedFrames) && cachedFrames.length > 0
+    // Empty arrays are valid cache hits (no usable scans for this product).
+    const cacheHit = Array.isArray(cachedFrames)
 
     if (this.hasTimestampTarget && !cacheHit) {
       this.timestampTarget.textContent = "Loading…"
@@ -282,11 +283,12 @@ export default class extends Controller {
   }
 
   // Single-site tilts use Unidata Level III (IEM RIDGE tiles are N0B-only).
-  // Results are cached per sector+product so site/tilt switches reuse downloads.
+  // Results are cached per sector+product so site/tilt switches reuse downloads
+  // (including empty lists when a product has no usable scans).
   async loadRidgeFrames(site, product = this.ridgeProduct()) {
     const key = this.level3CacheKey(site.sector, product)
     const cached = this.level3Cache.get(key)
-    if (cached?.frames?.length) return cached.frames
+    if (Array.isArray(cached?.frames)) return cached.frames
     if (cached?.promise) return cached.promise
 
     const promise = buildLevel3Frames(site.sector, product, site)
