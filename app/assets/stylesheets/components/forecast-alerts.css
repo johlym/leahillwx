@@ -21,7 +21,7 @@
 }
 
 @utility forecast-alerts-bar-label {
-  @apply shrink-0 px-0 py-0
+  @apply shrink-0 border border-accent px-1 py-0.5 rounded-lg
          text-[0.65rem] font-semibold uppercase tracking-[0.08em]
          text-accent;
 }
