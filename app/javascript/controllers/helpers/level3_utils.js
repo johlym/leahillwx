@@ -78,6 +78,17 @@ export function revokeLevel3FrameUrls(frames) {
   }
 }
 
+/**
+ * After a non-empty S3 listing, require at least one successful frame.
+ * Returning [] here would be cached by loadRidgeFrames like a real miss.
+ */
+export function requireLoadedLevel3Frames(listedCount, frames, { sector, product } = {}) {
+  if (frames.length > 0) return frames
+  throw new Error(
+    `Level III: listed ${listedCount} key(s) for ${sector}/${product} but all frame loads failed`,
+  )
+}
+
 export function parseLevel3KeyTime(key) {
   // ATX_NAB_2026_07_21_23_08_51
   const match = key.match(/_(\d{4})_(\d{2})_(\d{2})_(\d{2})_(\d{2})_(\d{2})$/)

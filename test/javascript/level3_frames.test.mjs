@@ -9,6 +9,7 @@ import {
   parseLevel3KeyTime,
   preferredLevel3MaxFrames,
   preferredLevel3PlotSize,
+  requireLoadedLevel3Frames,
   revokeLevel3FrameUrls,
   shouldLimitRadarMemory,
 } from "../../app/javascript/controllers/helpers/level3_utils.js"
@@ -82,6 +83,23 @@ describe("dbzColor", () => {
     assert.equal(dbzColor(4), null)
     assert.match(dbzColor(25), /^rgba\(/)
     assert.match(dbzColor(55), /^rgba\(/)
+  })
+})
+
+describe("requireLoadedLevel3Frames", () => {
+  it("returns frames when at least one load succeeded", () => {
+    const frames = [{ id: "a" }]
+    assert.equal(
+      requireLoadedLevel3Frames(3, frames, { sector: "ATX", product: "NAB" }),
+      frames,
+    )
+  })
+
+  it("throws when keys were listed but every load failed", () => {
+    assert.throws(
+      () => requireLoadedLevel3Frames(4, [], { sector: "ATX", product: "NAB" }),
+      /listed 4 key\(s\) for ATX\/NAB but all frame loads failed/,
+    )
   })
 })
 

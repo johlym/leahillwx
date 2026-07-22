@@ -284,7 +284,9 @@ export default class extends Controller {
 
   // Single-site tilts use Unidata Level III (IEM RIDGE tiles are N0B-only).
   // Results are cached per sector+product so site/tilt switches reuse downloads
-  // (including empty lists when a product has no usable scans).
+  // (including empty lists when S3 listed no keys). All-load failures throw
+  // from buildLevel3Frames so the catch below drops the entry and syncMode
+  // can retry later instead of caching a poisoned [].
   async loadRidgeFrames(site, product = this.ridgeProduct()) {
     const key = this.level3CacheKey(site.sector, product)
     const cached = this.level3Cache.get(key)

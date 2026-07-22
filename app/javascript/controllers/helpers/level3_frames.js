@@ -13,6 +13,7 @@ import {
   parseLevel3KeyTime,
   preferredLevel3MaxFrames,
   preferredLevel3PlotSize,
+  requireLoadedLevel3Frames,
   revokeLevel3FrameUrls,
 } from "./level3_utils"
 
@@ -25,6 +26,7 @@ export {
   parseLevel3KeyTime,
   preferredLevel3MaxFrames,
   preferredLevel3PlotSize,
+  requireLoadedLevel3Frames,
   revokeLevel3FrameUrls,
 }
 
@@ -95,11 +97,13 @@ export async function loadLevel3Frame(key, { size = LEVEL3_PLOT_SIZE } = {}) {
 /**
  * Build oldest→newest frame list (metadata + rendered URLs).
  * Individual scan failures are skipped so one bad S3 object does not
- * blank the whole site/tilt; unexpected aborts revoke any blob URLs
- * already created for this call.
+ * blank the whole site/tilt. If S3 listed keys but every load failed,
+ * throw so callers do not cache [] as a permanent "no scans" hit.
+ * Unexpected aborts revoke any blob URLs already created for this call.
  */
 export async function buildLevel3Frames(sector, product, site, opts = {}) {
   const keys = await listLevel3Keys(sector, product, opts)
+  // Genuine empty listing — safe to cache as "no scans for this product".
   if (keys.length === 0) return []
 
   const size = opts.size ?? preferredLevel3PlotSize()
@@ -108,6 +112,7 @@ export async function buildLevel3Frames(sector, product, site, opts = {}) {
   const frames = await loadFramesWithConcurrency(sampled, (item) =>
     loadLevel3Frame(item.key, { ...opts, size }),
   )
+  requireLoadedLevel3Frames(sampled.length, frames, { sector, product })
 
   return frames.map((frame) => ({
     ...frame,
