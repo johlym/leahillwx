@@ -1,4 +1,4 @@
-// Pure helpers for building LibreWXR radar / satellite frame lists.
+// Pure helpers for building LibreWXR radar frame lists.
 
 export const LIBREWXR_DEFAULT_HOST = "https://api.librewxr.net"
 /** NEXRAD Level III scheme — closest built-in match to the site rain ladder. */
