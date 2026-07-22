@@ -8,10 +8,12 @@ import {
   LIBREWXR_DEFAULT_HOST,
   LIBREWXR_OPTIONS_SNOW,
   normalizeLibreWxrHost,
+  resolveLibreWxrTileHost,
   librewxrMetadataUrl,
   librewxrAlertsUrl,
   buildLibreWxrRadarFrames,
   buildLibreWxrSatelliteFrames,
+  resolvePreservedFrameIndex,
   boundsForRadius,
   ridgeProductForTilt,
   alertPathStyle,
@@ -97,6 +99,26 @@ describe("buildLibreWxrRadarFrames", () => {
       "https://api.librewxr.net/v2/radar/1784601600/256/{z}/{x}/{y}/6/1_0.png",
     )
   })
+
+  it("prefers configured tileHost over metadata host", () => {
+    assert.equal(
+      resolveLibreWxrTileHost({ host: "https://api.librewxr.net" }, "https://radar.example.com"),
+      "https://radar.example.com",
+    )
+
+    const frames = buildLibreWxrRadarFrames(
+      {
+        host: "https://api.librewxr.net",
+        radar: { past: [{ time: 1784601600, path: "/v2/radar/1784601600" }] },
+      },
+      { tileHost: "https://radar.example.com/", arrows: null },
+    )
+
+    assert.equal(
+      frames[0].urlTemplate,
+      "https://radar.example.com/v2/radar/1784601600/256/{z}/{x}/{y}/6/1_1.png",
+    )
+  })
 })
 
 describe("buildLibreWxrSatelliteFrames", () => {
@@ -113,6 +135,45 @@ describe("buildLibreWxrSatelliteFrames", () => {
     assert.equal(
       frames[0].urlTemplate,
       "https://api.librewxr.net/v2/satellite/1784725200/256/{z}/{x}/{y}/0/0_0.png",
+    )
+  })
+
+  it("uses configured tileHost for satellite tiles", () => {
+    const frames = buildLibreWxrSatelliteFrames(
+      {
+        host: "https://api.librewxr.net",
+        satellite: {
+          infrared: [{ time: 1784725200, path: "/v2/satellite/1784725200" }],
+        },
+      },
+      { tileHost: "https://radar.example.com" },
+    )
+
+    assert.match(frames[0].urlTemplate, /^https:\/\/radar\.example\.com\//)
+  })
+})
+
+describe("resolvePreservedFrameIndex", () => {
+  it("keeps the same frame id when still present", () => {
+    const frames = [
+      { id: "a", time: new Date("2026-07-22T12:00:00Z") },
+      { id: "b", time: new Date("2026-07-22T12:10:00Z") },
+    ]
+    assert.equal(resolvePreservedFrameIndex(frames, frames[1]), 1)
+  })
+
+  it("falls back to the latest frame at or before the prior time", () => {
+    const frames = [
+      { id: "a", time: new Date("2026-07-22T12:00:00Z") },
+      { id: "b", time: new Date("2026-07-22T12:10:00Z") },
+      { id: "c", time: new Date("2026-07-22T12:20:00Z") },
+    ]
+    assert.equal(
+      resolvePreservedFrameIndex(frames, {
+        id: "gone",
+        time: new Date("2026-07-22T12:12:00Z"),
+      }),
+      1,
     )
   })
 })

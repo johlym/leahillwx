@@ -19,6 +19,7 @@ import {
   librewxrAlertsUrl,
   buildLibreWxrRadarFrames,
   buildLibreWxrSatelliteFrames,
+  resolvePreservedFrameIndex,
   boundsForRadius,
   ridgeProductForTilt,
   alertPathStyle,
@@ -264,7 +265,7 @@ export default class extends Controller {
     return ridgeProductForTilt(this.selectedTilt, RIDGE_PRODUCT)
   }
 
-  async syncMode({ force = false } = {}) {
+  async syncMode({ force = false, preserveFrame = false } = {}) {
     const mode = this.resolveMode()
     const product = mode === "ridge" ? this.ridgeProduct() : null
     const compositeLayer = mode === "librewxr" ? this.compositeLayer : null
@@ -277,6 +278,9 @@ export default class extends Controller {
     ) {
       return
     }
+
+    const previousFrame =
+      preserveFrame && this.frames.length > 0 ? this.frames[this.frameIndex] : null
 
     const generation = ++this.syncGeneration
     this.stopTimer()
@@ -294,8 +298,9 @@ export default class extends Controller {
     // Empty arrays are valid cache hits (no usable scans for this product).
     const cacheHit = Array.isArray(cachedFrames)
 
-    if (this.hasTimestampTarget && !cacheHit) {
-      this.timestampTarget.textContent = "Loading…"
+    // Quiet refresh: keep the current timestamp visible while new frames load.
+    if (!cacheHit && !preserveFrame) {
+      this.setTimestamp("Loading…")
     }
 
     try {
@@ -318,12 +323,10 @@ export default class extends Controller {
         this.activeMode = null
         this.activeProduct = null
         this.activeCompositeLayer = null
-        if (this.hasTimestampTarget) {
-          let message = "No frames"
-          if (mode === "ridge") message = `No frames for ${this.selectedTilt}°`
-          else if (this.compositeLayer === "cloud") message = "Cloud unavailable"
-          this.timestampTarget.textContent = message
-        }
+        let message = "No frames"
+        if (mode === "ridge") message = `No frames for ${this.selectedTilt}°`
+        else if (this.compositeLayer === "cloud") message = "Cloud unavailable"
+        this.setTimestamp(message)
         return
       }
 
@@ -331,8 +334,7 @@ export default class extends Controller {
       this.activeProduct = product
       this.activeCompositeLayer = compositeLayer
       this.frames = frames
-      // Oldest → newest; start at 0 so playback advances through time.
-      this.frameIndex = 0
+      this.frameIndex = resolvePreservedFrameIndex(frames, previousFrame)
       this.tileLayers = this.frames.map((frame) => this.createFrameLayer(frame))
       this.showFrame(this.frameIndex)
 
@@ -345,13 +347,18 @@ export default class extends Controller {
       this.activeCompositeLayer = null
       this.frames = []
       this.clearRadarLayers()
-      if (this.hasTimestampTarget) {
-        this.timestampTarget.textContent =
-          this.compositeLayer === "cloud" && mode === "librewxr"
-            ? "Cloud unavailable"
-            : "Radar unavailable"
-      }
+      this.setTimestamp(
+        this.compositeLayer === "cloud" && mode === "librewxr"
+          ? "Cloud unavailable"
+          : "Radar unavailable",
+      )
     }
+  }
+
+  setTimestamp(text, { nowcast = false } = {}) {
+    if (!this.hasTimestampTarget) return
+    this.timestampTarget.textContent = text
+    this.timestampTarget.classList.toggle("is-nowcast", nowcast)
   }
 
   level3CacheKey(sector, product) {
@@ -460,11 +467,13 @@ export default class extends Controller {
 
   async loadLibreWxrFrames() {
     const api = await this.fetchLibreWxrMetadata()
+    const tileHost = this.librewxrHostValue
     if (this.compositeLayer === "cloud") {
-      return buildLibreWxrSatelliteFrames(api)
+      return buildLibreWxrSatelliteFrames(api, { tileHost })
     }
 
     return buildLibreWxrRadarFrames(api, {
+      tileHost,
       options: this.snowColorsEnabled ? LIBREWXR_OPTIONS_SNOW : LIBREWXR_OPTIONS_NOSNOW,
       arrows: this.arrowsEnabled ? "light" : null,
       includeNowcast: true,
@@ -490,7 +499,7 @@ export default class extends Controller {
     if (this.resolveMode() !== "librewxr") return
     try {
       await this.fetchLibreWxrMetadata({ force: true })
-      await this.syncMode({ force: true })
+      await this.syncMode({ force: true, preserveFrame: true })
     } catch (error) {
       console.warn("LibreWXR metadata refresh failed", error)
     }
@@ -561,9 +570,8 @@ export default class extends Controller {
     this.frameIndex = nextIndex
 
     const frame = this.frames[this.frameIndex]
-    if (this.hasTimestampTarget && frame) {
-      this.timestampTarget.textContent = frame.label
-      this.timestampTarget.classList.toggle("is-nowcast", Boolean(frame.isNowcast))
+    if (frame) {
+      this.setTimestamp(frame.label, { nowcast: Boolean(frame.isNowcast) })
     }
   }
 

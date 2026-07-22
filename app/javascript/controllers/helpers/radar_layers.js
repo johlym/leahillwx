@@ -67,6 +67,14 @@ export function librewxrAlertsUrl(base, { lat, lon, bbox } = {}) {
 }
 
 /**
+ * Prefer the app-configured LibreWXR origin for tile URLs so custom hosts
+ * are not overridden by the `host` field inside weather-maps.json.
+ */
+export function resolveLibreWxrTileHost(api, tileHost) {
+  return normalizeLibreWxrHost(tileHost || api?.host || LIBREWXR_DEFAULT_HOST)
+}
+
+/**
  * Build LibreWXR radar frames (past + optional nowcast) from weather-maps.json.
  * @param {{ host?: string, radar?: { past?: { time: number, path: string }[], nowcast?: { time: number, path: string }[] } }} api
  */
@@ -78,9 +86,10 @@ export function buildLibreWxrRadarFrames(
     options = LIBREWXR_OPTIONS_SNOW,
     arrows = "light",
     includeNowcast = true,
+    tileHost,
   } = {},
 ) {
-  const host = normalizeLibreWxrHost(api.host || LIBREWXR_DEFAULT_HOST)
+  const host = resolveLibreWxrTileHost(api, tileHost)
   const past = api.radar?.past || []
   const nowcast = includeNowcast ? api.radar?.nowcast || [] : []
   const arrowQs = arrows ? `?arrows=${encodeURIComponent(arrows)}` : ""
@@ -105,8 +114,8 @@ export function buildLibreWxrRadarFrames(
  * Build LibreWXR GMGSI satellite frames from weather-maps.json.
  * @param {{ host?: string, satellite?: { infrared?: { time: number, path: string }[] } }} api
  */
-export function buildLibreWxrSatelliteFrames(api, { size = 256 } = {}) {
-  const host = normalizeLibreWxrHost(api.host || LIBREWXR_DEFAULT_HOST)
+export function buildLibreWxrSatelliteFrames(api, { size = 256, tileHost } = {}) {
+  const host = resolveLibreWxrTileHost(api, tileHost)
   const frames = api.satellite?.infrared || []
   return frames.map((frame) => {
     const time = new Date(frame.time * 1000)
@@ -119,6 +128,28 @@ export function buildLibreWxrSatelliteFrames(api, { size = 256 } = {}) {
       isNowcast: false,
     }
   })
+}
+
+/**
+ * Pick a frame index after a metadata refresh so playback does not jump to 0.
+ * Prefers an exact id match, otherwise the latest frame at or before the prior time.
+ */
+export function resolvePreservedFrameIndex(frames, previousFrame) {
+  if (!previousFrame || !Array.isArray(frames) || frames.length === 0) return 0
+
+  const byId = frames.findIndex((frame) => frame.id === previousFrame.id)
+  if (byId >= 0) return byId
+
+  const previousTime = previousFrame.time?.getTime?.()
+  if (previousTime == null) return 0
+
+  let best = 0
+  for (let i = 0; i < frames.length; i += 1) {
+    const time = frames[i].time?.getTime?.()
+    if (time != null && time <= previousTime) best = i
+    else if (time != null && time > previousTime) break
+  }
+  return best
 }
 
 /** Bounds roughly covering `radiusMiles` around a point. */
