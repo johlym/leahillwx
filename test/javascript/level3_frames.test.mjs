@@ -127,6 +127,25 @@ describe("loadFramesWithConcurrency", () => {
     )
   })
 
+  it("reports completed/total progress including rejected items", async () => {
+    const updates = []
+    await loadFramesWithConcurrency(
+      ["a", "bad", "c"],
+      async (key) => {
+        if (key === "bad") throw new Error("fetch failed")
+        return { id: key }
+      },
+      {
+        concurrency: 2,
+        onProgress: (progress) => updates.push({ ...progress }),
+      },
+    )
+
+    assert.deepEqual(updates[0], { completed: 0, total: 3 })
+    assert.deepEqual(updates.at(-1), { completed: 3, total: 3 })
+    assert.equal(updates.length, 4)
+  })
+
   it("revokes blob URLs already loaded when a later batch aborts", async () => {
     const revoked = []
     const originalRevoke = URL.revokeObjectURL
