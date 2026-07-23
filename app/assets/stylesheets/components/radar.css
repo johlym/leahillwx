@@ -39,15 +39,15 @@
          max-w-[calc(100%-1rem)] sm:max-w-md;
 }
 
-/* Half the playback control row (~min-h-11 + py-1.5 → ~3.5rem; sm ~3.25rem). */
+/* Quarter the playback control row (~min-h-11 + py-1.5 → ~3.5rem; sm ~3.25rem). */
 @utility radar-load-progress {
   @apply pointer-events-none w-full overflow-hidden
          rounded-[0.45rem] border border-border backdrop-blur-md;
-  height: 1.75rem;
+  height: 0.875rem;
   background: color-mix(in oklab, var(--color-bg) 88%, transparent);
 
   @media (width >= 40rem) {
-    height: 1.625rem;
+    height: 0.8125rem;
   }
 
   &.hidden {
