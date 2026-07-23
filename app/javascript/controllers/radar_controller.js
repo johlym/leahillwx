@@ -28,6 +28,8 @@ export default class extends Controller {
   static targets = [
     "map",
     "controls",
+    "loadProgress",
+    "loadProgressBar",
     "playPause",
     "playIcon",
     "pauseIcon",
@@ -65,6 +67,10 @@ export default class extends Controller {
     this.warmingFrames = false
     this.frameRevealToken = 0
     this.revealingFrame = false
+    this.loadProgressToken = 0
+    this.loadProgressValue = 0
+    this.loadProgressCreepTimer = null
+    this.loadProgressHideTimer = null
     // sector:product → { frames } | { promise } for Level III reuse across sites/tilts
     this.level3Cache = new Map()
     this.basemapErrors = 0
@@ -132,6 +138,7 @@ export default class extends Controller {
     this.zooming = false
     this.warmingFrames = false
     this.cancelPendingFrameReveal()
+    this.resetLoadProgress()
     this.stopTimer()
     this.stopMetadataRefresh()
     this.clearRadarLayers()
@@ -255,6 +262,9 @@ export default class extends Controller {
       this.tileLayers.length > 0
 
     const previousLayers = canPreserve ? [...this.tileLayers] : null
+    // User-facing loads (initial composite, site, tilt) get a progress bar.
+    // Quiet metadata refreshes keep the current radar up and stay silent.
+    const showProgress = !canPreserve
 
     const generation = ++this.syncGeneration
     if (!canPreserve) {
@@ -262,6 +272,7 @@ export default class extends Controller {
       this.stopTimer()
       this.clearRadarLayers()
       this.frames = []
+      this.beginLoadProgress()
     }
 
     const site =
@@ -304,6 +315,7 @@ export default class extends Controller {
         this.activeProduct = null
         const message = mode === "ridge" ? `No frames for ${this.selectedTilt}°` : "No frames"
         this.setTimestamp(message)
+        if (showProgress) this.finishLoadProgress()
         return
       }
 
@@ -319,6 +331,8 @@ export default class extends Controller {
         return
       }
 
+      if (showProgress) this.markLoadProgress(62)
+
       await this.commitFrameSet({
         frames,
         mode,
@@ -327,6 +341,10 @@ export default class extends Controller {
         preserve: canPreserve,
         generation,
       })
+
+      if (showProgress && generation === this.syncGeneration && this.map) {
+        this.finishLoadProgress()
+      }
     } catch (error) {
       if (generation !== this.syncGeneration || !this.map) return
       console.error("Radar sync failed", error)
@@ -340,7 +358,91 @@ export default class extends Controller {
       this.frames = []
       this.clearRadarLayers()
       this.setTimestamp("Radar unavailable")
+      if (showProgress) this.finishLoadProgress()
     }
+  }
+
+  // --- Load progress --------------------------------------------------------
+
+  beginLoadProgress() {
+    this.loadProgressToken += 1
+    const token = this.loadProgressToken
+    this.clearLoadProgressTimers()
+    this.loadProgressValue = 0
+    this.setLoadProgress(10)
+    this.showLoadProgressUi()
+
+    // Creep while metadata / Level III work is in flight so the bar never
+    // looks stalled before we know how far along the fetch is.
+    this.loadProgressCreepTimer = window.setInterval(() => {
+      if (token !== this.loadProgressToken) return
+      if (this.loadProgressValue >= 48) return
+      this.setLoadProgress(this.loadProgressValue + 3)
+    }, 220)
+  }
+
+  markLoadProgress(value) {
+    this.clearLoadProgressCreep()
+    this.setLoadProgress(Math.max(this.loadProgressValue, value))
+  }
+
+  finishLoadProgress() {
+    const token = this.loadProgressToken
+    this.clearLoadProgressCreep()
+    this.setLoadProgress(100)
+    this.loadProgressHideTimer = window.setTimeout(() => {
+      if (token !== this.loadProgressToken) return
+      this.hideLoadProgressUi()
+    }, 220)
+  }
+
+  resetLoadProgress() {
+    this.loadProgressToken += 1
+    this.clearLoadProgressTimers()
+    this.loadProgressValue = 0
+    this.hideLoadProgressUi()
+  }
+
+  clearLoadProgressCreep() {
+    if (this.loadProgressCreepTimer) {
+      window.clearInterval(this.loadProgressCreepTimer)
+      this.loadProgressCreepTimer = null
+    }
+  }
+
+  clearLoadProgressTimers() {
+    this.clearLoadProgressCreep()
+    if (this.loadProgressHideTimer) {
+      window.clearTimeout(this.loadProgressHideTimer)
+      this.loadProgressHideTimer = null
+    }
+  }
+
+  setLoadProgress(value) {
+    const next = Math.max(0, Math.min(100, Math.round(value)))
+    this.loadProgressValue = next
+    if (this.hasLoadProgressBarTarget) {
+      this.loadProgressBarTarget.style.setProperty("--radar-load-progress", String(next / 100))
+    }
+    if (this.hasLoadProgressTarget) {
+      this.loadProgressTarget.setAttribute("aria-valuenow", String(next))
+    }
+  }
+
+  showLoadProgressUi() {
+    if (!this.hasLoadProgressTarget) return
+    this.loadProgressTarget.classList.remove("hidden")
+    this.loadProgressTarget.setAttribute("aria-hidden", "false")
+  }
+
+  hideLoadProgressUi() {
+    if (!this.hasLoadProgressTarget) return
+    this.loadProgressTarget.classList.add("hidden")
+    this.loadProgressTarget.setAttribute("aria-hidden", "true")
+    if (this.hasLoadProgressBarTarget) {
+      this.loadProgressBarTarget.style.setProperty("--radar-load-progress", "0")
+    }
+    this.loadProgressValue = 0
   }
 
   /**

@@ -21,6 +21,7 @@ class RadarSmokeTest < ApplicationSystemTestCase
     assert_selector "body.radar-page"
     assert_selector "[data-controller='radar']"
     assert_selector "[data-radar-target='map']"
+    assert_selector "[data-radar-target='loadProgress'][role='progressbar']", visible: :all
     # CSS uppercases chip labels; match case-insensitively on visible text.
     assert_selector "button.radar-site-chip", text: /composite/i
     assert_selector "button.radar-site-chip", text: "ATX"

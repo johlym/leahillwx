@@ -63,6 +63,8 @@ class RadarControllerTest < ActionDispatch::IntegrationTest
     get radar_url
     assert_select "[data-radar-target='playPause']"
     assert_select "[data-radar-target='timestamp']"
+    assert_select "[data-radar-target='loadProgress'][role='progressbar']"
+    assert_select "[data-radar-target='loadProgressBar']"
     assert_select "button.radar-site-chip[data-site-id='']", text: "Composite"
     assert_select "button.radar-site-chip[data-site-id='KATX']", text: "ATX"
     assert_select "button.radar-site-chip[data-site-id='KRTX']", text: "RTX"
