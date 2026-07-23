@@ -346,8 +346,9 @@ export default class extends Controller {
   /**
    * Apply a loaded frame set.
    * Initial loads: freeze on the newest frame until its tiles are ready, then
-   * animate newest → older. Frame advances keep the previous layer up until the
-   * next one has loaded so we never flash an empty radar pane.
+   * animate oldest → newest (wrapping from newest to oldest on the first tick).
+   * Frame advances keep the previous layer up until the next one has loaded so
+   * we never flash an empty radar pane.
    * Quiet refreshes: preserve playback index and resume after the new layer paints.
    */
   async commitFrameSet({
@@ -396,7 +397,7 @@ export default class extends Controller {
     if (this.playing && !this.zooming) this.startTimer()
 
     if (!preserve) {
-      // Prefetch older frames ahead of the newest→older loop.
+      // Prefetch the next few frames ahead of the oldest→newest loop.
       void this.prefetchUpcomingFrames(this.frameIndex, generation, 2)
     }
   }
@@ -459,8 +460,8 @@ export default class extends Controller {
 
     const urls = []
     for (let step = 1; step <= count; step += 1) {
-      // Playback steps newest → older (index decreases).
-      const index = (fromIndex - step + this.frames.length) % this.frames.length
+      // Playback steps oldest → newest (index increases, wrapping at the end).
+      const index = (fromIndex + step) % this.frames.length
       urls.push(...this.viewportUrlsForFrame(this.frames[index]))
     }
 
@@ -777,8 +778,8 @@ export default class extends Controller {
 
   advanceFrame() {
     if (this.warmingFrames || this.revealingFrame || this.zooming || !this.playing) return
-    // Frames are oldest→newest; step backward so the loop plays newest → older.
-    this.showFrame(this.frameIndex - 1)
+    // Frames are oldest→newest; step forward for a normal radar loop.
+    this.showFrame(this.frameIndex + 1)
   }
 
   startTimer() {
