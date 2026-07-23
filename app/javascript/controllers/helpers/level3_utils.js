@@ -75,21 +75,30 @@ export function preferredLevel3MaxFrames(env = globalThis) {
  * @template T, R
  * @param {T[]} items
  * @param {(item: T) => Promise<R>} loadFn
- * @param {{ concurrency?: number }} [opts]
+ * @param {{ concurrency?: number, onProgress?: (p: { completed: number, total: number }) => void }} [opts]
  * @returns {Promise<R[]>}
  */
-export async function loadFramesWithConcurrency(items, loadFn, { concurrency = 3 } = {}) {
+export async function loadFramesWithConcurrency(
+  items,
+  loadFn,
+  { concurrency = 3, onProgress = null } = {},
+) {
   const frames = []
+  const total = items.length
+  let completed = 0
+  onProgress?.({ completed, total })
   try {
     for (let i = 0; i < items.length; i += concurrency) {
       const batch = items.slice(i, i + concurrency)
       const settled = await Promise.allSettled(batch.map((item) => loadFn(item)))
       for (const outcome of settled) {
+        completed += 1
         if (outcome.status === "fulfilled") {
           frames.push(outcome.value)
         } else {
           console.warn("Level III frame failed", outcome.reason)
         }
+        onProgress?.({ completed, total })
       }
     }
     return frames

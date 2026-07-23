@@ -102,15 +102,26 @@ export async function loadLevel3Frame(key, { size = LEVEL3_PLOT_SIZE } = {}) {
  * Unexpected aborts revoke any blob URLs already created for this call.
  */
 export async function buildLevel3Frames(sector, product, site, opts = {}) {
-  const keys = await listLevel3Keys(sector, product, opts)
+  const { onProgress = null, ...loadOpts } = opts
+  onProgress?.({ phase: "list", completed: 0, total: 1 })
+  const keys = await listLevel3Keys(sector, product, loadOpts)
   // Genuine empty listing — safe to cache as "no scans for this product".
-  if (keys.length === 0) return []
+  if (keys.length === 0) {
+    onProgress?.({ phase: "frames", completed: 0, total: 0 })
+    return []
+  }
+  onProgress?.({ phase: "list", completed: 1, total: 1 })
 
-  const size = opts.size ?? preferredLevel3PlotSize()
-  const maxFrames = opts.maxFrames ?? preferredLevel3MaxFrames()
+  const size = loadOpts.size ?? preferredLevel3PlotSize()
+  const maxFrames = loadOpts.maxFrames ?? preferredLevel3MaxFrames()
   const sampled = sampleFrames(keys, maxFrames)
-  const frames = await loadFramesWithConcurrency(sampled, (item) =>
-    loadLevel3Frame(item.key, { ...opts, size }),
+  const frames = await loadFramesWithConcurrency(
+    sampled,
+    (item) => loadLevel3Frame(item.key, { ...loadOpts, size }),
+    {
+      onProgress: ({ completed, total }) =>
+        onProgress?.({ phase: "frames", completed, total }),
+    },
   )
   requireLoadedLevel3Frames(sampled.length, frames, { sector, product })
 

@@ -28,6 +28,8 @@ export default class extends Controller {
   static targets = [
     "map",
     "controls",
+    "loadProgress",
+    "loadProgressBar",
     "playPause",
     "playIcon",
     "pauseIcon",
@@ -65,6 +67,9 @@ export default class extends Controller {
     this.warmingFrames = false
     this.frameRevealToken = 0
     this.revealingFrame = false
+    this.loadProgressToken = 0
+    this.loadProgressValue = 0
+    this.loadProgressHideTimer = null
     // sector:product → { frames } | { promise } for Level III reuse across sites/tilts
     this.level3Cache = new Map()
     this.basemapErrors = 0
@@ -132,6 +137,7 @@ export default class extends Controller {
     this.zooming = false
     this.warmingFrames = false
     this.cancelPendingFrameReveal()
+    this.resetLoadProgress()
     this.stopTimer()
     this.stopMetadataRefresh()
     this.clearRadarLayers()
@@ -255,6 +261,9 @@ export default class extends Controller {
       this.tileLayers.length > 0
 
     const previousLayers = canPreserve ? [...this.tileLayers] : null
+    // User-facing loads (initial composite, site, tilt) get a progress bar.
+    // Quiet metadata refreshes keep the current radar up and stay silent.
+    const showProgress = !canPreserve
 
     const generation = ++this.syncGeneration
     if (!canPreserve) {
@@ -262,6 +271,7 @@ export default class extends Controller {
       this.stopTimer()
       this.clearRadarLayers()
       this.frames = []
+      this.beginLoadProgress()
     }
 
     const site =
@@ -288,9 +298,15 @@ export default class extends Controller {
           this.updateSiteUi()
           return this.syncMode({ force: true })
         }
-        frames = await this.loadRidgeFrames(site, product)
+        frames = await this.loadRidgeFrames(site, product, {
+          onProgress: showProgress
+            ? (progress) => this.applyLevel3LoadProgress(progress)
+            : null,
+        })
       } else {
+        if (showProgress) this.setLoadProgress(4)
         frames = await this.loadLibreWxrFrames()
+        if (showProgress) this.setLoadProgress(18)
       }
 
       if (generation !== this.syncGeneration || !this.map) return
@@ -304,6 +320,7 @@ export default class extends Controller {
         this.activeProduct = null
         const message = mode === "ridge" ? `No frames for ${this.selectedTilt}°` : "No frames"
         this.setTimestamp(message)
+        if (showProgress) this.finishLoadProgress()
         return
       }
 
@@ -326,7 +343,12 @@ export default class extends Controller {
         previousLayers,
         preserve: canPreserve,
         generation,
+        trackPaintProgress: showProgress,
       })
+
+      if (showProgress && generation === this.syncGeneration && this.map) {
+        this.finishLoadProgress()
+      }
     } catch (error) {
       if (generation !== this.syncGeneration || !this.map) return
       console.error("Radar sync failed", error)
@@ -340,7 +362,99 @@ export default class extends Controller {
       this.frames = []
       this.clearRadarLayers()
       this.setTimestamp("Radar unavailable")
+      if (showProgress) this.finishLoadProgress()
     }
+  }
+
+  // --- Load progress --------------------------------------------------------
+
+  beginLoadProgress() {
+    this.loadProgressToken += 1
+    this.clearLoadProgressTimers()
+    this.loadProgressValue = 0
+    // Snap to empty without animating backward from a previous load.
+    if (this.hasLoadProgressBarTarget) {
+      this.loadProgressBarTarget.style.transition = "none"
+      this.setLoadProgress(0, { force: true })
+      void this.loadProgressBarTarget.offsetWidth
+      this.loadProgressBarTarget.style.transition = ""
+    } else {
+      this.setLoadProgress(0, { force: true })
+    }
+    this.showLoadProgressUi()
+  }
+
+  /**
+   * Level III site/tilt loads: S3 list, then N decoded frames.
+   * Maps list → ~8%, each finished frame → 8–95%.
+   */
+  applyLevel3LoadProgress({ phase, completed = 0, total = 0 } = {}) {
+    if (phase === "list") {
+      this.setLoadProgress(completed > 0 ? 8 : 2)
+      return
+    }
+    if (phase === "frames") {
+      if (total <= 0) {
+        this.setLoadProgress(95)
+        return
+      }
+      this.setLoadProgress(8 + (completed / total) * 87)
+    }
+  }
+
+  finishLoadProgress() {
+    const token = this.loadProgressToken
+    this.setLoadProgress(100)
+    this.loadProgressHideTimer = window.setTimeout(() => {
+      if (token !== this.loadProgressToken) return
+      this.hideLoadProgressUi()
+    }, 220)
+  }
+
+  resetLoadProgress() {
+    this.loadProgressToken += 1
+    this.clearLoadProgressTimers()
+    this.loadProgressValue = 0
+    this.hideLoadProgressUi()
+  }
+
+  clearLoadProgressTimers() {
+    if (this.loadProgressHideTimer) {
+      window.clearTimeout(this.loadProgressHideTimer)
+      this.loadProgressHideTimer = null
+    }
+  }
+
+  setLoadProgress(value, { force = false } = {}) {
+    const next = Math.max(0, Math.min(100, Math.round(value)))
+    // Never visually reverse within a load — overlapping callbacks can race.
+    if (!force && next < this.loadProgressValue) return
+    this.loadProgressValue = next
+    if (this.hasLoadProgressBarTarget) {
+      this.loadProgressBarTarget.style.setProperty("--radar-load-progress", String(next / 100))
+    }
+    if (this.hasLoadProgressTarget) {
+      this.loadProgressTarget.setAttribute("aria-valuenow", String(next))
+    }
+  }
+
+  showLoadProgressUi() {
+    if (!this.hasLoadProgressTarget) return
+    this.loadProgressTarget.classList.remove("hidden")
+    this.loadProgressTarget.setAttribute("aria-hidden", "false")
+  }
+
+  hideLoadProgressUi() {
+    if (!this.hasLoadProgressTarget) return
+    this.loadProgressTarget.classList.add("hidden")
+    this.loadProgressTarget.setAttribute("aria-hidden", "true")
+    if (this.hasLoadProgressBarTarget) {
+      this.loadProgressBarTarget.style.transition = "none"
+      this.loadProgressBarTarget.style.setProperty("--radar-load-progress", "0")
+      void this.loadProgressBarTarget.offsetWidth
+      this.loadProgressBarTarget.style.transition = ""
+    }
+    this.loadProgressValue = 0
   }
 
   /**
@@ -358,6 +472,7 @@ export default class extends Controller {
     previousLayers,
     preserve,
     generation = this.syncGeneration,
+    trackPaintProgress = false,
   }) {
     if (!this.map || !frames?.length) return
 
@@ -382,7 +497,18 @@ export default class extends Controller {
     // Wait for the mounted frame before tearing down the previous set so quiet
     // refreshes do not blink to the basemap.
     this.warmingFrames = true
-    await this.waitForLayerLoad(this.tileLayers[this.frameIndex])
+    const progressToken = this.loadProgressToken
+    const progressFloor = this.loadProgressValue
+    await this.waitForLayerLoad(this.tileLayers[this.frameIndex], 8000, {
+      onProgress: trackPaintProgress
+        ? ({ loaded, expected }) => {
+            if (progressToken !== this.loadProgressToken) return
+            const total = Math.max(expected, 1)
+            const t = Math.min(1, loaded / total)
+            this.setLoadProgress(progressFloor + (100 - progressFloor) * t)
+          }
+        : null,
+    })
     if (generation !== this.syncGeneration || !this.map) {
       this.warmingFrames = false
       // Always detach the superseded set: an aborted quiet refresh otherwise
@@ -419,24 +545,38 @@ export default class extends Controller {
     })
   }
 
-  waitForLayerLoad(layer, timeoutMs = 8000) {
+  waitForLayerLoad(layer, timeoutMs = 8000, { onProgress = null } = {}) {
     if (!layer || !this.map) return Promise.resolve()
 
     // Level III image overlays are already decoded blobs — no wait needed.
     if (typeof layer.setUrl === "function" && layer._url?.startsWith?.("blob:")) {
+      onProgress?.({ loaded: 1, expected: 1 })
       return Promise.resolve()
     }
 
+    // Composite tiles: estimate viewport coverage, then count tileload events.
+    const expected = Math.max(this.viewportUrlsForFrame(this.frames[this.frameIndex]).length, 1)
+    let loaded = 0
+
     return new Promise((resolve) => {
       let settled = false
+      const bump = () => {
+        loaded += 1
+        onProgress?.({ loaded: Math.min(loaded, expected), expected })
+      }
       const done = () => {
         if (settled) return
         settled = true
         layer.off?.("load", done)
+        layer.off?.("tileload", bump)
+        layer.off?.("tileerror", bump)
         window.clearTimeout(timer)
+        onProgress?.({ loaded: expected, expected })
         resolve()
       }
       const timer = window.setTimeout(done, timeoutMs)
+      layer.on?.("tileload", bump)
+      layer.on?.("tileerror", bump)
       layer.once?.("load", done)
 
       // Do not trust a synchronous !isLoading() right after addTo — Leaflet
@@ -517,13 +657,20 @@ export default class extends Controller {
   // (including empty lists when S3 listed no keys). All-load failures throw
   // from buildLevel3Frames so the catch below drops the entry and syncMode
   // can retry later instead of caching a poisoned [].
-  async loadRidgeFrames(site, product = this.ridgeProduct()) {
+  async loadRidgeFrames(site, product = this.ridgeProduct(), { onProgress = null } = {}) {
     const key = this.level3CacheKey(site.sector, product)
     const cached = this.level3Cache.get(key)
-    if (Array.isArray(cached?.frames)) return cached.frames
-    if (cached?.promise) return cached.promise
+    if (Array.isArray(cached?.frames)) {
+      onProgress?.({ phase: "frames", completed: 1, total: 1 })
+      return cached.frames
+    }
+    if (cached?.promise) {
+      const frames = await cached.promise
+      onProgress?.({ phase: "frames", completed: 1, total: 1 })
+      return frames
+    }
 
-    const promise = buildLevel3Frames(site.sector, product, site)
+    const promise = buildLevel3Frames(site.sector, product, site, { onProgress })
       .then((frames) => {
         const entry = this.level3Cache.get(key)
         if (entry?.promise === promise) {

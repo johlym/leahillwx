@@ -39,6 +39,37 @@
          max-w-[calc(100%-1rem)] sm:max-w-md;
 }
 
+/* Quarter the playback control row (~min-h-11 + py-1.5 → ~3.5rem; sm ~3.25rem). */
+@utility radar-load-progress {
+  @apply pointer-events-none w-full overflow-hidden
+         rounded-[0.45rem] border border-border backdrop-blur-md;
+  height: 0.875rem;
+  background: color-mix(in oklab, var(--color-bg) 88%, transparent);
+
+  @media (width >= 40rem) {
+    height: 0.8125rem;
+  }
+
+  &.hidden {
+    display: none;
+  }
+}
+
+@utility radar-load-progress-track {
+  @apply relative h-full w-full overflow-hidden;
+}
+
+@utility radar-load-progress-bar {
+  @apply absolute inset-y-0 left-0 h-full w-full origin-left;
+  transform: scaleX(var(--radar-load-progress, 0));
+  transition: transform 0.22s ease-out;
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--color-accent) 75%, transparent),
+    var(--color-accent-strong)
+  );
+}
+
 @utility radar-controls-playback {
   @apply pointer-events-auto flex items-center gap-2
          rounded-[0.45rem] border border-border px-2 py-1.5

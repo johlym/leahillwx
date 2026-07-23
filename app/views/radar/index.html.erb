@@ -14,6 +14,23 @@
   <div class="radar-map" data-radar-target="map" role="application" aria-label="Live weather radar map"></div>
 
   <div class="radar-controls" data-radar-target="controls">
+    <div
+      class="radar-load-progress hidden"
+      data-radar-target="loadProgress"
+      role="progressbar"
+      aria-label="Loading radar"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-valuenow="0"
+      aria-hidden="true">
+      <div class="radar-load-progress-track">
+        <div
+          class="radar-load-progress-bar"
+          data-radar-target="loadProgressBar"
+          style="--radar-load-progress: 0"></div>
+      </div>
+    </div>
+
     <div class="radar-controls-playback" role="group" aria-label="Radar animation">
       <button
         type="button"
