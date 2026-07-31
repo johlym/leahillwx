@@ -22,6 +22,7 @@ class BulkWriteMeasurementsJob
 
       # Insert all records
       insert_measurements!(records) if records.any?
+      WeatherMeasurements::TotalCount.recalculate! if deleted_count.positive? || records.any?
       Rails.logger.info("Bulk import (overwrite): #{records.size} inserted, #{deleted_count} deleted")
     elsif update_records
       # Update existing records and insert new ones
@@ -42,6 +43,7 @@ class BulkWriteMeasurementsJob
 
       # Insert new records in bulk
       insert_measurements!(new_records) if new_records.any?
+      WeatherMeasurements::TotalCount.increment!(by: new_records.size)
       Rails.logger.info("Bulk import: #{new_records.size} created, #{updated_count} updated")
     else
       # Original behavior: filter out duplicates
@@ -65,7 +67,9 @@ class BulkWriteMeasurementsJob
 
       # Insert only new records
       insert_measurements!(new_records) if new_records.any?
+      WeatherMeasurements::TotalCount.increment!(by: new_records.size)
     end
+
   rescue => e
     Rails.logger.error("Error in bulk measurement import: #{e.message}")
     raise

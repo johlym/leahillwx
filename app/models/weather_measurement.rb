@@ -348,6 +348,7 @@ class WeatherMeasurement < ApplicationRecord
   end
 
   def broadcast_update
-    WeatherMeasurements::LiveUpdateBroadcast.call
+    WeatherMeasurements::TotalCount.increment!
+    WeatherMeasurements::LiveUpdateBroadcast.call(self)
   end
 end

@@ -1,9 +1,7 @@
 class RootController < ApplicationController
   def index
-    @current = WeatherMeasurement
-      .select("weather_measurements.*, (SELECT COUNT(*) FROM weather_measurements) as total_count")
-      .order(reading_date_time: :desc)
-      .first
+    @current = WeatherMeasurement.order(reading_date_time: :desc).first
+    @measurement_total_count = WeatherMeasurements::TotalCount.read
 
     @almanac = AlmanacEntry.for_date(Time.zone.today)
 
