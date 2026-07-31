@@ -353,6 +353,7 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
       assert payload[:sparklines].is_a?(Hash)
       assert_equal 144, payload[:sparklines][:humidity][:labels].length
       assert_includes payload[:sparklines][:humidity][:values], 50
+      assert_equal WeatherMeasurements::TotalCount.read, payload[:counter]
       assert_equal WeatherMeasurement.count, payload[:counter]
     end
   end

@@ -26,6 +26,10 @@ module ActiveSupport
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
 
-    # Add more helper methods to be used by all tests here...
+    # TotalCount lives in Redis; transactional fixtures roll back Postgres but not
+    # Redis, so clear the per-worker key before every test to avoid drift.
+    setup do
+      WeatherMeasurements::TotalCount.clear!
+    end
   end
 end
