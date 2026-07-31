@@ -3,14 +3,6 @@
 require "test_helper"
 
 class WeatherMeasurements::TotalCountTest < ActiveSupport::TestCase
-  setup do
-    WeatherMeasurements::TotalCount.clear!
-  end
-
-  teardown do
-    WeatherMeasurements::TotalCount.clear!
-  end
-
   test "read initializes from the database when redis key is missing" do
     expected = WeatherMeasurement.count
 
@@ -28,13 +20,15 @@ class WeatherMeasurements::TotalCountTest < ActiveSupport::TestCase
   end
 
   test "create callback increments the cached total count" do
-    before = WeatherMeasurements::TotalCount.read
+    before = WeatherMeasurement.count
 
     create_measurement!(reading_date_time: Time.current)
     assert_equal before + 1, WeatherMeasurements::TotalCount.read
+    assert_equal WeatherMeasurement.count, WeatherMeasurements::TotalCount.read
 
     create_measurement!(reading_date_time: 1.minute.from_now)
     assert_equal before + 2, WeatherMeasurements::TotalCount.read
+    assert_equal WeatherMeasurement.count, WeatherMeasurements::TotalCount.read
   end
 
   test "recalculate replaces a stale redis value" do
@@ -46,7 +40,6 @@ class WeatherMeasurements::TotalCountTest < ActiveSupport::TestCase
     assert_equal expected, WeatherMeasurements::TotalCount.recalculate!
     assert_equal expected, WeatherMeasurements::TotalCount.read
   end
-
 
   private
 

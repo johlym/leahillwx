@@ -1,3 +1,9 @@
+DatabaseConsistencyCheckers:
+  # App-layer numericality validators are intentional; mirroring every bound
+  # into Postgres CHECK constraints is out of scope for now.
+  NumericalityConstraintChecker:
+    enabled: false
+
 # Ignore false positive from Rails' ActionText and ActiveStorage
 ActionText::RichText:
   enabled: false

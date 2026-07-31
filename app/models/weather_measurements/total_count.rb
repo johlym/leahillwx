@@ -46,7 +46,18 @@ module WeatherMeasurements
     def self.redis_key
       return KEY unless Rails.env.test?
 
-      "#{KEY}:#{ENV.fetch('TEST_ENV_NUMBER', '0')}"
+      "#{KEY}:#{test_worker_id}"
     end
+
+    def self.test_worker_id
+      if ActiveSupport::TestCase.respond_to?(:parallel_worker_id) &&
+          !ActiveSupport::TestCase.parallel_worker_id.nil?
+        return ActiveSupport::TestCase.parallel_worker_id
+      end
+
+      number = ENV.fetch("TEST_ENV_NUMBER", "0")
+      number.empty? ? "0" : number
+    end
+    private_class_method :test_worker_id
   end
 end
