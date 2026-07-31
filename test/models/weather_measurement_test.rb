@@ -357,4 +357,3 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
     end
   end
 end
-
