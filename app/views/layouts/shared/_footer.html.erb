@@ -1,4 +1,4 @@
 <div class="site-footer">
   <p>&copy; 2021-<%= Time.current.year %> lhwx.org. Data is not guaranteed to be accurate. Consult professional forecasts before making decisions based on the information presented here.</p>
-  <p>lhwx.org is a project by <%= link_to "Johnathan Lyman", "https://johnathan.org", target: "_blank" %> | version <code><%= ENV["HEROKU_RELEASE_VERSION"] || "unknown" %></code> | Measurement no. <code data-weather-update-target="counter"><%= number_with_delimiter(@current&.total_count || @current&.counter) %></code></p>
+  <p>lhwx.org is a project by <%= link_to "Johnathan Lyman", "https://johnathan.org", target: "_blank" %> | version <code><%= ENV["HEROKU_RELEASE_VERSION"] || "unknown" %></code> | Measurement no. <code data-weather-update-target="counter"><%= number_with_delimiter(@measurement_total_count || @current&.total_count || @current&.counter) %></code></p>
 </div>

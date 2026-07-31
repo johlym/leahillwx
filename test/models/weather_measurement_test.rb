@@ -347,16 +347,13 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
       WeatherMeasurement.create!(valid_attrs(humidity: 55, reading_date_time: 10.minutes.ago))
       WeatherMeasurement.create!(valid_attrs(humidity: 50))
 
-      current = WeatherMeasurement
-        .select("weather_measurements.*, (SELECT COUNT(*) FROM weather_measurements) as total_count")
-        .order(reading_date_time: :desc)
-        .first
-
+      current = WeatherMeasurement.order(reading_date_time: :desc).first
       payload = WeatherMeasurements::LiveUpdateBroadcast.new.send(:payload, current)
 
       assert payload[:sparklines].is_a?(Hash)
       assert_equal 144, payload[:sparklines][:humidity][:labels].length
       assert_includes payload[:sparklines][:humidity][:values], 50
+      assert_equal WeatherMeasurement.count, payload[:counter]
     end
   end
 end

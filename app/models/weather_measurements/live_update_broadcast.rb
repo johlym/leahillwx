@@ -2,19 +2,19 @@
 
 module WeatherMeasurements
   class LiveUpdateBroadcast
-    def self.call
-      new.call
+    def self.call(measurement = nil)
+      new(measurement).call
+    end
+
+    def initialize(measurement = nil)
+      @measurement = measurement
     end
 
     def call
-      current_with_count = WeatherMeasurement
-        .select("weather_measurements.*, (SELECT COUNT(*) FROM weather_measurements) as total_count")
-        .order(reading_date_time: :desc)
-        .first
+      current = @measurement || WeatherMeasurement.order(reading_date_time: :desc).first
+      return unless current
 
-      return unless current_with_count
-
-      data_json = payload(current_with_count).to_json
+      data_json = payload(current).to_json
       turbo_stream_html = %(<turbo-stream action="weather_update" data="#{CGI.escapeHTML(data_json)}"><template></template></turbo-stream>)
 
       ActionCable.server.broadcast("weather_measurements", turbo_stream_html)
@@ -35,7 +35,7 @@ module WeatherMeasurements
         feels_like_f: helpers.number_with_precision(
           measurement.feels_like.to_fahrenheit, precision: 2, strip_insignificant_zeros: true
         ),
-        counter: measurement.total_count,
+        counter: TotalCount.read,
         wind_speed_mph: helpers.number_with_precision(
           measurement.wind_speed_mph, precision: 2, strip_insignificant_zeros: true
         ),

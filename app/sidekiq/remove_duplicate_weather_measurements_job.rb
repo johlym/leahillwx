@@ -20,6 +20,7 @@ class RemoveDuplicateWeatherMeasurementsJob
       records_to_delete.destroy_all
     end
 
+    WeatherMeasurements::TotalCount.recalculate! if duplicate_date_times.any?
     Rails.logger.info("Duplicate entries removed: #{duplicate_date_times.count}")
   end
 end
