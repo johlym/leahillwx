@@ -1,0 +1,5 @@
+<%= turbo_frame_tag "weather_alerts_bar" do %>
+  <% if @weather_alerts.present? %>
+    <%= render Home::Forecast::AlertsBarComponent.new(alerts: @weather_alerts) %>
+  <% end %>
+<% end %>

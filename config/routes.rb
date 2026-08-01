@@ -4,6 +4,7 @@ require "sidekiq/cron/web"
 Rails.application.routes.draw do
   root "root#index"
   get "about", to: "root#about"
+  get "alerts/bar", to: "alerts#bar", as: :alerts_bar
   get "alerts", to: "alerts#index", as: :alerts
 
   namespace :api do
