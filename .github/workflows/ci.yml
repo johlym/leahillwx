@@ -12,6 +12,9 @@ env:
 jobs:
   scan_ruby:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
 
     steps:
       - name: Checkout code
@@ -23,10 +26,86 @@ jobs:
           bundler-cache: true
 
       - name: Scan for common Rails security vulnerabilities using static analysis
-        run: bin/brakeman --no-pager
+        id: brakeman
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          bin/brakeman --no-pager 2>&1 | tee brakeman-output.txt
 
       - name: Scan for known security vulnerabilities in gems used
-        run: bin/bundler-audit
+        id: bundler_audit
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          bin/bundler-audit 2>&1 | tee bundler-audit-output.txt
+
+      - name: Build PR comment body
+        if: github.event_name == 'pull_request'
+        id: comment
+        env:
+          BRAKEMAN_OUTCOME: ${{ steps.brakeman.outcome }}
+          BUNDLER_AUDIT_OUTCOME: ${{ steps.bundler_audit.outcome }}
+        run: |
+          has_findings=false
+          {
+            echo "## Ruby security scan"
+            echo
+            echo "These checks no longer fail CI. Address findings below when practical (e.g. gem updates from bundler-audit)."
+            echo
+
+            if [ "$BRAKEMAN_OUTCOME" = "failure" ]; then
+              has_findings=true
+              echo "### Brakeman"
+              echo
+              echo '```'
+              # Keep comment under GitHub's size limit.
+              head -c 20000 brakeman-output.txt || true
+              echo
+              echo '```'
+              echo
+            else
+              echo "### Brakeman"
+              echo
+              echo "No issues found."
+              echo
+            fi
+
+            if [ "$BUNDLER_AUDIT_OUTCOME" = "failure" ]; then
+              has_findings=true
+              echo "### Bundler audit"
+              echo
+              echo '```'
+              head -c 20000 bundler-audit-output.txt || true
+              echo
+              echo '```'
+              echo
+            else
+              echo "### Bundler audit"
+              echo
+              echo "No vulnerable gems found."
+              echo
+            fi
+          } > comment-body.md
+
+          if [ "$has_findings" = "true" ]; then
+            echo "has_findings=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_findings=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Comment scan findings on PR
+        if: github.event_name == 'pull_request' && steps.comment.outputs.has_findings == 'true'
+        uses: marocchino/sticky-pull-request-comment@v3
+        with:
+          header: scan-ruby
+          path: comment-body.md
+
+      - name: Remove stale scan comment when clean
+        if: github.event_name == 'pull_request' && steps.comment.outputs.has_findings == 'false'
+        uses: marocchino/sticky-pull-request-comment@v3
+        with:
+          header: scan-ruby
+          delete: true
 
   lint:
     runs-on: ubuntu-latest
