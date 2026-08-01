@@ -35,6 +35,34 @@ class AlertsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "bar renders alert bar inside turbo frame when alerts are present" do
+    stub_librewxr_alerts([
+      WeatherAlert.new(
+        event: "Heat Advisory",
+        description: "Hot conditions expected across the lowlands.",
+        starts_at: 1.hour.ago,
+        ends_at: 2.hours.from_now,
+        source: "librewxr"
+      )
+    ]) do
+      get alerts_bar_url
+      assert_response :success
+      assert_select "turbo-frame#weather_alerts_bar a.forecast-alerts-bar[href='#{alerts_path}']", text: /Heat Advisory/
+      assert_select "turbo-frame#weather_alerts_bar a.forecast-alerts-bar", text: /Until/
+      assert_select "a.forecast-alerts-bar", text: /Hot conditions/, count: 0
+      assert_select "header.site-header", count: 0
+    end
+  end
+
+  test "bar returns empty turbo frame when there are no alerts" do
+    stub_librewxr_alerts([]) do
+      get alerts_bar_url
+      assert_response :success
+      assert_select "turbo-frame#weather_alerts_bar"
+      assert_select "a.forecast-alerts-bar", count: 0
+    end
+  end
+
   private
 
   def stub_librewxr_alerts(alerts)
