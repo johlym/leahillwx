@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 class DownloadLatestEarthquakeJob
   include Sidekiq::Job
 
-  def perform(*args)
+  def perform(*_args)
     eq = UsgsEarthquakeClient.new.get_latest_earthquake
     return if eq.nil?
 
@@ -19,5 +21,7 @@ class DownloadLatestEarthquakeJob
 
     earthquake.assign_attributes(eq.except(:usgs_id))
     earthquake.save!
+  rescue HttpClient::RequestError => e
+    Rails.logger.warn("Earthquake download failed: #{e.message}")
   end
 end

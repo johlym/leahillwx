@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DownloadOpenWeatherAqiJob
   include Sidekiq::Job
 
@@ -18,5 +20,7 @@ class DownloadOpenWeatherAqiJob
       pm10: components["pm10"],
       nh3: components["nh3"]
     )
+  rescue OpenWeatherClient::RequestError, KeyError => e
+    Rails.logger.warn("OpenWeather AQI download failed: #{e.message}")
   end
 end

@@ -115,7 +115,32 @@ class DownloadLatestEarthquakeJobTest < ActiveSupport::TestCase
     assert_equal "us7000stable", existing.reload.usgs_id
   end
 
+  test "logs and continues when the USGS client raises RequestError" do
+    assert_no_difference "Earthquake.count" do
+      stub_api_error(HttpClient::RequestError.new("HTTP GET failed: Net::ReadTimeout")) do
+        DownloadLatestEarthquakeJob.new.perform
+      end
+    end
+  end
+
   private
+
+  def stub_api_error(error)
+    UsgsEarthquakeClient.singleton_class.alias_method(:__orig_new, :new)
+    UsgsEarthquakeClient.define_singleton_method(:new) do |*_args|
+      Object.new.tap do |fake|
+        fake.define_singleton_method(:get_latest_earthquake) { raise error }
+      end
+    end
+    begin
+      yield
+    ensure
+      UsgsEarthquakeClient.singleton_class.remove_method(:new)
+      UsgsEarthquakeClient.singleton_class.alias_method(:new, :__orig_new)
+      UsgsEarthquakeClient.singleton_class.remove_method(:__orig_new)
+    end
+  end
+
 
   def with_env(vars)
     originals = vars.transform_values { |_| :__unset__ }

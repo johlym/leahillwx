@@ -49,5 +49,15 @@ module ThirdPartyWeather
       assert_equal "2026-07-18 12:00:00", captured[:query][:dateutc]
       refute_includes captured[:query][:dateutc], "+"
     end
+
+    test "swallows transient connection resets without raising" do
+      HTTParty.define_singleton_method(:get) do |*_args, **_kwargs|
+        raise Errno::ECONNRESET, "Connection reset by peer"
+      end
+
+      assert_nothing_raised do
+        PwsWeather.call(@measurement)
+      end
+    end
   end
 end

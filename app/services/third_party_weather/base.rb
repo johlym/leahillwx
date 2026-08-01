@@ -32,6 +32,10 @@ module ThirdPartyWeather
 
       begin
         upload(measurement)
+      rescue *HttpClient::NETWORK_ERRORS => e
+        # Uploads are best-effort and Sidekiq retry is disabled for these jobs.
+        release_send_slot!
+        Rails.logger.error "[#{service_name}] raised #{e.class}: #{e.message}"
       rescue StandardError => e
         release_send_slot!
         Rails.logger.error "[#{service_name}] raised #{e.class}: #{e.message}"
