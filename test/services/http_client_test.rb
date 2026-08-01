@@ -32,4 +32,37 @@ class HttpClientTest < ActiveSupport::TestCase
       HttpClient.get("https://example.com")
     end
   end
+
+  test "get wraps network timeouts as RequestError" do
+    HTTParty.define_singleton_method(:get) do |*_args, **_kwargs|
+      raise Net::OpenTimeout, "execution expired"
+    end
+
+    error = assert_raises(HttpClient::RequestError) do
+      HttpClient.get("https://example.com")
+    end
+    assert_match(/Net::OpenTimeout/, error.message)
+  end
+
+  test "get wraps connection resets as RequestError" do
+    HTTParty.define_singleton_method(:get) do |*_args, **_kwargs|
+      raise Errno::ECONNRESET, "Connection reset by peer"
+    end
+
+    error = assert_raises(HttpClient::RequestError) do
+      HttpClient.get("https://example.com")
+    end
+    assert_match(/ECONNRESET/, error.message)
+  end
+
+  test "get_json wraps invalid JSON as RequestError" do
+    HTTParty.define_singleton_method(:get) do |*_args, **_kwargs|
+      FakeResponse.new(code: 200, body: '{"incomplete":')
+    end
+
+    error = assert_raises(HttpClient::RequestError) do
+      HttpClient.get_json("https://example.com")
+    end
+    assert_match(/invalid JSON/, error.message)
+  end
 end
