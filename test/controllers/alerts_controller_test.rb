@@ -47,7 +47,7 @@ class AlertsControllerTest < ActionDispatch::IntegrationTest
     ]) do
       get alerts_bar_url
       assert_response :success
-      assert_select "turbo-frame#weather_alerts_bar a.forecast-alerts-bar[href='#{alerts_path}']", text: /Heat Advisory/
+      assert_select "turbo-frame#weather_alerts_bar a.forecast-alerts-bar[href='#{alerts_path}'][data-turbo-frame='_top']", text: /Heat Advisory/
       assert_select "turbo-frame#weather_alerts_bar a.forecast-alerts-bar", text: /Until/
       assert_select "a.forecast-alerts-bar", text: /Hot conditions/, count: 0
       assert_select "header.site-header", count: 0

@@ -32,7 +32,7 @@ class Home::Forecast::AlertsBarComponentTest < ViewComponent::TestCase
     assert_text "Heat Advisory"
     assert_text(/Until/i)
     assert_no_text "Hot conditions expected"
-    assert_selector "a.forecast-alerts-bar[href='/alerts']"
+    assert_selector "a.forecast-alerts-bar[href='/alerts'][data-turbo-frame='_top']"
   end
 
   test "shows alert count in indicator when multiple are active" do
