@@ -95,6 +95,34 @@ class AqiTest < ActiveSupport::TestCase
     assert reading.stale?
   end
 
+  test "latest prefers airnow even when openweather is newer" do
+    Aqi.upsert_reading!(
+      observed_at: 2.hours.ago,
+      pm2_5: 3.8,
+      epa_aqi: 18,
+      source: "airnow"
+    )
+    Aqi.upsert_reading!(
+      observed_at: 1.hour.ago,
+      pm2_5: 425.8,
+      source: "openweather"
+    )
+
+    latest = Aqi.latest
+    assert_equal "airnow", latest.source
+    assert_equal 18, latest.epa_aqi
+  end
+
+  test "latest falls back to openweather when no airnow rows exist" do
+    Aqi.upsert_reading!(
+      observed_at: 1.hour.ago,
+      pm2_5: 12.0,
+      source: "openweather"
+    )
+
+    assert_equal "openweather", Aqi.latest.source
+  end
+
   test "daily_averages groups by Pacific date" do
     zone = ActiveSupport::TimeZone["America/Los_Angeles"]
     day = zone.local(2026, 7, 13, 10)

@@ -16,6 +16,9 @@ class RootController < ApplicationController
     @hourly_ranges = WeatherData::LiveCardHourlyRanges.new.call
     @today_peaks = WeatherData::TodayPeaks.from_hourly_ranges(@hourly_ranges)
     @aqi = Aqi.latest
+    if @aqi.nil? || @aqi.stale? || @aqi.source != "airnow"
+      DownloadAirNowAqiJob.perform_async
+    end
     @wildfire = WildfireSnapshot.latest
     @aurora = AuroraSnapshot.latest
     @planet_night = ensure_planet_night

@@ -159,6 +159,7 @@ module WeatherData
 
     def aqi_buckets
       rows = Aqi.with_observation
+        .where(source: "airnow")
         .where(observed_at: start_bucket..(end_bucket + INTERVAL_MINUTES.minutes - 1.second))
         .pluck(:observed_at, :epa_aqi, :pm2_5)
 

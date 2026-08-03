@@ -5,10 +5,12 @@ class RootControllerTest < ActionDispatch::IntegrationTest
   setup do
     Sidekiq::Testing.fake!
     DownloadOpenWeatherForecastJob.clear
+    DownloadAirNowAqiJob.clear
   end
 
   teardown do
     DownloadOpenWeatherForecastJob.clear
+    DownloadAirNowAqiJob.clear
   end
 
   test "should get index" do
@@ -51,5 +53,36 @@ class RootControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal 0, DownloadOpenWeatherForecastJob.jobs.size
+  end
+
+  test "index enqueues AirNow AQI download when latest reading is openweather" do
+    Aqi.delete_all
+    Aqi.upsert_reading!(
+      observed_at: 1.hour.ago,
+      pm2_5: 12.0,
+      source: "openweather"
+    )
+    DownloadAirNowAqiJob.clear
+
+    get root_url
+
+    assert_response :success
+    assert_equal 1, DownloadAirNowAqiJob.jobs.size
+  end
+
+  test "index does not enqueue AirNow AQI download when airnow reading is fresh" do
+    Aqi.delete_all
+    Aqi.upsert_reading!(
+      observed_at: 1.hour.ago,
+      pm2_5: 3.8,
+      epa_aqi: 18,
+      source: "airnow"
+    )
+    DownloadAirNowAqiJob.clear
+
+    get root_url
+
+    assert_response :success
+    assert_equal 0, DownloadAirNowAqiJob.jobs.size
   end
 end
