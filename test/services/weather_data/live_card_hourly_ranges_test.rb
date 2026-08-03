@@ -102,6 +102,28 @@ class WeatherData::LiveCardHourlyRangesTest < ActiveSupport::TestCase
     assert_equal 50, humidity[:y_max]
   end
 
+  test "aqi sparkline ignores openweather rows" do
+    Aqi.create!(
+      observed_at: @now - 10.minutes,
+      pm2_5: 425.8,
+      epa_aqi: 451,
+      source: "openweather"
+    )
+    Aqi.create!(
+      observed_at: @now,
+      pm2_5: 3.8,
+      epa_aqi: 18,
+      source: "airnow"
+    )
+
+    aqi = WeatherData::LiveCardHourlyRanges.new(now: @now).call[:aqi]
+
+    assert_includes aqi[:values], 18
+    refute_includes aqi[:values].compact, 451
+    assert_equal 18, aqi[:y_min]
+    assert_equal 18, aqi[:y_max]
+  end
+
   private
 
   def create_measurement(minutes_ago:, humidity:, temperature:, uvi:, rain_rate:, wind_speed: 1, gust_speed: 2)

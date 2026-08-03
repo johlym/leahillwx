@@ -39,8 +39,11 @@ class Aqi < ApplicationRecord
   scope :with_observation, -> { where.not(observed_at: nil) }
   scope :chronological, -> { order(observed_at: :asc) }
 
+  # Prefer AirNow (monitor truth). OpenWeather is only a fallback when no
+  # AirNow rows exist — its pollution feed can be hours ahead but wrong.
   def self.latest
-    with_observation.order(observed_at: :desc).first
+    with_observation.where(source: "airnow").order(observed_at: :desc).first ||
+      with_observation.order(observed_at: :desc).first
   end
 
   def self.recent(hours: 48)
