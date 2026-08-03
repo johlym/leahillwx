@@ -34,16 +34,6 @@ class OpenWeatherClient
     get_json(endpoint_path, params)
   end
 
-  def retrieve_aqi
-    endpoint_path = "/data/2.5/air_pollution"
-    params = {
-      "appid" => @appid,
-      "lat" => @lat,
-      "lon" => @lon
-    }
-    get_json(endpoint_path, params)
-  end
-
   private
 
   def get_json(endpoint_path, params)
