@@ -1,5 +1,6 @@
 <%= link_to alerts_path,
             class: "forecast-alerts-bar",
+            data: { turbo_frame: "_top" },
             aria: { label: "View all weather alerts" } do %>
   <div class="forecast-alerts-bar-inner">
     <span class="forecast-alerts-bar-label"><%= indicator_label %></span>
