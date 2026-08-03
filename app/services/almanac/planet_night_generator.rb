@@ -56,14 +56,25 @@ module Almanac
 
     def generate_and_persist!(date = Time.current.in_time_zone(@timezone).to_date)
       payload = generate(date)
-      record = PlanetNight.find_or_initialize_by(date: payload[:date])
-      record.timezone = payload[:timezone]
-      record.planets = payload[:planets]
-      record.save!
-      record
+      persist_payload!(payload)
     end
 
     private
+
+    # Homepage traffic can enqueue multiple jobs for the same date before the first
+    # insert commits; upsert on the unique date index keeps that race idempotent.
+    def persist_payload!(payload)
+      PlanetNight.upsert(
+        {
+          date: payload[:date],
+          timezone: payload[:timezone],
+          planets: payload[:planets]
+        },
+        unique_by: :index_planet_nights_on_date,
+        update_only: %i[timezone planets]
+      )
+      PlanetNight.find_by!(date: payload[:date])
+    end
 
     def build_planet(body, window_start, window_end, civil_dusk, civil_dawn)
       rise_at = @horizon.rise(body, window_start, window_end)
