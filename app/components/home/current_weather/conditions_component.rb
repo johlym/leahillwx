@@ -109,10 +109,6 @@ class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
     end
   end
 
-  def reading_timestamp_header
-    Time.current.in_time_zone("America/Los_Angeles").strftime("%b %-d, %Y @ %-I:%M %p").upcase
-  end
-
   def current_rain_day
     format("%.2f", @current.rain_day_in)
   end

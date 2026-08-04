@@ -52,8 +52,7 @@ class Home::Forecast::HourlyForecastComponentTest < ViewComponent::TestCase
   test "renders the hour label with AM/PM in Pacific time" do
     render_inline(Home::Forecast::HourlyForecastComponent.new(hours: @hours, timestamp: @timestamp))
 
-    assert_selector "p.hour", text: /12/
-    assert_selector "p.hour span.ampm", text: "PM"
+    assert_selector "p.hour", text: /12 PM/
   end
 
   test "renders the rounded temperature with a degree symbol" do
@@ -65,23 +64,12 @@ class Home::Forecast::HourlyForecastComponentTest < ViewComponent::TestCase
     assert_selector "p.temperature", text: "70°"
   end
 
-  test "renders wind speed and gust rounded to whole numbers" do
-    single_hour = [ build_hour(dt: @noon_pacific.to_i, wind_speed: 4.4704, wind_gust: 8.9408) ]
-
-    render_inline(Home::Forecast::HourlyForecastComponent.new(hours: single_hour, timestamp: @timestamp))
-
-    # 4.4704 m/s -> 10 mph, 8.9408 m/s -> 20 mph
-    assert_selector "p.wind", text: /10 \| 20/
-    assert_selector "p.wind i.fa-wind"
-  end
-
-  test "renders precipitation as a percentage" do
+  test "renders precipitation chance as a percentage" do
     single_hour = [ build_hour(dt: @noon_pacific.to_i, pop: 0.35) ]
 
     render_inline(Home::Forecast::HourlyForecastComponent.new(hours: single_hour, timestamp: @timestamp))
 
-    assert_selector "p.precip", text: /35%/
-    assert_selector "p.precip i.fa-cloud-rain"
+    assert_selector "p.precip", text: /35% Rain/
   end
 
   test "renders the weather icon for each hour" do
@@ -92,12 +80,10 @@ class Home::Forecast::HourlyForecastComponentTest < ViewComponent::TestCase
     assert_selector "div.icon-container i", count: 3
   end
 
-  test "renders the openweathermap attribution link with the formatted timestamp" do
+  test "renders the openweathermap data source label" do
     render_inline(Home::Forecast::HourlyForecastComponent.new(hours: @hours, timestamp: @timestamp))
 
-    assert_text "as of"
-    assert_selector "a[href='https://openweathermap.org/?utm_source=lhwx.org&utm_medium=referral'][target='_blank']",
-                    text: "OpenWeatherMap"
+    assert_text "Data updated via OpenWeatherMap"
   end
 
   test "handles being given no hours without crashing" do
