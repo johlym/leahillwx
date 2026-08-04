@@ -1,6 +1,5 @@
 <div class="weather-tile weekly-forecast">
-  <h2 class="weather-tile-heading">7-day Forecast</h2>
-  <p class="tile-subtitle">as of <%= formatted_timestamp %>. Forecast data via <%= link_to "OpenWeatherMap", "https://openweathermap.org/?utm_source=lhwx.org&utm_medium=referral", target: "_blank" %>.</p>
+  <h2 class="weather-tile-heading">7-Day Forecast</h2>
   <% days.each do |entry| %>
   <div class="forecast-entry">
     <div class="date-grid">
@@ -11,18 +10,14 @@
       <div class="icon">
         <%= render "root/shared/weather_icon", icon: entry.weather_icon %>
       </div>
-      <div class="high-low">
-        <span class="high"><%= entry.temp_max.round %>°F</span>
-        <span class="low"><%= entry.temp_min.round %>°F</span>
-      </div>
+      <span class="forecast-condition-label"><%= entry.weather_description&.titleize %></span>
     </div>
     <div class="forecast-text">
-      <p class="forecast-description"><%= entry.weather_description&.titleize %></p>
       <p class="forecast-summary"><%= entry.summary %>.</p>
     </div>
-    <div class="wind">
-      <p><span class="wind-speed"><%= entry.wind_speed.round %></span> <span class="unit">mph</span> <%= render Elements::WindVaneComponent.new(direction: entry.wind_deg) %></p>
-      <p class="wind-gust"><%= entry.wind_gust ? "#{entry.wind_gust.round} mph gusts" : "" %></p>
+    <div class="forecast-temps">
+      <span class="high"><%= entry.temp_max.round %>°</span>
+      <span class="low"><%= entry.temp_min.round %>°</span>
     </div>
   </div>
   <% end %>

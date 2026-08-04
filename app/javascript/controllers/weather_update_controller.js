@@ -39,10 +39,10 @@ export default class extends Controller {
 
   updateWeatherData(data) {
     if (this.hasTemperatureTarget) {
-      this.temperatureTarget.textContent = `${this.asInt(data.temperature_f)}°F`
+      this.temperatureTarget.textContent = `${this.asInt(data.temperature_f)}°`
     }
     if (this.hasFeelsLikeTarget) {
-      this.feelsLikeTarget.textContent = `Feels like ${this.asInt(data.feels_like_f)}°F`
+      this.feelsLikeTarget.textContent = `${this.asInt(data.feels_like_f)}°F`
     }
     if (this.hasCounterTarget) {
       this.counterTarget.textContent = data.counter.toLocaleString()
@@ -55,11 +55,11 @@ export default class extends Controller {
       this.windDirectionTarget.textContent = data.wind_direction_compass
     }
     if (this.hasWindCompassTarget && typeof data.wind_direction_deg === "number") {
-      const needle = this.windCompassTarget.querySelector(".compass__needle")
+      const needle = this.windCompassTarget.querySelector(".compass-needle")
       if (needle) needle.style.setProperty("--compass-needle-deg", `${data.wind_direction_deg}deg`)
     }
     if (this.hasGustSpeedTarget) {
-      this.gustSpeedTarget.textContent = `Gusting to ${this.asInt(data.gust_speed_mph)} mph`
+      this.gustSpeedTarget.innerHTML = `Gusting to <strong class="text-white">${this.asInt(data.gust_speed_mph)} mph</strong>`
     }
     if (this.hasRainDayTarget) {
       this.rainDayTarget.textContent = this.asFixed2(data.rain_day_in)
@@ -177,32 +177,18 @@ export default class extends Controller {
 
     return readings.map((reading) => {
       const name = reading.name || `Ch ${reading.channel}`
+      let valueHtml = `<span class="soil-channel-na">N/A</span>`
+      if (reading.moisture != null) {
+        valueHtml = `<span class="soil-channel-number">${this.asInt(reading.moisture)}</span><span class="soil-channel-unit">%</span>`
+        if (reading.temperature_f != null) {
+          valueHtml += `<span class="soil-channel-temp"> / ${this.asInt(reading.temperature_f)}°F</span>`
+        }
+      }
       return `<div class="soil-channel">
         <span class="soil-channel-name">${name}</span>
-        ${this.renderSoilMetric(reading.moisture, "%", reading.moisture_battery)}
-        ${this.renderSoilMetric(reading.temperature_f, "°F", reading.temperature_battery)}
+        <span class="soil-channel-value">${valueHtml}</span>
       </div>`
     }).join("")
-  }
-
-  renderSoilMetric(value, unit, battery) {
-    const primary = value != null
-      ? `<span class="soil-channel-number">${this.asInt(value)}</span><span class="soil-channel-unit">${unit}</span>`
-      : `<span class="soil-channel-na">N/A</span>`
-
-    let batteryHtml = ""
-    if (battery != null) {
-      batteryHtml = `<span class="soil-channel-battery">
-        <span class="soil-channel-battery-number">${this.asFixed2(battery)}</span><span class="soil-channel-unit">V</span>
-      </span>`
-    } else if (value != null) {
-      batteryHtml = `<span class="soil-channel-battery soil-channel-na">—</span>`
-    }
-
-    return `<span class="soil-channel-metric">
-      <span class="soil-channel-value">${primary}</span>
-      ${batteryHtml}
-    </span>`
   }
 
   asInt(value) {

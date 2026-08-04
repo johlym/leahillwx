@@ -1,76 +1,68 @@
-/* 7-day forecast card. Outer surface + header live in weekly-forecast;
-   each row is a forecast-entry. Descendant styling is unavoidable
-   because the row markup is flat inside the wrapper. */
+/* 7-day forecast card. */
 
 @utility weekly-forecast {
-  @apply bg-surface border border-border rounded-xl text-text overflow-hidden;
+  @apply bg-slate-900/40 border border-slate-900 rounded-2xl p-6 text-text;
 
   & > .weather-tile-heading {
-    @apply block px-4 py-3 bg-bg-elevated border-b border-border
-           font-condensed uppercase tracking-[0.05em] text-text-strong text-[1.05rem] m-0;
+    @apply font-heading text-base font-bold text-white uppercase tracking-wider m-0 mb-6;
   }
   & > .tile-subtitle {
-    @apply px-4 py-[0.35rem] border-b border-border text-subtle text-[0.75rem] bg-bg-elevated mb-0;
+    @apply text-[10px] text-slate-500 mb-4 mt-0;
   }
 }
 
 @utility forecast-entry {
-  @apply flex flex-wrap items-center px-4 py-[0.85rem] gap-3 border-b border-border
-         transition-[background-color] duration-150;
+  @apply flex items-center justify-between gap-4 p-3 rounded-lg
+         transition-colors duration-150;
 
   &:hover {
-    @apply bg-surface-2;
-  }
-  &:last-child {
-    @apply border-b-0;
+    @apply bg-slate-900/60;
   }
 
   & > .date-grid {
-    @apply min-w-18 text-text;
+    @apply w-24 shrink-0;
   }
   & > .date-grid .dayname {
-    @apply font-condensed uppercase text-[1.35rem] text-text-strong leading-none mb-[0.15rem];
+    @apply text-sm font-bold text-white block m-0 uppercase;
   }
   & > .date-grid .daynum {
-    @apply uppercase text-[0.85rem] text-muted tracking-[0.04em];
+    @apply text-[10px] text-slate-500 uppercase m-0;
   }
 
   & > .conditions {
-    @apply flex items-center gap-3 min-w-32;
+    @apply flex items-center gap-2 shrink-0;
   }
   & > .conditions .icon {
-    @apply text-text text-2xl;
+    @apply text-amber-400 text-xl;
   }
   & > .conditions .high-low {
-    @apply flex items-baseline gap-2;
+    @apply hidden;
   }
-  & > .conditions .high {
-    @apply font-condensed text-3xl text-text-strong leading-none;
-  }
-  & > .conditions .low {
-    @apply font-condensed text-[1.35rem] text-muted leading-none;
+  & > .conditions .forecast-condition-label {
+    @apply text-xs text-slate-300 hidden sm:inline-block;
   }
 
   & > .forecast-text {
-    @apply flex-1 basis-48;
+    @apply flex-1 max-w-[200px] text-right sm:text-left min-w-0;
   }
   & > .forecast-text .forecast-description {
-    @apply text-text font-medium mb-[0.15rem];
+    @apply hidden;
   }
   & > .forecast-text .forecast-summary {
-    @apply text-muted text-[0.85rem];
+    @apply text-xs text-slate-400 block line-clamp-1 m-0;
+  }
+
+  & > .forecast-temps {
+    @apply text-right shrink-0;
+  }
+  & > .forecast-temps .high {
+    @apply font-heading text-sm font-bold text-rose-400;
+  }
+  & > .forecast-temps .low {
+    @apply font-heading text-sm font-bold text-slate-500 ml-2;
   }
 
   & > .wind {
-    @apply min-w-24 text-right;
-  }
-  & > .wind .wind-speed {
-    @apply font-condensed text-[1.15rem] text-text-strong;
-  }
-  & > .wind .unit {
-    @apply text-[0.85rem] text-muted mr-[0.15rem];
-  }
-  & > .wind .wind-gust {
-    @apply text-subtle text-[0.75rem];
+    @apply hidden;
   }
 }

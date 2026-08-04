@@ -12,18 +12,22 @@
     data-palette-next-transition-at-value="<%= @palette_next_transition_at.iso8601 %>"
   <% end %>>
   <head>
-    <title><%= content_for(:title) || "Lea Hill Weather (v2)" %></title>
+    <title><%= content_for(:title) || "Lea Hill Weather" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Lea Hill Weather">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="description" content="Current weather conditions and forecasts for Lea Hill, Auburn, WA">
-    <meta name="theme-color" content="#141625">
+    <meta name="theme-color" content="#020617">
     <meta name="color-scheme" content="dark">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <%= yield :head %>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap">
 
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">

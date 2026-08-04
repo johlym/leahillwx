@@ -1,45 +1,69 @@
-/* Sky & nearby hazards strip under the live conditions cards. */
+/* Sky & nearby hazards strip. */
 
 @utility sky-hazards {
-  @apply relative isolate py-2 text-text;
+  @apply relative isolate py-8 text-text bg-slate-950;
 }
 
 @utility sky-hazards-inner {
-  @apply container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 pb-4;
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 }
 
 @utility sky-hazards-header {
-  @apply mb-3;
+  @apply border-t border-slate-900 pt-8 mb-6;
 }
 
 @utility sky-hazards-title {
-  @apply font-condensed uppercase tracking-[0.08em] text-lg text-text-strong;
+  @apply font-heading text-lg font-bold text-white uppercase tracking-wider m-0;
 }
 
 @utility sky-hazards-subtitle {
-  @apply text-muted text-sm mt-1;
+  @apply hidden;
 }
 
 @utility sky-hazards-strip {
-  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3;
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6;
+}
+
+@utility sky-hazards-card-label {
+  @apply text-[10px] font-bold uppercase tracking-widest block;
+}
+
+@utility sky-hazards-card-label-danger {
+  @apply text-red-400;
+}
+
+@utility sky-hazards-card-label-indigo {
+  @apply text-indigo-400;
+}
+
+@utility sky-hazards-card-label-success {
+  @apply text-emerald-400;
+}
+
+@utility sky-hazards-card-label-info {
+  @apply text-sky-400;
 }
 
 @utility sky-hazards-planet-list {
-  @apply mt-2 flex flex-col gap-1 text-[0.78rem] text-muted;
+  @apply mt-3 space-y-2 text-xs;
 
   & li {
-    @apply flex flex-wrap items-baseline gap-x-2 gap-y-0.5;
+    @apply flex flex-col gap-1;
   }
 
   & strong {
-    @apply text-text min-w-[4.5rem];
+    @apply text-slate-300 font-bold;
   }
 }
 
+@utility sky-hazards-planet-row {
+  @apply flex justify-between items-center;
+}
+
 @utility sky-hazards-planet-times {
-  @apply font-mono text-text;
+  @apply text-slate-500;
 }
 
 @utility sky-hazards-credits {
-  @apply mt-3 text-[0.7rem] text-muted;
+  @apply mt-4 text-[10px] text-slate-600;
 }

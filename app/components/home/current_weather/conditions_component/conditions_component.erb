@@ -1,226 +1,152 @@
 <section class="current-conditions" data-palette-transition>
-  <%# Same 4-col / gap-3 tracks as the live strip below so Wind/Sun
-      align with AQI/Soil (and Humidity/UV with the temp span). %>
   <div class="current-conditions-inner">
     <div class="current-conditions-hero">
-      <div class="current-conditions-primary">
-        <p class="current-conditions-timestamp"
-           data-weather-update-target="timestamp">
-          <%= reading_timestamp %>
-        </p>
-
-        <div class="current-conditions-temp-row">
-          <span class="current-conditions-temp"
-                data-weather-update-target="temperature"><%= current_temperature %>°F</span>
-
-          <div class="current-conditions-desc">
-            <div class="current-conditions-icon">
+      <div class="current-hero-card">
+        <div class="current-hero-glow" aria-hidden="true"></div>
+        <div class="relative z-10">
+          <span class="current-hero-label">Current Conditions</span>
+          <div class="current-hero-temp-row">
+            <span class="current-hero-temp"
+                  data-weather-update-target="temperature"><%= current_temperature %>°</span>
+            <span class="current-hero-unit">F</span>
+          </div>
+          <div class="current-hero-desc">
+            <div class="current-hero-icon">
               <%= render "root/shared/weather_icon", icon: weather_icon, night: night_time?, blackout: true %>
             </div>
-            <p class="current-conditions-summary"><%= weather_description %></p>
+            <p class="current-hero-summary"><%= weather_description %></p>
           </div>
         </div>
-
-        <p class="current-conditions-feels">
-          <span data-weather-update-target="feelsLike">Feels like <%= current_feels_like %>°F</span>
-          <% if today_high && today_low %>
-            <span class="current-conditions-sep">·</span>
-            High <%= today_high %>° / Low <%= today_low %>°
-          <% end %>
-        </p>
+        <div class="current-hero-stats">
+          <div>
+            <span class="current-hero-stat-label">Feels Like</span>
+            <span class="current-hero-stat-value" data-weather-update-target="feelsLike"><%= current_feels_like %>°F</span>
+          </div>
+          <div>
+            <span class="current-hero-stat-label">Today High</span>
+            <span class="current-hero-stat-high"><%= today_high ? "#{today_high}°F" : "—" %></span>
+          </div>
+          <div>
+            <span class="current-hero-stat-label">Today Low</span>
+            <span class="current-hero-stat-low"><%= today_low ? "#{today_low}°F" : "—" %></span>
+          </div>
+        </div>
       </div>
+
+      <div class="current-wind-card">
+        <div>
+          <span class="current-hero-label">Wind Direction</span>
+          <div class="current-wind-dial-wrap" data-weather-update-target="windCompass">
+            <%= render Elements::CompassComponent.new(direction: @current.wind_dir, size: :lg, show_label: false) %>
+          </div>
+          <div class="mt-4 text-center">
+            <span class="font-heading text-3xl font-black text-white block leading-none tabular-nums"
+                  data-weather-update-target="windSpeed"><%= current_wind_speed %></span>
+            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">MPH</span>
+          </div>
+        </div>
+        <div class="current-wind-footer">
+          <span data-weather-update-target="gustSpeed">Gusting to <strong class="text-white"><%= current_gust_speed %> mph</strong></span>
+          from <strong class="text-white" data-weather-update-target="windDirection"><%= current_wind_direction %></strong>
+        </div>
+      </div>
+
+      <% if @almanac %>
+        <div class="current-sky-card">
+          <div>
+            <span class="current-hero-label">Celestial Cycles</span>
+            <div class="mt-4">
+              <%= render Elements::SkyArcComponent.new(almanac: @almanac) %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="live-strip">
+      <%= render Ui::CardComponent.new(padding: :default) do %>
+        <div class="live-tile">
+          <span class="live-tile-label">Humidity</span>
+          <div class="live-tile-body">
+            <div class="live-tile-value">
+              <span class="live-tile-number" data-weather-update-target="humidity"><%= current_humidity %></span>
+              <span class="live-tile-unit">%</span>
+            </div>
+          </div>
+          <% if today_peaks[:humidity] %>
+            <p class="live-tile-peak">Peak today <strong class="text-slate-300"><%= today_peaks[:humidity] %>%</strong></p>
+          <% end %>
+        </div>
+      <% end %>
 
       <%= render Ui::CardComponent.new(padding: :default) do %>
         <div class="live-tile">
-          <div class="live-tile-split">
-            <div class="live-tile-main">
-              <div class="live-tile-label">
-                <i class="fa-regular fa-wind"></i>
-                <span>Wind</span>
-              </div>
-              <div class="live-tile-body">
-                <div class="live-tile-value">
-                  <span class="live-tile-number live-tile-number-xl"
-                        data-weather-update-target="windSpeed"><%= current_wind_speed %></span>
-                  <span class="live-tile-unit live-tile-unit-lg">mph</span>
-                </div>
-                <p class="live-tile-meta">
-                  from <span data-weather-update-target="windDirection"><%= current_wind_direction %></span><br />
-                  <span data-weather-update-target="gustSpeed">Gusting to <%= current_gust_speed %> mph</span>
-                </p>
-              </div>
+          <span class="live-tile-label">UV Index</span>
+          <div class="live-tile-body">
+            <div class="live-tile-value items-center gap-2">
+              <span class="live-tile-number" data-weather-update-target="uvi"><%= current_uvi %></span>
+              <span class="status-badge <%= uv_badge_class %>"><%= current_uv_index_category %></span>
             </div>
-            <div class="live-tile-aside" data-weather-update-target="windCompass">
-              <%= render Elements::CompassComponent.new(direction: @current.wind_dir, size: :lg, show_label: false) %>
+            <div class="uv-scale" aria-hidden="true">
+              <div class="uv-scale-fill <%= uv_fill_class %>" style="width: <%= uv_marker_position %>%;"></div>
             </div>
           </div>
-          <% if today_peaks[:wind_gust_mph] %>
-            <p class="live-tile-peak">Peak gust today <%= today_peaks[:wind_gust_mph] %> mph</p>
-          <% end %>
-          <%= render Home::CurrentWeather::LiveSparklineComponent.new(
-                series: hourly_ranges[:wind],
-                metric: "wind",
-                y_unit: " mph",
-                decimals: 0,
-                aria_label: "10-minute average wind speed so far today"
-              ) %>
         </div>
       <% end %>
 
-      <% if @almanac %>
-        <%= render Ui::CardComponent.new(padding: :default) do %>
-          <div class="live-tile-label">
-            <i class="fa-regular fa-sunrise"></i>
-            <span>Sun &amp; Moon Today</span>
-          </div>
-          <%= render Elements::SkyArcComponent.new(almanac: @almanac) %>
-        <% end %>
-      <% end %>
+      <%= render Home::CurrentWeather::Pm25Component.new(current: aqi, sparkline: hourly_ranges[:aqi]) %>
+
+      <%= render Home::CurrentWeather::SoilComponent.new(readings: @current&.soil_readings || []) %>
     </div>
-  </div>
-</section>
 
-<div class="primary-container">
-  <%# lg: 1 Humidity, 2 UV, 3 AQI, 4 Soil (row-span-2)
-         5 Rain, 6 Dew Point, 7 Cloud Base, 4 Soil %>
-  <div class="live-strip">
-    <%= render Ui::CardComponent.new(padding: :default) do %>
-      <div class="live-tile">
-        <div class="live-tile-label">
-          <i class="fa-regular fa-hand-holding-droplet"></i>
-          <span>Humidity</span>
-        </div>
-        <div class="live-tile-body">
-          <div class="live-tile-value">
-            <span class="live-tile-number" data-weather-update-target="humidity"><%= current_humidity %></span>
-            <span class="live-tile-unit">%</span>
-          </div>
-        </div>
-        <% if today_peaks[:humidity] %>
-          <p class="live-tile-peak">Peak today <%= today_peaks[:humidity] %>%</p>
-        <% end %>
-        <%= render Home::CurrentWeather::LiveSparklineComponent.new(
-              series: hourly_ranges[:humidity],
-              metric: "humidity",
-              y_unit: "%",
-              decimals: 0,
-              aria_label: "10-minute average humidity so far today"
-            ) %>
-      </div>
-    <% end %>
-
-    <%= render Ui::CardComponent.new(padding: :default) do %>
-      <div class="live-tile">
-        <div class="live-tile-label">
-          <i class="fa-kit fa-regular-sun-circle-exclamation"></i>
-          <span>UV Index</span>
-        </div>
-        <div class="live-tile-body">
-          <div class="live-tile-value">
-            <span class="live-tile-number" data-weather-update-target="uvi"><%= current_uvi %></span>
-          </div>
-          <div class="uv-scale" aria-hidden="true" style="--uv: <%= uv_marker_position %>%;">
-            <div class="uv-scale-marker"></div>
-          </div>
-          <p class="live-tile-meta">
-            <span data-weather-update-target="solarIrradiance"><%= current_solar_irradiance %></span> W/m²
-            · <%= current_uv_index_category %>
-          </p>
-        </div>
-        <% if today_peaks[:uvi] %>
-          <p class="live-tile-peak">Peak today <%= today_peaks[:uvi] %></p>
-        <% end %>
-        <%= render Home::CurrentWeather::LiveSparklineComponent.new(
-              series: hourly_ranges[:uvi],
-              metric: "uvi",
-              y_unit: "",
-              decimals: 0,
-              aria_label: "10-minute average UV index so far today"
-            ) %>
-      </div>
-    <% end %>
-
-    <%= render Home::CurrentWeather::Pm25Component.new(current: aqi, sparkline: hourly_ranges[:aqi]) %>
-
-    <%= render Home::CurrentWeather::SoilComponent.new(readings: @current&.soil_readings || []) %>
-
-    <%= render Ui::CardComponent.new(padding: :default) do %>
-      <div class="live-tile">
-        <div class="live-tile-label">
-          <i class="fa-regular fa-cloud-rain"></i>
-          <span>Rain</span>
-        </div>
-        <div class="live-tile-body">
-          <div class="live-tile-value">
-            <span class="live-tile-number" data-weather-update-target="rainDay"><%= current_rain_day %></span>
-            <span class="live-tile-unit">in</span>
+    <div class="live-strip-secondary">
+      <%= render Ui::CardComponent.new(padding: :default) do %>
+        <div class="live-tile">
+          <span class="live-tile-label">Rainfall</span>
+          <div class="live-tile-body">
+            <div class="live-tile-value">
+              <span class="live-tile-number" data-weather-update-target="rainDay"><%= current_rain_day %></span>
+              <span class="live-tile-unit-lg">in</span>
+            </div>
           </div>
           <p class="live-tile-meta">
             <span data-weather-update-target="rainRate"><%= current_rain_hour %></span> in/hr right now
           </p>
         </div>
-        <% if today_peaks[:rain_rate_in] %>
-          <p class="live-tile-peak">Peak rate today <%= today_peaks[:rain_rate_in] %> in/hr</p>
-        <% end %>
-        <%= render Home::CurrentWeather::LiveSparklineComponent.new(
-              series: hourly_ranges[:rain_rate],
-              metric: "rain_rate",
-              y_unit: " in",
-              decimals: 2,
-              aria_label: "10-minute average rain rate so far today"
-            ) %>
-      </div>
-    <% end %>
+      <% end %>
 
-    <%= render Ui::CardComponent.new(padding: :default) do %>
-      <div class="live-tile">
-        <div class="live-tile-label">
-          <i class="fa-regular fa-droplet-degree"></i>
-          <span>Dew Point</span>
-        </div>
-        <div class="live-tile-body">
-          <div class="live-tile-value">
-            <span class="live-tile-number" data-weather-update-target="dewPoint"><%= current_dew_point %></span>
-            <span class="live-tile-unit">°F</span>
+      <%= render Ui::CardComponent.new(padding: :default) do %>
+        <div class="live-tile">
+          <span class="live-tile-label">Dew Point</span>
+          <div class="live-tile-body">
+            <div class="live-tile-value">
+              <span class="live-tile-number" data-weather-update-target="dewPoint"><%= current_dew_point %></span>
+              <span class="live-tile-unit-lg">°F</span>
+            </div>
           </div>
+          <% if today_peaks[:dew_point_f] %>
+            <p class="live-tile-peak">Peak today: <%= today_peaks[:dew_point_f] %>°F</p>
+          <% else %>
+            <p class="live-tile-meta">Derived from temperature &amp; humidity</p>
+          <% end %>
         </div>
-        <% if today_peaks[:dew_point_f] %>
-          <p class="live-tile-peak">Peak today <%= today_peaks[:dew_point_f] %>°F</p>
-        <% end %>
-        <%= render Home::CurrentWeather::LiveSparklineComponent.new(
-              series: hourly_ranges[:dew_point],
-              metric: "dew_point",
-              y_unit: "°",
-              decimals: 0,
-              aria_label: "10-minute average dew point so far today"
-            ) %>
-      </div>
-    <% end %>
+      <% end %>
 
-    <%= render Ui::CardComponent.new(padding: :default) do %>
-      <div class="live-tile">
-        <div class="live-tile-label">
-          <i class="fa-regular fa-cloud"></i>
-          <span>Cloud Base</span>
-        </div>
-        <div class="live-tile-body">
-          <div class="live-tile-value">
-            <span class="live-tile-number"><%= number_with_delimiter(current_cloud_base_ft) %></span>
-            <span class="live-tile-unit">ft</span>
+      <%= render Ui::CardComponent.new(padding: :default) do %>
+        <div class="live-tile">
+          <span class="live-tile-label">Cloud Base</span>
+          <div class="live-tile-body">
+            <div class="live-tile-value">
+              <span class="live-tile-number"><%= number_with_delimiter(current_cloud_base_ft) %></span>
+              <span class="live-tile-unit-lg">ft</span>
+            </div>
           </div>
-          <p class="live-tile-meta">Estimated from temp/dew spread</p>
+          <p class="live-tile-meta">Estimated from temperature &amp; humidity spread</p>
         </div>
-        <%= render Home::CurrentWeather::LiveSparklineComponent.new(
-              series: hourly_ranges[:cloud_base],
-              metric: "cloud_base",
-              y_unit: " ft",
-              decimals: 0,
-              aria_label: "10-minute average cloud base so far today"
-            ) %>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
   </div>
-</div>
+</section>
 
 <%= render Home::CurrentWeather::SkyHazardsComponent.new(
       wildfire: wildfire,

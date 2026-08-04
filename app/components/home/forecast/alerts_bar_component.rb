@@ -26,6 +26,6 @@ class Home::Forecast::AlertsBarComponent < ViewComponent::Base
 
   def indicator_label
     count = @alerts.length
-    count > 1 ? "#{count} Alerts" : "Alert"
+    count > 1 ? "#{count} ALERTS" : "ALERT"
   end
 end

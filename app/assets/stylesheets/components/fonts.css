@@ -1,7 +1,10 @@
-@font-face {
-  font-family: "Saira Extra Condensed";
-  src: url("SairaExtraCondensed-SemiBold.woff2") format("woff2");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
+/* Display + telemetry fonts (see DESIGN.md). Loaded via Google Fonts in the layout. */
+
+@theme {
+  --font-heading: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "JetBrains Mono", ui-monospace, monospace;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  /* Back-compat for existing font-condensed utilities → display face */
+  --font-condensed: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "JetBrains Mono", ui-monospace, monospace;
 }

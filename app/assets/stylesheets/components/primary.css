@@ -2,25 +2,14 @@
 
 @layer base {
   html {
-    @apply antialiased scheme-only-dark;
+    @apply antialiased scheme-only-dark font-body;
     background-color: var(--color-bg);
   }
 
   body {
     color: var(--color-text);
     min-height: 100dvh;
-    background:
-      radial-gradient(
-        90% 60% at 15% -10%,
-        color-mix(in oklab, var(--color-accent) 12%, transparent),
-        transparent 55%
-      ),
-      radial-gradient(
-        70% 50% at 90% 100%,
-        color-mix(in oklab, var(--color-accent-strong) 8%, transparent),
-        transparent 60%
-      ),
-      var(--color-bg);
+    background-color: var(--color-bg);
   }
 
   a {
@@ -35,29 +24,26 @@
   }
 }
 
-/* Page container. Also styles the h1/h2/h3 tree inside so raw markdown-
-   style views (e.g. graphs index) look correct without adding utilities
-   to every heading. */
 @utility primary-container {
-  @apply container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 my-4 text-text;
+  @apply container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 my-4 text-text;
 
   & h1 {
-    @apply text-5xl font-condensed uppercase my-4 tracking-wide text-text-strong;
+    @apply font-heading text-5xl font-bold uppercase my-4 tracking-wider text-text-strong;
   }
   & h2 {
-    @apply text-3xl font-condensed uppercase my-4 tracking-wide text-text-strong;
+    @apply font-heading text-3xl font-bold uppercase my-4 tracking-wider text-text-strong;
   }
   & h3 {
-    @apply text-xl font-condensed uppercase my-3 tracking-wide text-text;
+    @apply font-heading text-xl font-bold uppercase my-3 tracking-wider text-text;
   }
   & h1 small,
   & h2 small {
-    @apply text-base normal-case tracking-normal text-muted;
+    @apply text-base normal-case tracking-normal text-muted font-body font-normal;
   }
 }
 
 @utility about-article {
-  @apply container mx-auto px-3 sm:px-6 lg:px-8 my-4 text-text
+  @apply container mx-auto px-4 sm:px-6 lg:px-8 my-4 text-text
          prose prose-invert max-w-4xl;
 }
 
@@ -66,28 +52,13 @@
 }
 
 @utility btn-primary {
-  @apply inline-flex items-center gap-2 px-4 py-2 rounded-[0.4rem] cursor-pointer
+  @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer
          text-accent-contrast font-semibold no-underline
-         transition-[background,border-color,color,box-shadow,transform] duration-150;
-  background: linear-gradient(
-    180deg,
-    var(--color-accent-strong),
-    var(--color-accent)
-  );
-  border: 1px solid
-    color-mix(in oklab, var(--color-accent-strong) 65%, transparent);
-  box-shadow:
-    0 1px 0 color-mix(in oklab, #fff 15%, transparent) inset,
-    0 0 0 1px color-mix(in oklab, var(--color-accent) 25%, transparent),
-    0 6px 20px -10px color-mix(in oklab, var(--color-accent) 55%, transparent);
+         transition-[background,border-color,color] duration-150
+         bg-accent hover:bg-accent-strong border border-accent;
 
   &:hover {
     @apply text-accent-contrast no-underline;
-    box-shadow:
-      0 1px 0 color-mix(in oklab, #fff 20%, transparent) inset,
-      0 0 0 1px color-mix(in oklab, var(--color-accent) 45%, transparent),
-      0 10px 28px -12px
-        color-mix(in oklab, var(--color-accent) 70%, transparent);
   }
   &:active {
     transform: translateY(1px);
@@ -98,19 +69,13 @@
 }
 
 @utility btn-secondary {
-  @apply inline-flex items-center gap-2 px-4 py-2 rounded-[0.4rem] cursor-pointer
+  @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer
          text-text font-medium no-underline
-         backdrop-blur-sm backdrop-saturate-150
-         transition-[background-color,border-color,color,box-shadow,transform] duration-150;
-  background: color-mix(in oklab, var(--color-surface) 60%, transparent);
-  border: 1px solid
-    color-mix(in oklab, var(--color-border-strong) 70%, transparent);
+         transition-[background-color,border-color,color] duration-150
+         bg-surface border border-border hover:bg-surface-2 hover:text-text-strong;
 
   &:hover {
-    @apply bg-surface-2 text-accent-strong no-underline;
-    border-color: color-mix(in oklab, var(--color-accent) 55%, transparent);
-    box-shadow: 0 0 0 1px
-      color-mix(in oklab, var(--color-accent) 25%, transparent);
+    @apply no-underline;
   }
   &:active {
     transform: translateY(1px);

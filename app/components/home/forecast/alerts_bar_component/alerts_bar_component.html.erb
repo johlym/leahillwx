@@ -3,8 +3,13 @@
             data: { turbo_frame: "_top" },
             aria: { label: "View all weather alerts" } do %>
   <div class="forecast-alerts-bar-inner">
-    <span class="forecast-alerts-bar-label"><%= indicator_label %></span>
-    <span class="forecast-alerts-bar-event"><%= event_label(primary_alert) %></span>
+    <div class="forecast-alerts-bar-label">
+      <span class="forecast-alerts-bar-dot" aria-hidden="true">
+        <span class="forecast-alerts-bar-dot-ping"></span>
+        <span class="forecast-alerts-bar-dot-core"></span>
+      </span>
+      <span class="forecast-alerts-bar-event"><%= indicator_label %>: <%= event_label(primary_alert) %></span>
+    </div>
     <% if ends_label(primary_alert) %>
       <span class="forecast-alerts-bar-meta">Until <%= ends_label(primary_alert) %></span>
     <% end %>

@@ -1,11 +1,14 @@
 <div class="hourly-forecast">
-  <h2 class="weather-tile-heading">Hourly Forecast</h2>
-  
+  <div class="hourly-forecast-header">
+    <h2 class="weather-tile-heading">Hourly Forecast</h2>
+    <p>Data updated via OpenWeatherMap</p>
+  </div>
+
   <div class="hourly-forecast-row">
     <% hours.each do |hour| %>
       <div class="hourly-forecast-item">
         <p class="hour">
-          <%= hour.time.in_time_zone("America/Los_Angeles").strftime("%-I") %> <span class="ampm"><%= hour.time.in_time_zone("America/Los_Angeles").strftime("%p") %></span>
+          <%= hour.time.in_time_zone("America/Los_Angeles").strftime("%-I %p") %>
         </p>
         <div class="icon-container">
           <%= render "root/shared/weather_icon", icon: hour.weather_icon, night: night_time?(hour.time) %>
@@ -14,16 +17,11 @@
           <p class="temperature">
             <%= hour.temp.round %>°
           </p>
-          <p class="wind">
-            <i class="fa-regular fa-fw fa-wind"></i> <%= hour.wind_speed.round %> | <%= hour.wind_gust.round %>
-          </p>
           <p class="precip">
-            <i class="fa-regular fa-fw fa-cloud-rain"></i> <%= (hour.pop * 100).round %>%
+            <%= (hour.pop * 100).round %>% Rain
           </p>
         </div>
       </div>
     <% end %>
   </div>
-
-  <p>as of <%= formatted_timestamp %>. Forecast data via <%= link_to "OpenWeatherMap", "https://openweathermap.org/?utm_source=lhwx.org&utm_medium=referral", target: "_blank" %>.</p>
 </div>
