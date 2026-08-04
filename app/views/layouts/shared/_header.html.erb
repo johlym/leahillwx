@@ -4,11 +4,19 @@
   <nav aria-label="Global" class="site-header-nav">
     <div class="site-header-brand-wrap" data-controller="connection-status">
       <a href="/" class="site-header-brand">
-        <%= image_tag "logo.png", alt: "Lea Hill Weather", class: "site-header-logo" %>
-        <span class="site-header-title">Lea Hill Weather</span>
+        <span class="site-header-logo-tile" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="site-header-logo">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z" />
+          </svg>
+        </span>
+        <span class="site-header-brand-text">
+          <span class="site-header-title">Lea Hill Weather</span>
+          <span class="site-header-live-row hidden" data-connection-status-target="badge">
+            <span class="site-header-live-dot" aria-hidden="true"></span>
+            <span class="site-header-live-badge">LIVE</span>
+          </span>
+        </span>
       </a>
-      <span class="site-header-live-badge hidden"
-            data-connection-status-target="badge">LIVE</span>
     </div>
 
     <div class="site-header-menu-toggle-wrap">
@@ -31,6 +39,19 @@
       <%= link_to "Almanac", almanac_path, class: nav_link_classes(almanac_path) %>
       <%= link_to "About",   about_path,   class: nav_link_classes(about_path) %>
     </div>
+
+    <% if @current&.reading_date_time || content_for?(:header_meta) %>
+      <div class="site-header-meta">
+        <% if content_for?(:header_meta) %>
+          <%= yield :header_meta %>
+        <% else %>
+          <span class="site-header-meta-label">Last Updated</span>
+          <span class="site-header-meta-value" data-weather-update-target="timestamp">
+            <%= @current.reading_date_time.in_time_zone("America/Los_Angeles").strftime("%b %-d, %Y @ %-I:%M %p") %>
+          </span>
+        <% end %>
+      </div>
+    <% end %>
   </nav>
 
   <div id="mobile-menu"

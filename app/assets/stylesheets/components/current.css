@@ -1,101 +1,106 @@
-/* Live-conditions hero + strip. Markup uses semantic component classes;
-   Tailwind utilities stay here via @apply. Flat kebab names (no BEM). */
+/* Live-conditions hero + metric cards — modular telemetry dashboard. */
 
 @utility current-conditions {
-  @apply relative isolate py-6 pb-4 text-text;
-
-  &::before {
-    content: "";
-    @apply absolute inset-x-0 -top-8 -bottom-12 -z-10 pointer-events-none;
-    background:
-      radial-gradient(
-        80% 70% at 18% 25%,
-        color-mix(in oklab, var(--color-accent) 14%, transparent),
-        transparent 65%
-      ),
-      radial-gradient(
-        70% 70% at 82% 45%,
-        color-mix(in oklab, var(--color-accent-strong) 10%, transparent),
-        transparent 65%
-      );
-    mask-image: linear-gradient(
-      to bottom,
-      black 0%,
-      black 70%,
-      transparent 100%
-    );
-    -webkit-mask-image: linear-gradient(
-      to bottom,
-      black 0%,
-      black 70%,
-      transparent 100%
-    );
-  }
+  @apply relative isolate py-8 text-text bg-slate-950;
 }
 
-/* Same 4-col / gap-3 tracks as the live strip so Wind/Sun align with
-   AQI/Soil (and Humidity/UV with the temp span). */
 @utility current-conditions-inner {
-  @apply container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-6 lg:py-10;
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 }
 
 @utility current-conditions-hero {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 items-center;
+  @apply grid grid-cols-1 lg:grid-cols-12 gap-6;
 }
 
-@utility current-conditions-primary {
-  @apply md:col-span-2 flex flex-col items-center text-center
-         lg:items-start lg:text-left gap-3 min-w-0;
+/* Hero temperature panel */
+@utility current-hero-card {
+  @apply lg:col-span-5 bg-slate-900/50 border border-slate-800/80 rounded-2xl p-6
+         flex flex-col justify-between relative overflow-hidden backdrop-blur-sm;
 }
 
-@utility current-conditions-timestamp {
-  @apply text-muted font-condensed uppercase tracking-[0.08em] text-[0.95rem];
+@utility current-hero-glow {
+  @apply absolute top-0 right-0 w-64 h-64 bg-sky-500/5 rounded-full blur-3xl pointer-events-none;
 }
 
-@utility current-conditions-temp-row {
-  @apply mt-1 flex flex-col items-center justify-center gap-4
-         sm:flex-row sm:items-baseline sm:justify-center lg:justify-start;
+@utility current-hero-label {
+  @apply text-xs font-semibold text-slate-400 uppercase tracking-widest;
 }
 
-@utility current-conditions-temp {
-  @apply font-condensed font-light leading-[0.9] tracking-[-0.02em]
-         text-text-strong tabular-nums text-[clamp(6rem,18vw,11rem)];
-  text-shadow:
-    0 0 20px color-mix(in oklab, var(--color-accent-strong) 35%, transparent),
-    0 0 55px color-mix(in oklab, var(--color-accent) 22%, transparent);
+@utility current-hero-temp-row {
+  @apply mt-6 flex items-baseline gap-2;
 }
 
-@utility current-conditions-desc {
-  @apply text-center sm:text-left;
+@utility current-hero-temp {
+  @apply font-heading text-7xl sm:text-8xl font-black text-white tracking-tighter tabular-nums leading-none;
 }
 
-@utility current-conditions-icon {
-  @apply text-[2.25rem] text-text-strong;
-  filter: drop-shadow(
-    0 0 12px color-mix(in oklab, var(--color-accent) 45%, transparent)
-  );
+@utility current-hero-unit {
+  @apply font-heading text-4xl font-bold text-sky-400;
 }
 
-@utility current-conditions-summary {
-  @apply mt-1 font-condensed uppercase tracking-[0.06em] text-2xl text-text;
+@utility current-hero-desc {
+  @apply mt-4 flex items-center gap-3;
 }
 
-@utility current-conditions-feels {
-  @apply text-muted text-base;
+@utility current-hero-icon {
+  @apply text-3xl text-amber-400;
 }
 
-@utility current-conditions-sep {
-  @apply mx-[0.4rem] text-subtle;
+@utility current-hero-summary {
+  @apply font-heading text-lg font-bold text-slate-200 m-0;
 }
 
-/* Live strip below the hero — same column tracks as the hero grid. */
+@utility current-hero-stats {
+  @apply mt-8 pt-6 border-t border-slate-800/60 grid grid-cols-3 gap-2 text-xs relative z-10;
+}
+
+@utility current-hero-stat-label {
+  @apply text-slate-500 block;
+}
+
+@utility current-hero-stat-value {
+  @apply font-semibold text-slate-200 mt-0.5 block;
+}
+
+@utility current-hero-stat-high {
+  @apply font-semibold text-rose-400 mt-0.5 block;
+}
+
+@utility current-hero-stat-low {
+  @apply font-semibold text-sky-400 mt-0.5 block;
+}
+
+/* Wind dial card */
+@utility current-wind-card {
+  @apply lg:col-span-3 bg-slate-900/50 border border-slate-800/80 rounded-2xl p-6
+         flex flex-col justify-between backdrop-blur-sm;
+}
+
+@utility current-wind-dial-wrap {
+  @apply mt-6 flex justify-center;
+}
+
+@utility current-wind-footer {
+  @apply mt-4 text-xs text-center border-t border-slate-800/60 pt-4 text-slate-400;
+}
+
+/* Celestial card */
+@utility current-sky-card {
+  @apply lg:col-span-4 bg-slate-900/50 border border-slate-800/80 rounded-2xl p-6
+         flex flex-col justify-between backdrop-blur-sm;
+}
+
+/* Metric card strips */
 @utility live-strip {
-  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-1 mb-4;
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6;
 }
 
-/* Live tile — repeated for every metric in the strip. */
+@utility live-strip-secondary {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-6 mt-6;
+}
+
 @utility live-tile {
-  @apply flex flex-col gap-[0.55rem] min-h-full;
+  @apply flex flex-col gap-1 min-h-full;
 }
 
 @utility live-tile-header {
@@ -103,20 +108,15 @@
 }
 
 @utility live-tile-label {
-  @apply flex items-center gap-[0.4rem] text-muted text-xs
-         uppercase tracking-[0.08em] whitespace-nowrap;
-
-  & > i {
-    @apply text-accent text-base;
-  }
+  @apply text-[10px] font-bold text-slate-400 tracking-wider uppercase block;
 }
 
 @utility live-tile-source {
-  @apply text-muted text-[0.78rem] leading-[1.35] text-right truncate min-w-0;
+  @apply text-[10px] text-slate-500 leading-none text-right truncate min-w-0;
 }
 
 @utility live-tile-body {
-  @apply flex flex-col gap-[0.3rem] min-w-0 flex-1;
+  @apply flex flex-col gap-1 min-w-0 flex-1 mt-3;
 }
 
 @utility live-tile-body-fill {
@@ -124,47 +124,43 @@
 }
 
 @utility live-tile-value {
-  @apply inline-flex items-baseline gap-1 text-text-strong
-         font-condensed leading-none tabular-nums;
+  @apply inline-flex items-baseline gap-1 text-white;
 }
 
 @utility live-tile-number {
-  @apply text-[2.5rem] font-medium tabular-nums;
-  text-shadow: 0 0 22px
-    color-mix(in oklab, var(--color-accent) 22%, transparent);
+  @apply text-4xl font-extrabold tabular-nums font-heading leading-none;
 }
 
 @utility live-tile-number-xl {
-  @apply text-[3.25rem];
+  @apply text-3xl;
 }
 
 @utility live-tile-number-sm {
-  @apply text-[1.65rem] leading-tight;
+  @apply text-3xl;
 }
 
 @utility live-tile-unit {
-  @apply text-[1.15rem] text-muted tracking-[0.02em];
+  @apply text-lg font-bold text-slate-400;
 }
 
 @utility live-tile-unit-lg {
-  @apply text-[1.35rem];
+  @apply text-sm font-bold text-slate-400;
 }
 
 @utility live-tile-meta {
-  @apply text-muted text-[0.78rem] leading-[1.35];
+  @apply text-xs text-slate-500 mt-4;
 }
 
 @utility live-tile-meta-tight {
-  @apply mt-0.5;
+  @apply mt-1;
 }
 
 @utility live-tile-peak {
-  @apply text-[0.7rem] leading-[1.3] pt-[0.35rem] tracking-[0.02em];
-  color: color-mix(in oklab, var(--color-muted) 75%, transparent);
+  @apply text-xs text-slate-500 mt-4;
 }
 
 @utility live-tile-stale {
-  @apply text-warning;
+  @apply text-amber-400;
 }
 
 @utility live-tile-split {
@@ -180,9 +176,8 @@
 }
 
 @utility live-tile-sparkline {
-  @apply relative pt-2 h-[4.5rem] min-h-[4.5rem] shrink-0;
-  border-top: 1px dashed
-    color-mix(in oklab, var(--color-border) 60%, transparent);
+  @apply relative pt-2 h-[4.5rem] min-h-[4.5rem] shrink-0 mt-3;
+  border-top: 1px dashed color-mix(in oklab, var(--color-border) 60%, transparent);
 
   & canvas {
     width: 100% !important;
@@ -190,8 +185,6 @@
   }
 }
 
-/* Latest sparkline sample — only visible while the site is LIVE
-   (ActionCable connected; see connection-status + html.is-live). */
 .live-sparkline-pulse {
   position: absolute;
   top: 0;
@@ -245,138 +238,87 @@ html.is-live .live-sparkline-pulse:not([hidden])::after {
   }
 }
 
-/* Tall soil card spans two rows in the live strip at lg. */
 @utility soil-card {
-  @apply lg:row-span-2;
+  @apply flex flex-col justify-between;
 }
 
-/* Stretch cards so sparklines share a bottom baseline even when card
-   body content heights differ (home live strip + wind card). */
-.current-conditions .ui-card:has(.live-tile),
-.primary-container .ui-card:has(.live-tile) {
-  @apply h-full flex flex-col;
-}
-
-.current-conditions .ui-card:has(.live-tile) > .ui-card-body,
-.primary-container .ui-card:has(.live-tile) > .ui-card-body {
-  @apply flex flex-1 flex-col min-h-0;
-}
-
-/* UV Index colour scale — green (0) -> yellow -> orange -> red ->
-   purple (12+). Marker is positioned by an inline CSS variable set
-   from Ruby (`--uv:` percentage). */
 @utility uv-scale {
-  @apply relative my-[0.3rem] h-2 rounded-full;
-  background: linear-gradient(
-    to right,
-    oklch(0.75 0.18 145) 0%,
-    oklch(0.85 0.18 100) 25%,
-    oklch(0.78 0.19 65) 50%,
-    oklch(0.66 0.24 25) 75%,
-    oklch(0.55 0.22 310) 100%
-  );
-  box-shadow:
-    0 0 0 1px color-mix(in oklab, var(--color-border) 60%, transparent),
-    0 1px 0 color-mix(in oklab, var(--color-text) 6%, transparent) inset;
+  @apply relative mt-4 w-full bg-slate-800 h-1.5 rounded-full overflow-hidden;
+}
+
+@utility uv-scale-fill {
+  @apply h-full rounded-full;
 }
 
 @utility uv-scale-marker {
-  @apply absolute -top-0.75 -bottom-0.75 w-0.75 rounded-full bg-text-strong;
+  @apply absolute top-0 bottom-0 w-0.5 bg-white/80;
   left: var(--uv, 0%);
   transform: translateX(-50%);
-  box-shadow: 0 0 8px color-mix(in oklab, var(--color-text) 60%, transparent);
 }
 
-/* EPA AQI colour scale (AirNow RGB). Stops match the piecewise bar:
-   0–100 → first third, 100–200 → middle, 200–500 → last third.
-   Category edges: 50≈16.7%, 100≈33.3%, 150=50%, 200≈66.7%, 300≈77.8%. */
 @utility aqi-scale {
-  @apply relative my-[0.3rem] h-2 rounded-full;
-  background: linear-gradient(
-    to right,
-    rgb(0, 228, 0) 0%,
-    rgb(0, 228, 0) 16.7%,
-    rgb(255, 255, 0) 16.7%,
-    rgb(255, 255, 0) 33.3%,
-    rgb(255, 126, 0) 33.3%,
-    rgb(255, 126, 0) 50%,
-    rgb(255, 0, 0) 50%,
-    rgb(255, 0, 0) 66.7%,
-    rgb(143, 63, 151) 66.7%,
-    rgb(143, 63, 151) 77.8%,
-    rgb(126, 0, 35) 77.8%,
-    rgb(126, 0, 35) 100%
-  );
-  box-shadow:
-    0 0 0 1px color-mix(in oklab, var(--color-border) 60%, transparent),
-    0 1px 0 color-mix(in oklab, var(--color-text) 6%, transparent) inset;
+  @apply relative mt-4 w-full bg-slate-800 h-1.5 rounded-full overflow-hidden;
+}
+
+@utility aqi-scale-fill {
+  @apply h-full rounded-full;
 }
 
 @utility aqi-scale-marker {
-  @apply absolute -top-0.75 -bottom-0.75 w-0.75 rounded-full bg-text-strong;
+  @apply absolute top-0 bottom-0 w-0.5 bg-white/80;
   left: var(--aqi, 0%);
   transform: translateX(-50%);
-  box-shadow: 0 0 8px color-mix(in oklab, var(--color-text) 60%, transparent);
 }
 
-/* Soil table — sensor + humidity/temp (each with its own battery). */
+/* Soil — compact sensor list matching mockup */
 @utility soil-table {
-  @apply grid gap-[0.25rem] min-w-0;
+  @apply mt-3 space-y-1 text-xs min-w-0;
 }
 
 @utility soil-table-header {
-  @apply grid grid-cols-[2fr_1.25fr_1.25fr] gap-x-2
-         text-muted text-[0.68rem] uppercase tracking-[0.08em]
-         pb-[0.2rem] border-b border-border/50;
-
-  & > :not(:first-child) {
-    @apply text-center;
-  }
+  @apply hidden;
 }
 
 @utility soil-channels {
-  @apply grid gap-[0.2rem] min-w-0;
+  @apply space-y-1 min-w-0;
 }
 
 @utility soil-channel {
-  @apply grid grid-cols-[2fr_1.25fr_1.25fr] items-start gap-x-2
-         py-[0.2rem] border-b border-border/40 last:border-b-0;
-
-  & > :not(:first-child) {
-    @apply justify-self-center;
-  }
+  @apply flex justify-between items-baseline gap-2;
 }
 
 @utility soil-channel-name {
-  @apply text-muted text-[0.78rem] tracking-[0.02em] min-w-0 truncate;
+  @apply text-slate-400 truncate;
 }
 
 @utility soil-channel-metric {
-  @apply grid justify-items-center gap-0;
+  @apply inline;
 }
 
 @utility soil-channel-value {
-  @apply inline-flex items-baseline justify-center gap-[0.1rem]
-         text-text-strong text-[0.78rem] tracking-[0.02em] tabular-nums leading-none;
+  @apply font-bold text-emerald-400 tabular-nums;
 }
 
 @utility soil-channel-number {
-  @apply text-[0.78rem] font-bold;
+  @apply font-bold;
 }
 
 @utility soil-channel-battery {
-  @apply inline-flex items-baseline justify-center gap-[0.1rem] mt-[0.2rem]
-         text-[0.78rem] font-normal tracking-[0.02em] tabular-nums leading-none text-muted;
+  @apply hidden;
 }
 
 @utility soil-channel-battery-number {
-  @apply text-[0.78rem] font-normal;
+  @apply hidden;
 }
 
 @utility soil-channel-unit {
-  @apply text-[0.78rem] text-muted tracking-[0.02em];
+  @apply font-bold;
+}
+
+@utility soil-channel-temp {
+  @apply text-slate-500 font-normal;
 }
 
 @utility soil-channel-na {
-  @apply text-[0.78rem] text-muted tracking-[0.02em];
+  @apply text-slate-500;
 }

@@ -88,7 +88,24 @@ class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
     when 8..10
       "Very High"
     else
-      "Holy Sh*t"
+      "Extreme"
+    end
+  end
+
+  def uv_badge_class
+    case @current.uvi.to_i
+    when 0..2 then "status-badge-success"
+    when 3..5 then "status-badge-warning"
+    else "status-badge-danger"
+    end
+  end
+
+  def uv_fill_class
+    case @current.uvi.to_i
+    when 0..2 then "bg-emerald-500"
+    when 3..5 then "bg-amber-400"
+    when 6..7 then "bg-orange-500"
+    else "bg-red-500"
     end
   end
 

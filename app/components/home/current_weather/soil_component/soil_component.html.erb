@@ -1,53 +1,22 @@
 <%= render Ui::CardComponent.new(padding: :default, classes: "soil-card") do %>
   <div class="live-tile">
-    <div class="live-tile-label">
-      <i class="fa-solid fa-seedling"></i>
-      <span>Soil</span>
-    </div>
+    <span class="live-tile-label">Soil Sensors</span>
 
     <div class="live-tile-body live-tile-body-fill">
       <div class="soil-table">
-        <div class="soil-table-header" aria-hidden="true">
-          <span>Sensor</span>
-          <span>Humidity</span>
-          <span>Temp.</span>
-        </div>
-
         <div class="soil-channels" data-weather-update-target="soil">
           <% if readings? %>
             <% readings.each do |reading| %>
               <div class="soil-channel">
                 <span class="soil-channel-name"><%= reading["name"] %></span>
-                <span class="soil-channel-metric">
-                  <span class="soil-channel-value">
-                    <% if !reading["moisture"].nil? %>
-                      <span class="soil-channel-number"><%= reading["moisture"] %></span><span class="soil-channel-unit">%</span>
-                    <% else %>
-                      <span class="soil-channel-na">N/A</span>
-                    <% end %>
-                  </span>
-                  <% if !reading["moisture_battery"].nil? %>
-                    <span class="soil-channel-battery">
-                      <span class="soil-channel-battery-number"><%= format("%.2f", reading["moisture_battery"]) %></span><span class="soil-channel-unit">V</span>
-                    </span>
-                  <% elsif !reading["moisture"].nil? %>
-                    <span class="soil-channel-battery soil-channel-na">—</span>
-                  <% end %>
-                </span>
-                <span class="soil-channel-metric">
-                  <span class="soil-channel-value">
+                <span class="soil-channel-value">
+                  <% if !reading["moisture"].nil? %>
+                    <span class="soil-channel-number"><%= reading["moisture"] %></span><span class="soil-channel-unit">%</span>
                     <% if !reading["temperature_f"].nil? %>
-                      <span class="soil-channel-number"><%= reading["temperature_f"] %></span><span class="soil-channel-unit">°F</span>
-                    <% else %>
-                      <span class="soil-channel-na">N/A</span>
+                      <span class="soil-channel-temp"> / <%= reading["temperature_f"] %>°F</span>
                     <% end %>
-                  </span>
-                  <% if !reading["temperature_battery"].nil? %>
-                    <span class="soil-channel-battery">
-                      <span class="soil-channel-battery-number"><%= format("%.2f", reading["temperature_battery"]) %></span><span class="soil-channel-unit">V</span>
-                    </span>
-                  <% elsif !reading["temperature_f"].nil? %>
-                    <span class="soil-channel-battery soil-channel-na">—</span>
+                  <% else %>
+                    <span class="soil-channel-na">N/A</span>
                   <% end %>
                 </span>
               </div>

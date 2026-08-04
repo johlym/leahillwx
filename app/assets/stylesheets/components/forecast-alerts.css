@@ -1,38 +1,48 @@
 /* Header alert strip (above nav) + /alerts detail page. */
 
 @utility forecast-alerts-bar {
-  @apply block border-b border-border no-underline
+  @apply block border-b border-red-900/50 no-underline
+         bg-red-950/40
          transition-colors duration-150;
-  background: transparent;
 
   &:hover {
-    background: color-mix(in oklab, var(--color-bg) 55%, transparent);
+    @apply bg-red-950/55;
   }
 
   &:focus-visible {
-    outline: 2px solid var(--color-accent);
+    outline: 2px solid var(--color-danger);
     outline-offset: -2px;
   }
 }
 
 @utility forecast-alerts-bar-inner {
-  @apply container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8
-         py-2 sm:py-2.5 flex items-center gap-2.5 sm:gap-3 min-w-0;
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8
+         py-2.5 flex flex-col sm:flex-row items-center justify-between
+         gap-2 text-xs min-w-0;
 }
 
 @utility forecast-alerts-bar-label {
-  @apply shrink-0 border border-accent px-1 py-0.5 rounded-lg
-         text-[0.65rem] font-semibold uppercase tracking-[0.08em]
-         text-accent;
+  @apply flex items-center gap-2 text-red-400 font-semibold shrink-0;
+}
+
+@utility forecast-alerts-bar-dot {
+  @apply relative flex h-2 w-2;
+}
+
+@utility forecast-alerts-bar-dot-ping {
+  @apply absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 animate-ping;
+}
+
+@utility forecast-alerts-bar-dot-core {
+  @apply relative inline-flex rounded-full h-2 w-2 bg-red-500;
 }
 
 @utility forecast-alerts-bar-event {
-  @apply min-w-0 flex-1 truncate m-0
-         text-[0.9rem] sm:text-[0.95rem] font-semibold text-text-strong leading-none;
+  @apply min-w-0 truncate m-0 text-red-400 font-semibold leading-none;
 }
 
 @utility forecast-alerts-bar-meta {
-  @apply shrink-0 m-0 text-[0.7rem] sm:text-[0.75rem] text-muted whitespace-nowrap;
+  @apply shrink-0 m-0 text-slate-400 font-medium whitespace-nowrap;
 }
 
 /* --- /alerts ---------------------------------------------------- */
@@ -42,12 +52,12 @@
 }
 
 @utility alerts-page-empty {
-  @apply m-0 text-muted;
+  @apply m-0 text-slate-500;
 }
 
 @utility alerts-page-article {
-  @apply border border-border rounded-[0.35rem] px-4 py-4 sm:px-5 sm:py-5;
-  background: color-mix(in oklab, var(--color-accent) 6%, var(--color-bg));
+  @apply border border-slate-900 rounded-xl px-4 py-4 sm:px-5 sm:py-5
+         bg-slate-900/40;
 }
 
 @utility alerts-page-eyebrow {
@@ -55,36 +65,35 @@
 }
 
 @utility alerts-page-badge {
-  @apply inline-flex items-center px-1.5 py-0.5 rounded-[0.25rem]
-         text-[0.65rem] font-semibold uppercase tracking-[0.08em]
-         text-accent-contrast;
-  background: var(--color-accent);
+  @apply inline-flex items-center px-2 py-0.5 rounded
+         text-[10px] font-bold uppercase tracking-wider
+         text-red-400 bg-red-500/10;
 }
 
 @utility alerts-page-severity {
-  @apply inline-flex items-center text-[0.7rem] font-medium text-muted uppercase tracking-[0.06em];
+  @apply inline-flex items-center text-[10px] font-medium text-slate-500 uppercase tracking-wider;
 }
 
 @utility alerts-page-title {
-  @apply m-0 text-[1.05rem] sm:text-[1.15rem] font-semibold text-text-strong leading-snug;
+  @apply m-0 text-base sm:text-lg font-heading font-bold text-white leading-snug;
 }
 
 @utility alerts-page-meta {
-  @apply m-0 mt-2 flex flex-col gap-0.5 text-[0.8rem] text-muted;
+  @apply m-0 mt-2 flex flex-col gap-0.5 text-xs text-slate-500;
 }
 
 @utility alerts-page-regions {
-  @apply m-0 mt-3 text-[0.8rem] text-text leading-snug;
+  @apply m-0 mt-3 text-xs text-slate-300 leading-snug;
 }
 
 @utility alerts-page-regions-label {
-  @apply font-semibold text-text-strong;
+  @apply font-semibold text-white;
 }
 
 @utility alerts-page-body {
-  @apply m-0 mt-4 text-[0.85rem] sm:text-[0.9rem] text-text leading-relaxed whitespace-pre-wrap;
+  @apply m-0 mt-4 text-xs sm:text-sm text-slate-300 leading-relaxed whitespace-pre-wrap;
 }
 
 @utility alerts-page-source {
-  @apply m-0 mt-4 text-[0.7rem] text-muted;
+  @apply m-0 mt-4 text-[10px] text-slate-600;
 }

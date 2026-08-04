@@ -1,137 +1,96 @@
-/* Earthquake feed — table of the latest seismic events. Layout is a
-   fixed-width row-based flex table; magnitude classes tint rows. */
+/* Earthquake feed — compact data table. */
 
 @utility earthquake-table-container {
   @apply w-full overflow-x-auto;
 }
 
 @utility earthquake-table {
-  @apply text-text border-t border-b border-border;
-  min-width: 720px;
+  @apply w-full text-left border-collapse text-xs text-text;
+  min-width: 640px;
 }
 
 @utility eq-header {
-  @apply flex bg-bg-elevated border-b border-border;
+  @apply border-b border-slate-800 text-slate-500 uppercase tracking-wider;
 }
 
 @utility eq-header-cell {
-  @apply px-3 py-[0.6rem] text-[0.7rem] text-muted uppercase tracking-[0.06em];
+  @apply pb-3 font-semibold text-left;
 }
 
 @utility eq-body {
-  @apply flex flex-col gap-px bg-border;
+  @apply divide-y divide-slate-800/50;
 }
 
 @utility eq-row {
-  @apply flex bg-surface transition-[background-color] duration-150;
+  @apply transition-colors duration-150;
 
   &:hover {
-    @apply bg-surface-2;
+    @apply bg-slate-900/40;
   }
 }
 
 @utility eq-cell {
-  @apply px-3 py-[0.7rem] text-[0.85rem] text-text;
+  @apply py-3.5 text-slate-400;
 }
 
-/* Column widths (shared between header and body cells) */
 .revised-header,
 .revised-cell {
-  @apply p-0 shrink-0 w-4;
+  @apply w-0 p-0 overflow-hidden;
 }
 .mag-header,
 .eq-mag-cell {
-  @apply shrink-0 w-15 whitespace-nowrap;
+  @apply whitespace-nowrap pr-4;
 }
 .timestamp-header,
 .eq-timestamp-cell {
-  @apply shrink-0 w-37.5 whitespace-nowrap;
+  @apply whitespace-nowrap pr-4 text-slate-300;
 }
 .location-header,
 .eq-location-cell {
-  @apply flex-1;
+  @apply pr-4;
 }
 .distance-header,
-.eq-distance-cell {
-  @apply shrink-0 w-25 whitespace-nowrap;
-}
+.eq-distance-cell,
 .depth-header,
 .eq-depth-cell {
-  @apply shrink-0 w-25 whitespace-nowrap;
-}
-
-.eq-timestamp-cell,
-.eq-distance-cell,
-.eq-depth-cell {
-  @apply text-muted;
+  @apply whitespace-nowrap;
 }
 
 .eq-location-cell a {
-  @apply text-accent;
+  @apply text-sky-400 font-medium no-underline hover:underline;
 }
 
 .eq-mag-cell span.mag {
-  @apply text-center text-2xl font-bold text-text-strong font-condensed;
+  @apply inline-flex px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400
+         font-bold text-xs font-heading;
+}
+
+.eq-row.mag-4 .eq-mag-cell span.mag {
+  @apply bg-amber-500/10 text-amber-400;
+}
+.eq-row.mag-5 .eq-mag-cell span.mag,
+.eq-row.mag-6 .eq-mag-cell span.mag {
+  @apply bg-amber-500/15 text-amber-400;
+}
+.eq-row.mag-7 .eq-mag-cell span.mag,
+.eq-row.mag-8 .eq-mag-cell span.mag,
+.eq-row.mag-9 .eq-mag-cell span.mag {
+  @apply bg-red-500/15 text-red-400;
 }
 
 .revised-cell.revised {
-  @apply bg-surface-2;
+  @apply w-auto;
 }
 .revised-cell div.revised-tag {
-  @apply h-full flex items-center justify-center text-muted whitespace-nowrap;
-  font-size: 10px;
-  letter-spacing: 0.15em;
-  transform: rotate(-90deg);
+  @apply text-[9px] text-amber-400 font-bold tracking-wider;
 }
 
-/* Magnitude tinting — subtle warm bump for stronger quakes. */
-.eq-row.mag-4 {
-  background-color: color-mix(
-    in oklab,
-    var(--color-warning) 12%,
-    var(--color-surface)
-  );
-}
-.eq-row.mag-4 .eq-cell,
-.eq-row.mag-4 .eq-cell.eq-mag-cell span.mag {
-  color: var(--color-warning);
-}
-
-.eq-row.mag-5,
-.eq-row.mag-6 {
-  background-color: color-mix(
-    in oklab,
-    var(--color-warning) 22%,
-    var(--color-surface)
-  );
-}
-.eq-row.mag-5 .eq-cell,
-.eq-row.mag-6 .eq-cell,
-.eq-row.mag-5 .eq-cell.eq-mag-cell span.mag,
-.eq-row.mag-6 .eq-cell.eq-mag-cell span.mag {
-  color: var(--color-warning);
-}
-
-.eq-row.mag-7,
-.eq-row.mag-8,
-.eq-row.mag-9 {
-  background-color: color-mix(
-    in oklab,
-    var(--color-danger) 22%,
-    var(--color-surface)
-  );
-}
-.eq-row.mag-7 .eq-cell,
-.eq-row.mag-8 .eq-cell,
-.eq-row.mag-9 .eq-cell,
-.eq-row.mag-7 .eq-cell.eq-mag-cell span.mag,
-.eq-row.mag-8 .eq-cell.eq-mag-cell span.mag,
-.eq-row.mag-9 .eq-cell.eq-mag-cell span.mag {
-  color: var(--color-danger);
+.eq-time {
+  @apply text-slate-500;
 }
 
 @utility usgs-logo {
-  @apply flex items-center justify-end py-2 gap-2 text-subtle text-[0.75rem];
+  @apply flex items-center justify-end py-2 gap-2 text-slate-600 text-[10px] mt-2;
 
   & img {
     filter: brightness(0.9) contrast(1.05);

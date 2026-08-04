@@ -44,7 +44,8 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
   test "should show report" do
     get report_url(2024, "january")
     assert_response :success
-    assert_select "h1 small", text: "for January 2024"
+    assert_select "h1.ui-section-header-title", text: /Climatological Summary/
+    assert_select "p.ui-section-header-subtitle", text: "January 2024"
   end
 
   test "should return 404 for invalid month name" do

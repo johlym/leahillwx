@@ -1,8 +1,4 @@
-/* SVG compass. Everything is inside an <svg>, so descendant styling
-   is unavoidable (fill/stroke on child <path>/<text>/<circle>).
-   The size variants set a --compass-size custom property that the
-   dial reads. Rotation uses --compass-needle-deg set inline per
-   compass. */
+/* SVG wind compass — instrument dial styling. */
 
 @utility compass {
   @apply inline-flex flex-col items-center gap-[0.35rem] text-text;
@@ -24,40 +20,35 @@
   --compass-size: 4rem;
 }
 @utility compass-lg {
-  --compass-size: 6rem;
+  --compass-size: 7rem;
 }
 
-/* Ring, ticks, and cardinal letters — painted via CSS so var()
-   resolves reliably (var() in SVG XML attributes paints unreliably
-   in Safari). */
 @utility compass-ring {
-  stroke: color-mix(in oklab, var(--color-text) 22%, transparent);
+  stroke: #1e293b; /* slate-800 */
 }
 
 @utility compass-ticks {
   & line {
-    stroke: color-mix(in oklab, var(--color-text) 32%, transparent);
+    stroke: color-mix(in oklab, #94a3b8 40%, transparent);
   }
 }
 
 @utility compass-cardinals {
   & text {
-    fill: color-mix(in oklab, var(--color-text) 60%, transparent);
-    font-family: var(--font-condensed);
-    @apply font-semibold;
+    fill: #64748b; /* slate-500 */
+    font-family: var(--font-mono);
+    @apply font-bold;
   }
   & text.compass-cardinal-n {
-    @apply fill-danger font-bold;
+    fill: #64748b;
+    @apply font-bold;
   }
   & text.compass-cardinal-secondary {
-    fill: color-mix(in oklab, var(--color-text) 38%, transparent);
+    fill: color-mix(in oklab, #64748b 70%, transparent);
     @apply font-medium tracking-[-0.03em];
   }
 }
 
-/* Needle. transform-box + transform-origin lock the pivot to (50,50)
-   in viewBox coordinates so the needle spins around the center at
-   any physical size. */
 @utility compass-needle {
   transform: rotate(var(--compass-needle-deg, 0deg));
   transform-box: view-box;
@@ -66,22 +57,22 @@
 }
 
 @utility compass-needle-fore {
-  fill: var(--color-accent-strong, #ffd27a);
+  fill: #38bdf8; /* sky-400 */
 }
 
 @utility compass-needle-aft {
-  fill: color-mix(in oklab, var(--color-text) 35%, transparent);
+  fill: color-mix(in oklab, #94a3b8 35%, transparent);
 }
 
 @utility compass-hub {
-  fill: var(--color-text-strong, #fff);
+  fill: #fff;
 }
 
 @utility compass-label {
-  @apply font-condensed text-[0.85rem] font-medium tracking-[0.05em] uppercase text-text-strong;
+  @apply font-heading text-xs font-bold tracking-wider uppercase text-white;
 
   .compass-xs > &,
   .compass-sm > & {
-    @apply text-[0.7rem];
+    @apply text-[10px];
   }
 }

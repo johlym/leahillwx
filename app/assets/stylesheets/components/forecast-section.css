@@ -1,15 +1,23 @@
 /* Home page columns below the live strip, plus camera grids. */
 
 @utility home-columns {
-  @apply grid grid-cols-1 lg:grid-cols-[6fr_4fr] gap-4 mt-4;
+  @apply grid grid-cols-1 lg:grid-cols-12 gap-8 mt-0;
 }
 
 @utility home-column {
-  @apply flex flex-col gap-4;
+  @apply flex flex-col gap-6;
+}
+
+@utility home-column-forecast {
+  @apply lg:col-span-7;
+}
+
+@utility home-column-cameras {
+  @apply lg:col-span-5;
 }
 
 @utility tile-subtitle {
-  @apply text-muted text-[0.8rem] mb-[0.6rem];
+  @apply text-[10px] text-slate-500 mb-0;
 }
 
 @utility tile-subtitle-mono {
@@ -17,18 +25,46 @@
 }
 
 @utility camera-grid {
-  @apply grid grid-cols-2 gap-2;
+  @apply grid grid-cols-2 gap-4;
 
   & figure {
-    @apply m-0 rounded-[0.4rem] overflow-hidden border border-border bg-bg-elevated;
+    @apply relative m-0 rounded-xl overflow-hidden border border-slate-800;
   }
 
   & figcaption {
-    @apply text-center text-muted text-[0.75rem] uppercase tracking-[0.04em]
-           px-[0.4rem] py-[0.35rem] border-b border-border;
+    @apply absolute inset-x-0 bottom-0 z-10
+           text-[9px] font-bold text-white truncate uppercase tracking-wider
+           px-2 py-2
+           bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent;
   }
 
   & img {
-    @apply block w-full h-auto filter-[contrast(1.02)];
+    @apply block w-full h-24 object-cover transition-transform duration-300;
   }
+
+  & figure:hover img {
+    transform: scale(1.05);
+  }
+}
+
+@utility camera-grid-airport {
+  & img {
+    @apply h-20;
+  }
+}
+
+@utility camera-status {
+  @apply text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded;
+}
+
+@utility camera-refresh {
+  @apply text-[10px] text-slate-500;
+}
+
+@utility home-section {
+  @apply py-8 bg-slate-950;
+}
+
+@utility home-section-inner {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 }

@@ -14,74 +14,93 @@
   iss_pass: @iss_pass
 ) %>
 
-<div class="primary-container">
-  <% if @forecast&.created_at %>
-    <%= render Home::Forecast::HourlyForecastComponent.new(hours: @forecast.hours.first(8), timestamp: @forecast.created_at) %>
-  <% end %>
+<section class="home-section">
+  <div class="home-section-inner">
+    <% if @forecast&.created_at %>
+      <%= render Home::Forecast::HourlyForecastComponent.new(hours: @forecast.hours.first(8), timestamp: @forecast.created_at) %>
+    <% end %>
+  </div>
+</section>
 
-  <div class="home-columns">
-    <div class="home-column">
-      <% if @forecast&.created_at %>
-        <%= render Home::Forecast::DailyForecastComponent.new(days: @forecast.days, timestamp: @forecast.created_at) %>
-      <% end %>
+<section class="home-section">
+  <div class="home-section-inner">
+    <div class="home-columns">
+      <div class="home-column home-column-forecast">
+        <% if @forecast&.created_at %>
+          <%= render Home::Forecast::DailyForecastComponent.new(days: @forecast.days, timestamp: @forecast.created_at) %>
+        <% end %>
+      </div>
 
-      <%= render Ui::CardComponent.new(title: "Earthquakes", subtitle: "The last 5 earthquakes nearest to this location.") do %>
+      <div class="home-column home-column-cameras">
+        <div class="ui-card ui-card-pad-loose" data-controller="image-refresh">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="ui-card-title m-0">Auburn Traffic Feeds</h2>
+            <span class="camera-status">Active</span>
+          </div>
+          <div class="camera-grid" id="traffic_cameras">
+            <figure>
+              <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/226.jpg", alt: "A ST SE / 2nd ST SE" %>
+              <figcaption>A ST SE / 2ND ST SE</figcaption>
+            </figure>
+            <figure>
+              <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/28.jpg", alt: "8th ST NE / Harvey" %>
+              <figcaption>8TH ST NE / HARVEY</figcaption>
+            </figure>
+            <figure>
+              <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/12.jpg", alt: "S 277th ST / Auburn Way N" %>
+              <figcaption>S 277TH / AUBURN WAY N</figcaption>
+            </figure>
+            <figure>
+              <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/161.jpg", alt: "SE 312th ST / 124th AVE SE" %>
+              <figcaption>SE 312TH / 124TH AVE SE</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div class="ui-card ui-card-pad-loose" data-controller="image-refresh">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="ui-card-title m-0">Auburn Muni (S50)</h2>
+            <span class="camera-refresh">
+              Updates in <span data-image-refresh-target="countdown">60</span>s
+            </span>
+          </div>
+          <div class="camera-grid camera-grid-airport" id="airport_cameras">
+            <figure>
+              <%= image_tag "https://images.wsdot.wa.gov/airports/auburn2.jpg", alt: "North" %>
+              <figcaption>NORTH VIEW</figcaption>
+            </figure>
+            <figure>
+              <%= image_tag "https://images.wsdot.wa.gov/airports/auburn4.jpg", alt: "East" %>
+              <figcaption>EAST VIEW</figcaption>
+            </figure>
+            <figure>
+              <%= image_tag "https://images.wsdot.wa.gov/airports/auburn3.jpg", alt: "South" %>
+              <figcaption>SOUTH VIEW</figcaption>
+            </figure>
+            <figure>
+              <%= image_tag "https://images.wsdot.wa.gov/airports/auburn1.jpg", alt: "West" %>
+              <figcaption>WEST VIEW</figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="home-section">
+  <div class="home-section-inner">
+    <div class="border-t border-slate-900 pt-8">
+      <%= render Ui::CardComponent.new(
+            title: "Earthquakes",
+            subtitle: "The last 5 earthquakes nearest to this location",
+            padding: :loose
+          ) do |c| %>
+        <% c.with_actions do %>
+          <span class="text-[10px] text-slate-500">Earthquake feed provided by USGS</span>
+        <% end %>
         <%= render Home::EarthquakeTableComponent.new(earthquakes: @earthquakes) %>
       <% end %>
     </div>
-
-    <div class="home-column">
-      <%= render Ui::CardComponent.new(title: "Auburn Traffic Cameras", padding: :default) do %>
-        <div data-controller="image-refresh">
-          <p class="tile-subtitle">
-            Next refresh in <span data-image-refresh-target="countdown" class="tile-subtitle-mono">60</span> seconds.
-          </p>
-          <div class="camera-grid" id="traffic_cameras">
-            <figure>
-              <figcaption>A ST SE / 2nd ST SE</figcaption>
-              <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/226.jpg", alt: "A ST SE / 2nd ST SE" %>
-            </figure>
-            <figure>
-              <figcaption>8th ST NE / Harvey</figcaption>
-              <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/28.jpg", alt: "8th ST NE / Harvey" %>
-            </figure>
-            <figure>
-              <figcaption>S 277th ST / Auburn Way N</figcaption>
-              <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/12.jpg", alt: "S 277th ST / Auburn Way N" %>
-            </figure>
-            <figure>
-              <figcaption>SE 312th ST / 124th AVE SE</figcaption>
-              <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/161.jpg", alt: "SE 312th ST / 124th AVE SE" %>
-            </figure>
-          </div>
-        </div>
-      <% end %>
-
-      <%= render Ui::CardComponent.new(title: "Auburn Muni (S50)", padding: :default) do %>
-        <div data-controller="image-refresh">
-          <p class="tile-subtitle">
-            Next refresh in <span data-image-refresh-target="countdown" class="tile-subtitle-mono">60</span> seconds.
-          </p>
-          <div class="camera-grid" id="airport_cameras">
-            <figure>
-              <figcaption>North</figcaption>
-              <%= image_tag "https://images.wsdot.wa.gov/airports/auburn2.jpg", alt: "North" %>
-            </figure>
-            <figure>
-              <figcaption>East</figcaption>
-              <%= image_tag "https://images.wsdot.wa.gov/airports/auburn4.jpg", alt: "East" %>
-            </figure>
-            <figure>
-              <figcaption>South</figcaption>
-              <%= image_tag "https://images.wsdot.wa.gov/airports/auburn3.jpg", alt: "South" %>
-            </figure>
-            <figure>
-              <figcaption>West</figcaption>
-              <%= image_tag "https://images.wsdot.wa.gov/airports/auburn1.jpg", alt: "West" %>
-            </figure>
-          </div>
-        </div>
-      <% end %>
-    </div>
   </div>
-</div>
+</section>

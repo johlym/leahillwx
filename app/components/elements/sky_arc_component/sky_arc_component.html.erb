@@ -46,11 +46,11 @@
     <% sun = bodies.find { |b| b.key == "sun" } %>
     <% if sun %>
       <text x="10" y="118" text-anchor="start" font-size="8"
-            style="fill: var(--color-muted); font-family: var(--font-condensed)">
+            style="fill: #64748b; font-family: var(--font-mono)">
         <%= format_hm(sun.rise_at) %>
       </text>
       <text x="190" y="118" text-anchor="end" font-size="8"
-            style="fill: var(--color-muted); font-family: var(--font-condensed)">
+            style="fill: #64748b; font-family: var(--font-mono)">
         <%= format_hm(sun.set_at) %>
       </text>
     <% end %>

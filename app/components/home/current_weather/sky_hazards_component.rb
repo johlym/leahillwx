@@ -90,7 +90,27 @@ class Home::CurrentWeather::SkyHazardsComponent < ViewComponent::Base
     "—"
   end
 
+  # Rough overnight visibility share for the progress bar (rise→set
+  # clipped to a 12h civil-night window). Falls back to 50% when times
+  # are missing so the UI still shows an instrument-style meter.
+  def planet_visibility_pct(planet)
+    rise_at = parse_planet_time(planet["rise_at"])
+    set_at = parse_planet_time(planet["set_at"])
+    return 50 unless rise_at && set_at
+
+    duration_h = ((set_at - rise_at) / 1.hour).abs
+    ((duration_h / 12.0) * 100.0).clamp(10.0, 100.0).round
+  end
+
   private
+
+  def parse_planet_time(iso)
+    return nil if iso.blank?
+
+    Time.zone.parse(iso)
+  rescue ArgumentError, TypeError
+    nil
+  end
 
   def compass_label(degrees)
     return "?" if degrees.nil?

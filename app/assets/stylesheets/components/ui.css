@@ -1,70 +1,22 @@
-/* Ui:: primitives. Flat kebab class names (no BEM). Effects Tailwind
-   can't express (pseudo glows, SVG select chevron, canvas sizing) and
-   all layout/typography for the shared primitives live here. */
+/* Ui:: primitives — tonal layered cards with thin borders (DESIGN.md). */
 
-/* Card — shared elevated surface. */
 @utility ui-card {
-  --card-glow: color-mix(in oklab, var(--color-accent) 12%, transparent);
-  @apply relative flex flex-col overflow-hidden rounded-[0.85rem]
-         border border-border-strong/55 text-text
-         backdrop-blur-sm backdrop-saturate-150
-         transition-[border-color,box-shadow,transform] duration-200;
-  background: linear-gradient(
-    140deg,
-    color-mix(in oklab, var(--color-surface) 92%, transparent),
-    color-mix(in oklab, var(--color-surface-2) 92%, transparent)
-  );
-  box-shadow:
-    0 1px 0 color-mix(in oklab, var(--color-text) 4%, transparent) inset,
-    0 -1px 0 color-mix(in oklab, var(--color-bg) 40%, transparent) inset,
-    0 12px 28px -18px rgba(0, 0, 0, 0.65),
-    0 0 0 1px color-mix(in oklab, var(--color-accent) 3%, transparent);
-
-  &::before {
-    content: "";
-    @apply absolute inset-0 rounded-[inherit] pointer-events-none opacity-85;
-    background: radial-gradient(
-      120% 60% at 50% -10%,
-      var(--card-glow),
-      transparent 65%
-    );
-  }
-
-  & > * {
-    @apply relative z-10;
-  }
+  @apply relative flex flex-col overflow-hidden rounded-xl
+         border border-slate-900 text-text
+         bg-slate-900/40
+         transition-[border-color,background-color] duration-150;
 
   &:hover {
-    border-color: color-mix(
-      in oklab,
-      var(--color-accent) 40%,
-      var(--color-border-strong)
-    );
-    box-shadow:
-      0 1px 0 color-mix(in oklab, var(--color-text) 5%, transparent) inset,
-      0 -1px 0 color-mix(in oklab, var(--color-bg) 40%, transparent) inset,
-      0 20px 40px -22px rgba(0, 0, 0, 0.7),
-      0 0 0 1px color-mix(in oklab, var(--color-accent) 20%, transparent),
-      0 0 32px -12px color-mix(in oklab, var(--color-accent) 45%, transparent);
+    @apply border-slate-800 bg-slate-900/50;
   }
 }
 
 @utility ui-card-subtle {
-  background: color-mix(in oklab, var(--color-bg-elevated) 90%, transparent);
-  @apply border-border;
+  @apply bg-slate-900/30 border-slate-900;
 }
 
 @utility ui-card-emphasis {
-  background: linear-gradient(
-    160deg,
-    color-mix(in oklab, var(--color-surface-2) 95%, transparent),
-    color-mix(in oklab, var(--color-surface) 95%, transparent)
-  );
-  border-color: color-mix(
-    in oklab,
-    var(--color-accent) 40%,
-    var(--color-border-strong)
-  );
+  @apply bg-slate-900/50 border-slate-800/80 backdrop-blur-sm;
 }
 
 @utility ui-card-pad-none {
@@ -81,7 +33,7 @@
 }
 
 @utility ui-card-header {
-  @apply flex items-start justify-between gap-4 mb-3;
+  @apply flex items-start justify-between gap-4 mb-4;
 }
 
 @utility ui-card-header-text {
@@ -89,15 +41,15 @@
 }
 
 @utility ui-card-title {
-  @apply font-condensed uppercase tracking-[0.04em] text-[1.05rem] text-text-strong;
+  @apply font-heading uppercase tracking-wider text-sm font-bold text-white;
 
   & > i {
-    @apply mr-[0.35rem] text-accent;
+    @apply mr-[0.35rem] text-sky-400;
   }
 }
 
 @utility ui-card-subtitle {
-  @apply mt-[0.15rem] text-xs text-muted;
+  @apply mt-1 text-xs text-slate-500;
 }
 
 @utility ui-card-actions {
@@ -109,23 +61,12 @@
 }
 
 @utility ui-card-footer {
-  @apply mt-4 pt-3 border-t border-border text-xs text-muted;
+  @apply mt-4 pt-3 border-t border-slate-800/60 text-xs text-slate-500;
 }
 
-/* Section header — needs the ::after underline gradient. */
 @utility ui-section-header {
   @apply relative flex items-end justify-between gap-4 mt-8 mb-4
-         pb-[0.6rem] border-b border-border/65;
-
-  &::after {
-    content: "";
-    @apply absolute left-0 right-0 -bottom-px h-px;
-    background: linear-gradient(
-      to right,
-      color-mix(in oklab, var(--color-accent) 45%, transparent) 0,
-      transparent 25%
-    );
-  }
+         pb-3 border-b border-slate-900;
 }
 
 @utility ui-section-header-text {
@@ -133,24 +74,21 @@
 }
 
 @utility ui-section-header-title {
-  @apply font-condensed uppercase tracking-[0.05em] text-text-strong text-[1.75rem];
-  text-shadow: 0 0 24px
-    color-mix(in oklab, var(--color-accent) 22%, transparent);
+  @apply font-heading uppercase tracking-wider text-lg font-bold text-white;
 
   & > i {
-    @apply mr-[0.35rem] text-accent;
+    @apply mr-[0.35rem] text-sky-400;
   }
 }
 
 @utility ui-section-header-subtitle {
-  @apply mt-[0.15rem] text-[0.85rem] text-muted;
+  @apply mt-1 text-xs text-slate-500;
 }
 
 @utility ui-section-header-actions {
   @apply flex items-center gap-3 shrink-0;
 }
 
-/* Stat — big value + label + optional secondary / trend. */
 @utility ui-stat {
   @apply flex flex-col gap-1;
 }
@@ -166,17 +104,17 @@
 }
 
 @utility ui-stat-label {
-  @apply inline-flex items-center gap-[0.4rem] text-xs uppercase
-         tracking-[0.06em] text-muted;
+  @apply inline-flex items-center gap-[0.4rem] text-[10px] uppercase
+         tracking-wider text-slate-400 font-bold;
 
   & > i {
-    @apply text-accent;
+    @apply text-sky-400;
   }
 }
 
 @utility ui-stat-value {
   @apply inline-flex items-baseline gap-[0.3rem] leading-none
-         font-condensed font-medium text-text-strong tabular-nums;
+         font-heading font-extrabold text-white tabular-nums;
 }
 
 @utility ui-stat-value-sm {
@@ -193,11 +131,11 @@
 }
 
 @utility ui-stat-unit {
-  @apply text-[0.55em] font-normal tracking-[0.02em] text-muted;
+  @apply text-[0.55em] font-bold tracking-wider text-slate-400;
 }
 
 @utility ui-stat-secondary {
-  @apply text-[0.8rem] text-muted;
+  @apply text-xs text-slate-500;
 }
 
 @utility ui-stat-trend {
@@ -205,27 +143,25 @@
 }
 
 @utility ui-stat-trend-up {
-  @apply text-success;
+  @apply text-emerald-400;
 }
 @utility ui-stat-trend-down {
-  @apply text-danger;
+  @apply text-red-400;
 }
 @utility ui-stat-trend-flat {
-  @apply text-muted;
+  @apply text-slate-500;
 }
 
-/* Year / month picker label + select. */
 @utility ui-field-label {
-  @apply inline-flex items-center gap-2 text-[0.8rem] uppercase
-         tracking-[0.05em] text-muted;
+  @apply inline-flex items-center gap-2 text-[10px] uppercase
+         tracking-wider text-slate-400 font-bold;
 }
 
 @utility ui-year-picker-select {
-  @apply appearance-none cursor-pointer text-text font-[inherit] text-[0.85rem]
-         py-[0.4rem] pl-[0.7rem] pr-8 rounded-[0.4rem]
-         border border-border-strong/70 bg-surface/70
-         backdrop-blur-sm backdrop-saturate-150
-         transition-[border-color,box-shadow] duration-150;
+  @apply appearance-none cursor-pointer text-text font-[inherit] text-xs
+         py-1.5 pl-3 pr-8 rounded-lg
+         border border-slate-800 bg-slate-900/50
+         transition-[border-color] duration-150;
   background-image:
     linear-gradient(45deg, transparent 50%, var(--color-muted) 50%),
     linear-gradient(135deg, var(--color-muted) 50%, transparent 50%);
@@ -236,34 +172,20 @@
     5px 5px,
     5px 5px;
   background-repeat: no-repeat;
-  box-shadow: 0 1px 0 color-mix(in oklab, var(--color-text) 4%, transparent)
-    inset;
 
   &:hover {
-    border-color: color-mix(in oklab, var(--color-accent) 45%, transparent);
+    @apply border-slate-700;
   }
 
   &:focus {
     outline: none;
-    @apply border-accent;
-    box-shadow: 0 0 0 3px
-      color-mix(in oklab, var(--color-accent) 25%, transparent);
+    @apply border-sky-500;
   }
 }
 
-/* Chart figure + frame. */
 @utility ui-chart {
-  @apply relative m-0 rounded-[0.85rem] border border-border-strong/55
-         text-text backdrop-blur-sm backdrop-saturate-150
-         px-4 pt-4 pb-2;
-  background: linear-gradient(
-    160deg,
-    color-mix(in oklab, var(--color-surface) 94%, transparent),
-    color-mix(in oklab, var(--color-surface-2) 94%, transparent)
-  );
-  box-shadow:
-    0 1px 0 color-mix(in oklab, var(--color-text) 4%, transparent) inset,
-    0 12px 30px -20px rgba(0, 0, 0, 0.7);
+  @apply relative m-0 rounded-xl border border-slate-900
+         text-text bg-slate-900/40 px-4 pt-4 pb-2;
 }
 
 @utility ui-chart-caption {
@@ -271,12 +193,11 @@
 }
 
 @utility ui-chart-title {
-  @apply font-condensed uppercase tracking-[0.04em] text-[1.05rem]
-         text-text-strong;
+  @apply font-heading uppercase tracking-wider text-sm font-bold text-white;
 }
 
 @utility ui-chart-subtitle {
-  @apply text-[0.8rem] text-muted;
+  @apply text-xs text-slate-500;
 }
 
 @utility ui-chart-frame {
@@ -292,25 +213,24 @@
   height: var(--chart-height);
 }
 
-/* Shared layout grids used across pages/components. */
 @utility ui-card-grid {
-  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4;
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6;
 }
 
 @utility ui-stack {
-  @apply flex flex-col gap-4;
+  @apply flex flex-col gap-6;
 }
 
 @utility ui-stack-spaced {
-  @apply flex flex-col gap-4 mt-4;
+  @apply flex flex-col gap-6 mt-4;
 }
 
 @utility ui-split-grid {
-  @apply grid grid-cols-1 lg:grid-cols-2 gap-4;
+  @apply grid grid-cols-1 lg:grid-cols-2 gap-6;
 }
 
 @utility ui-split-grid-spaced {
-  @apply grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4;
+  @apply grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4;
 }
 
 @utility ui-toolbar {
@@ -318,20 +238,19 @@
 }
 
 @utility ui-message {
-  @apply text-muted;
+  @apply text-slate-500;
 }
 
 @utility ui-message-spaced {
-  @apply text-muted mt-2 text-sm;
+  @apply text-slate-500 mt-2 text-xs;
 }
 
 @utility ui-message-body {
-  @apply text-text;
+  @apply text-slate-300;
 }
 
-/* Date navigation component. */
 @utility date-nav {
-  @apply bg-surface border border-border rounded-[0.6rem] px-4 py-3 my-4 text-text;
+  @apply bg-slate-900/40 border border-slate-900 rounded-xl px-4 py-3 my-4 text-text;
 }
 
 @utility date-nav-row {
@@ -343,73 +262,89 @@
 }
 
 @utility date-nav-select {
-  @apply bg-bg-elevated border border-border-strong text-text
-         px-[0.55rem] py-[0.35rem] rounded-[0.35rem] font-[inherit]
-         text-[0.85rem] disabled:opacity-40 disabled:cursor-not-allowed;
+  @apply bg-slate-950 border border-slate-800 text-text
+         px-2 py-1.5 rounded-lg font-[inherit]
+         text-xs disabled:opacity-40 disabled:cursor-not-allowed;
 }
 
 @utility date-nav-button {
-  @apply cursor-pointer bg-accent text-accent-contrast border border-accent
-         px-[0.9rem] py-[0.35rem] rounded-[0.35rem] font-[inherit]
-         font-semibold text-[0.8rem] uppercase tracking-[0.05em]
-         hover:enabled:bg-accent-strong hover:enabled:border-accent-strong
+  @apply cursor-pointer bg-sky-500 text-slate-950 border border-sky-500
+         px-3 py-1.5 rounded-lg font-[inherit]
+         font-semibold text-[10px] uppercase tracking-wider
+         hover:enabled:bg-sky-400 hover:enabled:border-sky-400
          disabled:opacity-40 disabled:cursor-not-allowed
          transition-[background-color,border-color] duration-150;
 }
 
 @utility date-nav-message {
-  @apply text-muted text-[0.8rem] mt-[0.4rem];
+  @apply text-slate-500 text-xs mt-1;
 }
 
-/* Tabs — active state has a color-mix inset shadow. */
 @utility ui-tabs {
-  @apply inline-flex p-1 gap-1 rounded-[0.55rem]
-         border border-border-strong/55 bg-bg-elevated/75
-         backdrop-blur-sm backdrop-saturate-150;
-  box-shadow:
-    0 1px 0 color-mix(in oklab, var(--color-text) 4%, transparent) inset,
-    0 6px 18px -14px rgba(0, 0, 0, 0.5);
+  @apply inline-flex p-1 gap-1 rounded-xl
+         border border-slate-900 bg-slate-900/40;
 }
 
 @utility ui-tabs-tab {
   @apply inline-flex items-center gap-[0.4rem] bg-transparent
-         border border-transparent rounded-[0.35rem] cursor-pointer
-         font-[inherit] uppercase tracking-[0.05em] text-muted
-         text-[0.85rem] px-[0.9rem] py-[0.4rem]
-         transition-[color,background-color,border-color] duration-150;
+         border border-transparent rounded-lg cursor-pointer
+         font-[inherit] uppercase tracking-wider text-slate-400
+         text-xs px-3 py-1.5
+         transition-[color,background-color] duration-150;
 
   & > i {
     @apply text-[0.85em];
   }
 
   &:hover {
-    @apply text-text bg-surface;
+    @apply text-white bg-slate-900;
   }
 }
 
 @utility ui-tabs-tab-active {
-  @apply text-accent-contrast;
-  background: linear-gradient(
-    180deg,
-    var(--color-accent-strong),
-    var(--color-accent)
-  );
-  border-color: color-mix(
-    in oklab,
-    var(--color-accent-strong) 65%,
-    transparent
-  );
-  box-shadow:
-    0 1px 0 color-mix(in oklab, #fff 15%, transparent) inset,
-    0 4px 14px -8px color-mix(in oklab, var(--color-accent) 65%, transparent);
+  @apply text-white bg-slate-900;
 
   &:hover {
-    @apply text-accent-contrast;
+    @apply text-white bg-slate-900;
   }
 }
 
 @utility ui-tabs-sm {
   & > .ui-tabs-tab {
-    @apply text-xs px-[0.6rem] py-[0.3rem];
+    @apply text-[10px] px-2 py-1;
   }
+}
+
+/* Status badge pills (Low / Moderate / Contained, etc.) */
+@utility status-badge {
+  @apply inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full;
+}
+
+@utility status-badge-success {
+  @apply text-emerald-400 bg-emerald-500/10;
+}
+
+@utility status-badge-warning {
+  @apply text-amber-400 bg-amber-500/10;
+}
+
+@utility status-badge-danger {
+  @apply text-red-400 bg-red-500/10;
+}
+
+@utility status-badge-info {
+  @apply text-sky-400 bg-sky-500/10;
+}
+
+@utility status-badge-muted {
+  @apply text-slate-400 bg-slate-500/10;
+}
+
+/* Thin progress track used for UV / AQI / planet bars */
+@utility meter-track {
+  @apply w-full bg-slate-800 h-1.5 rounded-full overflow-hidden;
+}
+
+@utility meter-fill {
+  @apply h-full rounded-full;
 }

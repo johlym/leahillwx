@@ -1,4 +1,4 @@
-/* Sun/moon arc infographic. */
+/* Sun/moon arc — quiet celestial visualization. */
 
 @utility sky-arc {
   @apply flex flex-col gap-2 text-text w-full;
@@ -6,10 +6,7 @@
 
 @utility sky-arc-svg {
   @apply w-full h-auto;
-  aspect-ratio: 200 / 130;
-  filter: drop-shadow(
-    0 6px 18px color-mix(in oklab, var(--color-accent) 20%, transparent)
-  );
+  aspect-ratio: 200 / 100;
 }
 
 @utility sky-arc-body {
@@ -18,44 +15,37 @@
 
 @utility sky-arc-body-live {
   & circle {
-    filter: drop-shadow(
-      0 0 6px color-mix(in oklab, var(--color-warning) 70%, transparent)
-    );
+    filter: drop-shadow(0 0 4px color-mix(in oklab, #fbbf24 50%, transparent));
   }
 }
 
 @utility sky-arc-body-dim {
-  @apply opacity-35;
+  @apply opacity-40;
 }
 
-/* Moon-specific "live" glow — cool white instead of warm yellow. */
 .sky-arc-body-moon.sky-arc-body-live circle {
-  filter: drop-shadow(
-    0 0 6px color-mix(in oklab, var(--color-muted) 70%, transparent)
-  );
+  filter: drop-shadow(0 0 4px color-mix(in oklab, #818cf8 50%, transparent));
 }
 
 @utility sky-arc-legend {
-  @apply flex flex-col gap-[0.2rem] text-[0.75rem] text-muted;
+  @apply grid grid-cols-2 gap-4 text-xs mt-2 pt-2;
 }
 
 @utility sky-arc-legend-row {
-  @apply inline-flex items-center gap-2;
+  @apply inline-flex items-center gap-2 text-slate-400;
 }
 
 @utility sky-arc-legend-times {
-  @apply text-text font-mono text-[0.75rem];
+  @apply text-white font-bold text-xs;
 }
 
 @utility sky-arc-swatch {
-  @apply inline-block size-3 rounded-full;
-  border: 1px solid
-    color-mix(in oklab, var(--color-border-strong) 50%, transparent);
+  @apply inline-block size-2 rounded-full;
 }
 
 @utility sky-arc-swatch-sun {
-  @apply bg-warning;
+  @apply bg-amber-400;
 }
 @utility sky-arc-swatch-moon {
-  background-color: color-mix(in oklab, var(--color-muted) 90%, transparent);
+  @apply bg-indigo-400;
 }

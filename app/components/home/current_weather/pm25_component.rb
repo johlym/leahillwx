@@ -49,4 +49,23 @@ class Home::CurrentWeather::Pm25Component < ViewComponent::Base
     else "Awaiting first reading"
     end
   end
+
+  def category_badge_class
+    case category.to_s.downcase
+    when /good/ then "status-badge-success"
+    when /moderate/ then "status-badge-warning"
+    when /sensitive|unhealthy|very|hazard/ then "status-badge-danger"
+    else "status-badge-muted"
+    end
+  end
+
+  def category_fill_class
+    case category.to_s.downcase
+    when /good/ then "bg-emerald-500"
+    when /moderate/ then "bg-amber-400"
+    when /sensitive/ then "bg-orange-500"
+    when /unhealthy|very|hazard/ then "bg-red-500"
+    else "bg-slate-500"
+    end
+  end
 end

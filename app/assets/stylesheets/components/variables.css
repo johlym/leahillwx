@@ -1,26 +1,24 @@
 @theme {
-  --color-brand-50: oklch(0.966 0.016 278.57);
-  --color-brand-100: oklch(0.923 0.037 277.34);
-  --color-brand-200: oklch(0.855 0.072 276.97);
-  --color-brand-300: oklch(0.78 0.112 274.01);
-  --color-brand-400: oklch(0.714 0.149 271.6);
-  --color-brand-500: oklch(0.639 0.193 266.97);
-  --color-brand-600: oklch(0.571 0.235 261.49);
-  --color-brand-700: oklch(0.494 0.209 260.64);
-  --color-brand-800: oklch(0.417 0.177 260.69);
-  --color-brand-900: oklch(0.282 0.12 260.73);
-  --color-brand-950: oklch(0.211 0.09 260.84);
+  --color-brand-50: oklch(0.97 0.02 240);
+  --color-brand-100: oklch(0.93 0.03 240);
+  --color-brand-200: oklch(0.86 0.05 240);
+  --color-brand-300: oklch(0.78 0.08 235);
+  --color-brand-400: oklch(0.74 0.12 230);
+  --color-brand-500: oklch(0.68 0.14 230);
+  --color-brand-600: oklch(0.58 0.14 235);
+  --color-brand-700: oklch(0.48 0.12 240);
+  --color-brand-800: oklch(0.37 0.08 245);
+  --color-brand-900: oklch(0.27 0.05 250);
+  --color-brand-950: oklch(0.17 0.03 255);
 
   --color-brand-primary: var(--color-brand-500);
   --color-brand-dark: var(--color-brand-900);
   --color-brand-light: var(--color-brand-300);
   --color-brand-border: var(--color-brand-700);
 
-  /* Palette-driven semantic tokens. The concrete values live under
-     :root[data-palette="..."] below; here we bridge them into Tailwind's
-     theme so they generate real utilities (bg-surface, text-muted,
-     border-strong, ring-accent, etc.). Palette switching still works
-     because these vars resolve to var(--surface)/etc. at read time. */
+  /* Palette-driven semantic tokens. Bridged into Tailwind so utilities
+     like bg-surface / text-muted resolve, while :root[data-palette]
+     swaps the concrete values. */
   --color-bg: var(--bg);
   --color-bg-elevated: var(--bg-elevated);
   --color-surface: var(--surface);
@@ -44,130 +42,129 @@
   --color-chart-5: var(--chart-5);
   --color-chart-6: var(--chart-6);
 
-  --font-condensed: "Saira Extra Condensed", sans-serif;
+  --font-heading: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "JetBrains Mono", ui-monospace, monospace;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-condensed: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "JetBrains Mono", ui-monospace, monospace;
 
   --breakpoint-xxs: 23rem;
   --breakpoint-xs: 30rem;
 }
 
 /*
- * Time-of-day palettes. All dark-based (no white / light option).
- * Boundaries (all in local America/Los_Angeles):
+ * Time-of-day palettes — slate-first dark canvas (DESIGN.md), with
+ * restrained hue shifts at sunrise / midday / sunset.
+ *
+ * Boundaries (America/Los_Angeles):
  *   sunrise  -> at daily sunrise
  *   midday   -> at 12:00 noon
  *   sunset   -> 1 hour before daily sunset
  *   night    -> 10 minutes after daily sunset
- *
- * Tokens exposed to the rest of the app:
- *   --bg, --bg-elevated, --surface, --surface-2, --border, --border-strong,
- *   --text, --text-strong, --muted, --subtle,
- *   --accent, --accent-strong, --accent-contrast,
- *   --success, --warning, --danger,
- *   --chart-1..6
  */
 
 :root,
 :root[data-palette="night"] {
-  --bg: oklch(0.14 0.03 275);
-  --bg-elevated: oklch(0.17 0.035 275);
-  --surface: oklch(0.2 0.038 275);
-  --surface-2: oklch(0.24 0.042 275);
-  --border: oklch(0.3 0.045 275);
-  --border-strong: oklch(0.42 0.055 275);
-  --text: oklch(0.96 0.02 250);
-  --text-strong: oklch(0.995 0.005 250);
-  --muted: oklch(0.75 0.03 260);
-  --subtle: oklch(0.6 0.035 265);
-  --accent: oklch(0.74 0.14 265);
-  --accent-strong: oklch(0.82 0.16 260);
-  --accent-contrast: oklch(0.14 0.03 275);
-  --success: oklch(0.78 0.16 155);
-  --warning: oklch(0.82 0.16 78);
-  --danger: oklch(0.72 0.19 27);
-  --chart-1: oklch(0.75 0.16 265);
-  --chart-2: oklch(0.8 0.16 30);
-  --chart-3: oklch(0.78 0.16 155);
-  --chart-4: oklch(0.82 0.16 78);
-  --chart-5: oklch(0.72 0.19 335);
-  --chart-6: oklch(0.72 0.19 200);
+  /* slate-950 / slate-900 / slate-800 family */
+  --bg: oklch(0.129 0.042 264.7);
+  --bg-elevated: oklch(0.17 0.035 260);
+  --surface: oklch(0.208 0.042 265.8 / 0.5);
+  --surface-2: oklch(0.208 0.042 265.8 / 0.7);
+  --border: oklch(0.279 0.041 260.0);
+  --border-strong: oklch(0.372 0.044 257.3);
+  --text: oklch(0.968 0.007 247.9);
+  --text-strong: oklch(1 0 0);
+  --muted: oklch(0.704 0.04 256.8);
+  --subtle: oklch(0.554 0.046 257.4);
+  --accent: oklch(0.746 0.16 232.7); /* sky-400 */
+  --accent-strong: oklch(0.685 0.169 237.3); /* sky-500 */
+  --accent-contrast: oklch(0.129 0.042 264.7);
+  --success: oklch(0.765 0.177 163.2); /* emerald-400 */
+  --warning: oklch(0.828 0.189 84.4); /* amber-400 */
+  --danger: oklch(0.704 0.191 22.2); /* red-400 */
+  --chart-1: oklch(0.746 0.16 232.7);
+  --chart-2: oklch(0.712 0.194 13.4); /* rose-400 */
+  --chart-3: oklch(0.765 0.177 163.2);
+  --chart-4: oklch(0.828 0.189 84.4);
+  --chart-5: oklch(0.673 0.182 276.9); /* indigo-400 */
+  --chart-6: oklch(0.704 0.191 22.2);
 }
 
 :root[data-palette="sunrise"] {
-  --bg: oklch(0.3 0.09 28);
-  --bg-elevated: oklch(0.34 0.1 30);
-  --surface: oklch(0.38 0.11 33);
-  --surface-2: oklch(0.43 0.12 38);
-  --border: oklch(0.52 0.12 40);
-  --border-strong: oklch(0.62 0.14 45);
-  --text: oklch(0.98 0.03 60);
-  --text-strong: oklch(0.995 0.02 60);
-  --muted: oklch(0.86 0.06 45);
-  --subtle: oklch(0.72 0.07 40);
-  --accent: oklch(0.82 0.19 45);
-  --accent-strong: oklch(0.88 0.2 55);
-  --accent-contrast: oklch(0.18 0.06 25);
-  --success: oklch(0.82 0.17 145);
-  --warning: oklch(0.86 0.17 80);
-  --danger: oklch(0.74 0.2 20);
-  --chart-1: oklch(0.85 0.18 55);
-  --chart-2: oklch(0.78 0.2 25);
-  --chart-3: oklch(0.82 0.17 145);
-  --chart-4: oklch(0.87 0.17 90);
-  --chart-5: oklch(0.75 0.19 340);
-  --chart-6: oklch(0.78 0.16 220);
+  --bg: oklch(0.16 0.04 50);
+  --bg-elevated: oklch(0.2 0.045 48);
+  --surface: oklch(0.24 0.05 45 / 0.55);
+  --surface-2: oklch(0.28 0.055 42 / 0.7);
+  --border: oklch(0.35 0.05 40);
+  --border-strong: oklch(0.45 0.06 38);
+  --text: oklch(0.97 0.01 80);
+  --text-strong: oklch(1 0 0);
+  --muted: oklch(0.72 0.04 60);
+  --subtle: oklch(0.58 0.04 55);
+  --accent: oklch(0.828 0.189 84.4);
+  --accent-strong: oklch(0.769 0.188 70.1);
+  --accent-contrast: oklch(0.16 0.04 50);
+  --success: oklch(0.765 0.177 163.2);
+  --warning: oklch(0.828 0.189 84.4);
+  --danger: oklch(0.704 0.191 22.2);
+  --chart-1: oklch(0.828 0.189 84.4);
+  --chart-2: oklch(0.712 0.194 13.4);
+  --chart-3: oklch(0.765 0.177 163.2);
+  --chart-4: oklch(0.879 0.169 91.6);
+  --chart-5: oklch(0.673 0.182 276.9);
+  --chart-6: oklch(0.746 0.16 232.7);
 }
 
 :root[data-palette="midday"] {
-  --bg: oklch(0.28 0.07 235);
-  --bg-elevated: oklch(0.32 0.08 235);
-  --surface: oklch(0.36 0.09 230);
-  --surface-2: oklch(0.42 0.1 228);
-  --border: oklch(0.5 0.1 225);
-  --border-strong: oklch(0.6 0.12 222);
-  --text: oklch(0.98 0.02 230);
-  --text-strong: oklch(0.995 0.01 230);
-  --muted: oklch(0.85 0.04 230);
-  --subtle: oklch(0.7 0.05 230);
-  --accent: oklch(0.82 0.16 215);
-  --accent-strong: oklch(0.88 0.18 210);
-  --accent-contrast: oklch(0.16 0.05 240);
-  --success: oklch(0.82 0.17 155);
-  --warning: oklch(0.86 0.17 82);
-  --danger: oklch(0.74 0.2 25);
-  --chart-1: oklch(0.83 0.17 215);
-  --chart-2: oklch(0.8 0.18 40);
-  --chart-3: oklch(0.82 0.17 150);
-  --chart-4: oklch(0.87 0.17 90);
-  --chart-5: oklch(0.78 0.19 330);
-  --chart-6: oklch(0.75 0.2 265);
+  --bg: oklch(0.15 0.04 235);
+  --bg-elevated: oklch(0.19 0.045 235);
+  --surface: oklch(0.23 0.05 232 / 0.5);
+  --surface-2: oklch(0.28 0.055 230 / 0.7);
+  --border: oklch(0.34 0.05 230);
+  --border-strong: oklch(0.44 0.06 228);
+  --text: oklch(0.97 0.01 230);
+  --text-strong: oklch(1 0 0);
+  --muted: oklch(0.72 0.04 230);
+  --subtle: oklch(0.58 0.04 230);
+  --accent: oklch(0.746 0.16 232.7);
+  --accent-strong: oklch(0.685 0.169 237.3);
+  --accent-contrast: oklch(0.15 0.04 235);
+  --success: oklch(0.765 0.177 163.2);
+  --warning: oklch(0.828 0.189 84.4);
+  --danger: oklch(0.704 0.191 22.2);
+  --chart-1: oklch(0.746 0.16 232.7);
+  --chart-2: oklch(0.828 0.189 84.4);
+  --chart-3: oklch(0.765 0.177 163.2);
+  --chart-4: oklch(0.879 0.169 91.6);
+  --chart-5: oklch(0.673 0.182 276.9);
+  --chart-6: oklch(0.712 0.194 13.4);
 }
 
 :root[data-palette="sunset"] {
-  --bg: oklch(0.28 0.1 340);
-  --bg-elevated: oklch(0.32 0.11 340);
-  --surface: oklch(0.37 0.12 340);
-  --surface-2: oklch(0.42 0.13 342);
-  --border: oklch(0.5 0.13 345);
-  --border-strong: oklch(0.6 0.14 348);
-  --text: oklch(0.98 0.02 60);
-  --text-strong: oklch(0.995 0.02 55);
-  --muted: oklch(0.85 0.06 50);
-  --subtle: oklch(0.72 0.07 50);
-  --accent: oklch(0.82 0.2 50);
-  --accent-strong: oklch(0.88 0.21 45);
-  --accent-contrast: oklch(0.16 0.06 340);
-  --success: oklch(0.82 0.16 150);
-  --warning: oklch(0.88 0.17 85);
-  --danger: oklch(0.74 0.2 20);
-  --chart-1: oklch(0.86 0.19 45);
-  --chart-2: oklch(0.78 0.2 340);
-  --chart-3: oklch(0.82 0.16 150);
-  --chart-4: oklch(0.87 0.17 90);
-  --chart-5: oklch(0.75 0.19 300);
-  --chart-6: oklch(0.75 0.17 220);
+  --bg: oklch(0.15 0.04 300);
+  --bg-elevated: oklch(0.19 0.045 300);
+  --surface: oklch(0.23 0.05 300 / 0.55);
+  --surface-2: oklch(0.28 0.055 305 / 0.7);
+  --border: oklch(0.34 0.05 305);
+  --border-strong: oklch(0.44 0.06 310);
+  --text: oklch(0.97 0.01 80);
+  --text-strong: oklch(1 0 0);
+  --muted: oklch(0.72 0.04 280);
+  --subtle: oklch(0.58 0.04 280);
+  --accent: oklch(0.75 0.14 55);
+  --accent-strong: oklch(0.8 0.16 50);
+  --accent-contrast: oklch(0.15 0.04 300);
+  --success: oklch(0.765 0.177 163.2);
+  --warning: oklch(0.828 0.189 84.4);
+  --danger: oklch(0.704 0.191 22.2);
+  --chart-1: oklch(0.8 0.16 50);
+  --chart-2: oklch(0.712 0.194 13.4);
+  --chart-3: oklch(0.765 0.177 163.2);
+  --chart-4: oklch(0.828 0.189 84.4);
+  --chart-5: oklch(0.673 0.182 276.9);
+  --chart-6: oklch(0.746 0.16 232.7);
 }
 
-/* Smooth palette transitions on token-driven properties. */
 html,
 body,
 [data-palette-transition] {

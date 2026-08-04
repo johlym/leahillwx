@@ -28,7 +28,7 @@ class Home::Forecast::AlertsBarComponentTest < ViewComponent::TestCase
     )
 
     render_inline(Home::Forecast::AlertsBarComponent.new(alerts: [ alert ]))
-    assert_text "Alert"
+    assert_text "ALERT"
     assert_text "Heat Advisory"
     assert_text(/Until/i)
     assert_no_text "Hot conditions expected"
@@ -56,7 +56,7 @@ class Home::Forecast::AlertsBarComponentTest < ViewComponent::TestCase
     ]
 
     render_inline(Home::Forecast::AlertsBarComponent.new(alerts: alerts))
-    assert_text "2 Alerts"
+    assert_text "2 ALERTS"
     assert_text "Heat Advisory"
     assert_no_text "+1 more"
   end
