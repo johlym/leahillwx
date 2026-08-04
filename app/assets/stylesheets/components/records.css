@@ -1,78 +1,56 @@
-/* Records page: record cards + GitHub-style heatmap. */
-
-/* --- Record card body ------------------------------------------- */
+/* Records — metric cards + temperature heatmap. */
 
 @utility record-card-label {
-  @apply inline-flex items-center gap-[0.4rem] text-muted text-xs
-         uppercase tracking-[0.06em] mb-[0.35rem];
+  @apply inline-flex items-center gap-1.5 text-slate-400 text-[10px]
+         uppercase tracking-wider font-bold mb-2;
 
   & > i {
-    @apply text-accent;
+    @apply text-sky-400;
   }
 }
 
 @utility record-card-value {
-  @apply flex items-baseline gap-[0.35rem] text-text-strong
-         font-condensed leading-none tabular-nums;
+  @apply flex items-baseline gap-1 text-white
+         font-heading leading-none tabular-nums;
 }
 
 @utility record-card-value-number {
-  @apply text-[2.1rem] font-medium;
-  text-shadow: 0 0 22px
-    color-mix(in oklab, var(--color-accent) 22%, transparent);
+  @apply text-4xl font-extrabold;
 }
 
 @utility record-card-value-unit {
-  @apply text-[0.9rem] text-muted tracking-[0.02em];
+  @apply text-sm font-bold text-slate-400 tracking-wider;
 }
 
 @utility record-card-delta {
-  @apply inline-flex items-center gap-[0.2rem] ml-2 font-mono text-xs
-         px-[0.4rem] py-[0.15rem] rounded-[0.35rem] align-middle text-muted;
-  background-color: color-mix(
-    in oklab,
-    var(--color-surface-2) 60%,
-    transparent
-  );
-  border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+  @apply inline-flex items-center gap-0.5 ml-2 font-mono text-[10px]
+         px-2 py-0.5 rounded-full align-middle text-slate-400
+         bg-slate-800/60 border border-slate-800;
 }
 
 @utility record-card-delta-up {
-  @apply text-warning;
-  border-color: color-mix(in oklab, var(--color-warning) 40%, transparent);
-  background-color: color-mix(
-    in oklab,
-    var(--color-warning) 12%,
-    var(--color-surface)
-  );
+  @apply text-rose-400 border-rose-500/20 bg-rose-500/10;
 }
 
 @utility record-card-delta-down {
-  @apply text-chart-6;
-  border-color: color-mix(in oklab, var(--color-chart-6) 40%, transparent);
-  background-color: color-mix(
-    in oklab,
-    var(--color-chart-6) 12%,
-    var(--color-surface)
-  );
+  @apply text-sky-400 border-sky-500/20 bg-sky-500/10;
 }
 
 @utility record-card-delta-flat {
-  @apply text-subtle;
+  @apply text-slate-500;
 }
 
 @utility record-card-meta {
-  @apply text-muted text-[0.8rem] mt-2;
+  @apply text-slate-500 text-xs mt-3;
 }
 
 @utility record-card-meta-muted {
-  @apply text-subtle italic;
+  @apply text-slate-600 italic;
 }
 
 @utility record-card-sparkline {
   @apply relative mt-3 pt-2 h-14;
-  border-top: 1px dashed
-    color-mix(in oklab, var(--color-border) 60%, transparent);
+  border-top: 1px dashed color-mix(in oklab, #1e293b 70%, transparent);
 
   & canvas {
     width: 100% !important;
@@ -81,29 +59,18 @@
 }
 
 @utility record-inline-code {
-  @apply bg-surface-2 text-text border border-border font-mono px-[0.35rem]
-         rounded-sm text-[0.75em];
+  @apply bg-slate-950 text-slate-300 border border-slate-800 font-mono px-1.5
+         rounded text-[0.75em];
 }
 
 /* --- Temperature heatmap --------------------------------------- */
 
 @utility temp-heatmap {
-  @apply relative rounded-[0.85rem] border border-border-strong/55 my-6
-         px-5 py-4 pb-5 text-text overflow-clip
-         backdrop-blur-sm backdrop-saturate-150;
-  background: linear-gradient(
-    160deg,
-    color-mix(in oklab, var(--color-surface) 94%, transparent),
-    color-mix(in oklab, var(--color-surface-2) 94%, transparent)
-  );
-  box-shadow:
-    0 1px 0 color-mix(in oklab, var(--color-text) 4%, transparent) inset,
-    0 12px 28px -20px rgba(0, 0, 0, 0.6);
+  @apply relative rounded-2xl border border-slate-900 my-6
+         px-5 py-5 text-text overflow-clip
+         bg-slate-900/40;
 }
 
-/* Outer grid owns the column tracks; each row is a subgrid so all
-   rows (day-tick header + 12 month rows) share one column axis and
-   stay perfectly aligned. */
 @utility temp-heatmap-grid {
   @apply grid gap-y-0.75;
   min-width: 540px;
@@ -119,54 +86,45 @@
   @apply items-end pb-1;
 }
 
-/* Highlight is a `::before` overlay rather than an `outline`, so:
-   - vertical extent (-inset-y-0.75 = -3px) exactly fills the 3px
-     row-gap and never bleeds onto the adjacent months' cells,
-   - horizontal edges stay flush with the row so the scroll
-     container's `overflow-x: auto` clip doesn't shave the sides,
-   - the row's own layout is untouched. */
 @utility temp-heatmap-row-highlight {
   @apply relative z-10;
 
   &::before {
     content: "";
     @apply absolute inset-x-0 -inset-y-0.75 pointer-events-none rounded-md;
-    border: 2px solid
-      color-mix(in oklab, var(--color-accent-strong) 90%, transparent);
-    box-shadow:
-      0 0 22px color-mix(in oklab, var(--color-accent) 55%, transparent),
-      0 0 4px color-mix(in oklab, var(--color-accent) 90%, transparent) inset;
+    border: 1px solid color-mix(in oklab, #38bdf8 70%, transparent);
+    box-shadow: 0 0 16px color-mix(in oklab, #38bdf8 20%, transparent);
   }
 }
 
 @utility temp-heatmap-day-tick {
-  @apply text-subtle text-[0.65rem] font-mono text-center;
+  @apply text-slate-600 text-[10px] font-mono text-center;
 }
 
 @utility temp-heatmap-month-label {
-  @apply text-muted font-condensed uppercase
-         tracking-[0.05em] text-[0.75rem] pr-[0.35rem] text-right;
+  @apply text-slate-400 font-heading uppercase
+         tracking-wider text-[10px] font-bold pr-1 text-right;
 }
 
 @utility temp-heatmap-month-label-highlight {
-  @apply text-accent-strong font-bold;
+  @apply text-sky-400 font-bold;
 }
 
 @utility temp-heatmap-cell {
   @apply aspect-square rounded-[3px] bg-clip-padding
          transition-[transform,outline,filter] duration-120;
-  border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+  border: 1px solid color-mix(in oklab, #1e293b 70%, transparent);
 
   &:hover,
   &:focus-visible {
-    @apply outline-2 outline-accent outline-offset-1 scale-105 relative z-10 cursor-pointer;
-    filter: brightness(1.05);
+    @apply outline-2 outline-sky-400 outline-offset-1 scale-105 relative z-10 cursor-pointer;
+    filter: brightness(1.08);
   }
 }
 
 @utility temp-heatmap-cell-empty {
   @apply bg-transparent;
-  border: 1px dashed color-mix(in oklab, var(--color-border) 80%, transparent);
+  border: 1px dashed color-mix(in oklab, #334155 80%, transparent);
 }
 
 @utility temp-heatmap-cell-void {
@@ -174,7 +132,7 @@
 }
 
 @utility temp-heatmap-cell-partial {
-  border-color: color-mix(in oklab, var(--color-text) 25%, transparent);
+  border-color: color-mix(in oklab, #94a3b8 30%, transparent);
 }
 
 @utility temp-heatmap-legend-swatch-partial {
@@ -183,15 +141,11 @@
     transparent 0 4px,
     rgba(0, 0, 0, 0.35) 4px 6px
   );
-  background-color: color-mix(
-    in oklab,
-    var(--color-muted) 45%,
-    var(--color-surface)
-  );
+  background-color: color-mix(in oklab, #64748b 45%, #0f172a);
 }
 
 @utility temp-heatmap-header {
-  @apply flex items-baseline justify-between gap-4 flex-wrap mb-3;
+  @apply flex items-baseline justify-between gap-4 flex-wrap mb-4;
 }
 
 @utility temp-heatmap-header-text {
@@ -199,12 +153,12 @@
 }
 
 @utility temp-heatmap-title {
-  @apply m-0 font-condensed uppercase tracking-[0.05em] text-text-strong
-         text-[1.1rem];
+  @apply m-0 font-heading uppercase tracking-wider text-white
+         text-sm font-bold;
 }
 
 @utility temp-heatmap-subtitle {
-  @apply mt-[0.15rem] text-muted text-[0.8rem];
+  @apply mt-1 text-slate-500 text-xs;
 }
 
 @utility temp-heatmap-scroll {
@@ -212,8 +166,8 @@
 }
 
 @utility temp-heatmap-footer {
-  @apply flex items-center gap-6 flex-wrap mt-[0.85rem] pt-[0.85rem]
-         border-t border-border;
+  @apply flex items-center gap-6 flex-wrap mt-4 pt-4
+         border-t border-slate-800;
 }
 
 @utility temp-heatmap-legend {
@@ -221,25 +175,22 @@
 }
 
 @utility temp-heatmap-legend-label {
-  @apply text-muted text-xs font-mono;
+  @apply text-slate-500 text-[10px] font-mono uppercase tracking-wider;
 }
 
 @utility temp-heatmap-legend-bar {
-  @apply inline-block w-[clamp(9rem,22vw,16rem)] h-3 rounded-full;
-  border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
-  box-shadow: 0 0 0 1px
-    color-mix(in oklab, var(--color-accent) 8%, transparent) inset;
+  @apply inline-block w-[clamp(9rem,22vw,16rem)] h-1.5 rounded-full;
+  border: 1px solid color-mix(in oklab, #1e293b 70%, transparent);
 }
 
 @utility temp-heatmap-legend-note {
-  @apply inline-flex items-center gap-2 text-muted text-xs;
+  @apply inline-flex items-center gap-2 text-slate-500 text-[10px];
 }
 
 @utility temp-heatmap-legend-swatch {
-  @apply inline-block w-[1.15rem] h-3 rounded-xs border border-border/60;
+  @apply inline-block w-[1.15rem] h-3 rounded-sm border border-slate-800;
 }
 
 @utility temp-heatmap-legend-note-label {
-  @apply uppercase tracking-[0.05em];
+  @apply uppercase tracking-wider;
 }
-

@@ -1,12 +1,10 @@
-/* Leaflet chrome overrides for /radar.
-   Leaflet’s default bar is white. These need !important because vendor
-   leaflet.css is unlayered and Tailwind may emit it after this file. */
+/* Leaflet chrome overrides for /radar — slate instrument panel. */
 
 .radar-map.leaflet-container {
   width: 100%;
   height: 100%;
-  background-color: var(--color-bg);
-  font-family: var(--font-sans);
+  background-color: #020617;
+  font-family: var(--font-mono);
 }
 
 .radar-map.leaflet-container img.leaflet-tile {
@@ -19,8 +17,8 @@
   max-width: 70vw;
   font-size: 0.6rem;
   line-height: 1.25;
-  color: var(--color-muted) !important;
-  background: color-mix(in oklab, var(--color-bg) 80%, transparent) !important;
+  color: #64748b !important;
+  background: color-mix(in oklab, #020617 85%, transparent) !important;
 }
 
 @media (min-width: 40rem) {
@@ -31,26 +29,24 @@
 
 .radar-map .leaflet-bar,
 .radar-map.leaflet-touch .leaflet-bar {
-  border: 1px solid var(--color-border) !important;
-  border-radius: 2px !important;
+  border: 1px solid #1e293b !important;
+  border-radius: 0.5rem !important;
   overflow: hidden;
   box-shadow: none !important;
-  background: color-mix(in oklab, var(--color-bg) 88%, transparent) !important;
+  background: color-mix(in oklab, #020617 88%, transparent) !important;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
 
 .radar-map .leaflet-bar a,
 .radar-map.leaflet-touch .leaflet-bar a {
-  color: var(--color-text-strong) !important;
+  color: #f1f5f9 !important;
   background-color: transparent !important;
-  border-bottom: 1px solid var(--color-border) !important;
-  /* Match Leaflet stock control size (26px / 30px touch). */
+  border-bottom: 1px solid #1e293b !important;
   width: 26px !important;
   height: 26px !important;
   font-size: 18px !important;
   border-radius: 0 !important;
-  /* Flex centers +/− better than line-height (minus sits low otherwise). */
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -61,28 +57,28 @@
 
 .radar-map .leaflet-bar a:first-child,
 .radar-map.leaflet-touch .leaflet-bar a:first-child {
-  border-top-left-radius: 2px !important;
-  border-top-right-radius: 2px !important;
+  border-top-left-radius: 0.5rem !important;
+  border-top-right-radius: 0.5rem !important;
 }
 
 .radar-map .leaflet-bar a:last-child,
 .radar-map.leaflet-touch .leaflet-bar a:last-child {
   border-bottom: none !important;
-  border-bottom-left-radius: 2px !important;
-  border-bottom-right-radius: 2px !important;
+  border-bottom-left-radius: 0.5rem !important;
+  border-bottom-right-radius: 0.5rem !important;
 }
 
 .radar-map .leaflet-bar a:hover,
 .radar-map .leaflet-bar a:focus,
 .radar-map.leaflet-touch .leaflet-bar a:hover,
 .radar-map.leaflet-touch .leaflet-bar a:focus {
-  color: var(--color-text-strong) !important;
-  background-color: var(--color-surface) !important;
+  color: #fff !important;
+  background-color: #0f172a !important;
 }
 
 .radar-map .leaflet-bar a.leaflet-disabled,
 .radar-map.leaflet-touch .leaflet-bar a.leaflet-disabled {
-  color: var(--color-subtle) !important;
+  color: #475569 !important;
   background-color: transparent !important;
 }
 

@@ -1,6 +1,11 @@
 <div class="primary-container">
-  <h1>Astronomical Almanac <small>for <%= @month_date.strftime("%B %Y") %></small></h1>
-  
+  <%= render Ui::SectionHeaderComponent.new(
+    title: "Astronomical Almanac",
+    subtitle: @month_date.strftime("%B %Y"),
+    icon: "fa-regular fa-moon-stars",
+    level: 1
+  ) %>
+
   <% if @current_entry %>
     <%= render Almanac::CurrentDayCardComponent.new(
       entry: @current_entry,
@@ -8,13 +13,13 @@
       location: @location
     ) %>
   <% end %>
-  
+
   <%= render Almanac::MonthNavigationComponent.new(
     current_year: @month_date.year,
     current_month: @month_date.month,
     location: @location
   ) %>
-  
+
   <%= render Almanac::MonthlyCalendarComponent.new(
     month_date: @month_date,
     entries: @entries,

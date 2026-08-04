@@ -1,9 +1,8 @@
-/* Full-viewport radar page — 100dvh shell, touch-friendly controls. */
+/* Full-viewport radar — slate instrument chrome over dark basemap. */
 
 @utility radar-page {
-  @apply h-dvh max-h-dvh overflow-hidden;
+  @apply h-dvh max-h-dvh overflow-hidden bg-slate-950;
 
-  /* Prefer small viewport height on mobile browsers with dynamic chrome. */
   height: 100svh;
   max-height: 100svh;
 
@@ -11,9 +10,9 @@
     @apply shrink-0 relative z-50;
   }
 
-  /* Mobile menu overlays the map instead of expanding document height. */
   & .site-header-mobile-menu {
-    @apply absolute inset-x-0 top-full z-50 shadow-lg;
+    @apply absolute inset-x-0 top-full z-50;
+    box-shadow: 0 12px 24px -16px rgba(0, 0, 0, 0.7);
   }
 
   & .site-main {
@@ -21,7 +20,8 @@
   }
 
   & .site-footer-radar {
-    @apply shrink-0 mt-0 py-1.5 px-3 text-[0.65rem] leading-snug border-t border-border;
+    @apply shrink-0 mt-0 py-1.5 px-3 text-[10px] leading-snug
+           border-t border-slate-900 bg-slate-950 text-slate-600;
   }
 }
 
@@ -30,7 +30,7 @@
 }
 
 @utility radar-map {
-  @apply absolute inset-0 z-0 w-full h-full bg-bg;
+  @apply absolute inset-0 z-0 w-full h-full bg-slate-950;
 }
 
 @utility radar-controls {
@@ -39,12 +39,11 @@
          max-w-[calc(100%-1rem)] sm:max-w-md;
 }
 
-/* Quarter the playback control row (~min-h-11 + py-1.5 → ~3.5rem; sm ~3.25rem). */
 @utility radar-load-progress {
   @apply pointer-events-none w-full overflow-hidden
-         rounded-[0.45rem] border border-border backdrop-blur-md;
+         rounded-lg border border-slate-800 backdrop-blur-md
+         bg-slate-950/80;
   height: 0.875rem;
-  background: color-mix(in oklab, var(--color-bg) 88%, transparent);
 
   @media (width >= 40rem) {
     height: 0.8125rem;
@@ -60,29 +59,22 @@
 }
 
 @utility radar-load-progress-bar {
-  @apply absolute inset-y-0 left-0 h-full w-full origin-left;
+  @apply absolute inset-y-0 left-0 h-full w-full origin-left bg-sky-400;
   transform: scaleX(var(--radar-load-progress, 0));
   transition: transform 0.22s ease-out;
-  background: linear-gradient(
-    90deg,
-    color-mix(in oklab, var(--color-accent) 75%, transparent),
-    var(--color-accent-strong)
-  );
 }
 
 @utility radar-controls-playback {
   @apply pointer-events-auto flex items-center gap-2
-         rounded-[0.45rem] border border-border px-2 py-1.5
-         backdrop-blur-md;
-  background: color-mix(in oklab, var(--color-bg) 88%, transparent);
+         rounded-xl border border-slate-800 px-2 py-1.5
+         backdrop-blur-md bg-slate-950/80;
 }
 
 @utility radar-controls-sites {
   @apply pointer-events-auto flex items-stretch gap-1 overflow-x-auto
          overscroll-x-contain [-webkit-overflow-scrolling:touch]
-         rounded-[0.45rem] border border-border p-1
-         backdrop-blur-md;
-  background: color-mix(in oklab, var(--color-bg) 88%, transparent);
+         rounded-xl border border-slate-800 p-1
+         backdrop-blur-md bg-slate-950/80;
   scrollbar-width: none;
 
   &::-webkit-scrollbar {
@@ -92,69 +84,66 @@
 
 @utility radar-controls-tilts {
   @apply pointer-events-auto flex items-center gap-1
-         rounded-[0.45rem] border border-border p-1 pl-2
-         backdrop-blur-md w-fit max-w-full;
-  background: color-mix(in oklab, var(--color-bg) 88%, transparent);
+         rounded-xl border border-slate-800 p-1 pl-2
+         backdrop-blur-md w-fit max-w-full bg-slate-950/80;
 }
 
 @utility radar-controls-layers {
   @apply pointer-events-auto flex items-center gap-1
-         rounded-[0.45rem] border border-border p-1 pl-2
-         backdrop-blur-md w-fit max-w-full;
-  background: color-mix(in oklab, var(--color-bg) 88%, transparent);
+         rounded-xl border border-slate-800 p-1 pl-2
+         backdrop-blur-md w-fit max-w-full bg-slate-950/80;
 }
 
 @utility radar-controls-label {
-  @apply shrink-0 px-1 text-[0.7rem] sm:text-[0.65rem] font-medium uppercase
-         tracking-[0.06em] text-muted whitespace-nowrap;
+  @apply shrink-0 px-1 text-[10px] font-bold uppercase
+         tracking-wider text-slate-500 whitespace-nowrap;
 }
 
 @utility radar-control-btn {
   @apply inline-flex items-center justify-center shrink-0
          min-h-11 min-w-11 sm:min-h-10 sm:min-w-10
-         rounded-[0.35rem] border border-border bg-surface
-         text-text-strong cursor-pointer
+         rounded-lg border border-slate-800 bg-slate-900/60
+         text-white cursor-pointer
          touch-manipulation select-none;
 
   &:hover {
-    @apply bg-bg-elevated;
+    @apply bg-slate-900;
   }
 
   &:focus-visible {
-    outline: 2px solid var(--color-accent);
+    outline: 2px solid #38bdf8;
     outline-offset: 2px;
   }
 }
 
 @utility radar-timestamp {
-  @apply font-mono text-[0.75rem] sm:text-[0.8rem] text-muted
+  @apply font-mono text-xs sm:text-sm text-slate-400
          whitespace-nowrap truncate min-w-0;
 
   &.is-nowcast {
-    @apply text-accent-strong;
+    @apply text-sky-400;
   }
 }
 
 @utility radar-site-chip {
   @apply inline-flex items-center justify-center shrink-0
          min-h-11 px-3 sm:min-h-9 sm:px-2.5
-         rounded-[0.3rem] border border-transparent
-         text-[0.75rem] sm:text-[0.7rem] font-medium uppercase tracking-[0.04em]
-         text-muted cursor-pointer touch-manipulation select-none
+         rounded-lg border border-transparent
+         text-xs sm:text-[11px] font-bold uppercase tracking-wider
+         text-slate-400 cursor-pointer touch-manipulation select-none
          whitespace-nowrap;
 
   &:hover {
-    @apply text-text-strong bg-surface;
+    @apply text-white bg-slate-900;
   }
 
   &:focus-visible {
-    outline: 2px solid var(--color-accent);
+    outline: 2px solid #38bdf8;
     outline-offset: 1px;
   }
 
   &.is-active {
-    @apply text-accent-strong border-border bg-surface;
-    background-color: color-mix(in oklab, var(--color-accent) 14%, transparent);
+    @apply text-sky-400 border-slate-800 bg-sky-500/10;
   }
 
   &.is-disabled,
@@ -163,7 +152,6 @@
   }
 }
 
-/* Leaflet divIcon markers for station + radar sites. */
 @utility radar-marker {
   @apply flex items-center justify-center;
 }
@@ -171,14 +159,12 @@
 @utility radar-marker-site {
   @apply min-w-11 min-h-11 sm:min-w-9 sm:min-h-9
          flex items-center justify-center rounded-full
-         border border-border text-[0.65rem] font-semibold
-         text-text-strong cursor-pointer touch-manipulation
-         backdrop-blur-sm;
-  background: color-mix(in oklab, var(--color-bg-elevated) 90%, transparent);
+         border border-slate-800 text-[10px] font-bold
+         text-white cursor-pointer touch-manipulation
+         backdrop-blur-sm bg-slate-950/90;
 
   &.is-active {
-    @apply text-accent-contrast border-accent;
-    background: var(--color-accent);
+    @apply text-slate-950 border-sky-400 bg-sky-400;
   }
 }
 

@@ -43,8 +43,14 @@
 }
 
 @utility about-article {
-  @apply container mx-auto px-4 sm:px-6 lg:px-8 my-4 text-text
-         prose prose-invert max-w-4xl;
+  @apply container mx-auto px-4 sm:px-6 lg:px-8 my-8 text-slate-300
+         prose prose-invert max-w-4xl
+         prose-headings:font-heading prose-headings:uppercase
+         prose-headings:tracking-wider prose-headings:text-white
+         prose-a:text-sky-400 prose-a:no-underline hover:prose-a:underline
+         prose-code:text-slate-300 prose-code:bg-slate-900
+         prose-code:border prose-code:border-slate-800 prose-code:rounded
+         prose-strong:text-white;
 }
 
 @utility chart-section {

@@ -1,5 +1,10 @@
 <div class="primary-container">
-  <h1>Climatological Summary <small>for <%= @report.month_name %> <%= @report.year %></small></h1>
+  <%= render Ui::SectionHeaderComponent.new(
+    title: "Climatological Summary",
+    subtitle: "#{@report.month_name} #{@report.year}",
+    icon: "fa-regular fa-calendar-days",
+    level: 1
+  ) %>
 
   <%= render Shared::DateNavigationComponent.new(
     current_year: @report.year,
@@ -15,7 +20,7 @@
   <%= render Reports::StatisticsTableComponent.new(report: @report, period_type: :daily, has_partial_periods: has_partial_days?(@report)) %>
 
   <div class="report-notes">
-    <h3>Notes:</h3>
+    <h3>Notes</h3>
     <ul>
       <li>Times shown in 24-hour format (HH:MM) in the <code>America/Los_Angeles</code> timezone</li>
       <li>Days with no data shown as "N/A"</li>

@@ -1,15 +1,16 @@
-/* Almanac page — current-day cards, month navigation, monthly calendar. */
+/* Almanac — current-day cards, month navigation, monthly calendar. */
 
 @utility almanac-nav {
   @apply flex flex-col md:flex-row items-stretch md:items-center
-         md:justify-between gap-3 my-4 mb-6;
+         md:justify-between gap-3 my-6
+         bg-slate-900/40 border border-slate-900 rounded-2xl px-4 py-3;
 }
 
 @utility almanac-nav-prev-next {
   @apply flex flex-wrap gap-2;
 
   & .btn-secondary {
-    @apply text-[0.85rem];
+    @apply text-xs;
   }
 }
 
@@ -18,22 +19,22 @@
 }
 
 @utility almanac-current-list {
-  @apply list-none p-0 m-0 flex flex-col gap-[0.35rem];
+  @apply list-none p-0 m-0 flex flex-col gap-2;
 
   & li {
-    @apply flex justify-between items-center gap-3 text-[0.85rem];
+    @apply flex justify-between items-center gap-3 text-xs;
   }
   & li > span:first-child {
-    @apply text-muted uppercase tracking-[0.05em] text-[0.7rem];
+    @apply text-slate-500 uppercase tracking-wider text-[10px] font-bold;
   }
   & li > span:last-child {
-    @apply text-text-strong font-condensed text-base;
+    @apply text-white font-heading text-sm font-bold tabular-nums;
   }
 }
 
 @utility almanac-current-meta {
   & > span:last-child {
-    @apply text-subtle text-[0.75rem] font-[inherit] italic;
+    @apply text-slate-500 text-[10px] font-[inherit] italic !font-normal;
   }
 }
 
@@ -45,77 +46,65 @@
   @apply mt-6;
 
   & > .almanac-table-toggle {
-    @apply mb-3;
+    @apply mb-4;
   }
 
   & .table-container {
-    @apply overflow-x-auto bg-surface border border-border rounded-xl;
+    @apply overflow-x-auto bg-slate-900/40 border border-slate-900 rounded-2xl;
   }
 
   & .table-container > table {
-    @apply w-full text-[0.75rem] text-text;
+    @apply w-full text-[11px] text-slate-300;
     min-width: max-content;
     border-collapse: separate;
     border-spacing: 0;
   }
 
   & .table-container > table thead {
-    @apply bg-bg-elevated text-muted;
+    @apply text-slate-500;
   }
   & .table-container > table thead tr {
-    @apply border-b border-border;
+    @apply border-b border-slate-800;
   }
   & .table-container > table thead tr th {
-    @apply px-[0.4rem] py-2 text-center font-medium uppercase tracking-[0.05em] text-[0.65rem];
-    border-right: 1px solid
-      color-mix(in oklab, var(--color-border) 60%, transparent);
+    @apply px-1.5 py-2.5 text-center font-semibold uppercase tracking-wider text-[10px];
+    border-right: 1px solid color-mix(in oklab, #1e293b 60%, transparent);
   }
   & .table-container > table thead tr th:last-child {
     @apply border-r-0;
   }
   & .table-container > table thead .secondary-header th {
-    @apply text-subtle text-[0.6rem];
-    background-color: color-mix(
-      in oklab,
-      var(--color-bg-elevated) 70%,
-      var(--color-surface)
-    );
+    @apply text-slate-600 text-[9px] bg-slate-950/40;
   }
 
   & .table-container > table tbody tr {
-    @apply bg-surface cursor-pointer;
-    border-bottom: 1px solid
-      color-mix(in oklab, var(--color-border) 40%, transparent);
+    @apply cursor-pointer transition-colors duration-150;
+    border-bottom: 1px solid color-mix(in oklab, #1e293b 40%, transparent);
   }
   & .table-container > table tbody tr:hover {
-    @apply bg-surface-2;
+    @apply bg-slate-900/60;
   }
   & .table-container > table tbody tr.today {
-    background-color: color-mix(
-      in oklab,
-      var(--color-accent) 15%,
-      var(--color-surface)
-    );
+    background-color: color-mix(in oklab, #38bdf8 10%, transparent);
   }
   & .table-container > table tbody tr.today td {
-    @apply text-accent-strong font-semibold;
+    @apply text-sky-400 font-semibold;
   }
   & .table-container > table tbody td {
-    @apply px-[0.4rem] py-[0.35rem] text-center;
-    border-right: 1px solid
-      color-mix(in oklab, var(--color-border) 40%, transparent);
+    @apply px-1.5 py-1.5 text-center;
+    border-right: 1px solid color-mix(in oklab, #1e293b 40%, transparent);
   }
   & .table-container > table tbody td:last-child {
     @apply border-r-0;
   }
   & .table-container > table tbody td.expanded-row {
-    @apply bg-bg-elevated p-4;
+    @apply bg-slate-950/50 p-4;
   }
   & .table-container > table tbody td.expanded-row .expanded-container {
     @apply max-w-4xl mx-auto;
   }
   & .table-container > table tbody td.expanded-row .expanded-inner {
-    @apply bg-surface border border-border rounded-lg p-3;
+    @apply bg-slate-900/50 border border-slate-800 rounded-xl p-3;
   }
 
   & .almanac-day-cell {
@@ -123,10 +112,10 @@
   }
 
   & .almanac-day-chevron {
-    @apply text-muted font-mono;
+    @apply text-slate-600 font-mono;
   }
 
   & .almanac-cell-meta {
-    @apply text-xs text-subtle;
+    @apply text-[10px] text-slate-600;
   }
 }

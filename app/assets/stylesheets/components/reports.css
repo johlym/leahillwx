@@ -1,30 +1,27 @@
-/* Reports page. Each panel (overview-statistics, daily-data,
-   hourly-data, notes) is a flat @utility with descendant selectors
-   because the tables inside are large and would be painful to inline. */
+/* Reports — compact telemetry data tables. */
 
 @utility overview-statistics {
-  @apply bg-surface border border-border rounded-xl px-5 py-4 my-4;
+  @apply bg-slate-900/40 border border-slate-900 rounded-2xl px-5 py-5 my-6;
 
   & h2 {
-    @apply m-0 mb-3 font-condensed uppercase tracking-[0.05em] text-text-strong text-[1.1rem];
+    @apply m-0 mb-4 font-heading uppercase tracking-wider text-white text-sm font-bold;
   }
 
   & .stats-table-wrapper {
     @apply overflow-x-auto;
   }
   & .stats-table {
-    @apply w-full text-text text-[0.85rem];
+    @apply w-full text-slate-300 text-xs;
     border-collapse: separate;
     border-spacing: 0;
   }
   & .stats-table thead tr th {
-    @apply bg-bg-elevated text-muted text-center px-3 py-2 font-medium
-           uppercase tracking-[0.05em] text-[0.7rem] border-b border-border;
+    @apply text-slate-500 text-center px-3 pb-3 font-semibold
+           uppercase tracking-wider text-[10px] border-b border-slate-800;
   }
   & .stats-table tbody tr td {
-    @apply px-3 py-[0.6rem] text-center whitespace-nowrap text-text;
-    border-bottom: 1px solid
-      color-mix(in oklab, var(--color-border) 50%, transparent);
+    @apply px-3 py-3.5 text-center whitespace-nowrap text-slate-300;
+    border-bottom: 1px solid color-mix(in oklab, #1e293b 50%, transparent);
   }
   & .stats-table tbody tr:last-child td {
     @apply border-b-0;
@@ -39,22 +36,18 @@
 }
 
 @utility report-data-panel {
-  @apply bg-surface border border-border rounded-xl px-5 py-4 my-4;
+  @apply bg-slate-900/40 border border-slate-900 rounded-2xl px-5 py-5 my-6;
 
   & h2 {
-    @apply m-0 mb-[0.35rem] font-condensed uppercase tracking-[0.05em] text-text-strong text-[1.1rem];
+    @apply m-0 mb-1 font-heading uppercase tracking-wider text-white text-sm font-bold;
   }
   & .subtitle {
-    @apply text-muted text-[0.75rem] mb-2;
+    @apply text-slate-500 text-[10px] mb-4;
   }
   & .partial-day-note {
-    @apply text-warning px-[0.9rem] py-[0.6rem] mb-3 rounded-[0.4rem] text-[0.85rem];
-    background-color: color-mix(
-      in oklab,
-      var(--color-warning) 15%,
-      var(--color-surface)
-    );
-    border: 1px solid color-mix(in oklab, var(--color-warning) 40%, transparent);
+    @apply text-amber-400 px-3 py-2.5 mb-4 rounded-lg text-xs;
+    background-color: color-mix(in oklab, #fbbf24 10%, transparent);
+    border: 1px solid color-mix(in oklab, #fbbf24 25%, transparent);
   }
   & .partial-day-note:empty {
     @apply hidden;
@@ -64,73 +57,66 @@
     @apply overflow-x-auto;
   }
   & .report-table {
-    @apply min-w-full text-text text-[0.8rem];
+    @apply min-w-full text-slate-300 text-xs;
     border-collapse: separate;
     border-spacing: 0;
   }
   & .report-table thead tr th {
-    @apply bg-bg-elevated text-muted px-2 py-[0.55rem] font-medium text-[0.7rem]
-           uppercase tracking-[0.04em] text-center border-b border-border;
+    @apply text-slate-500 px-2 pb-3 font-semibold text-[10px]
+           uppercase tracking-wider text-center border-b border-slate-800;
   }
   & .report-table tbody tr {
-    @apply bg-surface;
+    @apply transition-colors duration-150;
   }
   & .report-table tbody tr:nth-child(even) {
-    background-color: color-mix(
-      in oklab,
-      var(--color-bg-elevated) 60%,
-      var(--color-surface)
-    );
+    background-color: color-mix(in oklab, #0f172a 40%, transparent);
   }
   & .report-table tbody tr:hover {
-    @apply bg-surface-2;
+    @apply bg-slate-900/60;
   }
   & .report-table tbody tr.partial-day {
-    background-color: color-mix(
-      in oklab,
-      var(--color-warning) 15%,
-      var(--color-surface)
-    );
+    background-color: color-mix(in oklab, #fbbf24 8%, transparent);
   }
   & .report-table tbody tr.partial-day td {
-    @apply text-warning;
+    @apply text-amber-400;
   }
   & .report-table tbody td {
-    @apply px-[0.4rem] py-2 text-center whitespace-nowrap;
-    border-bottom: 1px solid
-      color-mix(in oklab, var(--color-border) 40%, transparent);
+    @apply px-1.5 py-3 text-center whitespace-nowrap;
+    border-bottom: 1px solid color-mix(in oklab, #1e293b 40%, transparent);
   }
   & .report-table tbody tr:last-child td {
     @apply border-b-0;
   }
   & .report-table td.no-data {
-    @apply text-subtle italic;
-    background-color: color-mix(in oklab, var(--color-border) 20%, transparent);
+    @apply text-slate-600 italic;
   }
   & .report-table td a {
-    @apply text-accent;
+    @apply text-sky-400 font-medium no-underline hover:underline;
   }
   & .report-table td.report-cell-peak {
-    @apply text-text-strong font-bold;
+    @apply text-white font-bold;
   }
 }
 
 @utility report-notes {
-  @apply bg-surface border border-border rounded-[0.6rem] px-[1.15rem] py-[0.85rem] my-4 text-muted;
+  @apply bg-slate-900/30 border border-slate-900 rounded-xl px-5 py-4 my-6 text-slate-500 text-xs;
 
   & h3 {
-    @apply mt-0 font-condensed uppercase tracking-[0.05em] text-base text-text-strong;
+    @apply mt-0 mb-2 font-heading uppercase tracking-wider text-sm font-bold text-white;
   }
   & ul li {
-    @apply list-disc ml-5;
+    @apply list-disc ml-5 text-slate-400;
   }
   & code {
-    @apply bg-surface-2 text-text px-[0.35rem] rounded-sm font-mono text-[0.85em];
+    @apply bg-slate-950 text-slate-300 px-1.5 rounded font-mono text-[0.85em] border border-slate-800;
+  }
+  & a {
+    @apply text-sky-400 no-underline hover:underline;
   }
 }
 
 @utility report-download-link {
-  @apply text-[0.85rem] mt-2 mb-4;
+  @apply text-xs mt-2 mb-4;
 }
 
 @utility report-period-cell {
@@ -142,18 +128,17 @@
 }
 
 @utility report-partial-icon {
-  @apply text-warning;
+  @apply text-amber-400;
 }
 
 @utility report-empty {
-  @apply text-center text-muted py-4;
+  @apply text-center text-slate-500 py-4 text-xs;
 }
 
 @utility report-generation-time {
-  @apply text-center text-xs text-muted;
+  @apply text-center text-[10px] text-slate-600 mb-4;
 }
 
 @utility stats-day-meta {
-  @apply text-xs;
-  color: var(--color-subtle);
+  @apply text-[10px] text-slate-600;
 }

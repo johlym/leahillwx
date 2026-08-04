@@ -2,23 +2,23 @@
 
 # GitHub-style calendar heatmap of daily high temperatures for a given
 # year. 12 rows (one per month), up to 31 columns (one per day). Colors
-# ramp purple -> indigo -> blue -> green -> yellow -> orange -> red as
-# temperature climbs across the observed range. Days marked as
-# `partial: true` (incomplete data) get a diagonal-stripe overlay so a
-# viewer can tell the value is provisional. Tooltip on each cell shows
-# the date and the high/low pair via the shared tooltip controller.
+# ramp sky -> emerald -> amber -> orange -> rose -> red as temperature
+# climbs across the observed range (DESIGN.md semantic weather accents).
+# Days marked as `partial: true` (incomplete data) get a diagonal-stripe
+# overlay so a viewer can tell the value is provisional. Tooltip on each
+# cell shows the date and the high/low pair via the shared tooltip controller.
 module Records
   class TemperatureHeatmapComponent < ViewComponent::Base
     # 7-stop OKLCH ramp. The interpolation is done in oklab which
     # preserves perceptual smoothness across the hue rotation.
     COLOR_STOPS = [
-      "oklch(0.32 0.14 300)",   # deep purple
-      "oklch(0.42 0.15 275)",   # indigo
-      "oklch(0.55 0.16 245)",   # blue
-      "oklch(0.66 0.16 155)",   # green
-      "oklch(0.78 0.17 95)",    # yellow
-      "oklch(0.72 0.19 55)",    # orange
-      "oklch(0.62 0.22 25)"     # red
+      "oklch(0.45 0.12 245)",   # deep sky
+      "oklch(0.58 0.14 220)",   # sky
+      "oklch(0.68 0.14 180)",   # teal
+      "oklch(0.75 0.15 145)",   # emerald
+      "oklch(0.82 0.16 90)",    # amber
+      "oklch(0.72 0.18 45)",    # orange
+      "oklch(0.65 0.2 20)"      # rose/red
     ].freeze
 
     def initialize(year:, days:, highlight_month: nil)
