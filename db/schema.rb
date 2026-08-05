@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_20_035100) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_05_174000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -260,13 +260,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_20_035100) do
 
   create_table "wildfire_snapshots", force: :cascade do |t|
     t.float "acres"
+    t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
     t.float "distance_mi", null: false
     t.string "external_id"
     t.datetime "fetched_at", null: false
     t.float "lat", null: false
     t.float "lon", null: false
-    t.string "name", null: false
+    t.string "name"
     t.float "percent_contained"
     t.string "source", null: false
     t.datetime "updated_at", null: false
