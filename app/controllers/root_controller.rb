@@ -19,12 +19,13 @@ class RootController < ApplicationController
     if @aqi.nil? || @aqi.stale? || @aqi.source != "airnow"
       DownloadAirNowAqiJob.perform_async
     end
-    @wildfire = WildfireSnapshot.latest
+    latest_wildfire = WildfireSnapshot.latest
+    @wildfire = WildfireSnapshot.latest_active
     @aurora = AuroraSnapshot.latest
     @planet_night = ensure_planet_night
     @iss_pass = IssPass.next_visible || IssPass.next_any
 
-    enqueue_sky_hazard_refreshes
+    enqueue_sky_hazard_refreshes(latest_wildfire)
   end
 
   def about
@@ -42,8 +43,8 @@ class RootController < ApplicationController
     nil
   end
 
-  def enqueue_sky_hazard_refreshes
-    if @wildfire.nil? || @wildfire.fetched_at < 30.minutes.ago
+  def enqueue_sky_hazard_refreshes(latest_wildfire)
+    if latest_wildfire.nil? || latest_wildfire.fetched_at < 30.minutes.ago
       DownloadNearestWildfireJob.perform_async
     end
 

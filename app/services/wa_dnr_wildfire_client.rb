@@ -1,16 +1,26 @@
 # frozen_string_literal: true
 
-# Fetches current WA DNR fire statistics (state preferred source).
+# Fetches live WA DNR wildfire statistics (state preferred source).
 # Layer lacks percent contained — callers enrich from NIFC when possible.
+#
+# "Current DNR Fire Statistics" keeps incidents until FIRE_OUT_DT is set, which
+# includes controlled / non-wildfire records. Restrict to uncontrolled wildfires.
 class WaDnrWildfireClient
   TIMEOUT_SECONDS = 20
   LAYER_URL = "https://gis.dnr.wa.gov/site3/rest/services/Public_Wildfire/WADNR_PUBLIC_WD_WildFire_Data/MapServer/1/query"
+
+  # Live = not out, not controlled, wildfire class only (excludes DF/SF/VF, etc.).
+  ACTIVE_WHERE = [
+    "FIRE_OUT_DT IS NULL",
+    "CONTROL_DT IS NULL",
+    "FIREEVNT_CLASS_LABEL_NM = 'WF'"
+  ].join(" AND ").freeze
 
   def active_fires
     data = HttpClient.get_json(
       LAYER_URL,
       query: {
-        where: "FIRE_OUT_DT IS NULL",
+        where: ACTIVE_WHERE,
         outFields: "INCIDENT_NM,ACRES_BURNED,LAT_COORD,LON_COORD,FIREEVENT_ID,INCIDENT_ID,OBJECTID,FIREEVNT_CLASS_LABEL_NM",
         returnGeometry: true,
         outSR: 4326,
@@ -37,7 +47,6 @@ class WaDnrWildfireClient
     lon = attrs["LON_COORD"] || geometry["x"]
     return nil if lat.nil? || lon.nil?
 
-    # Prefer wildfire-class incidents; keep others if that's all we have.
     {
       name: attrs["INCIDENT_NM"].presence || "Unnamed fire",
       lat: lat.to_f,

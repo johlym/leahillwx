@@ -12,7 +12,12 @@ class NifcWildfireClient
     state_clause = states.map { |s|
       "POOState = 'US-#{s}' OR POOState = '#{s}'"
     }.join(" OR ")
-    where = "IncidentTypeCategory = 'WF' AND (#{state_clause})"
+    # WFIGS "Current" layer should already be live; still exclude declared-out fires.
+    where = [
+      "IncidentTypeCategory = 'WF'",
+      "FireOutDateTime IS NULL",
+      "(#{state_clause})"
+    ].join(" AND ")
 
     data = HttpClient.get_json(
       LAYER_URL,
