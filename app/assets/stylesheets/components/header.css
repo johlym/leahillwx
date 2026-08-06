@@ -54,7 +54,8 @@
   @apply cursor-pointer text-slate-300 bg-transparent border border-slate-800
          rounded-lg px-2.5 py-2;
 
-  & > i {
+  & i,
+  & .svg-inline--fa {
     @apply text-[1.1rem];
   }
 }

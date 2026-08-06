@@ -38,8 +38,12 @@
         data-radar-target="playPause"
         data-action="click->radar#togglePlayback"
         aria-label="Pause radar animation">
-        <i class="fa-solid fa-pause" aria-hidden="true" data-radar-target="pauseIcon"></i>
-        <i class="fa-solid fa-play hidden" aria-hidden="true" data-radar-target="playIcon"></i>
+        <span data-radar-target="pauseIcon">
+          <i class="fa-solid fa-pause" aria-hidden="true"></i>
+        </span>
+        <span hidden data-radar-target="playIcon">
+          <i class="fa-solid fa-play" aria-hidden="true"></i>
+        </span>
       </button>
       <span class="radar-timestamp" data-radar-target="timestamp" aria-live="polite">Loading…</span>
     </div>
