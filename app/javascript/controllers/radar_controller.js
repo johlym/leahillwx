@@ -1004,8 +1004,8 @@ export default class extends Controller {
 
   updatePlaybackUi() {
     if (this.hasPlayIconTarget && this.hasPauseIconTarget) {
-      this.playIconTarget.classList.toggle("hidden", this.playing)
-      this.pauseIconTarget.classList.toggle("hidden", !this.playing)
+      this.playIconTarget.hidden = this.playing
+      this.pauseIconTarget.hidden = !this.playing
     }
     if (this.hasPlayPauseTarget) {
       this.playPauseTarget.setAttribute(

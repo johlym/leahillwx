@@ -18,16 +18,16 @@ export default class extends Controller {
   open() {
     this.menuTarget.classList.remove("hidden")
     this.buttonTarget.setAttribute("aria-expanded", "true")
-    this.openIconTarget.classList.add("hidden")
-    this.closeIconTarget.classList.remove("hidden")
+    this.openIconTarget.hidden = true
+    this.closeIconTarget.hidden = false
     this.isOpen = true
   }
 
   close() {
     this.menuTarget.classList.add("hidden")
     this.buttonTarget.setAttribute("aria-expanded", "false")
-    this.openIconTarget.classList.remove("hidden")
-    this.closeIconTarget.classList.add("hidden")
+    this.openIconTarget.hidden = false
+    this.closeIconTarget.hidden = true
     this.isOpen = false
   }
 }
