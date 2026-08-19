@@ -43,7 +43,7 @@
 }
 
 @utility current-hero-icon {
-  @apply text-3xl text-amber-400;
+  @apply text-3xl;
 }
 
 @utility current-hero-summary {
