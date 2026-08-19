@@ -88,6 +88,13 @@
   --chart-4: oklch(0.828 0.189 84.4);
   --chart-5: oklch(0.673 0.182 276.9); /* indigo-400 */
   --chart-6: oklch(0.704 0.191 22.2);
+
+  /* Phenomenon colors for condition icons. Stable across palettes so
+     rain stays sky and sun stays amber instead of tracking chart series. */
+  --weather-sun: var(--warning);
+  --weather-moon: var(--chart-5);
+  --weather-cloud: var(--muted);
+  --weather-precip: oklch(0.746 0.16 232.7); /* sky-400 */
 }
 
 :root[data-palette="sunrise"] {

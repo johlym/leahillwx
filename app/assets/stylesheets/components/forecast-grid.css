@@ -12,15 +12,20 @@
 }
 
 @utility forecast-entry {
-  @apply flex items-center justify-between gap-4 p-3 rounded-lg
+  @apply grid items-center gap-x-4 gap-y-1 p-3 rounded-lg
          transition-colors duration-150;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "date conditions temps"
+    "date text text";
 
   &:hover {
     @apply bg-slate-900/60;
   }
 
   & > .date-grid {
-    @apply w-24 shrink-0;
+    @apply w-24 shrink-0 self-center;
+    grid-area: date;
   }
   & > .date-grid .dayname {
     @apply text-sm font-bold text-white block m-0 uppercase;
@@ -30,10 +35,11 @@
   }
 
   & > .conditions {
-    @apply flex items-center gap-2 shrink-0;
+    @apply flex items-center justify-start gap-2 shrink-0 justify-self-start;
+    grid-area: conditions;
   }
   & > .conditions .icon {
-    @apply text-amber-400 text-xl;
+    @apply text-xl;
   }
   & > .conditions .high-low {
     @apply hidden;
@@ -43,17 +49,19 @@
   }
 
   & > .forecast-text {
-    @apply flex-1 max-w-[200px] text-right sm:text-left min-w-0;
+    @apply min-w-0 text-left;
+    grid-area: text;
   }
   & > .forecast-text .forecast-description {
     @apply hidden;
   }
   & > .forecast-text .forecast-summary {
-    @apply text-xs text-slate-400 block line-clamp-1 m-0;
+    @apply text-xs text-slate-400 block line-clamp-2 m-0;
   }
 
   & > .forecast-temps {
     @apply text-right shrink-0;
+    grid-area: temps;
   }
   & > .forecast-temps .high {
     @apply font-heading text-sm font-bold text-rose-400;

@@ -28,7 +28,7 @@
   @apply grid grid-cols-2 gap-4;
 
   & figure {
-    @apply relative m-0 rounded-xl overflow-hidden border border-slate-800;
+    @apply relative m-0 rounded-xl overflow-hidden border border-slate-800 aspect-video;
   }
 
   & figcaption {
@@ -39,17 +39,7 @@
   }
 
   & img {
-    @apply block w-full h-24 object-cover transition-transform duration-300;
-  }
-
-  & figure:hover img {
-    transform: scale(1.05);
-  }
-}
-
-@utility camera-grid-airport {
-  & img {
-    @apply h-20;
+    @apply absolute inset-0 size-full object-cover;
   }
 }
 
