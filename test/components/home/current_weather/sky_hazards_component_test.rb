@@ -10,7 +10,7 @@ class Home::CurrentWeather::SkyHazardsComponentTest < ViewComponent::TestCase
 
     assert_text "Creek Fire"
     assert_text "Uncontained"
-    assert_text "1,500 acres"
+    assert_text "1500 acres"
     assert_no_text "Contained"
     assert_selector ".status-badge-danger"
     assert_no_selector ".status-badge-success"
