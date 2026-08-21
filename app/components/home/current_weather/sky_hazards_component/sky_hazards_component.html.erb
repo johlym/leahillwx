@@ -11,8 +11,8 @@
           <div class="mt-4">
             <span class="text-3xl font-black text-white font-heading"><%= wildfire_distance %></span>
             <span class="text-xs text-slate-400 block mt-1 uppercase"><%= @wildfire.name %></span>
-            <span class="status-badge status-badge-success mt-2">
-              Contained — <%= wildfire_containment %>
+            <span class="status-badge <%= wildfire_status_badge_class %> mt-2">
+              <%= wildfire_status_label %>
               <% if @wildfire.acres %>
                 · <%= number_with_precision(@wildfire.acres, precision: 0) %> acres
               <% end %>
