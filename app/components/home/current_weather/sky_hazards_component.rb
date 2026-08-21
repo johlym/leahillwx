@@ -38,10 +38,22 @@ class Home::CurrentWeather::SkyHazardsComponent < ViewComponent::Base
     "#{number_with_precision(@wildfire.distance_mi, precision: 0)} mi"
   end
 
-  def wildfire_containment
-    return "—" unless @wildfire&.percent_contained
+  def wildfire_status_label
+    return nil unless @wildfire
 
-    "#{@wildfire.percent_contained.round(0)}%"
+    pct = @wildfire.percent_contained
+    return "Uncontained" if pct.nil? || pct < 1
+    return "Contained" if pct >= 100
+
+    "#{pct.round(0)}% contained"
+  end
+
+  def wildfire_status_badge_class
+    pct = @wildfire&.percent_contained
+    return "status-badge-danger" if pct.nil? || pct < 1
+    return "status-badge-success" if pct >= 100
+
+    "status-badge-warning"
   end
 
   def iss_direction_line
