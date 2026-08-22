@@ -83,7 +83,7 @@ Optional nested arrays: `soil[]` and `temp_probes[]` (channels 1–8).
 | -------------- | ------ | ------------- |
 | Station observations | Measurement API | live insert + Action Cable broadcast |
 | **AQI / PM2.5** | **AirNow** HourlyAQObs CSV (`AIRNOW_AQSID`, default Auburn 29th St `840530330047`) | `DownloadAirNowAqiJob` hourly at `:15`; also from `/` if latest is missing, stale (>8h), or not `source: airnow` |
-| Forecast | OpenWeather One Call 3.0 | `DownloadOpenWeatherForecastJob` every 2 minutes (and from `/` if older than 1h) |
+| Forecast | OpenWeather One Call 3.0 | `DownloadOpenWeatherForecastJob` every 10 minutes (and from `/` if older than 1h) |
 | Alerts bar | LibreWXR + OpenWeather alerts from the forecast | async Turbo Frame `GET /alerts/bar` (needs `LOCATION_LAT` / `LOCATION_LON`) |
 | Wildfire | `NearestWildfireResolver` | `DownloadNearestWildfireJob` every 30 min |
 | Radar (`/radar`) | LibreWXR composite + Unidata Level III | browser-direct; see `docs/radar/README.md` |

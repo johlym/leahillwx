@@ -47,7 +47,7 @@
   <li>Data capture: Ecowitt GW11000</li>
   <li>Data is measured in metric units (Celsius, mm, etc.) and converted to imperial units (Fahrenheit, inches, etc.) for display. Pressure is captured in hPa/millibars and displayed the same.</li>
   <li>All timestamps are recorded in UTC and coverted to <code>America/Los_Angeles</code> for display.</li>
-  <li>Forecasts: The <%= link_to "OpenWeatherMap API", "https://openweathermap.org/api?utm_source=lhwx.org&utm_medium=referral", target: "_blank" %>, retrieved every 30 minutes.</li>
+  <li>Forecasts: The <%= link_to "OpenWeatherMap API", "https://openweathermap.org/api?utm_source=lhwx.org&utm_medium=referral", target: "_blank" %>, retrieved every 10 minutes.</li>
   <li>Air quality: <%= link_to "AirNow", "https://www.airnow.gov/", target: "_blank" %> HourlyAQObs for the Auburn 29th St monitor (EPA AQI / PM2.5), retrieved hourly.</li>
   <li>Backend: data is captured through a custom <%= link_to "Rust application", "https://github.com/johlym/wxlistener", target: "_blank" %> and forwarded to this site via an HTTP endpoint.</li>
   <li>Frontend: this site is built using Ruby on Rails. Data is stored in a PostgreSQL database.</li>
