@@ -117,6 +117,21 @@
 
       <%= render Ui::CardComponent.new(padding: :default) do %>
         <div class="live-tile">
+          <span class="live-tile-label">Barometric Pressure</span>
+          <div class="live-tile-body">
+            <div class="live-tile-value">
+              <span class="live-tile-number" data-weather-update-target="pressure"><%= current_barometric_pressure %></span>
+              <span class="live-tile-unit">hPa</span>
+            </div>
+          </div>
+          <% if today_peaks[:pressure_hpa] %>
+            <p class="live-tile-peak">Peak today <strong class="text-slate-300"><%= today_peaks[:pressure_hpa] %> hPa</strong></p>
+          <% end %>
+        </div>
+      <% end %>
+
+      <%= render Ui::CardComponent.new(padding: :default) do %>
+        <div class="live-tile">
           <span class="live-tile-label">Dew Point</span>
           <div class="live-tile-body">
             <div class="live-tile-value">

@@ -20,7 +20,9 @@ class TrendsController < ApplicationController
     @yoy_temp_chart = charts.yoy_temp_chart
     @yoy_rain_chart = charts.yoy_rain_chart
     @yoy_wind_chart = charts.yoy_wind_chart
+    @yoy_pressure_chart = charts.yoy_pressure_chart
     @rolling_temp_chart = charts.rolling_temp_chart
+    @rolling_pressure_chart = charts.rolling_pressure_chart
     @rain_cumulative_chart = charts.rain_cumulative_chart
     @aqi_daily_chart = charts.aqi_daily_chart
 

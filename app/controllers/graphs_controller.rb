@@ -43,6 +43,7 @@ class GraphsController < ApplicationController
     @temperature_chart = charts.temperature_chart
     @rain_chart = charts.rain_chart
     @wind_chart = charts.wind_chart
+    @pressure_chart = charts.pressure_chart
   end
 
   private

@@ -19,7 +19,12 @@ class Reports::OverviewStatisticsTableComponentTest < ViewComponent::TestCase
       month_high_wind_speed: 15.645,  # m/s (displays as ~35.00 mph)
       month_high_wind_day: 20,
       dominant_wind_dir: 180,
-      dominant_wind_dir_compass: "S"
+      dominant_wind_dir_compass: "S",
+      month_mean_pressure: 1012.5,
+      month_high_pressure: 1025.0,
+      month_high_pressure_day: 10,
+      month_low_pressure: 998.0,
+      month_low_pressure_day: 3
     )
   end
 
@@ -53,6 +58,9 @@ class Reports::OverviewStatisticsTableComponentTest < ViewComponent::TestCase
     assert_selector "th", text: "Heat DD"
     assert_selector "th", text: "Cool DD"
     assert_selector "th", text: "Total Precip"
+    assert_selector "th", text: "Mean Pressure"
+    assert_selector "th", text: "High Pressure"
+    assert_selector "th", text: "Low Pressure"
     assert_selector "th", text: "Avg Wind"
     assert_selector "th", text: "High Wind"
     assert_selector "th", text: "Wind Dir"
@@ -96,6 +104,16 @@ class Reports::OverviewStatisticsTableComponentTest < ViewComponent::TestCase
     render_inline(Reports::OverviewStatisticsTableComponent.new(report: @report))
 
     assert_selector "td", text: /3\.50 in\./
+  end
+
+  test "renders pressure statistics" do
+    render_inline(Reports::OverviewStatisticsTableComponent.new(report: @report))
+
+    assert_selector "td", text: /1012\.5 hPa/
+    assert_selector "td", text: /1025\.0 hPa/
+    assert_selector "td span.stats-day-meta", text: "(Day 10)"
+    assert_selector "td", text: /998\.0 hPa/
+    assert_selector "td span.stats-day-meta", text: "(Day 3)"
   end
 
   test "renders average wind speed" do

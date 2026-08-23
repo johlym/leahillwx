@@ -27,7 +27,12 @@ module WeatherData
         month_high_wind_speed: calculate_month_high_wind(entries),
         month_high_wind_day: find_high_wind_day(entries),
         dominant_wind_dir: calculate_monthly_dominant_wind(entries),
-        dominant_wind_dir_compass: degrees_to_compass(calculate_monthly_dominant_wind(entries))
+        dominant_wind_dir_compass: degrees_to_compass(calculate_monthly_dominant_wind(entries)),
+        month_mean_pressure: calculate_monthly_mean_pressure(entries),
+        month_high_pressure: calculate_month_high_pressure(entries),
+        month_high_pressure_day: find_high_pressure_day(entries),
+        month_low_pressure: calculate_month_low_pressure(entries),
+        month_low_pressure_day: find_low_pressure_day(entries)
       )
 
       report
@@ -83,6 +88,30 @@ module WeatherData
 
     def find_high_wind_day(entries)
       entry = entries.max_by { |e| e.high_wind_speed || -Float::INFINITY }
+      entry&.day
+    end
+
+    def calculate_monthly_mean_pressure(entries)
+      pressures = entries.map(&:mean_pressure).compact
+      return nil if pressures.empty?
+      pressures.sum / pressures.size
+    end
+
+    def calculate_month_high_pressure(entries)
+      entries.map(&:high_pressure).compact.max
+    end
+
+    def find_high_pressure_day(entries)
+      entry = entries.max_by { |e| e.high_pressure || -Float::INFINITY }
+      entry&.day
+    end
+
+    def calculate_month_low_pressure(entries)
+      entries.map(&:low_pressure).compact.min
+    end
+
+    def find_low_pressure_day(entries)
+      entry = entries.min_by { |e| e.low_pressure || Float::INFINITY }
       entry&.day
     end
 
