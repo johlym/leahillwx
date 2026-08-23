@@ -19,7 +19,8 @@ module WeatherData
         wind_gust_mph: peak(:wind),
         uvi: peak(:uvi),
         humidity: peak(:humidity),
-        rain_rate_in: peak(:rain_rate)
+        rain_rate_in: peak(:rain_rate),
+        pressure_hpa: peak(:pressure)
       }
     end
 

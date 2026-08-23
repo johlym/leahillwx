@@ -98,4 +98,9 @@ class ReportEntry < ApplicationRecord
     return "N/A" if wind_dir.nil?
     "#{wind_dir} (#{wind_dir_compass})"
   end
+
+  def formatted_pressure(pressure_hpa)
+    return "N/A" if pressure_hpa.nil?
+    format("%.1f", pressure_hpa)
+  end
 end

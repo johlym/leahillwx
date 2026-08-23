@@ -9,7 +9,8 @@ class WeatherData::TodayPeaksTest < ActiveSupport::TestCase
       humidity: { y_max: 70, y_min: 50 },
       uvi: { y_max: 5, y_min: 0 },
       rain_rate: { y_max: 0.05, y_min: 0.0 },
-      dew_point: { y_max: 55, y_min: 40 }
+      dew_point: { y_max: 55, y_min: 40 },
+      pressure: { y_max: 1018, y_min: 1010 }
     )
 
     assert_equal 18, peaks[:wind_gust_mph]
@@ -17,6 +18,7 @@ class WeatherData::TodayPeaksTest < ActiveSupport::TestCase
     assert_equal 5, peaks[:uvi]
     assert_equal 0.05, peaks[:rain_rate_in]
     assert_equal 55, peaks[:dew_point_f]
+    assert_equal 1018, peaks[:pressure_hpa]
   end
 
   test "returns nil peaks when hourly ranges have no data" do
@@ -75,6 +77,7 @@ class WeatherData::TodayPeaksTest < ActiveSupport::TestCase
     assert_equal ranges.dig(:uvi, :y_max), peaks[:uvi]
     assert_equal ranges.dig(:rain_rate, :y_max), peaks[:rain_rate_in]
     assert_equal ranges.dig(:dew_point, :y_max), peaks[:dew_point_f]
+    assert_equal ranges.dig(:pressure, :y_max), peaks[:pressure_hpa]
     assert_equal 70, peaks[:humidity]
   ensure
     travel_back

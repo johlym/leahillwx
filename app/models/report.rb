@@ -92,4 +92,9 @@ class Report < ApplicationRecord
     return "N/A" if speed_mps.nil?
     format("%.2f", speed_mps * 2.23694)
   end
+
+  def formatted_pressure(pressure_hpa)
+    return "N/A" if pressure_hpa.nil?
+    format("%.1f", pressure_hpa)
+  end
 end

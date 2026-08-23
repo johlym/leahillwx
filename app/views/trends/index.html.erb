@@ -51,6 +51,16 @@
         height: 320,
         aria_label: "Year-over-year monthly peak wind"
       ) %>
+
+      <%= render Ui::ChartComponent.new(
+        type: @yoy_pressure_chart[:type],
+        data: @yoy_pressure_chart[:data],
+        options: @yoy_pressure_chart[:options],
+        title: "Barometric Pressure",
+        subtitle: "Monthly mean",
+        height: 320,
+        aria_label: "Year-over-year monthly mean barometric pressure"
+      ) %>
     </div>
   <% end %>
 
@@ -85,6 +95,18 @@
         height: 340,
         aria_label: "Rolling mean temperature at 30, 90, and 365 day windows"
       ) %>
+
+      <% if @rolling_pressure_chart %>
+        <%= render Ui::ChartComponent.new(
+          type: @rolling_pressure_chart[:type],
+          data: @rolling_pressure_chart[:data],
+          options: @rolling_pressure_chart[:options],
+          title: "Barometric Pressure — rolling means",
+          subtitle: "30, 90, and 365-day windows",
+          height: 340,
+          aria_label: "Rolling mean barometric pressure at 30, 90, and 365 day windows"
+        ) %>
+      <% end %>
 
       <% if @rain_cumulative_chart %>
         <%= render Ui::ChartComponent.new(

@@ -96,6 +96,9 @@ class Reports::StatisticsTableComponentTest < ViewComponent::TestCase
       is_max_rain: false,
       is_max_avg_wind: false,
       is_max_high_wind: false,
+      is_max_mean_pressure: false,
+      is_max_high_pressure: false,
+      is_max_low_pressure: false,
       report: @report
     )
 
@@ -119,6 +122,9 @@ class Reports::StatisticsTableComponentTest < ViewComponent::TestCase
       is_max_rain: false,
       is_max_avg_wind: false,
       is_max_high_wind: false,
+      is_max_mean_pressure: false,
+      is_max_high_pressure: false,
+      is_max_low_pressure: false,
       report: @report
     )
 
@@ -142,6 +148,9 @@ class Reports::StatisticsTableComponentTest < ViewComponent::TestCase
       is_max_rain: false,
       is_max_avg_wind: false,
       is_max_high_wind: false,
+      is_max_mean_pressure: false,
+      is_max_high_pressure: false,
+      is_max_low_pressure: false,
       report: @report
     )
 
@@ -163,6 +172,9 @@ class Reports::StatisticsTableComponentTest < ViewComponent::TestCase
       is_max_rain: false,
       is_max_avg_wind: false,
       is_max_high_wind: false,
+      is_max_mean_pressure: false,
+      is_max_high_pressure: false,
+      is_max_low_pressure: false,
       report: @report
     )
 

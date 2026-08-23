@@ -9,13 +9,13 @@ module Graphs
     end
 
     def temperature_chart
-      entries = entries
-      return nil if entries.blank?
+      period_entries = entries
+      return nil if period_entries.blank?
 
-      labels = entries.map { |e| entry_label(e) }
-      highs = entries.map { |e| e.high_temp ? c_to_f(e.high_temp) : nil }
-      lows = entries.map { |e| e.low_temp ? c_to_f(e.low_temp) : nil }
-      means = entries.map { |e| e.mean_temp ? c_to_f(e.mean_temp) : nil }
+      labels = period_entries.map { |e| entry_label(e) }
+      highs = period_entries.map { |e| e.high_temp ? c_to_f(e.high_temp) : nil }
+      lows = period_entries.map { |e| e.low_temp ? c_to_f(e.low_temp) : nil }
+      means = period_entries.map { |e| e.mean_temp ? c_to_f(e.mean_temp) : nil }
 
       {
         type: "line",
@@ -56,11 +56,11 @@ module Graphs
     end
 
     def rain_chart
-      entries = entries
-      return nil if entries.blank? || entries.none? { |e| e.rain.present? }
+      period_entries = entries
+      return nil if period_entries.blank? || period_entries.none? { |e| e.rain.present? }
 
-      labels = entries.map { |e| entry_label(e) }
-      rain = entries.map { |e| e.rain ? (e.rain / 25.4).round(3) : 0 }
+      labels = period_entries.map { |e| entry_label(e) }
+      rain = period_entries.map { |e| e.rain ? (e.rain / 25.4).round(3) : 0 }
 
       {
         type: "bar",
@@ -85,12 +85,12 @@ module Graphs
     end
 
     def wind_chart
-      entries = entries
-      return nil if entries.blank? || entries.none? { |e| e.avg_wind_speed.present? || e.high_wind_speed.present? }
+      period_entries = entries
+      return nil if period_entries.blank? || period_entries.none? { |e| e.avg_wind_speed.present? || e.high_wind_speed.present? }
 
-      labels = entries.map { |e| entry_label(e) }
-      avg = entries.map { |e| e.avg_wind_speed ? (e.avg_wind_speed * 2.23694).round(1) : nil }
-      high = entries.map { |e| e.high_wind_speed ? (e.high_wind_speed * 2.23694).round(1) : nil }
+      labels = period_entries.map { |e| entry_label(e) }
+      avg = period_entries.map { |e| e.avg_wind_speed ? (e.avg_wind_speed * 2.23694).round(1) : nil }
+      high = period_entries.map { |e| e.high_wind_speed ? (e.high_wind_speed * 2.23694).round(1) : nil }
 
       {
         type: "line",
@@ -114,6 +114,53 @@ module Graphs
         options: {
           yUnit: " mph",
           yLabel: "Wind speed (mph)",
+          decimals: 1
+        }
+      }
+    end
+
+    def pressure_chart
+      period_entries = entries
+      return nil if period_entries.blank? || period_entries.none? { |e| e.mean_pressure.present? || e.high_pressure.present? || e.low_pressure.present? }
+
+      labels = period_entries.map { |e| entry_label(e) }
+      highs = period_entries.map { |e| e.high_pressure ? e.high_pressure.round(1) : nil }
+      lows = period_entries.map { |e| e.low_pressure ? e.low_pressure.round(1) : nil }
+      means = period_entries.map { |e| e.mean_pressure ? e.mean_pressure.round(1) : nil }
+
+      {
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "High",
+              data: highs,
+              color: "var(--chart-2)",
+              borderWidth: 2,
+              tension: 0.3
+            },
+            {
+              label: "Low",
+              data: lows,
+              color: "var(--chart-1)",
+              borderWidth: 2,
+              tension: 0.3,
+              fillTarget: 0
+            },
+            {
+              label: "Mean",
+              data: means,
+              color: "var(--chart-3)",
+              borderWidth: 2,
+              dashed: true,
+              tension: 0.3
+            }
+          ]
+        },
+        options: {
+          yUnit: " hPa",
+          yLabel: "Pressure (hPa)",
           decimals: 1
         }
       }

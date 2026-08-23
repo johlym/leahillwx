@@ -30,6 +30,18 @@
       <% end %>
     <% end %>
 
+    <% if @pressure_chart %>
+      <%= render Ui::ChartComponent.new(
+        type: @pressure_chart[:type],
+        data: @pressure_chart[:data],
+        options: @pressure_chart[:options],
+        title: "Barometric Pressure",
+        subtitle: @current_day ? "Hourly high, low, and mean" : "Daily high, low, and mean",
+        height: 420,
+        aria_label: "Line chart of barometric pressure high, low, and mean"
+      ) %>
+    <% end %>
+
     <div class="ui-split-grid">
       <% if @rain_chart %>
         <%= render Ui::ChartComponent.new(

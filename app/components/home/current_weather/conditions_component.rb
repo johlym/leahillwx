@@ -121,6 +121,10 @@ class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
     @current.dew_point.to_fahrenheit.round(0)
   end
 
+  def current_barometric_pressure
+    @current.barometer_rel.round(0)
+  end
+
   def reading_timestamp
     Time.current.in_time_zone("America/Los_Angeles").strftime("%b %-d, %Y @ %-I:%M %p")
   end

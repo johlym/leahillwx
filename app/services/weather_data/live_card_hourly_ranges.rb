@@ -42,6 +42,7 @@ module WeatherData
         rain_rate: series_for(weather, :rain_avg, :rain_high, :rain_low, decimals: 2),
         dew_point: series_for(weather, :dew_avg, :dew_high, :dew_low, decimals: 0),
         cloud_base: series_for(weather, :cloud_avg, :cloud_high, :cloud_low, decimals: 0),
+        pressure: series_for(weather, :pressure_avg, :pressure_high, :pressure_low, decimals: 0),
         aqi: series_for(aqi, :aqi_avg, :aqi_high, :aqi_low, decimals: 0)
       }
     end
@@ -128,10 +129,13 @@ module WeatherData
           Arel.sql("MIN(#{dew_expr})"),
           Arel.sql("AVG(#{cloud_expr})"),
           Arel.sql("MAX(#{cloud_expr})"),
-          Arel.sql("MIN(#{cloud_expr})")
+          Arel.sql("MIN(#{cloud_expr})"),
+          Arel.sql("AVG(barometer_rel)"),
+          Arel.sql("MAX(barometer_rel)"),
+          Arel.sql("MIN(barometer_rel)")
         )
 
-      rows.each_with_object({}) do |(bucket, wind_avg, wind_hi, wind_lo, hum_avg, hum_hi, hum_lo, uvi_avg, uvi_hi, uvi_lo, rain_avg, rain_hi, rain_lo, dew_avg, dew_hi, dew_lo, cloud_avg, cloud_hi, cloud_lo), memo|
+      rows.each_with_object({}) do |(bucket, wind_avg, wind_hi, wind_lo, hum_avg, hum_hi, hum_lo, uvi_avg, uvi_hi, uvi_lo, rain_avg, rain_hi, rain_lo, dew_avg, dew_hi, dew_lo, cloud_avg, cloud_hi, cloud_lo, pressure_avg, pressure_hi, pressure_lo), memo|
         key = normalize_bucket(bucket)
         memo[key] = {
           # Y-axis high uses peak gust; low/avg use sustained wind speed.
@@ -152,7 +156,10 @@ module WeatherData
           dew_low: dew_lo ? c_to_f(dew_lo) : nil,
           cloud_avg: cloud_avg,
           cloud_high: cloud_hi,
-          cloud_low: cloud_lo
+          cloud_low: cloud_lo,
+          pressure_avg: pressure_avg,
+          pressure_high: pressure_hi,
+          pressure_low: pressure_lo
         }
       end
     end
