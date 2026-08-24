@@ -23,6 +23,7 @@
 #
 # Indexes
 #
+#  index_weather_measurements_on_barometer_abs      (barometer_abs)
 #  index_weather_measurements_on_barometer_rel      (barometer_rel)
 #  index_weather_measurements_on_gust_speed         (gust_speed)
 #  index_weather_measurements_on_humidity           (humidity)
@@ -60,6 +61,35 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
     assert_in_delta 1013.25 / 33.8638866667, measurement.barometer_abs_inhg, 0.000001
     assert_in_delta 1015.0 / 33.8638866667, measurement.barometer_rel_inhg, 0.000001
     assert_in_delta measurement.barometer_abs_inhg, measurement.barometer_abs_mmhg, 0.000001
+  end
+
+  test "sea_level_pressure reduces station pressure at site elevation" do
+    measurement = WeatherMeasurement.new(valid_attrs(
+      barometer_abs: 29.63 * SeaLevelPressure::HPA_PER_INHG,
+      barometer_rel: 29.54 * SeaLevelPressure::HPA_PER_INHG
+    ))
+
+    with_elevation(416) do
+      assert_in_delta 1018.6, measurement.sea_level_pressure, 0.1
+      assert_in_delta 30.079, measurement.sea_level_pressure_inhg, 0.001
+      assert_in_delta 1018.4, measurement.sea_level_pressure_qff, 0.3
+    end
+  end
+
+  test "sea_level_pressure equals station pressure at sea level" do
+    measurement = WeatherMeasurement.new(valid_attrs(barometer_abs: 1013.25, barometer_rel: 1000.0))
+
+    with_elevation(0) do
+      assert_in_delta 1013.25, measurement.sea_level_pressure, 0.000001
+    end
+  end
+
+  def with_elevation(feet)
+    previous = ENV["LOCATION_ELEVATION_FT"]
+    ENV["LOCATION_ELEVATION_FT"] = feet.to_s
+    yield
+  ensure
+    previous.nil? ? ENV.delete("LOCATION_ELEVATION_FT") : ENV["LOCATION_ELEVATION_FT"] = previous
   end
 
   test "accepts empty soil by default" do

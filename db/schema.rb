@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_23_170000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_24_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -257,6 +257,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_23_170000) do
     t.float "uvi", null: false
     t.integer "wind_dir", null: false
     t.float "wind_speed", null: false
+    t.index ["barometer_abs"], name: "index_weather_measurements_on_barometer_abs"
     t.index ["barometer_rel"], name: "index_weather_measurements_on_barometer_rel"
     t.index ["gust_speed"], name: "index_weather_measurements_on_gust_speed"
     t.index ["humidity"], name: "index_weather_measurements_on_humidity"

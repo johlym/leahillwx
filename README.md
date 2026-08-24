@@ -105,6 +105,7 @@ Optional nested arrays: `soil[]` and `temp_probes[]` (channels 1–8).
 | -------- | ---------------------- |
 | `MEASUREMENT_API_KEY` | Ingest 401s; empty homepage 500s |
 | `LOCATION_LAT` / `LOCATION_LON` | Radar (`ENV.fetch`), wildfire, LibreWXR alerts, several geo jobs |
+| `LOCATION_ELEVATION_FT` | Optional; defaults to 416. Reduces station pressure to sea-level / altimeter |
 | `OPENWEATHER_API_KEY` | Forecast download |
 | `AIRNOW_AQSID` | Optional; defaults to Auburn 29th St |
 | `LIBREWXR_API_BASE` | Optional; defaults to `https://api.librewxr.net` |

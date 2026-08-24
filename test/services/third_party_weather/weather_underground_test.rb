@@ -83,7 +83,7 @@ module ThirdPartyWeather
       assert_in_delta @measurement.temperature.to_fahrenheit.round(2), params[:tempf], 0.001
       assert_in_delta @measurement.rain_rate_in.round(4), params[:rainin], 0.0001
       assert_in_delta @measurement.rain_day_in.round(4), params[:dailyrainin], 0.0001
-      assert_in_delta @measurement.barometer_rel_inhg.round(3), params[:baromin], 0.001
+      assert_in_delta @measurement.sea_level_pressure_inhg.round(3), params[:baromin], 0.001
       assert_in_delta @measurement.dew_point.to_fahrenheit.round(2), params[:dewptf], 0.001
       assert_equal 65, params[:humidity]
       assert_equal 10, captured[:timeout]

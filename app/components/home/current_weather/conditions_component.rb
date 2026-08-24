@@ -122,7 +122,7 @@ class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
   end
 
   def current_barometric_pressure
-    @current.barometer_rel.round(0)
+    @current.sea_level_pressure_qff.round(0)
   end
 
   def reading_timestamp

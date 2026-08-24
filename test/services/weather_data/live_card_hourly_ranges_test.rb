@@ -102,6 +102,32 @@ class WeatherData::LiveCardHourlyRangesTest < ActiveSupport::TestCase
     assert_equal 50, humidity[:y_max]
   end
 
+  test "pressure sparkline uses sea-level from station pressure not relative" do
+    previous = ENV["LOCATION_ELEVATION_FT"]
+    ENV["LOCATION_ELEVATION_FT"] = "416"
+
+    create_measurement_at(
+      @now,
+      humidity: 50, temperature: 17, uvi: 0, rain_rate: 0,
+      barometer_abs: 29.63 * SeaLevelPressure::HPA_PER_INHG,
+      barometer_rel: 29.54 * SeaLevelPressure::HPA_PER_INHG
+    )
+
+    pressure = WeatherData::LiveCardHourlyRanges.new(now: @now).call[:pressure]
+
+    expected = SeaLevelPressure.qff_hpa(
+      29.63 * SeaLevelPressure::HPA_PER_INHG,
+      temp_c: 17,
+      elevation_ft: 416
+    ).round
+
+    refute_includes pressure[:values].compact, 1000
+    assert_equal expected, pressure[:y_max]
+    assert_equal expected, pressure[:y_min]
+  ensure
+    previous.nil? ? ENV.delete("LOCATION_ELEVATION_FT") : ENV["LOCATION_ELEVATION_FT"] = previous
+  end
+
   test "aqi sparkline ignores openweather rows" do
     Aqi.create!(
       observed_at: @now - 10.minutes,
@@ -138,11 +164,11 @@ class WeatherData::LiveCardHourlyRangesTest < ActiveSupport::TestCase
     )
   end
 
-  def create_measurement_at(reading_date_time, humidity:, temperature:, uvi:, rain_rate:, wind_speed: 1, gust_speed: 2)
+  def create_measurement_at(reading_date_time, humidity:, temperature:, uvi:, rain_rate:, wind_speed: 1, gust_speed: 2, barometer_abs: 1013, barometer_rel: 1013)
     WeatherMeasurement.create!(
       reading_date_time: reading_date_time,
-      barometer_abs: 1013,
-      barometer_rel: 1013,
+      barometer_abs: barometer_abs,
+      barometer_rel: barometer_rel,
       gust_speed: gust_speed,
       humidity: humidity,
       light: 100,

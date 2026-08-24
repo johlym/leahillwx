@@ -8,6 +8,7 @@ on:
 env:
   LOCATION_LAT: 44.0000
   LOCATION_LON: -88.0000
+  LOCATION_ELEVATION_FT: 0
 
 jobs:
   scan_ruby:

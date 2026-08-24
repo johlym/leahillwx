@@ -11,6 +11,9 @@ if ENV["COVERAGE"] == "1"
 end
 
 ENV["RAILS_ENV"] ||= "test"
+# Tests treat stored hPa as already at the reported elevation unless a case
+# sets LOCATION_ELEVATION_FT. Production defaults to 416 ft (Leahill).
+ENV["LOCATION_ELEVATION_FT"] ||= "0"
 require_relative "../config/environment"
 require "rails/test_help"
 
@@ -30,6 +33,16 @@ module ActiveSupport
     # Redis, so clear the per-worker key before every test to avoid drift.
     setup do
       WeatherMeasurements::TotalCount.clear!
+    end
+
+    def with_env(vars)
+      originals = vars.to_h { |key, _| [ key, ENV.key?(key) ? ENV[key] : :__unset__ ] }
+      vars.each { |key, value| ENV[key] = value }
+      yield
+    ensure
+      originals.each do |key, original|
+        original == :__unset__ ? ENV.delete(key) : ENV[key] = original
+      end
     end
   end
 end

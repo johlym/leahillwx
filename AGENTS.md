@@ -18,7 +18,7 @@ This is the **lhwx.org** personal weather-station website: a Rails 8 app (Ruby 4
 - Frontend assets are built with esbuild + Tailwind; `app/assets/builds/*` is gitignored so build before/while serving: `yarn build` and `yarn build:css` (append `--watch` for live reload).
 
 ### Ingesting data (the app needs at least one measurement or the homepage 500s)
-- Set `MEASUREMENT_API_KEY` in `.env` (also set `LOCATION_LAT`/`LOCATION_LON`; copy from `env.sample`). The create/bulk endpoints require `Authorization: Bearer <MEASUREMENT_API_KEY>`.
+- Set `MEASUREMENT_API_KEY` in `.env` (also set `LOCATION_LAT`/`LOCATION_LON`/`LOCATION_ELEVATION_FT`; copy from `env.sample`). The create/bulk endpoints require `Authorization: Bearer <MEASUREMENT_API_KEY>`.
 - `POST /api/v1/weather_measurement` with a `weather_measurement` object (see `app/controllers/api/v1/weather_measurements_controller.rb` for permitted fields and `app/models/weather_measurement.rb` for required/validated fields). Returns `204` on success. `/api/v1/weather_measurement/bulk` enqueues a Sidekiq job.
 
 ### Lint / test / build (standard commands; see `.github/workflows/ci.yml` and `config/ci.rb`)

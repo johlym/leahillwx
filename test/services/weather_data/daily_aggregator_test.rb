@@ -99,9 +99,9 @@ class WeatherData::DailyAggregatorTest < ActiveSupport::TestCase
 
     entry = WeatherData::DailyAggregator.new(@date).aggregate
 
-    assert_in_delta 1012.667, entry.mean_pressure, 0.01
-    assert_equal 1018.0, entry.high_pressure
-    assert_equal 1008.0, entry.low_pressure
+    assert_in_delta 1010.0, entry.mean_pressure, 0.01
+    assert_equal 1015.0, entry.high_pressure
+    assert_equal 1005.0, entry.low_pressure
     assert_equal "11:00", entry.high_pressure_time
     assert_equal "12:00", entry.low_pressure_time
   end

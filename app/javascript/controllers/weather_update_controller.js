@@ -74,7 +74,9 @@ export default class extends Controller {
       this.humidityTarget.textContent = this.asInt(data.humidity)
     }
     if (this.hasPressureTarget) {
-      this.pressureTarget.textContent = this.asInt(data.barometer_rel_mb ?? data.barometer_abs_mb)
+      this.pressureTarget.textContent = this.asInt(
+        data.barometer_msl_mb ?? data.barometer_rel_mb ?? data.barometer_abs_mb
+      )
     }
     if (this.hasUviTarget) {
       this.uviTarget.textContent = this.asInt(data.uvi)

@@ -23,6 +23,7 @@
 #
 # Indexes
 #
+#  index_weather_measurements_on_barometer_abs      (barometer_abs)
 #  index_weather_measurements_on_barometer_rel      (barometer_rel)
 #  index_weather_measurements_on_gust_speed         (gust_speed)
 #  index_weather_measurements_on_humidity           (humidity)
@@ -66,6 +67,20 @@ class WeatherMeasurement < ApplicationRecord
 
   def barometer_rel_inhg
     barometer_rel * HPA_TO_INHG
+  end
+
+  # QNH altimeter from station pressure + site elevation. CWOP / WU / PWS.
+  def sea_level_pressure
+    SeaLevelPressure.hpa(barometer_abs)
+  end
+
+  def sea_level_pressure_inhg
+    sea_level_pressure * HPA_TO_INHG
+  end
+
+  # Temperature-reduced sea-level pressure (QFF). Site display and AWEKAS.
+  def sea_level_pressure_qff
+    SeaLevelPressure.qff_hpa(barometer_abs, temp_c: temperature)
   end
 
   # Deprecated aliases kept for callers that used the old misnamed helpers.
