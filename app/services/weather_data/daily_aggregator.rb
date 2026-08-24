@@ -80,8 +80,8 @@ module WeatherData
       high_measurement = measurements.max_by(&:temperature)
       low_measurement = measurements.min_by(&:temperature)
       gust_measurement = measurements.max_by(&:gust_speed)
-      high_pressure_measurement = measurements.max_by(&:barometer_rel)
-      low_pressure_measurement = measurements.min_by(&:barometer_rel)
+      high_pressure_measurement = measurements.max_by(&:barometer_abs)
+      low_pressure_measurement = measurements.min_by(&:barometer_abs)
 
       wind_dir_degrees = self.class.calculate_dominant_wind_direction(measurements)
       wind_dir_compass = degrees_to_compass(wind_dir_degrees)
@@ -89,7 +89,7 @@ module WeatherData
       wind_speeds_mps = measurements.map(&:wind_speed)
       avg_wind_speed_mps = wind_speeds_mps.sum / wind_speeds_mps.size
 
-      pressures = measurements.map(&:barometer_rel)
+      pressures = measurements.map(&:sea_level_pressure)
       mean_pressure = pressures.sum / pressures.size
 
       # rain_day is a cumulative counter that resets at midnight, so use the maximum value
@@ -113,9 +113,9 @@ module WeatherData
         wind_dir: wind_dir_degrees,
         wind_dir_compass: wind_dir_compass,
         mean_pressure: mean_pressure,
-        high_pressure: high_pressure_measurement.barometer_rel,
+        high_pressure: high_pressure_measurement.sea_level_pressure,
         high_pressure_time: format_time(high_pressure_measurement.reading_date_time),
-        low_pressure: low_pressure_measurement.barometer_rel,
+        low_pressure: low_pressure_measurement.sea_level_pressure,
         low_pressure_time: format_time(low_pressure_measurement.reading_date_time)
       }
     end

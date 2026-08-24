@@ -45,6 +45,31 @@ class RecordCalculatorTest < ActiveSupport::TestCase
     assert_equal 5.0, record.lowest_temp
   end
 
+  test "calculate_and_save! uses sea-level pressure from station abs not relative" do
+    previous = ENV["LOCATION_ELEVATION_FT"]
+    ENV["LOCATION_ELEVATION_FT"] = "416"
+
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: Time.zone.parse("2024-06-15 10:00:00"),
+      barometer_abs: 29.63 * SeaLevelPressure::HPA_PER_INHG,
+      barometer_rel: 29.54 * SeaLevelPressure::HPA_PER_INHG
+    ))
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: Time.zone.parse("2024-06-15 16:00:00"),
+      barometer_abs: 29.50 * SeaLevelPressure::HPA_PER_INHG,
+      barometer_rel: 29.40 * SeaLevelPressure::HPA_PER_INHG
+    ))
+
+    record = RecordCalculator.new(scope: "yearly", year: 2024).calculate_and_save!
+
+    assert_in_delta 1018.6, record.highest_pressure, 0.1
+    assert_in_delta 1014.1, record.lowest_pressure, 0.2
+    assert record.largest_pressure_swing.positive?
+    refute_in_delta 1000.3, record.highest_pressure, 1.0
+  ensure
+    previous.nil? ? ENV.delete("LOCATION_ELEVATION_FT") : ENV["LOCATION_ELEVATION_FT"] = previous
+  end
+
   test "calculate_and_save! creates an all_time record" do
     WeatherMeasurement.create!(measurement_attrs(
       reading_date_time: Time.zone.parse("2022-01-01 12:00:00"),

@@ -30,7 +30,7 @@ module ThirdPartyWeather
       params[:wdir] = measurement.wind_dir.round(0) if measurement.wind_dir
       params[:wspdhi] = (measurement.gust_speed * 10).round(0) if measurement.gust_speed
 
-      params[:bar] = (measurement.barometer_rel * 10).round(0) if measurement.barometer_rel
+      params[:bar] = (measurement.sea_level_pressure * 10).round(0) if measurement.sea_level_pressure
 
       params[:rain] = (measurement.rain_day * 10).round(0) if measurement.rain_day
       params[:rainrate] = (measurement.rain_rate * 10).round(0) if measurement.rain_rate

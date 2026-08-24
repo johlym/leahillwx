@@ -21,7 +21,7 @@ module ThirdPartyWeather
         time_utc.strftime("%H:%M"),
         measurement.temperature,
         measurement.humidity,
-        measurement.barometer_rel,
+        measurement.sea_level_pressure,
         (measurement.rain_day * 10).round(1), # mm * 10 as per AWEKAS spec
         (measurement.wind_speed * 3.6).round(1), # m/s to km/h
         measurement.wind_dir,

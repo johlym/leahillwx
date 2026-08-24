@@ -130,9 +130,9 @@ module WeatherData
           Arel.sql("AVG(#{cloud_expr})"),
           Arel.sql("MAX(#{cloud_expr})"),
           Arel.sql("MIN(#{cloud_expr})"),
-          Arel.sql("AVG(barometer_rel)"),
-          Arel.sql("MAX(barometer_rel)"),
-          Arel.sql("MIN(barometer_rel)")
+          Arel.sql("AVG(barometer_abs)"),
+          Arel.sql("MAX(barometer_abs)"),
+          Arel.sql("MIN(barometer_abs)")
         )
 
       rows.each_with_object({}) do |(bucket, wind_avg, wind_hi, wind_lo, hum_avg, hum_hi, hum_lo, uvi_avg, uvi_hi, uvi_lo, rain_avg, rain_hi, rain_lo, dew_avg, dew_hi, dew_lo, cloud_avg, cloud_hi, cloud_lo, pressure_avg, pressure_hi, pressure_lo), memo|
@@ -157,9 +157,9 @@ module WeatherData
           cloud_avg: cloud_avg,
           cloud_high: cloud_hi,
           cloud_low: cloud_lo,
-          pressure_avg: pressure_avg,
-          pressure_high: pressure_hi,
-          pressure_low: pressure_lo
+          pressure_avg: slp(pressure_avg),
+          pressure_high: slp(pressure_hi),
+          pressure_low: slp(pressure_lo)
         }
       end
     end
@@ -194,6 +194,10 @@ module WeatherData
 
     def c_to_f(celsius)
       celsius * 9.0 / 5.0 + 32.0
+    end
+
+    def slp(station_hpa)
+      SeaLevelPressure.hpa(station_hpa)
     end
   end
 end

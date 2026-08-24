@@ -25,6 +25,7 @@
 #
 # Indexes
 #
+#  index_weather_measurements_on_barometer_abs      (barometer_abs)
 #  index_weather_measurements_on_barometer_rel      (barometer_rel)
 #  index_weather_measurements_on_gust_speed         (gust_speed)
 #  index_weather_measurements_on_humidity           (humidity)

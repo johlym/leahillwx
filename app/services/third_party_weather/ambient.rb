@@ -24,7 +24,7 @@ module ThirdPartyWeather
         tempf: measurement.temperature.to_fahrenheit.round(2),
         rainin: measurement.rain_rate_in.round(4),
         dailyrainin: measurement.rain_day_in.round(4),
-        baromin: measurement.barometer_rel_inhg.round(3),
+        baromin: measurement.sea_level_pressure_inhg.round(3),
         dewptf: measurement.dew_point.to_fahrenheit.round(2),
         humidity: measurement.humidity,
         softwaretype: Base::SOFTWARE_TYPE,

@@ -11,6 +11,9 @@ if ENV["COVERAGE"] == "1"
 end
 
 ENV["RAILS_ENV"] ||= "test"
+# Tests treat stored hPa as already at the reported elevation unless a case
+# sets LOCATION_ELEVATION_FT. Production defaults to 416 ft (Leahill).
+ENV["LOCATION_ELEVATION_FT"] ||= "0"
 require_relative "../config/environment"
 require "rails/test_help"
 
