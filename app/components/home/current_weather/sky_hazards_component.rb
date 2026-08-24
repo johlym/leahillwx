@@ -3,11 +3,12 @@
 class Home::CurrentWeather::SkyHazardsComponent < ViewComponent::Base
   COMPASS = Iss::PassPredictor::COMPASS
 
-  def initialize(wildfire:, aurora:, planet_night:, iss_pass:)
+  def initialize(wildfire:, aurora:, planet_night:, iss_pass:, now: Time.current)
     @wildfire = wildfire
     @aurora = aurora
     @planet_night = planet_night
     @iss_pass = iss_pass
+    @now = now
   end
 
   def visible_planets
@@ -99,16 +100,19 @@ class Home::CurrentWeather::SkyHazardsComponent < ViewComponent::Base
     "#{label} +1 day"
   end
 
-  # Rough overnight visibility share for the progress bar (rise→set
-  # clipped to a 12h civil-night window). Falls back to 50% when times
-  # are missing so the UI still shows an instrument-style meter.
+  # How far the current rise→set transit has run. Long daytime spans
+  # (morning planets) used to fill the bar because duration / 12h was
+  # clamped to 100% even before the planet rose.
   def planet_visibility_pct(planet)
     rise_at = parse_planet_time(planet["rise_at"])
     set_at = parse_planet_time(planet["set_at"])
-    return 50 unless rise_at && set_at
+    return 0 unless rise_at && set_at && set_at > rise_at
 
-    duration_h = ((set_at - rise_at) / 1.hour).abs
-    ((duration_h / 12.0) * 100.0).clamp(10.0, 100.0).round
+    return 0 if @now <= rise_at
+    return 100 if @now >= set_at
+
+    span = (set_at - rise_at).to_f
+    (((@now - rise_at) / span) * 100.0).clamp(0.0, 100.0).round
   end
 
   private
