@@ -25,6 +25,19 @@ class PlanetNight < ApplicationRecord
   end
 
   def visible_planets
-    Array(planets).select { |p| p["visible_tonight"] }
+    Array(planets).select do |planet|
+      planet["visible_tonight"] && rise_on_card_date?(planet)
+    end
+  end
+
+  private
+
+  def rise_on_card_date?(planet)
+    rise = planet["rise_at"]
+    return true if rise.blank?
+
+    Time.zone.parse(rise).in_time_zone(timezone).to_date <= date
+  rescue ArgumentError, TypeError
+    true
   end
 end
