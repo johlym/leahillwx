@@ -56,6 +56,7 @@ module ThirdPartyWeather
       assert_equal "18.07.2026", values[2]
       assert_equal "12:00", values[3]
       assert_equal "20.0", values[4]
+      assert_in_delta @measurement.sea_level_pressure, values[6].to_f, 0.001
       assert_equal "-122.2285", values[-2]
       assert_equal "47.3073", values[-1]
     end

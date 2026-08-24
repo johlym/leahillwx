@@ -136,6 +136,22 @@ module ThirdPartyWeather
       assert socket.closed?
     end
 
+    test "APRS pressure field is sea-level tenths of millibars at 416 ft" do
+      WeatherMeasurement.delete_all
+      reading = create_reading_at(
+        Time.utc(2026, 7, 18, 13, 0, 0),
+        rain_day: 0.0,
+        barometer_abs: 29.63 * SeaLevelPressure::HPA_PER_INHG,
+        barometer_rel: 29.54 * SeaLevelPressure::HPA_PER_INHG
+      )
+
+      packet = with_env("LOCATION_ELEVATION_FT" => "416") do
+        Cwop::PacketBuilder.build(reading, callsign: "GW1125")
+      end
+
+      assert_includes packet, "b10186"
+    end
+
     test "does not release lock when claim raises" do
       Sidekiq.redis do |conn|
         conn.set(@lock_key, "other-worker", nx: true, ex: 300)

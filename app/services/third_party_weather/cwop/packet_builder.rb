@@ -28,6 +28,7 @@ module ThirdPartyWeather
         rain_24h = format("%03d", (rain_last_24h_inches * 100).round.clamp(0, 999))
         rain_day = format("%03d", (@measurement.rain_day_in * 100).round.clamp(0, 999))
         humidity = format_humidity(@measurement.humidity)
+        # APRS `b` is sea-level pressure in tenths of millibars (CWOP/APRS weather).
         pressure = format("%05d", (@measurement.sea_level_pressure * 10).round.clamp(0, 99_999))
 
         weather = "#{wind_dir}/#{wind_speed}g#{gust}t#{temp_f}r#{rain_hour}p#{rain_24h}P#{rain_day}h#{humidity}b#{pressure}"

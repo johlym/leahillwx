@@ -30,6 +30,7 @@ module ThirdPartyWeather
       params[:wdir] = measurement.wind_dir.round(0) if measurement.wind_dir
       params[:wspdhi] = (measurement.gust_speed * 10).round(0) if measurement.gust_speed
 
+      # WeatherCloud `bar` is sea-level pressure in tenths of hPa.
       params[:bar] = (measurement.sea_level_pressure * 10).round(0) if measurement.sea_level_pressure
 
       params[:rain] = (measurement.rain_day * 10).round(0) if measurement.rain_day

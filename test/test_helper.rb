@@ -34,5 +34,15 @@ module ActiveSupport
     setup do
       WeatherMeasurements::TotalCount.clear!
     end
+
+    def with_env(vars)
+      originals = vars.to_h { |key, _| [ key, ENV.key?(key) ? ENV[key] : :__unset__ ] }
+      vars.each { |key, value| ENV[key] = value }
+      yield
+    ensure
+      originals.each do |key, original|
+        original == :__unset__ ? ENV.delete(key) : ENV[key] = original
+      end
+    end
   end
 end
