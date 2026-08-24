@@ -6,8 +6,8 @@
 # DNR "Current Fire Statistics" keeps rows until CONTROL_DT / FIRE_OUT_DT are
 # set. Local-agency assist fires often never get those dates, so a nearby stale
 # incident (e.g. a 3-acre fire from last month) would monopolize the card.
-# Treat a DNR row as live only when NIFC still lists it, or it was discovered
-# recently enough that NIFC may not have it yet.
+# Treat a DNR row as live only when NIFC still lists the same incident, or it
+# was discovered recently enough that NIFC may not have it yet.
 class NearestWildfireResolver
   MATCH_DISTANCE_MI = 15.0
   RECENT_DNR_ONLY = 7.days
@@ -32,7 +32,7 @@ class NearestWildfireResolver
   private
 
   def live_dnr_fires(dnr_fires, nifc_fires)
-    dnr_fires.select { |dnr| nifc_match_for(dnr, nifc_fires) || recently_discovered?(dnr) }
+    dnr_fires.select { |dnr| same_incident_in_nifc?(dnr, nifc_fires) || recently_discovered?(dnr) }
   end
 
   def recently_discovered?(fire)
@@ -48,16 +48,24 @@ class NearestWildfireResolver
       .min_by { |fire| fire[:distance_mi] }
   end
 
-  def nifc_match_for(dnr_fire, nifc_fires)
-    nifc_fires.find do |nifc|
-      name_match = nifc[:name].to_s.downcase == dnr_fire[:name].to_s.downcase
-      near = GeoDistance.distance(dnr_fire[:lat], dnr_fire[:lon], nifc[:lat], nifc[:lon], unit: :mi) <= MATCH_DISTANCE_MI
-      name_match || near
-    end
+  def same_incident_in_nifc?(dnr_fire, nifc_fires)
+    nifc_fires.any? { |nifc| same_name?(dnr_fire, nifc) && nearby?(dnr_fire, nifc) }
+  end
+
+  def nearby_nifc(dnr_fire, nifc_fires)
+    nifc_fires.find { |nifc| nearby?(dnr_fire, nifc) }
+  end
+
+  def same_name?(left, right)
+    left[:name].to_s.downcase == right[:name].to_s.downcase
+  end
+
+  def nearby?(left, right)
+    GeoDistance.distance(left[:lat], left[:lon], right[:lat], right[:lon], unit: :mi) <= MATCH_DISTANCE_MI
   end
 
   def enrich_from_nifc(dnr_fire, nifc_fires)
-    match = nifc_match_for(dnr_fire, nifc_fires)
+    match = nearby_nifc(dnr_fire, nifc_fires)
     return dnr_fire unless match
 
     dnr_fire.merge(

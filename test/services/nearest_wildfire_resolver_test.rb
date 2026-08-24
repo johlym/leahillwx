@@ -118,6 +118,48 @@ class NearestWildfireResolverTest < ActiveSupport::TestCase
     end
   end
 
+  test "does not treat a same-named out-of-state NIFC fire as the same incident" do
+    dnr = [ {
+      name: "LITTLE BEAR",
+      lat: 47.83,
+      lon: -122.18,
+      acres: 0.1,
+      discovered_at: 49.days.ago,
+      external_id: "wa-little-bear",
+      source: "wadnr"
+    } ]
+    nifc = [
+      {
+        name: "LITTLE BEAR",
+        lat: 44.52,
+        lon: -119.04,
+        acres: 67.0,
+        percent_contained: 100.0,
+        url: "https://example.com/or-little-bear",
+        external_id: "or-little-bear",
+        source: "nifc",
+        state: "OR"
+      },
+      {
+        name: "Three Queens",
+        lat: 47.41,
+        lon: -121.26,
+        acres: 3849.0,
+        percent_contained: 13.0,
+        url: "https://example.com/three-queens",
+        external_id: "IRWIN-TQ",
+        source: "nifc",
+        state: "WA"
+      }
+    ]
+
+    stub_clients(dnr: dnr, nifc: nifc) do
+      result = NearestWildfireResolver.new(lat: 47.3073, lon: -122.2285).call
+      assert_equal "Three Queens", result[:name]
+      assert_equal "nifc", result[:source]
+    end
+  end
+
   test "keeps a recent DNR-only ignition before NIFC fallback" do
     dnr = [ {
       name: "New Local",
