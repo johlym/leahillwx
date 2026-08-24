@@ -61,7 +61,7 @@
 }
 
 @utility sky-hazards-planet-times {
-  @apply text-slate-500;
+  @apply text-slate-500 whitespace-nowrap;
 }
 
 @utility sky-hazards-credits {

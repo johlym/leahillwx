@@ -3,11 +3,12 @@
 class Home::CurrentWeather::SkyHazardsComponent < ViewComponent::Base
   COMPASS = Iss::PassPredictor::COMPASS
 
-  def initialize(wildfire:, aurora:, planet_night:, iss_pass:)
+  def initialize(wildfire:, aurora:, planet_night:, iss_pass:, now: Time.current)
     @wildfire = wildfire
     @aurora = aurora
     @planet_night = planet_night
     @iss_pass = iss_pass
+    @now = now
   end
 
   def visible_planets
@@ -83,26 +84,52 @@ class Home::CurrentWeather::SkyHazardsComponent < ViewComponent::Base
   end
 
   def format_planet_time(iso)
-    return "—" if iso.blank?
+    local = parse_local_planet_time(iso)
+    return "—" unless local
 
-    Time.zone.parse(iso).in_time_zone("America/Los_Angeles").strftime("%-I:%M %p")
-  rescue ArgumentError, TypeError
-    "—"
+    local.strftime("%-I:%M %p")
   end
 
-  # Rough overnight visibility share for the progress bar (rise→set
-  # clipped to a 12h civil-night window). Falls back to 50% when times
-  # are missing so the UI still shows an instrument-style meter.
+  def format_planet_set_time(planet)
+    local = parse_local_planet_time(planet["set_at"])
+    return "—" unless local
+
+    label = local.strftime("%-I:%M %p")
+    return label unless set_next_day?(local)
+
+    "#{label} +1 day"
+  end
+
+  # How far the current rise→set transit has run. Long daytime spans
+  # (morning planets) used to fill the bar because duration / 12h was
+  # clamped to 100% even before the planet rose.
   def planet_visibility_pct(planet)
     rise_at = parse_planet_time(planet["rise_at"])
     set_at = parse_planet_time(planet["set_at"])
-    return 50 unless rise_at && set_at
+    return 0 unless rise_at && set_at && set_at > rise_at
 
-    duration_h = ((set_at - rise_at) / 1.hour).abs
-    ((duration_h / 12.0) * 100.0).clamp(10.0, 100.0).round
+    return 0 if @now <= rise_at
+    return 100 if @now >= set_at
+
+    span = (set_at - rise_at).to_f
+    (((@now - rise_at) / span) * 100.0).clamp(0.0, 100.0).round
   end
 
   private
+
+  def set_next_day?(local_set)
+    night_date = @planet_night&.date
+    return false unless night_date
+
+    local_set.to_date > night_date
+  end
+
+  def parse_local_planet_time(iso)
+    parsed = parse_planet_time(iso)
+    return nil unless parsed
+
+    parsed.in_time_zone("America/Los_Angeles")
+  end
 
   def parse_planet_time(iso)
     return nil if iso.blank?
