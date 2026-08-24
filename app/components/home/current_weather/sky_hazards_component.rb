@@ -83,11 +83,20 @@ class Home::CurrentWeather::SkyHazardsComponent < ViewComponent::Base
   end
 
   def format_planet_time(iso)
-    return "—" if iso.blank?
+    local = parse_local_planet_time(iso)
+    return "—" unless local
 
-    Time.zone.parse(iso).in_time_zone("America/Los_Angeles").strftime("%-I:%M %p")
-  rescue ArgumentError, TypeError
-    "—"
+    local.strftime("%-I:%M %p")
+  end
+
+  def format_planet_set_time(planet)
+    local = parse_local_planet_time(planet["set_at"])
+    return "—" unless local
+
+    label = local.strftime("%-I:%M %p")
+    return label unless set_next_day?(local)
+
+    "#{label} +1 day"
   end
 
   # Rough overnight visibility share for the progress bar (rise→set
@@ -103,6 +112,20 @@ class Home::CurrentWeather::SkyHazardsComponent < ViewComponent::Base
   end
 
   private
+
+  def set_next_day?(local_set)
+    night_date = @planet_night&.date
+    return false unless night_date
+
+    local_set.to_date > night_date
+  end
+
+  def parse_local_planet_time(iso)
+    parsed = parse_planet_time(iso)
+    return nil unless parsed
+
+    parsed.in_time_zone("America/Los_Angeles")
+  end
 
   def parse_planet_time(iso)
     return nil if iso.blank?
