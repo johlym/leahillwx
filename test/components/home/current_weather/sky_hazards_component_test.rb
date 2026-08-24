@@ -42,10 +42,42 @@ class Home::CurrentWeather::SkyHazardsComponentTest < ViewComponent::TestCase
     assert_text "Venus"
     assert_text "10:33 AM - 9:14 PM"
     assert_no_text "9:14 PM +1 day"
-    assert_text "Mars"
-    assert_text "1:39 AM +1 day - 5:24 PM +1 day"
+    assert_no_text "Mars"
     assert_text "Saturn"
     assert_text "9:36 PM - 10:00 AM +1 day"
+  end
+
+  test "omits planets that rise after the card date" do
+    night = PlanetNight.create!(
+      date: Date.new(2026, 9, 6),
+      timezone: "America/Los_Angeles",
+      planets: [
+        {
+          "key" => "mars",
+          "label" => "Mars",
+          "rise_at" => "2026-09-07T01:39:48-07:00",
+          "set_at" => "2026-09-07T17:24:50-07:00",
+          "visible_tonight" => true
+        },
+        {
+          "key" => "saturn",
+          "label" => "Saturn",
+          "rise_at" => "2026-09-06T21:36:32-07:00",
+          "set_at" => "2026-09-07T10:00:07-07:00",
+          "visible_tonight" => true
+        }
+      ]
+    )
+
+    render_inline(Home::CurrentWeather::SkyHazardsComponent.new(
+      wildfire: nil,
+      aurora: nil,
+      planet_night: night,
+      iss_pass: nil
+    ))
+
+    assert_no_text "Mars"
+    assert_text "Saturn"
   end
 
   test "shows every visible planet, not a three-item cap" do
@@ -110,7 +142,7 @@ class Home::CurrentWeather::SkyHazardsComponentTest < ViewComponent::TestCase
       iss_pass: nil,
       now: now
     )
-    planets = night.visible_planets.index_by { |planet| planet["key"] }
+    planets = night.planets.index_by { |planet| planet["key"] }
 
     assert_equal 100, component.planet_visibility_pct(planets["venus"])
     assert_equal 0, component.planet_visibility_pct(planets["mars"])
@@ -133,7 +165,7 @@ class Home::CurrentWeather::SkyHazardsComponentTest < ViewComponent::TestCase
     )
     afternoon = Time.zone.parse("2026-09-04T14:49:00-07:00")
     next_afternoon = Time.zone.parse("2026-09-05T14:49:00-07:00")
-    planet = night.visible_planets.first
+    planet = night.planets.first
 
     before_rise = Home::CurrentWeather::SkyHazardsComponent.new(
       wildfire: nil, aurora: nil, planet_night: night, iss_pass: nil, now: afternoon

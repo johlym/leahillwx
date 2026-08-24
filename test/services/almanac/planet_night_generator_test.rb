@@ -81,13 +81,9 @@ class Almanac::PlanetNightGeneratorTest < ActiveSupport::TestCase
     assert_equal set_at.iso8601, planet["set_at"]
   end
 
-  test "morning planet is visible on the predawn rise, not the first daylight interval" do
+  test "morning planet that only rises after midnight is not listed tonight" do
     zone = ActiveSupport::TimeZone["America/Los_Angeles"]
     date = Date.new(2026, 8, 24)
-    first_rise = zone.local(2026, 8, 24, 1, 40)
-    first_set = zone.local(2026, 8, 24, 17, 26)
-    night_rise = zone.local(2026, 8, 25, 1, 39)
-    night_set = zone.local(2026, 8, 25, 17, 24)
 
     planet = generate_planet(
       date: date,
@@ -95,16 +91,16 @@ class Almanac::PlanetNightGeneratorTest < ActiveSupport::TestCase
       dawn: zone.local(2026, 8, 25, 5, 44),
       up_at_start: false,
       crossings: [
-        { time: first_rise, direction: :rising },
-        { time: first_set, direction: :setting },
-        { time: night_rise, direction: :rising },
-        { time: night_set, direction: :setting }
+        { time: zone.local(2026, 8, 24, 1, 40), direction: :rising },
+        { time: zone.local(2026, 8, 24, 17, 26), direction: :setting },
+        { time: zone.local(2026, 8, 25, 1, 39), direction: :rising },
+        { time: zone.local(2026, 8, 25, 17, 24), direction: :setting }
       ]
     )
 
-    assert planet["visible_tonight"]
-    assert_equal night_rise.iso8601, planet["rise_at"]
-    assert_equal night_set.iso8601, planet["set_at"]
+    assert_not planet["visible_tonight"]
+    assert_nil planet["rise_at"]
+    assert_nil planet["set_at"]
   end
 
   test "already-up outer planet is visible on tonight's rise after the morning set" do
@@ -154,7 +150,7 @@ class Almanac::PlanetNightGeneratorTest < ActiveSupport::TestCase
     assert_nil planet["set_at"]
   end
 
-  test "generate marks the August 2026 morning and already-up planets visible" do
+  test "generate lists tonight's evening planets, not predawn rises tomorrow" do
     payload = Almanac::PlanetNightGenerator.new(
       lat: 47.3073,
       lon: -122.2285
@@ -164,8 +160,8 @@ class Almanac::PlanetNightGeneratorTest < ActiveSupport::TestCase
 
     assert_equal false, visibility["mercury"]
     assert_equal true, visibility["venus"]
-    assert_equal true, visibility["mars"]
-    assert_equal true, visibility["jupiter"]
+    assert_equal false, visibility["mars"]
+    assert_equal false, visibility["jupiter"]
     assert_equal true, visibility["saturn"]
 
     saturn = payload[:planets].find { |planet| planet["key"] == "saturn" }

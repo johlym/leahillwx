@@ -44,7 +44,7 @@ module Almanac
       civil_dawn = @horizon.civil_dawn(day_end, next_day_end) || day_end + 6.hours
 
       planets = BspPositions::NAKED_EYE_PLANETS.map do |body|
-        build_planet(body, day_start, next_day_end, civil_dusk, civil_dawn)
+        build_planet(body, day_start, next_day_end, civil_dusk, civil_dawn, date)
       end
 
       {
@@ -76,8 +76,8 @@ module Almanac
       PlanetNight.find_by!(date: payload[:date])
     end
 
-    def build_planet(body, window_start, window_end, civil_dusk, civil_dawn)
-      interval = night_interval(body, window_start, window_end, civil_dusk, civil_dawn)
+    def build_planet(body, window_start, window_end, civil_dusk, civil_dawn, date)
+      interval = night_interval(body, window_start, window_end, civil_dusk, civil_dawn, date)
       rise_at = interval && interval[0]
       set_at = interval && interval[1]
       visible = interval.present?
@@ -106,12 +106,19 @@ module Almanac
     # overlaps civil night. Taking the first rise and first set independently
     # from local midnight treats last night's set and tonight's rise as one
     # interval, so morning planets and already-up outer planets never qualify.
-    def night_interval(body, window_start, window_end, civil_dusk, civil_dawn)
+    def night_interval(body, window_start, window_end, civil_dusk, civil_dawn, date)
       crossings = @horizon.horizon_crossings(body, window_start, window_end)
       up_at_start = altitude_at(body, window_start) >= 0.0
       above_horizon_intervals(crossings, up_at_start, window_start, window_end).find do |rise_at, set_at|
-        visible_during_civil_night?(rise_at, set_at, civil_dusk, civil_dawn)
+        visible_during_civil_night?(rise_at, set_at, civil_dusk, civil_dawn) &&
+          rise_on_card_date?(rise_at, date)
       end
+    end
+
+    # "Tonight" is this calendar evening. A predawn rise tomorrow is the
+    # next card's planet, even though it still overlaps civil night.
+    def rise_on_card_date?(rise_at, date)
+      rise_at.in_time_zone(@timezone).to_date <= date
     end
 
     def above_horizon_intervals(crossings, up_at_start, window_start, window_end)
