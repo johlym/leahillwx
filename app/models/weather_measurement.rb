@@ -79,6 +79,11 @@ class WeatherMeasurement < ApplicationRecord
     sea_level_pressure * HPA_TO_INHG
   end
 
+  # Temperature-reduced sea-level pressure (QFF). AWEKAS QC uses this.
+  def sea_level_pressure_qff
+    SeaLevelPressure.qff_hpa(barometer_abs, temp_c: temperature)
+  end
+
   # Deprecated aliases kept for callers that used the old misnamed helpers.
   alias_method :barometer_abs_mmhg, :barometer_abs_inhg
   alias_method :barometer_rel_mmhg, :barometer_rel_inhg

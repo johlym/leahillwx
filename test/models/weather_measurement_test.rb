@@ -72,6 +72,7 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
     with_elevation(416) do
       assert_in_delta 1018.6, measurement.sea_level_pressure, 0.1
       assert_in_delta 30.079, measurement.sea_level_pressure_inhg, 0.001
+      assert_in_delta 1018.4, measurement.sea_level_pressure_qff, 0.3
     end
   end
 

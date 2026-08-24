@@ -76,7 +76,7 @@ module ThirdPartyWeather
       refute_equal (STATION_ABS_INHG * SeaLevelPressure::HPA_PER_INHG * 10).round, params[:bar]
     end
 
-    test "AWEKAS field 7 is sea-level hPa" do
+    test "AWEKAS field 7 is QFF and closes the -18.5 hPa QC gap" do
       params = capture_query do
         with_upload_env(
           "AWEKAS_USERNAME" => "awekas-user",
@@ -89,8 +89,16 @@ module ThirdPartyWeather
       end
 
       pressure = params[:val].split(";")[6].to_f
-      assert_in_delta EXPECTED_SLP_HPA, pressure, 0.05
-      refute_in_delta STATION_REL_INHG * SeaLevelPressure::HPA_PER_INHG, pressure, 1.0
+      relative_hpa = STATION_REL_INHG * SeaLevelPressure::HPA_PER_INHG
+      expected_qff = SeaLevelPressure.qff_hpa(
+        STATION_ABS_INHG * SeaLevelPressure::HPA_PER_INHG,
+        temp_c: 20.0,
+        elevation_ft: ELEVATION_FT
+      ).round(1)
+
+      assert_in_delta expected_qff, pressure, 0.05
+      assert_in_delta(-18.5, relative_hpa - pressure, 1.0)
+      refute_in_delta relative_hpa, pressure, 1.0
       refute_in_delta STATION_ABS_INHG * SeaLevelPressure::HPA_PER_INHG, pressure, 1.0
     end
 
