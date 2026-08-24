@@ -84,20 +84,11 @@ class Home::CurrentWeather::SkyHazardsComponent < ViewComponent::Base
   end
 
   def format_planet_time(iso)
-    local = parse_local_planet_time(iso)
-    return "—" unless local
-
-    local.strftime("%-I:%M %p")
+    format_planet_clock(iso)
   end
 
   def format_planet_set_time(planet)
-    local = parse_local_planet_time(planet["set_at"])
-    return "—" unless local
-
-    label = local.strftime("%-I:%M %p")
-    return label unless set_next_day?(local)
-
-    "#{label} +1 day"
+    format_planet_clock(planet["set_at"])
   end
 
   # How far the current rise→set transit has run. Long daytime spans
@@ -117,11 +108,21 @@ class Home::CurrentWeather::SkyHazardsComponent < ViewComponent::Base
 
   private
 
-  def set_next_day?(local_set)
+  def format_planet_clock(iso)
+    local = parse_local_planet_time(iso)
+    return "—" unless local
+
+    label = local.strftime("%-I:%M %p")
+    return label unless next_day?(local)
+
+    "#{label} +1 day"
+  end
+
+  def next_day?(local_time)
     night_date = @planet_night&.date
     return false unless night_date
 
-    local_set.to_date > night_date
+    local_time.to_date > night_date
   end
 
   def parse_local_planet_time(iso)
