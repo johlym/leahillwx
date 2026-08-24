@@ -62,8 +62,10 @@ class RecordCalculatorTest < ActiveSupport::TestCase
 
     record = RecordCalculator.new(scope: "yearly", year: 2024).calculate_and_save!
 
-    assert_in_delta 1018.6, record.highest_pressure, 0.1
-    assert_in_delta 1014.1, record.lowest_pressure, 0.2
+    high = SeaLevelPressure.qff_hpa(29.63 * SeaLevelPressure::HPA_PER_INHG, temp_c: 20.0, elevation_ft: 416)
+    low = SeaLevelPressure.qff_hpa(29.50 * SeaLevelPressure::HPA_PER_INHG, temp_c: 20.0, elevation_ft: 416)
+    assert_in_delta high, record.highest_pressure, 0.1
+    assert_in_delta low, record.lowest_pressure, 0.2
     assert record.largest_pressure_swing.positive?
     refute_in_delta 1000.3, record.highest_pressure, 1.0
   ensure

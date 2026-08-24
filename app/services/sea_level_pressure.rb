@@ -12,7 +12,7 @@
 #     A = (P_s^0.190284 + 1.313e-5 * H)^5.2553026  (inHg, feet)
 # - qff_hpa: weewx/wview sea-level (QFF), uses actual temperature.
 #     P_msl = P_s / exp(-h / (T_K * 29.263))
-#   AWEKAS documents QFF.
+#   Site display (live tile, reports, records) and AWEKAS use QFF.
 class SeaLevelPressure
   HPA_PER_INHG = 33.8638866667
   DEFAULT_ELEVATION_FT = 416.0
@@ -55,5 +55,15 @@ class SeaLevelPressure
     return 0 if term.zero?
 
     station / term
+  end
+
+  # Per-row QFF for Postgres aggregates. Same formula as qff_hpa.
+  def self.qff_sql(abs_column: "barometer_abs", temp_column: "temperature", elevation_ft: self.elevation_ft)
+    height_m = elevation_ft.to_f * FEET_TO_METERS
+    abs = abs_column.to_s
+    temp = temp_column.to_s
+    return abs if height_m.zero?
+
+    "(#{abs} / EXP(#{format('%.6f', -height_m)} / ((#{temp} + 273.15) * #{QFF_SCALE})))"
   end
 end

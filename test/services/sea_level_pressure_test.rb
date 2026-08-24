@@ -44,6 +44,11 @@ class SeaLevelPressureTest < ActiveSupport::TestCase
     assert_in_delta 1003.4, SeaLevelPressure.qff_hpa(1003.4, temp_c: 18.0, elevation_ft: 0), 0.000001
   end
 
+  test "qff_sql is identity at sea level and the QFF formula aloft" do
+    assert_equal "barometer_abs", SeaLevelPressure.qff_sql(elevation_ft: 0)
+    assert_match(/EXP\(/, SeaLevelPressure.qff_sql(elevation_ft: 416))
+  end
+
   test "reads LOCATION_ELEVATION_FT when elevation is omitted" do
     previous = ENV["LOCATION_ELEVATION_FT"]
     ENV["LOCATION_ELEVATION_FT"] = "416"

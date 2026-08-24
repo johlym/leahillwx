@@ -69,8 +69,7 @@ class WeatherMeasurement < ApplicationRecord
     barometer_rel * HPA_TO_INHG
   end
 
-  # Sea-level / altimeter setting from station pressure + site elevation.
-  # Public pressure (dashboard, reports, uploads) uses this, not barometer_rel.
+  # QNH altimeter from station pressure + site elevation. CWOP / WU / PWS.
   def sea_level_pressure
     SeaLevelPressure.hpa(barometer_abs)
   end
@@ -79,7 +78,7 @@ class WeatherMeasurement < ApplicationRecord
     sea_level_pressure * HPA_TO_INHG
   end
 
-  # Temperature-reduced sea-level pressure (QFF). AWEKAS QC uses this.
+  # Temperature-reduced sea-level pressure (QFF). Site display and AWEKAS.
   def sea_level_pressure_qff
     SeaLevelPressure.qff_hpa(barometer_abs, temp_c: temperature)
   end

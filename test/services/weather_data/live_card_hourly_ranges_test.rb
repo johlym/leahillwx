@@ -115,9 +115,15 @@ class WeatherData::LiveCardHourlyRangesTest < ActiveSupport::TestCase
 
     pressure = WeatherData::LiveCardHourlyRanges.new(now: @now).call[:pressure]
 
+    expected = SeaLevelPressure.qff_hpa(
+      29.63 * SeaLevelPressure::HPA_PER_INHG,
+      temp_c: 17,
+      elevation_ft: 416
+    ).round
+
     refute_includes pressure[:values].compact, 1000
-    assert_equal 1019, pressure[:y_max]
-    assert_equal 1019, pressure[:y_min]
+    assert_equal expected, pressure[:y_max]
+    assert_equal expected, pressure[:y_min]
   ensure
     previous.nil? ? ENV.delete("LOCATION_ELEVATION_FT") : ENV["LOCATION_ELEVATION_FT"] = previous
   end
