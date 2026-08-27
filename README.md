@@ -83,13 +83,36 @@ Optional nested arrays: `soil[]` and `temp_probes[]` (channels 1–8).
 | -------------- | ------ | ------------- |
 | Station observations | Measurement API | live insert + Action Cable broadcast |
 | **AQI / PM2.5** | **AirNow** HourlyAQObs CSV (`AIRNOW_AQSID`, default Auburn 29th St `840530330047`) | `DownloadAirNowAqiJob` hourly at `:15`; also from `/` if latest is missing, stale (>8h), or not `source: airnow` |
-| Forecast | OpenWeather One Call 3.0 | `DownloadOpenWeatherForecastJob` every 10 minutes (and from `/` if older than 1h) |
+| Forecast | OpenWeather One Call 3.0 | `DownloadOpenWeatherForecastJob` every **10** minutes (`*/10`); homepage also enqueues if latest is missing or older than 1h |
 | Alerts bar | LibreWXR + OpenWeather alerts from the forecast | async Turbo Frame `GET /alerts/bar` (needs `LOCATION_LAT` / `LOCATION_LON`) |
-| Wildfire | `NearestWildfireResolver` | `DownloadNearestWildfireJob` every 30 min |
+| Wildfire | WA DNR + NIFC via `NearestWildfireResolver` | `DownloadNearestWildfireJob` every 30 min (and from `/` if snapshot is missing) |
 | Radar (`/radar`) | LibreWXR composite + Unidata Level III | browser-direct; see `docs/radar/README.md` |
 | Earthquakes | USGS | `DownloadLatestEarthquakeJob` every minute |
-| Aurora / ISS / planet night | NOAA / Celestrak / almanac | see `config/schedule.yml` |
+| Aurora | NOAA SWPC | `DownloadAuroraOutlookJob` every 15 min |
+| ISS | Celestrak TLE | `DownloadIssPassesJob` every 6 hours at `:15` |
+| Planets Tonight | DE440s BSP (`Almanac::PlanetNightGenerator`) | `GeneratePlanetNightJob` daily 10:20 UTC; homepage enqueues if today’s row is missing |
 | Webcams | static Auburn traffic + WSDOT airport URLs | client `image-refresh` every 60s |
+
+### Sea-level pressure (`SeaLevelPressure`)
+
+The console `barometer_rel` field is an uncalibrated offset (here it sits *below* station pressure) and is **not** used for display or uploads. Both reductions start from `barometer_abs` + `LOCATION_ELEVATION_FT` (default **416** ft).
+
+| Helper | Formula | Used by |
+| ------ | ------- | ------- |
+| `sea_level_pressure` / `_inhg` | NWS ASOS altimeter (QNH) | CWOP, Weather Underground, PWSWeather, WeatherCloud |
+| `sea_level_pressure_qff` | weewx/wview QFF (uses air temperature) | Homepage tile, reports, graphs, records, trends, AWEKAS |
+
+`SeaLevelPressure.qff_sql` is the same QFF expression for Postgres aggregates (hourly live-card sparkline). At elevation `0` both helpers return station pressure unchanged. Third-party uploads stay gated by `SEND_WX=true`.
+
+### Planets Tonight
+
+Naked-eye planets only (Mercury–Saturn). A planet is on the card when its rise→set interval overlaps civil night **and** the rise is on the card’s calendar date (a predawn rise tomorrow belongs on tomorrow’s card). Rise/set times after local midnight render as `h:mm AM +1 day`.
+
+`PlanetNight` is unique on `date`; homepage traffic upserts so concurrent jobs for the same night stay idempotent.
+
+### Nearest wildfire
+
+DNR “Current Fire Statistics” keeps rows until `CONTROL_DT` / `FIRE_OUT_DT` are set, including local-agency assists that never get those dates. `NearestWildfireResolver` treats a DNR row as live only if NIFC still lists the same name within **15 mi**, or it was discovered within **7 days**. Otherwise it falls back to the nearest NIFC fire in WA, then any NIFC fire. A successful “no live fire” poll writes an empty snapshot (`source: none`, `active: false`) so the card clears instead of sticking on last month’s incident.
 
 ### AQI rules (`Aqi`)
 
@@ -105,7 +128,7 @@ Optional nested arrays: `soil[]` and `temp_probes[]` (channels 1–8).
 | -------- | ---------------------- |
 | `MEASUREMENT_API_KEY` | Ingest 401s; empty homepage 500s |
 | `LOCATION_LAT` / `LOCATION_LON` | Radar (`ENV.fetch`), wildfire, LibreWXR alerts, several geo jobs |
-| `LOCATION_ELEVATION_FT` | Optional; defaults to 416. Reduces station pressure to sea-level / altimeter |
+| `LOCATION_ELEVATION_FT` | Optional; defaults to 416 ft (Leahill). QFF for the site UI + AWEKAS; QNH altimeter for CWOP / WU / PWS / WeatherCloud. Set `0` to leave station pressure unreduced. |
 | `OPENWEATHER_API_KEY` | Forecast download |
 | `AIRNOW_AQSID` | Optional; defaults to Auburn 29th St |
 | `LIBREWXR_API_BASE` | Optional; defaults to `https://api.librewxr.net` |
@@ -129,4 +152,5 @@ bin/database_consistency
 - **Empty measurements table → homepage 500.** Seed via the API, not fixtures, in a fresh DB.
 - **`Procfile.dev` listener** points at a binary that is not in this repo.
 - **Assets are gitignored.** Build (`yarn build` / `yarn build:css`) before serving.
-- Forecast model comments still say “every 10 minutes”; cron is every **2** minutes.
+- **Do not plot `barometer_rel`.** Display and uploads reduce `barometer_abs`. Tests should set `LOCATION_ELEVATION_FT` (helper defaults to `0` so fixtures stay identity).
+- Forecast cron and `Forecast` model comments both say every **10** minutes (`*/10`). Homepage still backfills if the latest row is older than **1 hour**.
