@@ -15,12 +15,14 @@
   "dependencies": {
     "@hotwired/stimulus": "^3.2.2",
     "@hotwired/turbo-rails": "^8.0.23",
+    "@maplibre/maplibre-gl-leaflet": "^0.1.4",
     "@tailwindcss/cli": "^4.1.18",
     "@tailwindcss/typography": "latest",
     "@tailwindplus/elements": "^1.0.0",
     "buffer": "6.0.3",
     "chart.js": "^4.5.1",
     "leaflet": "^1.9.4",
+    "maplibre-gl": "^5.0.0",
     "nexrad-level-3-data": "0.6.1",
     "tailwindcss": "^4.1.18"
   }

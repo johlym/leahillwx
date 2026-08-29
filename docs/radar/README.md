@@ -84,19 +84,20 @@ The map opens at **zoom 7** centered on `LOCATION_LAT` / `LOCATION_LON` (require
 | Stimulus controller | `app/javascript/controllers/radar_controller.js` |
 | Frame helpers | `app/javascript/controllers/helpers/radar_layers.js` |
 
-Leaflet JS comes from the `leaflet` npm package (bundled by esbuild). Leaflet CSS is vendored at `app/assets/stylesheets/vendor/leaflet.css`.
+Leaflet JS comes from the `leaflet` npm package (bundled by esbuild). MapLibre GL (`maplibre-gl` + `@maplibre/maplibre-gl-leaflet`) powers the CARTO vector basemap under Leaflet. Leaflet / MapLibre CSS are vendored at `app/assets/stylesheets/vendor/`.
 
 ### Basemap notes
 
-- Primary basemap: CARTO Dark Matter via the **apex** host `basemaps.cartocdn.com` (letter subdomains like `a.basemaps.cartocdn.com` fail to resolve in some environments).
-- If CARTO tiles error repeatedly, the controller falls back once to Esri World Dark Gray.
-- Leaflet’s default `mix-blend-mode: plus-lighter` on tiles is overridden on this page so dark basemaps stay visible against the site palette.
+- Primary basemap: **CARTO Dark Matter vector** via MapLibre GL (`dark-matter-gl-style`), mounted under Leaflet with `@maplibre/maplibre-gl-leaflet` so radar overlays stay Leaflet tile/image layers.
+- Set `CARTO_API_KEY` (free from [carto.com/basemaps/apikey](https://carto.com/basemaps/apikey/)) so the style URL includes `?key=…`. Vector is not watermarked today without a key, but CARTO recommends attaching one (and may require it later). The key is passed into the page as a Stimulus value (client-side by design; bind it to your site domain when requesting).
+- If the vector basemap errors repeatedly (or MapLibre fails to init), the controller falls back once to Esri World Dark Gray raster tiles.
+- Leaflet’s default `mix-blend-mode: plus-lighter` on raster tiles is overridden on this page; the MapLibre canvas basemap does not use that blend mode.
 
 ## Local development
 
 ```bash
 # Env
-cp env.sample .env   # set LOCATION_LAT / LOCATION_LON
+cp env.sample .env   # set LOCATION_LAT / LOCATION_LON / CARTO_API_KEY
 # optional: LIBREWXR_API_BASE=https://api.librewxr.net
 
 # Assets

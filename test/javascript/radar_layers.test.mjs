@@ -3,7 +3,7 @@ import { describe, it } from "node:test"
 import {
   RIDGE_PRODUCT,
   RIDGE_TILTS,
-  CARTO_DARK_URL,
+  CARTO_DARK_MATTER_STYLE,
   LIBREWXR_COLOR_SCHEME,
   LIBREWXR_DEFAULT_HOST,
   LIBREWXR_OPTIONS_SNOW,
@@ -15,6 +15,7 @@ import {
   boundsForRadius,
   ridgeProductForTilt,
   tileUrlsForViewport,
+  cartoDarkMatterStyleUrl,
 } from "../../app/javascript/controllers/helpers/radar_layers.js"
 
 describe("ridgeProductForTilt", () => {
@@ -161,9 +162,24 @@ describe("boundsForRadius", () => {
 })
 
 describe("basemap host", () => {
-  it("uses apex CARTO host without letter subdomains", () => {
-    assert.match(CARTO_DARK_URL, /^https:\/\/basemaps\.cartocdn\.com\//)
-    assert.doesNotMatch(CARTO_DARK_URL, /\{s\}/)
+  it("uses CARTO Dark Matter vector style URL", () => {
+    assert.match(
+      CARTO_DARK_MATTER_STYLE,
+      /^https:\/\/basemaps\.cartocdn\.com\/gl\/dark-matter-gl-style\/style\.json$/,
+    )
+  })
+
+  it("appends a CARTO API key query param when provided", () => {
+    assert.equal(cartoDarkMatterStyleUrl(""), CARTO_DARK_MATTER_STYLE)
+    assert.equal(cartoDarkMatterStyleUrl("   "), CARTO_DARK_MATTER_STYLE)
+    assert.equal(
+      cartoDarkMatterStyleUrl("abc123"),
+      `${CARTO_DARK_MATTER_STYLE}?key=abc123`,
+    )
+    assert.equal(
+      cartoDarkMatterStyleUrl("a b/c"),
+      `${CARTO_DARK_MATTER_STYLE}?key=a%20b%2Fc`,
+    )
   })
 })
 
