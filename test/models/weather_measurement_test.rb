@@ -262,13 +262,28 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
     assert_equal 12.5, measurement.temp_probes.first["temperature"]
   end
 
-  test "rejects temp_probes without temperature" do
+  test "drops temp_probes that have only battery" do
     measurement = WeatherMeasurement.new(valid_attrs(
-      temp_probes: [ { "channel" => 1, "battery" => 1.55 } ]
+      temp_probes: [
+        { "channel" => 1, "battery" => 1.55 },
+        { "channel" => 2, "temperature" => 11.0, "battery" => 1.4 }
+      ]
     ))
 
-    assert_not measurement.valid?
-    assert_includes measurement.errors[:temp_probes], "temperature must be a number"
+    assert measurement.valid?
+    assert_equal [ { "channel" => 2, "temperature" => 11.0, "battery" => 1.4 } ], measurement.temp_probes
+  end
+
+  test "drops soil entries that have only battery" do
+    measurement = WeatherMeasurement.new(valid_attrs(
+      soil: [
+        { "channel" => 1, "battery" => 1.6 },
+        { "channel" => 2, "moisture" => 40.0, "battery" => 1.5 }
+      ]
+    ))
+
+    assert measurement.valid?
+    assert_equal [ { "channel" => 2, "moisture" => 40.0, "battery" => 1.5 } ], measurement.soil
   end
 
   test "rejects duplicate temp_probe channels" do

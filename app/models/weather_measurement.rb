@@ -209,13 +209,33 @@ class WeatherMeasurement < ApplicationRecord
   def normalize_soil
     return if soil.nil?
 
-    self.soil = Array(soil).map { |entry| normalize_probe_entry(entry, %w[moisture temperature battery]) }
+    self.soil = Array(soil).filter_map do |entry|
+      normalized = normalize_probe_entry(entry, %w[moisture temperature battery])
+      next if measurement_blank_probe?(normalized, "moisture", "temperature")
+
+      normalized
+    end
   end
 
   def normalize_temp_probes
     return if temp_probes.nil?
 
-    self.temp_probes = Array(temp_probes).map { |entry| normalize_probe_entry(entry, %w[temperature battery]) }
+    self.temp_probes = Array(temp_probes).filter_map do |entry|
+      normalized = normalize_probe_entry(entry, %w[temperature battery])
+      next if measurement_blank_probe?(normalized, "temperature")
+
+      normalized
+    end
+  end
+
+  # Battery-only rows arrive when SENSOR_ID still reports a probe but livedata
+  # missed that channel. Drop them so one incomplete sensor cannot 422 the
+  # rest of the outdoor reading. Keep rows that declare a measurement so
+  # validation can still reject non-numeric values.
+  def measurement_blank_probe?(entry, *fields)
+    return false unless entry.is_a?(Hash)
+
+    fields.none? { |field| entry.key?(field) && !entry[field].nil? }
   end
 
   def normalize_probe_entry(entry, fields)
