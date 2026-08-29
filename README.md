@@ -12,7 +12,7 @@ Visual language: [`DESIGN.md`](DESIGN.md). Radar ops: [`docs/radar/README.md`](d
 | Rails | 8.1 |
 | Node | 24.x |
 | DB / jobs | PostgreSQL, Redis, Sidekiq + sidekiq-cron (`config/schedule.yml`) |
-| Frontend | Tailwind CSS 4, esbuild, Stimulus, Turbo, Leaflet, Chart.js |
+| Frontend | Tailwind CSS 4, esbuild, Stimulus, Turbo, Leaflet, MapLibre GL, Chart.js |
 | Timezone | `America/Los_Angeles` |
 
 ## Local setup
@@ -109,6 +109,7 @@ Optional nested arrays: `soil[]` and `temp_probes[]` (channels 1–8).
 | `OPENWEATHER_API_KEY` | Forecast download |
 | `AIRNOW_AQSID` | Optional; defaults to Auburn 29th St |
 | `LIBREWXR_API_BASE` | Optional; defaults to `https://api.librewxr.net` |
+| `CARTO_API_KEY` | Optional but recommended; `/radar` CARTO vector Dark Matter style URL |
 | `SENTRY_DSN` | Optional; PII on, traces 0.2 in production |
 | `SEND_WX` | Must be exactly `true` to upload to WU / PWS / AWEKAS / WeatherCloud / CWOP |
 | `SIDEKIQ_USER` / `SIDEKIQ_PASSWORD` | Production `/sidekiq` (open in development) |

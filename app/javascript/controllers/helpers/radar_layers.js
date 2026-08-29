@@ -26,11 +26,22 @@ export function ridgeProductForTilt(degrees, fallback = RIDGE_PRODUCT) {
   return match?.product || fallback
 }
 
-/** Primary dark basemap (CARTO). Avoid a/b/c/d letter subdomains — some
- * resolvers only answer the apex basemaps.cartocdn.com host. */
-export const CARTO_DARK_URL = "https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+/** CARTO Dark Matter vector style (MapLibre GL). Raster dark_all is retiring. */
+export const CARTO_DARK_MATTER_STYLE =
+  "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
 export const CARTO_ATTR =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+
+/**
+ * CARTO basemap style URL with optional free API key (`?key=`).
+ * Keys are free within fair use — https://carto.com/basemaps/apikey/
+ * Vector works without a key today, but CARTO recommends attaching one.
+ */
+export function cartoDarkMatterStyleUrl(apiKey) {
+  const key = String(apiKey || "").trim()
+  if (!key) return CARTO_DARK_MATTER_STYLE
+  return `${CARTO_DARK_MATTER_STYLE}?key=${encodeURIComponent(key)}`
+}
 
 /** Fallback dark basemap (Esri). Note z/y/x order. */
 export const ESRI_DARK_URL =

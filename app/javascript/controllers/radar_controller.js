@@ -1,15 +1,16 @@
 import { Controller } from "@hotwired/stimulus"
 import L from "leaflet"
+import { maplibreGL } from "@maplibre/maplibre-gl-leaflet"
 import {
   LIBREWXR_DEFAULT_HOST,
   LIBREWXR_OPTIONS_SNOW,
   LIBREWXR_MAX_NATIVE_ZOOM,
   LIBREWXR_METADATA_TTL_MS,
   LIBREWXR_ATTR,
-  CARTO_DARK_URL,
   CARTO_ATTR,
   ESRI_DARK_URL,
   ESRI_ATTR,
+  cartoDarkMatterStyleUrl,
   RIDGE_PRODUCT,
   RIDGE_TILTS,
   librewxrMetadataUrl,
@@ -44,6 +45,7 @@ export default class extends Controller {
     lon: Number,
     sites: { type: Array, default: [] },
     librewxrHost: { type: String, default: LIBREWXR_DEFAULT_HOST },
+    cartoApiKey: { type: String, default: "" },
   }
 
   connect() {
@@ -158,33 +160,54 @@ export default class extends Controller {
   }
 
   addBasemap() {
-    this.basemap = L.tileLayer(CARTO_DARK_URL, {
-      attribution: CARTO_ATTR,
+    const styleUrl = cartoDarkMatterStyleUrl(this.cartoApiKeyValue)
+
+    try {
+      this.basemap = maplibreGL({
+        style: styleUrl,
+        interactive: false,
+      })
+    } catch {
+      this.addEsriBasemapFallback()
+      return
+    }
+
+    this.basemap.addTo(this.map)
+
+    const glMap = this.basemap.getMaplibreMap?.()
+    if (glMap) {
+      glMap.on("error", () => {
+        this.basemapErrors += 1
+        if (this.basemapErrors >= 4 && !this.basemapFallback) {
+          this.addEsriBasemapFallback()
+        }
+      })
+    }
+
+    // Style-source attribution arrives async on MapLibre load; seed Leaflet now
+    // so OSM/CARTO credit is present before (and if) that fires.
+    if (this.map.attributionControl) {
+      this.map.attributionControl.addAttribution(CARTO_ATTR)
+    }
+  }
+
+  addEsriBasemapFallback() {
+    if (this.basemapFallback) return
+    this.basemapFallback = true
+
+    if (this.basemap && this.map?.hasLayer(this.basemap)) {
+      this.map.removeLayer(this.basemap)
+    }
+    this.basemap = null
+
+    L.tileLayer(ESRI_DARK_URL, {
+      attribution: ESRI_ATTR,
       maxZoom: this.mapMaxZoom,
       keepBuffer: 1,
       updateWhenIdle: true,
       updateWhenZooming: false,
       crossOrigin: true,
-    })
-
-    this.basemap.on("tileerror", () => {
-      this.basemapErrors += 1
-      // After a handful of failures, swap to Esri dark gray once.
-      if (this.basemapErrors >= 4 && !this.basemapFallback) {
-        this.basemapFallback = true
-        if (this.map.hasLayer(this.basemap)) this.map.removeLayer(this.basemap)
-        L.tileLayer(ESRI_DARK_URL, {
-          attribution: ESRI_ATTR,
-          maxZoom: this.mapMaxZoom,
-          keepBuffer: 1,
-          updateWhenIdle: true,
-          updateWhenZooming: false,
-          crossOrigin: true,
-        }).addTo(this.map)
-      }
-    })
-
-    this.basemap.addTo(this.map)
+    }).addTo(this.map)
   }
 
   async bootstrap() {

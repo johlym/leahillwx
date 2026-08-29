@@ -1,0 +1,20 @@
+/* MapLibre GL canvas basemap under Leaflet radar overlays. */
+
+.radar-map .maplibregl-map,
+.radar-map .maplibregl-canvas,
+.radar-map .maplibregl-canvas-container {
+  width: 100%;
+  height: 100%;
+}
+
+.radar-map .maplibregl-ctrl-attrib,
+.radar-map .maplibregl-ctrl-bottom-right,
+.radar-map .maplibregl-ctrl-bottom-left,
+.radar-map .maplibregl-ctrl-top-right,
+.radar-map .maplibregl-ctrl-top-left {
+  display: none;
+}
+
+.radar-map .leaflet-layer .maplibregl-map {
+  background: transparent;
+}
