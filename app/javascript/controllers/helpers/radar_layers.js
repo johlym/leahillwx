@@ -197,21 +197,39 @@ export function tileUrlsForViewport(
   return urls
 }
 
-/** Prefetch image URLs into the browser cache (no DOM / map attachment). */
+/**
+ * Prefetch image URLs into the browser cache (no DOM / map attachment).
+ * @param {string[]} urls
+ * @param {{
+ *   concurrency?: number,
+ *   timeoutMs?: number,
+ *   isCancelled?: () => boolean,
+ *   onProgress?: (p: { completed: number, total: number }) => void,
+ * }} [opts]
+ */
 export async function prefetchImages(
   urls,
-  { concurrency = 6, timeoutMs = 4000, isCancelled = null } = {},
+  { concurrency = 6, timeoutMs = 4000, isCancelled = null, onProgress = null } = {},
 ) {
   const list = [ ...new Set((urls || []).filter(Boolean)) ]
-  if (list.length === 0) return
+  if (list.length === 0) {
+    onProgress?.({ completed: 0, total: 0 })
+    return
+  }
 
   let cursor = 0
+  let completed = 0
+  const total = list.length
+  onProgress?.({ completed: 0, total })
+
   const workers = Array.from({ length: Math.min(concurrency, list.length) }, async () => {
     while (cursor < list.length) {
       if (isCancelled?.()) return
       const url = list[cursor]
       cursor += 1
       await prefetchImage(url, timeoutMs)
+      completed += 1
+      onProgress?.({ completed, total })
     }
   })
   await Promise.all(workers)
