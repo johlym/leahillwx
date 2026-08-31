@@ -125,16 +125,23 @@ class Api::V1::WeatherMeasurementControllerTest < ActionDispatch::IntegrationTes
     assert_response :unprocessable_entity
   end
 
-  test "create rejects temp_probe without temperature" do
+  test "create drops battery-only probes and keeps the outdoor reading" do
     payload = measurement_payload(
-      temp_probes: [ { channel: 1, battery: 1.55 } ]
+      soil: [ { channel: 1, battery: 1.6 } ],
+      temp_probes: [
+        { channel: 1, battery: 1.55 },
+        { channel: 2, temperature: 10.0, battery: 1.4 }
+      ]
     )
 
-    assert_no_difference("WeatherMeasurement.count") do
+    assert_difference("WeatherMeasurement.count", 1) do
       post api_v1_weather_measurement_url, params: payload, headers: auth_headers, as: :json
     end
 
-    assert_response :unprocessable_entity
+    assert_response :no_content
+    measurement = WeatherMeasurement.order(:id).last
+    assert_equal [], measurement.soil
+    assert_equal [ { "channel" => 2, "temperature" => 10.0, "battery" => 1.4 } ], measurement.temp_probes
   end
 
   test "create treats duplicate reading_date_time as success" do
