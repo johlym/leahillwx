@@ -179,9 +179,10 @@ export default class extends Controller {
 
     return readings.map((reading) => {
       const name = reading.name || `Ch ${reading.channel}`
+      const percent = reading.moisture != null ? reading.moisture : reading.humidity
       let valueHtml = `<span class="soil-channel-na">N/A</span>`
-      if (reading.moisture != null) {
-        valueHtml = `<span class="soil-channel-number">${this.asInt(reading.moisture)}</span><span class="soil-channel-unit">%</span>`
+      if (percent != null) {
+        valueHtml = `<span class="soil-channel-number">${this.asInt(percent)}</span><span class="soil-channel-unit">%</span>`
         if (reading.temperature_f != null) {
           valueHtml += `<span class="soil-channel-temp"> / ${this.asInt(reading.temperature_f)}°F</span>`
         }

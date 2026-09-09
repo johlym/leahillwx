@@ -75,7 +75,7 @@ curl -X POST http://localhost:3000/api/v1/weather_measurement \
   }'
 ```
 
-Optional nested arrays: `soil[]` and `temp_probes[]` (channels 1–8).
+Optional nested arrays: `soil[]`, `temp_probes[]`, and `temp_humidity[]` (channels 1–8).
 
 ## Data sources
 

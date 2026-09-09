@@ -1,12 +1,14 @@
-# Friendly names for soil moisture / temperature probe groupings.
-# Unnamed channels fall back to "Ch N" (soil) or "Temp Ch N" (temp probes).
+# Friendly names for auxiliary sensor groupings (soil moisture, temp probes,
+# wireless temp/humidity). Unnamed channels fall back to "Ch N" (soil),
+# "Temp Ch N" (temp probes), or "TH Ch N" (temp/humidity).
 #
 # Each key is the single display name for a grouping. Groups may declare:
-#   soil: <channel 1–8>         # moisture sensor channel
-#   temp_probe: <channel 1–8>   # temperature probe channel
-# Either key may be omitted for moisture-only or temp-only rows.
+#   soil: <channel 1–8>           # moisture sensor channel
+#   temp_probe: <channel 1–8>     # temperature probe channel
+#   temp_humidity: <channel 1–8>  # wireless temp/humidity channel
+# Any key may be omitted; channels that share a name merge into one card row.
 #
-# Example — humidity on soil ch 1 + temp probe ch 2 share one Soil card row:
+# Example — humidity on soil ch 1 + temp probe ch 2 share one row:
 # Front Yard:
 #   soil: 1
 #   temp_probe: 2
