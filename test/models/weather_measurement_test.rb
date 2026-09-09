@@ -12,6 +12,7 @@
 #  rain_rate         :float            not null
 #  reading_date_time :datetime         not null
 #  soil              :jsonb            not null
+#  temp_humidity     :jsonb            not null
 #  temp_probes       :jsonb            not null
 #  temperature       :float            not null
 #  uv                :integer          not null
@@ -197,6 +198,7 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
   test "soil_readings prefers temp_probe temperature over legacy soil temperature" do
     SoilChannels.instance_variable_set(:@soil_names, { 1 => "Front Yard" })
     SoilChannels.instance_variable_set(:@temp_probe_names, { 2 => "Front Yard" })
+    SoilChannels.instance_variable_set(:@temp_humidity_names, {})
 
     measurement = WeatherMeasurement.new(valid_attrs(
       soil: [ { "channel" => 1, "moisture" => 62.0, "temperature" => 0.0, "battery" => 1.6 } ],
@@ -286,6 +288,7 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
   test "soil_readings includes friendly channel name" do
     SoilChannels.instance_variable_set(:@soil_names, { 1 => "Raised bed" })
     SoilChannels.instance_variable_set(:@temp_probe_names, {})
+    SoilChannels.instance_variable_set(:@temp_humidity_names, {})
 
     measurement = WeatherMeasurement.new(valid_attrs(
       soil: [ { "channel" => 1, "moisture" => 78.0, "battery" => 1.6 } ]
@@ -299,6 +302,7 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
   test "soil_readings merges soil and temp_probe channels that share a friendly name" do
     SoilChannels.instance_variable_set(:@soil_names, { 1 => "Front Yard" })
     SoilChannels.instance_variable_set(:@temp_probe_names, { 2 => "Front Yard" })
+    SoilChannels.instance_variable_set(:@temp_humidity_names, {})
 
     measurement = WeatherMeasurement.new(valid_attrs(
       soil: [ { "channel" => 1, "moisture" => 62.0, "battery" => 1.6 } ],
@@ -322,6 +326,7 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
   test "soil_readings keeps distinct names as separate rows" do
     SoilChannels.instance_variable_set(:@soil_names, { 1 => "Raised bed", 2 => "Tomato pots" })
     SoilChannels.instance_variable_set(:@temp_probe_names, {})
+    SoilChannels.instance_variable_set(:@temp_humidity_names, {})
 
     measurement = WeatherMeasurement.new(valid_attrs(
       soil: [
@@ -340,6 +345,7 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
   test "soil_readings does not merge unconfigured soil and temp probe channel 1" do
     SoilChannels.instance_variable_set(:@soil_names, {})
     SoilChannels.instance_variable_set(:@temp_probe_names, {})
+    SoilChannels.instance_variable_set(:@temp_humidity_names, {})
 
     measurement = WeatherMeasurement.new(valid_attrs(
       soil: [ { "channel" => 1, "moisture" => 70.0, "battery" => 1.6 } ],
@@ -356,6 +362,7 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
   test "soil_readings prefers moisture from lower channel when both report it" do
     SoilChannels.instance_variable_set(:@soil_names, { 2 => "Bed", 3 => "Bed" })
     SoilChannels.instance_variable_set(:@temp_probe_names, {})
+    SoilChannels.instance_variable_set(:@temp_humidity_names, {})
 
     measurement = WeatherMeasurement.new(valid_attrs(
       soil: [
@@ -368,6 +375,101 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
     assert_equal 70, reading["moisture"]
     assert_equal 2, reading["channel"]
     assert_equal 1.5, reading["moisture_battery"]
+  ensure
+    SoilChannels.reload!
+  end
+
+  test "accepts valid temp_humidity channels" do
+    measurement = WeatherMeasurement.new(valid_attrs(
+      temp_humidity: [
+        { "channel" => 1, "temperature" => 27.6, "humidity" => 40, "battery_low" => false },
+        { "channel" => 2, "temperature" => 18.0, "humidity" => 55, "battery_low" => true }
+      ]
+    ))
+
+    assert measurement.valid?
+    assert_equal 2, measurement.temp_humidity.size
+    assert_equal 27.6, measurement.temp_humidity.first["temperature"]
+    assert_equal 40, measurement.temp_humidity.first["humidity"]
+    assert_equal false, measurement.temp_humidity.first["battery_low"]
+  end
+
+  test "rejects more than 8 temp_humidity channels" do
+    sensors = (1..9).map { |channel| { "channel" => channel, "temperature" => 20.0, "humidity" => 50 } }
+    measurement = WeatherMeasurement.new(valid_attrs(temp_humidity: sensors))
+
+    assert_not measurement.valid?
+    assert_includes measurement.errors[:temp_humidity], "cannot have more than 8 entries"
+  end
+
+  test "rejects duplicate temp_humidity channels" do
+    measurement = WeatherMeasurement.new(valid_attrs(
+      temp_humidity: [
+        { "channel" => 1, "temperature" => 27.6, "humidity" => 40 },
+        { "channel" => 1, "temperature" => 18.0, "humidity" => 55 }
+      ]
+    ))
+
+    assert_not measurement.valid?
+    assert_includes measurement.errors[:temp_humidity], "channel 1 is duplicated"
+  end
+
+  test "rejects temp_humidity without temperature or humidity" do
+    measurement = WeatherMeasurement.new(valid_attrs(
+      temp_humidity: [ { "channel" => 1, "battery_low" => false } ]
+    ))
+
+    assert_not measurement.valid?
+    assert_includes measurement.errors[:temp_humidity], "temperature must be a number"
+    assert_includes measurement.errors[:temp_humidity], "humidity must be a number"
+  end
+
+  test "rejects non-boolean temp_humidity battery_low" do
+    measurement = WeatherMeasurement.new(valid_attrs(
+      temp_humidity: [ { "channel" => 1, "temperature" => 27.6, "humidity" => 40, "battery_low" => "low" } ]
+    ))
+
+    assert_not measurement.valid?
+    assert_includes measurement.errors[:temp_humidity], "battery_low must be a boolean"
+  end
+
+  test "soil_readings includes temp_humidity with humidity and fahrenheit temp" do
+    SoilChannels.instance_variable_set(:@soil_names, {})
+    SoilChannels.instance_variable_set(:@temp_probe_names, {})
+    SoilChannels.instance_variable_set(:@temp_humidity_names, {})
+
+    measurement = WeatherMeasurement.new(valid_attrs(
+      temp_humidity: [ { "channel" => 1, "temperature" => 27.6, "humidity" => 40, "battery_low" => false } ]
+    ))
+
+    reading = measurement.soil_readings.first
+    assert_equal "TH Ch 1", reading["name"]
+    assert_equal 40, reading["humidity"]
+    assert_equal 82, reading["temperature_f"] # 27.6°C
+    assert_equal false, reading["battery_low"]
+    assert_nil reading["moisture"]
+  ensure
+    SoilChannels.reload!
+  end
+
+  test "soil_readings merges temp_humidity using friendly names" do
+    SoilChannels.instance_variable_set(:@soil_names, { 1 => "Greenhouse" })
+    SoilChannels.instance_variable_set(:@temp_probe_names, {})
+    SoilChannels.instance_variable_set(:@temp_humidity_names, { 2 => "Greenhouse" })
+
+    measurement = WeatherMeasurement.new(valid_attrs(
+      soil: [ { "channel" => 1, "moisture" => 62.0, "battery" => 1.6 } ],
+      temp_humidity: [ { "channel" => 2, "temperature" => 20.0, "humidity" => 45, "battery_low" => true } ]
+    ))
+
+    readings = measurement.soil_readings
+    assert_equal 1, readings.size
+    reading = readings.first
+    assert_equal "Greenhouse", reading["name"]
+    assert_equal 62, reading["moisture"]
+    assert_equal 45, reading["humidity"]
+    assert_equal 68, reading["temperature_f"] # 20°C
+    assert_equal true, reading["battery_low"]
   ensure
     SoilChannels.reload!
   end

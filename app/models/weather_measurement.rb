@@ -12,6 +12,7 @@
 #  rain_rate         :float            not null
 #  reading_date_time :datetime         not null
 #  soil              :jsonb            not null
+#  temp_humidity     :jsonb            not null
 #  temp_probes       :jsonb            not null
 #  temperature       :float            not null
 #  uv                :integer          not null
@@ -43,6 +44,7 @@ class WeatherMeasurement < ApplicationRecord
   after_create_commit :broadcast_update
   before_validation :normalize_soil
   before_validation :normalize_temp_probes
+  before_validation :normalize_temp_humidity
 
   # Validations
   # Are all the fields present?
@@ -57,6 +59,7 @@ class WeatherMeasurement < ApplicationRecord
 
   validate :soil_channels_are_valid
   validate :temp_probes_are_valid
+  validate :temp_humidity_are_valid
 
   # hectopascals (hPa) to inches of mercury (inHg)
   HPA_TO_INHG = 1.0 / 33.8638866667
@@ -145,10 +148,10 @@ class WeatherMeasurement < ApplicationRecord
     reading_date_time.in_time_zone("America/Los_Angeles").strftime("%B %d, %Y %I:%M:%S %p %Z")
   end
 
-  # Display-ready soil readings for SSR / ActionCable (temps in °F).
-  # Soil moisture and temp-probe channels that share a friendly name merge into one row.
+  # Display-ready auxiliary sensor readings for SSR / ActionCable (temps in °F).
+  # Soil moisture, temp-probe, and temp/humidity channels that share a friendly name merge into one row.
   def soil_readings
-    readings = soil_entry_readings + temp_probe_entry_readings
+    readings = soil_entry_readings + temp_probe_entry_readings + temp_humidity_entry_readings
     merge_soil_readings_by_name(readings)
   end
 
@@ -206,6 +209,28 @@ class WeatherMeasurement < ApplicationRecord
     end
   end
 
+  def temp_humidity_entry_readings
+    Array(temp_humidity).filter_map do |entry|
+      next unless entry.is_a?(Hash)
+
+      entry = entry.stringify_keys
+      channel = Integer(entry["channel"], exception: false)
+      next unless channel
+
+      reading = {
+        "channel" => channel,
+        "name" => SoilChannels.name_for_temp_humidity(channel),
+        "from_temp_humidity" => true
+      }
+      if entry["temperature"].is_a?(Numeric)
+        reading["temperature_f"] = entry["temperature"].to_fahrenheit.round(0)
+      end
+      reading["humidity"] = entry["humidity"].to_f.round(0) if entry["humidity"].is_a?(Numeric)
+      reading["battery_low"] = entry["battery_low"] if [ true, false ].include?(entry["battery_low"])
+      reading
+    end
+  end
+
   def normalize_soil
     return if soil.nil?
 
@@ -218,14 +243,14 @@ class WeatherMeasurement < ApplicationRecord
     self.temp_probes = Array(temp_probes).map { |entry| normalize_probe_entry(entry, %w[temperature battery]) }
   end
 
-  def normalize_probe_entry(entry, fields)
-    hash = case entry
-    when ActionController::Parameters then entry.to_unsafe_h
-    when Hash then entry
-    else
-      entry
-    end
+  def normalize_temp_humidity
+    return if temp_humidity.nil?
 
+    self.temp_humidity = Array(temp_humidity).map { |entry| normalize_temp_humidity_entry(entry) }
+  end
+
+  def normalize_probe_entry(entry, fields)
+    hash = probe_entry_hash(entry)
     return hash unless hash.is_a?(Hash)
 
     hash = hash.stringify_keys
@@ -234,6 +259,41 @@ class WeatherMeasurement < ApplicationRecord
       normalized[field] = hash[field] unless hash[field].nil?
     end
     normalized
+  end
+
+  def normalize_temp_humidity_entry(entry)
+    hash = probe_entry_hash(entry)
+    return hash unless hash.is_a?(Hash)
+
+    hash = hash.stringify_keys
+    normalized = { "channel" => hash["channel"] }
+    normalized["temperature"] = hash["temperature"] unless hash["temperature"].nil?
+    normalized["humidity"] = hash["humidity"] unless hash["humidity"].nil?
+    unless hash["battery_low"].nil?
+      normalized["battery_low"] = coerce_battery_low(hash["battery_low"])
+    end
+    normalized
+  end
+
+  # Keep unrecognized values so validation can reject them (Boolean.cast would
+  # quietly turn arbitrary strings into true).
+  def coerce_battery_low(value)
+    case value
+    when true, false then value
+    when 1, "1", "t", "T", "true", "TRUE" then true
+    when 0, "0", "f", "F", "false", "FALSE" then false
+    else
+      value
+    end
+  end
+
+  def probe_entry_hash(entry)
+    case entry
+    when ActionController::Parameters then entry.to_unsafe_h
+    when Hash then entry
+    else
+      entry
+    end
   end
 
   def soil_channels_are_valid
@@ -252,6 +312,56 @@ class WeatherMeasurement < ApplicationRecord
       required_fields: [ "temperature" ],
       require_moisture_or_temperature: false
     )
+  end
+
+  def temp_humidity_are_valid
+    return if temp_humidity.blank?
+
+    unless temp_humidity.is_a?(Array)
+      errors.add(:temp_humidity, "must be an array")
+      return
+    end
+
+    if temp_humidity.size > MAX_SOIL_CHANNELS
+      errors.add(:temp_humidity, "cannot have more than #{MAX_SOIL_CHANNELS} entries")
+    end
+
+    seen_channels = []
+
+    temp_humidity.each_with_index do |entry, index|
+      unless entry.is_a?(Hash)
+        errors.add(:temp_humidity, "entry at index #{index} must be an object")
+        next
+      end
+
+      entry = entry.stringify_keys
+      channel = Integer(entry["channel"], exception: false)
+      temperature = entry["temperature"]
+      humidity = entry["humidity"]
+      battery_low = entry["battery_low"]
+
+      if channel.nil? || !(1..MAX_SOIL_CHANNELS).cover?(channel)
+        errors.add(:temp_humidity, "channel must be an integer between 1 and #{MAX_SOIL_CHANNELS}")
+      elsif seen_channels.include?(channel)
+        errors.add(:temp_humidity, "channel #{channel} is duplicated")
+      else
+        seen_channels << channel
+      end
+
+      unless temperature.is_a?(Numeric)
+        errors.add(:temp_humidity, "temperature must be a number")
+      end
+
+      unless humidity.is_a?(Numeric)
+        errors.add(:temp_humidity, "humidity must be a number")
+      end
+
+      next if battery_low.nil?
+
+      unless [ true, false ].include?(battery_low)
+        errors.add(:temp_humidity, "battery_low must be a boolean")
+      end
+    end
   end
 
   def validate_probe_array(attribute:, entries:, required_fields:, require_moisture_or_temperature:)
@@ -335,14 +445,18 @@ class WeatherMeasurement < ApplicationRecord
 
       moisture = channels.find { |reading| reading.key?("moisture") }&.fetch("moisture")
       moisture_battery = channels.find { |reading| reading.key?("moisture_battery") }&.fetch("moisture_battery")
-      # Prefer dedicated temp_probes over legacy soil.temperature when both exist.
+      humidity = channels.find { |reading| reading.key?("humidity") }&.fetch("humidity")
+      # Prefer dedicated temp_probes, then temp/humidity, over legacy soil.temperature.
       temperature_f = pick_merged_temperature_f(channels)
       temperature_battery = pick_merged_temperature_battery(channels)
+      battery_low = pick_merged_battery_low(channels)
 
       merged["moisture"] = moisture unless moisture.nil?
       merged["moisture_battery"] = moisture_battery unless moisture_battery.nil?
+      merged["humidity"] = humidity unless humidity.nil?
       merged["temperature_f"] = temperature_f unless temperature_f.nil?
       merged["temperature_battery"] = temperature_battery unless temperature_battery.nil?
+      merged["battery_low"] = battery_low unless battery_low.nil?
 
       merged
     end
@@ -352,6 +466,9 @@ class WeatherMeasurement < ApplicationRecord
     probe = channels.find { |reading| reading["from_temp_probe"] && reading.key?("temperature_f") }
     return probe["temperature_f"] if probe
 
+    th = channels.find { |reading| reading["from_temp_humidity"] && reading.key?("temperature_f") }
+    return th["temperature_f"] if th
+
     channels.find { |reading| reading.key?("temperature_f") }&.fetch("temperature_f")
   end
 
@@ -360,6 +477,13 @@ class WeatherMeasurement < ApplicationRecord
     return probe["temperature_battery"] if probe
 
     channels.find { |reading| reading.key?("temperature_battery") }&.fetch("temperature_battery")
+  end
+
+  def pick_merged_battery_low(channels)
+    th = channels.find { |reading| reading["from_temp_humidity"] && reading.key?("battery_low") }
+    return th["battery_low"] if th
+
+    channels.find { |reading| reading.key?("battery_low") }&.fetch("battery_low")
   end
 
   def broadcast_update

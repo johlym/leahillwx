@@ -90,6 +90,23 @@ class Api::V1::WeatherMeasurementControllerTest < ActionDispatch::IntegrationTes
     assert_equal [ { "channel" => 2, "temperature" => 10.0, "battery" => 1.55 } ], measurement.temp_probes
   end
 
+  test "create stores temp_humidity" do
+    payload = measurement_payload(
+      temp_humidity: [ { channel: 1, temperature: 27.6, humidity: 40, battery_low: false } ]
+    )
+
+    assert_difference("WeatherMeasurement.count", 1) do
+      post api_v1_weather_measurement_url, params: payload, headers: auth_headers, as: :json
+    end
+
+    assert_response :no_content
+
+    measurement = WeatherMeasurement.order(:id).last
+    assert_equal [
+      { "channel" => 1, "temperature" => 27.6, "humidity" => 40, "battery_low" => false }
+    ], measurement.temp_humidity
+  end
+
   test "create succeeds without soil or temp_probes" do
     assert_difference("WeatherMeasurement.count", 1) do
       post api_v1_weather_measurement_url, params: measurement_payload, headers: auth_headers, as: :json
@@ -99,6 +116,7 @@ class Api::V1::WeatherMeasurementControllerTest < ActionDispatch::IntegrationTes
     measurement = WeatherMeasurement.order(:id).last
     assert_equal [], measurement.soil
     assert_equal [], measurement.temp_probes
+    assert_equal [], measurement.temp_humidity
   end
 
   test "create rejects invalid soil channel" do
@@ -128,6 +146,18 @@ class Api::V1::WeatherMeasurementControllerTest < ActionDispatch::IntegrationTes
   test "create rejects temp_probe without temperature" do
     payload = measurement_payload(
       temp_probes: [ { channel: 1, battery: 1.55 } ]
+    )
+
+    assert_no_difference("WeatherMeasurement.count") do
+      post api_v1_weather_measurement_url, params: payload, headers: auth_headers, as: :json
+    end
+
+    assert_response :unprocessable_entity
+  end
+
+  test "create rejects invalid temp_humidity channel" do
+    payload = measurement_payload(
+      temp_humidity: [ { channel: 9, temperature: 27.6, humidity: 40, battery_low: false } ]
     )
 
     assert_no_difference("WeatherMeasurement.count") do

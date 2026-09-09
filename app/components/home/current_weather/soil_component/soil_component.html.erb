@@ -1,17 +1,18 @@
 <%= render Ui::CardComponent.new(padding: :default, classes: "soil-card") do %>
   <div class="live-tile">
-    <span class="live-tile-label">Soil Sensors</span>
+    <span class="live-tile-label">Auxiliary Sensors</span>
 
     <div class="live-tile-body live-tile-body-fill">
       <div class="soil-table">
         <div class="soil-channels" data-weather-update-target="soil">
           <% if readings? %>
             <% readings.each do |reading| %>
+              <% percent = reading["moisture"].nil? ? reading["humidity"] : reading["moisture"] %>
               <div class="soil-channel">
                 <span class="soil-channel-name"><%= reading["name"] %></span>
                 <span class="soil-channel-value">
-                  <% if !reading["moisture"].nil? %>
-                    <span class="soil-channel-number"><%= reading["moisture"] %></span><span class="soil-channel-unit">%</span>
+                  <% if !percent.nil? %>
+                    <span class="soil-channel-number"><%= percent %></span><span class="soil-channel-unit">%</span>
                     <% if !reading["temperature_f"].nil? %>
                       <span class="soil-channel-temp"> / <%= reading["temperature_f"] %>°F</span>
                     <% end %>
