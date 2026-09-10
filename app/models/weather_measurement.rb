@@ -348,12 +348,21 @@ class WeatherMeasurement < ApplicationRecord
         seen_channels << channel
       end
 
-      unless temperature.is_a?(Numeric)
+      has_temperature = temperature.is_a?(Numeric)
+      has_humidity = humidity.is_a?(Numeric)
+
+      # wxlistener emits a row when ITEM_TEMP or ITEM_HUMI is present and omits
+      # the missing field. Requiring both 422s the whole outdoor reading.
+      if entry.key?("temperature") && !temperature.nil? && !has_temperature
         errors.add(:temp_humidity, "temperature must be a number")
       end
 
-      unless humidity.is_a?(Numeric)
+      if entry.key?("humidity") && !humidity.nil? && !has_humidity
         errors.add(:temp_humidity, "humidity must be a number")
+      end
+
+      unless has_temperature || has_humidity
+        errors.add(:temp_humidity, "entry must include temperature or humidity")
       end
 
       next if battery_low.nil?
