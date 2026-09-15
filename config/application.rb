@@ -36,6 +36,7 @@ module Leahillwx
     # Station / site local timezone. Date.current and Time.zone then
     # reflect Pacific calendar days (critical for almanac + sky arc).
     config.time_zone = "America/Los_Angeles"
+    config.middleware.use Rack::Attack
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end

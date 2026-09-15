@@ -10,8 +10,8 @@ class DownloadLatestEarthquakeJob
     Rails.logger.info(eq)
     lat = eq[:lat]
     lon = eq[:lon]
-    lat2 = ENV["LOCATION_LAT"].to_i
-    lon2 = ENV["LOCATION_LON"].to_i
+    lat2 = ENV["LOCATION_LAT"].to_f
+    lon2 = ENV["LOCATION_LON"].to_f
     unit = :mi
     eq[:distance] = GeoDistance.distance(lat, lon, lat2, lon2, unit: unit)
 

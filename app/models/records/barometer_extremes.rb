@@ -34,8 +34,8 @@ module Records
 
     def largest_pressure_swing
       largest_swing = @measurements
-        .select("DATE(reading_date_time) as date, MAX(#{qff_sql}) as max_qff, MIN(#{qff_sql}) as min_qff")
-        .group("DATE(reading_date_time)")
+        .select("(reading_date_time AT TIME ZONE 'America/Los_Angeles')::date as date, MAX(#{qff_sql}) as max_qff, MIN(#{qff_sql}) as min_qff")
+        .group("(reading_date_time AT TIME ZONE 'America/Los_Angeles')::date")
         .order(Arel.sql("MAX(#{qff_sql}) - MIN(#{qff_sql}) DESC"))
         .limit(1)
         .first
