@@ -112,7 +112,7 @@
 }
 
 @utility live-tile-source {
-  @apply text-[10px] text-slate-500 leading-none text-right truncate min-w-0;
+  @apply text-[10px] text-slate-400 leading-none text-right truncate min-w-0;
 }
 
 @utility live-tile-body {

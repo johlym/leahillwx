@@ -18,6 +18,17 @@ class RootControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "layout exposes language, skip link, and mobile menu controls" do
+    get root_url
+    assert_response :success
+    assert_select "html[lang=en]"
+    assert_select "a.skip-link[href='#main-content']", text: "Skip to content"
+    assert_select "main#main-content"
+    assert_select "button#mobile-menu-toggle[aria-controls=mobile-menu]"
+    assert_select "#mobile-menu[role=navigation][aria-labelledby=mobile-menu-toggle]"
+    assert_select "[data-connection-status-target=badge] [data-connection-status-target=label]", text: "OFFLINE"
+  end
+
   test "index defers weather alerts to async turbo frame" do
     get root_url
     assert_response :success
