@@ -85,4 +85,24 @@ class RootControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal 0, DownloadAirNowAqiJob.jobs.size
   end
+
+  test "index renders offline empty state when weather_measurements is empty" do
+    WeatherMeasurement.delete_all
+
+    get root_url
+
+    assert_response :success
+    assert_select "section.current-conditions[aria-label='Station offline']"
+    assert_select "h1", text: "Station offline"
+    assert_select ".status-badge", text: /Awaiting first reading/
+  end
+
+  test "about renders when weather_measurements is empty" do
+    WeatherMeasurement.delete_all
+
+    get about_url
+
+    assert_response :success
+    assert_match(/First measurement:\s*None yet/, response.body)
+  end
 end

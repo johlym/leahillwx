@@ -51,7 +51,7 @@
         <% else %>
           <span class="site-header-meta-label">Last Updated</span>
           <span class="site-header-meta-value" data-weather-update-target="timestamp">
-            <%= @current.reading_date_time.in_time_zone("America/Los_Angeles").strftime("%b %-d, %Y @ %-I:%M %p") %>
+            <%= @current&.reading_date_time&.in_time_zone("America/Los_Angeles")&.strftime("%b %-d, %Y @ %-I:%M %p") %>
           </span>
         <% end %>
       </div>

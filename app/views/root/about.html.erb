@@ -57,6 +57,6 @@
 <h2>Some semi-relevant details:</h2>
 <ul>
   <li>Number of weather measurements: <%= number_with_delimiter(@weather_measurement_count) %></li>
-  <li>First measurement: <%= @first_weather_measurement.reading_date_time.in_time_zone("America/Los_Angeles").strftime("%b %d, %Y @ %I:%M %p") %></li>
+  <li>First measurement: <%= @first_weather_measurement ? @first_weather_measurement.reading_date_time.in_time_zone("America/Los_Angeles").strftime("%b %d, %Y @ %I:%M %p") : "None yet" %></li>
 </ul>
 </article>
