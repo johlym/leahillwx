@@ -122,4 +122,17 @@ class BulkWriteMeasurementsJobTest < ActiveSupport::TestCase
   ensure
     WeatherMeasurement.define_singleton_method(:insert_all!, original) if original
   end
+
+  test "skips invalid measurements instead of inserting them" do
+    payload = [
+      measurement_hash("humidity" => 250, "reading_date_time" => 1.minute.ago.change(usec: 0).iso8601),
+      measurement_hash("humidity" => 55, "reading_date_time" => Time.current.change(usec: 0).iso8601)
+    ]
+
+    assert_difference("WeatherMeasurement.count", 1) do
+      BulkWriteMeasurementsJob.new.perform(payload)
+    end
+
+    assert_equal 55, WeatherMeasurement.order(:id).last.humidity
+  end
 end
