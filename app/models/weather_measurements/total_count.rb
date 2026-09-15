@@ -12,9 +12,7 @@ module WeatherMeasurements
         value = redis.get(redis_key)
         return Integer(value) if value
 
-        count = WeatherMeasurement.count
-        redis.set(redis_key, count)
-        count
+        seed_from_database(redis)
       end
     end
 
@@ -22,13 +20,13 @@ module WeatherMeasurements
       return read if by.zero?
 
       Sidekiq.redis do |redis|
-        if redis.get(redis_key)
-          redis.incrby(redis_key, by).to_i
-        else
-          count = WeatherMeasurement.count
-          redis.set(redis_key, count)
-          count
-        end
+        # SET NX seeds the absolute table count (the new row is already
+        # persisted). Never overwrite an existing key — a GET-then-SET
+        # race used to clobber increments from concurrent writers.
+        seeded = redis.set(redis_key, WeatherMeasurement.count, nx: true)
+        next Integer(redis.get(redis_key)) if seeded
+
+        redis.incrby(redis_key, by).to_i
       end
     end
 
@@ -48,6 +46,13 @@ module WeatherMeasurements
 
       "#{KEY}:#{test_worker_id}"
     end
+
+    def self.seed_from_database(redis)
+      count = WeatherMeasurement.count
+      redis.set(redis_key, count, nx: true)
+      Integer(redis.get(redis_key))
+    end
+    private_class_method :seed_from_database
 
     def self.test_worker_id
       if ActiveSupport::TestCase.respond_to?(:parallel_worker_id) &&
