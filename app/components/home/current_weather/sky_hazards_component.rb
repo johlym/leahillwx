@@ -40,9 +40,30 @@ class Home::CurrentWeather::SkyHazardsComponent < ViewComponent::Base
   end
 
   def wildfire_containment
-    return "—" unless @wildfire&.percent_contained
+    return nil unless @wildfire&.percent_contained
 
     "#{@wildfire.percent_contained.round(0)}%"
+  end
+
+  # Prefer honest status from percent contained; never claim "Contained"
+  # when containment is unknown or incomplete.
+  def wildfire_status_label
+    pct = @wildfire&.percent_contained
+    return "Unknown" if pct.nil?
+
+    if pct >= 100
+      "Contained — #{pct.round(0)}%"
+    else
+      "#{pct.round(0)}% contained"
+    end
+  end
+
+  def wildfire_status_badge_class
+    pct = @wildfire&.percent_contained
+    return "status-badge status-badge-muted" if pct.nil?
+    return "status-badge status-badge-success" if pct >= 100
+
+    "status-badge status-badge-warning"
   end
 
   def iss_direction_line

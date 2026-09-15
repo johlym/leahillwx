@@ -35,7 +35,7 @@ Interactive OpenAPI for the ingest API is at `/docs`.
 
 ## Ingest API
 
-The homepage **raises** if `weather_measurements` is empty (`Home::CurrentWeather::ConditionsComponent` reads `@current.temperature` with no nil guard). Post at least one reading before hitting `/`.
+The homepage renders an offline empty state when `weather_measurements` is empty. Post at least one reading to populate live conditions.
 
 Auth: `Authorization: Bearer <MEASUREMENT_API_KEY>`. Blank or wrong key → **401**.
 
@@ -50,7 +50,7 @@ Required scalar fields (model validations): `reading_date_time`, `barometer_abs`
 
 Units on the wire: temperature **°C**, barometer **hPa**, wind **m/s**, rain **mm**. The UI converts to °F / inHg / mph / inches.
 
-`heat_index`, `dew_point`, and `wind_chill` are permitted but **not persisted** — dew point and feels-like are computed on the model.
+`heat_index`, `dew_point`, and `wind_chill` are **not** accepted on ingest (those columns were dropped). Dew point and feels-like are computed on the model from temperature, humidity, and wind.
 
 ```bash
 curl -X POST http://localhost:3000/api/v1/weather_measurement \

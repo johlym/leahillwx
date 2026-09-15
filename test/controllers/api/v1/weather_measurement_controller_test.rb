@@ -194,4 +194,29 @@ class Api::V1::WeatherMeasurementControllerTest < ActionDispatch::IntegrationTes
 
     assert_response :no_content
   end
+
+  test "create ignores legacy heat_index dew_point wind_chill fields" do
+    payload = measurement_payload(
+      heat_index: 30.0,
+      dew_point: 10.0,
+      wind_chill: 5.0
+    )
+
+    assert_difference("WeatherMeasurement.count", 1) do
+      post api_v1_weather_measurement_url, params: payload, headers: auth_headers, as: :json
+    end
+
+    assert_response :no_content
+  end
+
+  test "create returns unauthorized for wrong-length api key without 500" do
+    assert_no_difference("WeatherMeasurement.count") do
+      post api_v1_weather_measurement_url,
+           params: measurement_payload,
+           headers: { "Authorization" => "Bearer short", "Content-Type" => "application/json" },
+           as: :json
+    end
+
+    assert_response :unauthorized
+  end
 end
