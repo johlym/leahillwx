@@ -41,6 +41,23 @@ class WeatherMeasurements::TotalCountTest < ActiveSupport::TestCase
     assert_equal expected, WeatherMeasurements::TotalCount.read
   end
 
+  test "increment does not overwrite an existing redis value with a table recount" do
+    Sidekiq.redis do |redis|
+      redis.set(WeatherMeasurements::TotalCount.redis_key, 50)
+    end
+
+    assert_equal 53, WeatherMeasurements::TotalCount.increment!(by: 3)
+    assert_equal 53, WeatherMeasurements::TotalCount.read
+  end
+
+  test "increment seeds a missing key from the table count without a second incr" do
+    WeatherMeasurements::TotalCount.clear!
+    expected = WeatherMeasurement.count
+
+    assert_equal expected, WeatherMeasurements::TotalCount.increment!(by: 1)
+    assert_equal expected, WeatherMeasurements::TotalCount.read
+  end
+
   private
 
   def create_measurement!(**attrs)

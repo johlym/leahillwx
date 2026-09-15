@@ -113,6 +113,13 @@ Optional nested arrays: `soil[]`, `temp_probes[]`, and `temp_humidity[]` (channe
 | `SENTRY_DSN` | Optional; PII on, traces 0.2 in production |
 | `SEND_WX` | Must be exactly `true` to upload to WU / PWS / AWEKAS / WeatherCloud / CWOP |
 | `SIDEKIQ_USER` / `SIDEKIQ_PASSWORD` | Production `/sidekiq` (open in development) |
+| `MEASUREMENT_RETENTION_DAYS` | Optional; default `1095`. Nightly purge of raw `weather_measurements` older than this |
+
+## Growth
+
+Reports (`reports` / `report_entries`) and records (`records`) are the long-term store for daily/hourly extremes and all-time highs. Raw `weather_measurements` are kept for the live dashboard, re-aggregation, and a rolling history window.
+
+`PurgeOldWeatherMeasurementsJob` (08:15 UTC daily) deletes raw rows older than `MEASUREMENT_RETENTION_DAYS` (default 3 years) in batches, then rebuilds the Redis vanity counter. `RecalculateMeasurementTotalCountJob` (08:10 UTC) repairs `WeatherMeasurements::TotalCount` if increments drift.
 
 ## Lint / test
 
