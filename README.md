@@ -132,6 +132,8 @@ bin/bundler-audit
 bin/database_consistency
 ```
 
+GitHub `scan_ruby` fails the job on Brakeman or bundler-audit findings. `config/brakeman.ignore` documents three static QFF `Arel.sql` fragments in `LiveCardHourlyRanges` (station elevation, not request input).
+
 ## Pitfalls
 
 - **Empty measurements table → homepage 500.** Seed via the API, not fixtures, in a fresh DB.
