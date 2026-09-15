@@ -178,7 +178,7 @@ export default class extends Controller {
     }
 
     return readings.map((reading) => {
-      const name = reading.name || `Ch ${reading.channel}`
+      const name = this.escapeHtml(reading.name || `Ch ${reading.channel}`)
       const percent = reading.moisture != null ? reading.moisture : reading.humidity
       let valueHtml = `<span class="soil-channel-na">N/A</span>`
       if (percent != null) {
@@ -192,6 +192,15 @@ export default class extends Controller {
         <span class="soil-channel-value">${valueHtml}</span>
       </div>`
     }).join("")
+  }
+
+  escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#39;")
   }
 
   asInt(value) {

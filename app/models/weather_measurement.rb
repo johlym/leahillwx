@@ -53,6 +53,10 @@ class WeatherMeasurement < ApplicationRecord
 
   # Are humidity, UV, wind direction integers?
   validates :humidity, :uv, :wind_dir, numericality: { only_integer: true }
+  validates :humidity, numericality: { in: 0..100 }, allow_nil: true
+  validates :wind_dir, numericality: { in: 0..359 }, allow_nil: true
+  validates :rain_day, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validates :temperature, numericality: { in: -90..60 }, allow_nil: true
 
   # Are barometer absolute, barometer relative, day max wind, gust speed, light, rain day, rain event, rain rate, uvi, wind speed greater than or equal to 0?
   validates :barometer_abs, :barometer_rel, :gust_speed, :light, :rain_rate, :uvi, :wind_speed, numericality: { greater_than_or_equal_to: 0 }

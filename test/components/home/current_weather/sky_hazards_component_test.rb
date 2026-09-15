@@ -177,4 +177,67 @@ class Home::CurrentWeather::SkyHazardsComponentTest < ViewComponent::TestCase
     assert_equal 0, before_rise.planet_visibility_pct(planet)
     assert_operator after_rise.planet_visibility_pct(planet), :>, 50
   end
+
+  test "wildfire status is Contained only when fully contained" do
+    fire = WildfireSnapshot.new(
+      name: "Demo Fire",
+      lat: 47.3,
+      lon: -122.2,
+      distance_mi: 12.0,
+      acres: 40.0,
+      percent_contained: 100.0,
+      source: "nifc",
+      fetched_at: Time.current,
+      active: true
+    )
+
+    component = Home::CurrentWeather::SkyHazardsComponent.new(
+      wildfire: fire, aurora: nil, planet_night: nil, iss_pass: nil
+    )
+
+    assert_equal "Contained — 100%", component.wildfire_status_label
+    assert_match(/status-badge-success/, component.wildfire_status_badge_class)
+  end
+
+  test "wildfire status is percent contained when not fully contained" do
+    fire = WildfireSnapshot.new(
+      name: "Demo Fire",
+      lat: 47.3,
+      lon: -122.2,
+      distance_mi: 12.0,
+      acres: 40.0,
+      percent_contained: 35.0,
+      source: "nifc",
+      fetched_at: Time.current,
+      active: true
+    )
+
+    component = Home::CurrentWeather::SkyHazardsComponent.new(
+      wildfire: fire, aurora: nil, planet_night: nil, iss_pass: nil
+    )
+
+    assert_equal "35% contained", component.wildfire_status_label
+    assert_match(/status-badge-warning/, component.wildfire_status_badge_class)
+  end
+
+  test "wildfire status is Unknown when containment missing" do
+    fire = WildfireSnapshot.new(
+      name: "Demo Fire",
+      lat: 47.3,
+      lon: -122.2,
+      distance_mi: 12.0,
+      acres: 40.0,
+      percent_contained: nil,
+      source: "nifc",
+      fetched_at: Time.current,
+      active: true
+    )
+
+    component = Home::CurrentWeather::SkyHazardsComponent.new(
+      wildfire: fire, aurora: nil, planet_night: nil, iss_pass: nil
+    )
+
+    assert_equal "Unknown", component.wildfire_status_label
+    assert_match(/status-badge-muted/, component.wildfire_status_badge_class)
+  end
 end

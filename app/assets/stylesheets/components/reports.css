@@ -8,7 +8,7 @@
   }
 
   & .stats-table-wrapper {
-    @apply overflow-x-auto;
+    @apply overflow-x-auto table-scroll;
   }
   & .stats-table {
     @apply w-full text-slate-300 text-xs;
@@ -42,7 +42,7 @@
     @apply m-0 mb-1 font-heading uppercase tracking-wider text-white text-sm font-bold;
   }
   & .subtitle {
-    @apply text-slate-500 text-[10px] mb-4;
+    @apply text-slate-400 text-[10px] mb-4;
   }
   & .partial-day-note {
     @apply text-amber-400 px-3 py-2.5 mb-4 rounded-lg text-xs;
@@ -54,7 +54,7 @@
   }
 
   & .report-table-wrapper {
-    @apply overflow-x-auto;
+    @apply overflow-x-auto table-scroll;
   }
   & .report-table {
     @apply min-w-full text-slate-300 text-xs;
@@ -136,9 +136,9 @@
 }
 
 @utility report-generation-time {
-  @apply text-center text-[10px] text-slate-600 mb-4;
+  @apply text-center text-[10px] text-slate-400 mb-4;
 }
 
 @utility stats-day-meta {
-  @apply text-[10px] text-slate-600;
+  @apply text-[10px] text-slate-400;
 }

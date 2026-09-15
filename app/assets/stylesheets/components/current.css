@@ -112,7 +112,7 @@
 }
 
 @utility live-tile-source {
-  @apply text-[10px] text-slate-500 leading-none text-right truncate min-w-0;
+  @apply text-[10px] text-slate-400 leading-none text-right truncate min-w-0;
 }
 
 @utility live-tile-body {
@@ -321,4 +321,8 @@ html.is-live .live-sparkline-pulse:not([hidden])::after {
 
 @utility soil-channel-na {
   @apply text-slate-500;
+}
+
+@utility station-offline-card {
+  @apply max-w-2xl mx-auto my-8;
 }

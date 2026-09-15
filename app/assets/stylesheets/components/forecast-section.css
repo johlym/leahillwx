@@ -17,7 +17,7 @@
 }
 
 @utility tile-subtitle {
-  @apply text-[10px] text-slate-500 mb-0;
+  @apply text-[10px] text-slate-400 mb-0;
 }
 
 @utility tile-subtitle-mono {
@@ -48,7 +48,7 @@
 }
 
 @utility camera-refresh {
-  @apply text-[10px] text-slate-500;
+  @apply text-[10px] text-slate-400;
 }
 
 @utility home-section {

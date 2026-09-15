@@ -95,5 +95,5 @@
 }
 
 @utility alerts-page-source {
-  @apply m-0 mt-4 text-[10px] text-slate-600;
+  @apply m-0 mt-4 text-[10px] text-slate-400;
 }
