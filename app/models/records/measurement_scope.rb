@@ -31,7 +31,7 @@ module Records
         else
           PACIFIC.local(year, 12, 31).end_of_day + 1.second
         end
-      [start_at, end_at]
+      [ start_at, end_at ]
     end
   end
 end
