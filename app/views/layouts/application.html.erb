@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html
+  lang="en"
   data-palette="<%= @palette || :night %>"
   data-controller="palette"
   <% if @palette_almanac&.sunrise_at %>
@@ -41,8 +42,9 @@
   </head>
 
   <body class="site-body <%= yield(:body_class) %>" data-controller="weather-update">
+    <a href="#main-content" class="skip-link">Skip to content</a>
     <%= render "layouts/shared/header" %>
-    <main class="site-main"><%= yield %></main>
+    <main id="main-content" class="site-main" tabindex="-1"><%= yield %></main>
     <% if content_for?(:footer) %>
       <%= yield :footer %>
     <% else %>

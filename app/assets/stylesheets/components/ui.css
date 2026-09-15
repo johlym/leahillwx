@@ -181,6 +181,10 @@
     outline: none;
     @apply border-sky-500;
   }
+
+  &:focus-visible {
+    @apply outline-2 outline-offset-2 outline-sky-400 border-sky-500;
+  }
 }
 
 @utility ui-chart {
@@ -210,7 +214,22 @@
 }
 
 @utility ui-chart-frame-sized {
-  height: var(--chart-height);
+  height: min(var(--chart-height), 16rem);
+
+  @media (min-width: 40rem) {
+    height: var(--chart-height);
+  }
+}
+
+@utility table-scroll {
+  @apply overflow-x-auto;
+  -webkit-overflow-scrolling: touch;
+  background:
+    linear-gradient(to right, rgb(2 6 23), rgb(2 6 23)) left / 1.25rem 100% no-repeat,
+    linear-gradient(to left, rgb(2 6 23), rgb(2 6 23)) right / 1.25rem 100% no-repeat,
+    linear-gradient(to right, rgb(15 23 42 / 0.85), transparent) left / 0.75rem 100% no-repeat,
+    linear-gradient(to left, rgb(15 23 42 / 0.85), transparent) right / 0.75rem 100% no-repeat;
+  background-attachment: local, local, scroll, scroll;
 }
 
 @utility ui-card-grid {

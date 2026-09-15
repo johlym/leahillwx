@@ -98,7 +98,7 @@
 }
 
 @utility temp-heatmap-day-tick {
-  @apply text-slate-600 text-[10px] font-mono text-center;
+  @apply text-slate-400 text-[10px] font-mono text-center;
 }
 
 @utility temp-heatmap-month-label {
@@ -162,7 +162,7 @@
 }
 
 @utility temp-heatmap-scroll {
-  @apply overflow-x-auto py-2;
+  @apply overflow-x-auto table-scroll py-2;
 }
 
 @utility temp-heatmap-footer {
@@ -175,7 +175,7 @@
 }
 
 @utility temp-heatmap-legend-label {
-  @apply text-slate-500 text-[10px] font-mono uppercase tracking-wider;
+  @apply text-slate-400 text-[10px] font-mono uppercase tracking-wider;
 }
 
 @utility temp-heatmap-legend-bar {

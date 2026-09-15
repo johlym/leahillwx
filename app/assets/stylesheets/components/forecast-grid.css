@@ -7,7 +7,7 @@
     @apply font-heading text-base font-bold text-white uppercase tracking-wider m-0 mb-6;
   }
   & > .tile-subtitle {
-    @apply text-[10px] text-slate-500 mb-4 mt-0;
+    @apply text-[10px] text-slate-400 mb-4 mt-0;
   }
 }
 
@@ -31,7 +31,7 @@
     @apply text-sm font-bold text-white block m-0 uppercase;
   }
   & > .date-grid .daynum {
-    @apply text-[10px] text-slate-500 uppercase m-0;
+    @apply text-[10px] text-slate-400 uppercase m-0;
   }
 
   & > .conditions {

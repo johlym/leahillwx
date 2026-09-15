@@ -39,11 +39,41 @@
 }
 
 @utility site-header-live-dot {
-  @apply h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse;
+  @apply h-1.5 w-1.5 rounded-full bg-slate-500;
 }
 
 @utility site-header-live-badge {
-  @apply text-[10px] uppercase tracking-wider text-emerald-400 font-bold;
+  @apply text-[10px] uppercase tracking-wider text-slate-400 font-bold;
+}
+
+@utility site-header-live-row-live {
+  & .site-header-live-dot {
+    @apply bg-emerald-500 animate-pulse;
+  }
+
+  & .site-header-live-badge {
+    @apply text-emerald-400;
+  }
+}
+
+@utility site-header-live-row-stale {
+  & .site-header-live-dot {
+    @apply bg-amber-400;
+  }
+
+  & .site-header-live-badge {
+    @apply text-amber-400;
+  }
+}
+
+@utility site-header-live-row-offline {
+  & .site-header-live-dot {
+    @apply bg-slate-500;
+  }
+
+  & .site-header-live-badge {
+    @apply text-slate-400;
+  }
 }
 
 @utility site-header-menu-toggle-wrap {
@@ -58,6 +88,10 @@
   & .svg-inline--fa {
     @apply text-[1.1rem];
   }
+
+  &:focus-visible {
+    @apply outline-2 outline-offset-2 outline-sky-400;
+  }
 }
 
 @utility site-header-links {
@@ -69,7 +103,7 @@
 }
 
 @utility site-header-meta-label {
-  @apply text-[10px] text-slate-500 uppercase tracking-wider block;
+  @apply text-[10px] text-slate-400 uppercase tracking-wider block;
 }
 
 @utility site-header-meta-value {
@@ -87,6 +121,10 @@
 @utility site-header-mobile-link {
   @apply px-3 py-2.5 rounded-lg text-slate-300 font-medium
          no-underline hover:bg-slate-900 hover:text-white hover:no-underline;
+
+  &:focus-visible {
+    @apply outline-2 outline-offset-2 outline-sky-400 text-white;
+  }
 }
 
 @utility nav-link {
@@ -97,6 +135,10 @@
 
   &:hover {
     @apply text-white no-underline;
+  }
+
+  &:focus-visible {
+    @apply outline-2 outline-offset-2 outline-sky-400 text-white;
   }
 }
 
@@ -122,7 +164,7 @@
   }
 
   & .site-footer-meta {
-    @apply text-[11px] text-slate-600 mt-1;
+    @apply text-[11px] text-slate-400 mt-1;
   }
 
   & a {
@@ -140,4 +182,18 @@
 
 @utility site-main {
   @apply flex-1 isolate bg-slate-950;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+@utility skip-link {
+  @apply sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2
+         focus:px-3 focus:py-2 focus:rounded-lg focus:bg-sky-500 focus:text-slate-950
+         focus:font-semibold focus:no-underline;
+
+  &:focus-visible {
+    @apply outline-2 outline-offset-2 outline-sky-300;
+  }
 }
