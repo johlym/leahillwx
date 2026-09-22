@@ -110,7 +110,7 @@ Optional nested arrays: `soil[]`, `temp_probes[]`, and `temp_humidity[]` (channe
 | `AIRNOW_AQSID` | Optional; defaults to Auburn 29th St |
 | `LIBREWXR_API_BASE` | Optional; defaults to `https://api.librewxr.net` |
 | `CARTO_API_KEY` | Optional but recommended; `/radar` CARTO vector Dark Matter style URL |
-| `SENTRY_DSN` | Optional; PII on, traces 0.2 in production |
+| `SENTRY_DSN` | Optional; error reporting only (tracing and profiling disabled) |
 | `SEND_WX` | Must be exactly `true` to upload to WU / PWS / AWEKAS / WeatherCloud / CWOP |
 | `SIDEKIQ_USER` / `SIDEKIQ_PASSWORD` | Production `/sidekiq` (open in development) |
 | `MEASUREMENT_RETENTION_DAYS` | Optional; default `1095`. Nightly purge of raw `weather_measurements` older than this |

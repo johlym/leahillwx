@@ -20,6 +20,9 @@ Sentry.init do |config|
   # creates monitors that miss check-ins whenever the process stops.
   config.enabled_patches += [ :sidekiq_cron ] if sentry_env == "production"
 
-  # Capture 100% in non-production; sample in production to control quota.
-  config.traces_sample_rate = Rails.env.production? ? 0.2 : 1.0
+  # Telebugs does not support tracing or profiling. nil (not 0.0) turns both
+  # off: a numeric rate, including 0.0, still enables the tracer and continues
+  # incoming traces.
+  config.traces_sample_rate = nil
+  config.profiles_sample_rate = nil
 end
