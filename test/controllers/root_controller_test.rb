@@ -27,6 +27,8 @@ class RootControllerTest < ActionDispatch::IntegrationTest
     assert_select "button#mobile-menu-toggle[aria-controls=mobile-menu]"
     assert_select "#mobile-menu[role=navigation][aria-labelledby=mobile-menu-toggle]"
     assert_select "[data-connection-status-target=badge] [data-connection-status-target=label]", text: "OFFLINE"
+    assert_select "meta[name=sentry-trace]", count: 0
+    assert_select "meta[name=baggage]", count: 0
   end
 
   test "index defers weather alerts to async turbo frame" do
