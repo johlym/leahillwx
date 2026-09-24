@@ -108,6 +108,27 @@ class BulkWriteMeasurementsJobTest < ActiveSupport::TestCase
     assert_equal 30.0, WeatherMeasurement.find_by!(reading_date_time: reading_at).temperature
   end
 
+  test "overwrite keeps existing rows when the replacement is invalid" do
+    keep_at = Time.zone.parse("2026-03-01 12:00:00")
+    replace_at = Time.zone.parse("2026-03-01 12:01:00")
+    WeatherMeasurement.create!(measurement_hash("reading_date_time" => keep_at, "temperature" => 18.5).symbolize_keys)
+    WeatherMeasurement.create!(measurement_hash("reading_date_time" => replace_at, "temperature" => 19.0).symbolize_keys)
+
+    payload = [
+      measurement_hash("reading_date_time" => keep_at.iso8601, "humidity" => 250, "temperature" => 99.0),
+      measurement_hash("reading_date_time" => replace_at.iso8601, "temperature" => 22.0)
+    ]
+
+    assert_no_difference("WeatherMeasurement.count") do
+      BulkWriteMeasurementsJob.new.perform(payload, false, true)
+    end
+
+    kept = WeatherMeasurement.find_by!(reading_date_time: keep_at)
+    assert_equal 18.5, kept.temperature
+    assert_equal 65, kept.humidity
+    assert_equal 22.0, WeatherMeasurement.find_by!(reading_date_time: replace_at).temperature
+  end
+
   test "re-raises after logging so Sidekiq can retry" do
     payload = [ measurement_hash ]
     job = BulkWriteMeasurementsJob.new

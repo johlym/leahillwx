@@ -16,14 +16,19 @@ class BulkWriteMeasurementsJob
                                          .index_by(&:reading_date_time)
 
     if overwrite
-      # Overwrite mode: delete existing and insert all records
-      timestamps = records.map { |r| Time.zone.parse(r["reading_date_time"]) }
-      deleted_count = WeatherMeasurement.where(reading_date_time: timestamps).delete_all
+      # Validate first so a bad row cannot delete a good reading and then
+      # get skipped. Ignore uniqueness — we are about to replace those rows.
+      valid_records = validate_records!(records, ignore_timestamp_taken: true)
+      timestamps = valid_records.filter_map { |r| parse_reading_time(r["reading_date_time"]) }
+      deleted_count = 0
 
-      # Insert all records
-      insert_measurements!(records) if records.any?
-      WeatherMeasurements::TotalCount.recalculate! if deleted_count.positive? || records.any?
-      Rails.logger.info("Bulk import (overwrite): #{records.size} inserted, #{deleted_count} deleted")
+      WeatherMeasurement.transaction do
+        deleted_count = WeatherMeasurement.where(reading_date_time: timestamps).delete_all if timestamps.any?
+        WeatherMeasurement.insert_all!(valid_records) if valid_records.any?
+      end
+
+      WeatherMeasurements::TotalCount.recalculate! if deleted_count.positive? || valid_records.any?
+      Rails.logger.info("Bulk import (overwrite): #{valid_records.size} inserted, #{deleted_count} deleted")
     elsif update_records
       # Update existing records and insert new ones
       new_records = []
@@ -85,11 +90,11 @@ class BulkWriteMeasurementsJob
   end
 
   # insert_all! skips Active Record validations; mirror create-path checks first.
-  def validate_records!(records)
+  def validate_records!(records, ignore_timestamp_taken: false)
     valid = []
     records.each do |attrs|
       measurement = WeatherMeasurement.new(attrs.except("created_at", "updated_at"))
-      if measurement.valid?
+      if acceptable_for_insert?(measurement, ignore_timestamp_taken: ignore_timestamp_taken)
         row = measurement.attributes.except("id")
         row["created_at"] = attrs["created_at"] || attrs[:created_at] || Time.current
         row["updated_at"] = attrs["updated_at"] || attrs[:updated_at] || Time.current
@@ -101,5 +106,23 @@ class BulkWriteMeasurementsJob
       end
     end
     valid
+  end
+
+  def acceptable_for_insert?(measurement, ignore_timestamp_taken:)
+    return true if measurement.valid?
+    return false unless ignore_timestamp_taken
+
+    details = measurement.errors.details
+    details.any? && details.all? do |attribute, errors|
+      attribute == :reading_date_time && errors.all? { |error| error[:error] == :taken }
+    end
+  end
+
+  def parse_reading_time(value)
+    case value
+    when Time, ActiveSupport::TimeWithZone then value
+    when DateTime then value.in_time_zone
+    else Time.zone.parse(value.to_s)
+    end
   end
 end
