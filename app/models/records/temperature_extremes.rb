@@ -51,10 +51,13 @@ module Records
     end
 
     def heat_index_and_wind_chill
+      # Bound like apparent_temp_extremes so all-time winter/summer scans
+      # cannot materialize the full matching set into Ruby.
       highest_heat_index = extreme_by_feels_like(
         @measurements.select(:temperature, :humidity, :wind_speed, :reading_date_time)
                      .where("temperature > 27")
-                     .where("humidity >= 40"),
+                     .where("humidity >= 40")
+                     .order(temperature: :desc).limit(250),
         :max
       )
       if highest_heat_index
@@ -65,7 +68,8 @@ module Records
       lowest_wind_chill = extreme_by_feels_like(
         @measurements.select(:temperature, :humidity, :wind_speed, :reading_date_time)
                      .where("temperature < 10")
-                     .where("wind_speed > 1.34"),
+                     .where("wind_speed > 1.34")
+                     .order(temperature: :asc).limit(250),
         :min
       )
       if lowest_wind_chill
