@@ -420,8 +420,27 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
     ))
 
     assert_not measurement.valid?
-    assert_includes measurement.errors[:temp_humidity], "temperature must be a number"
-    assert_includes measurement.errors[:temp_humidity], "humidity must be a number"
+    assert_includes measurement.errors[:temp_humidity], "entry must include temperature or humidity"
+  end
+
+  test "accepts temp_humidity with temperature only" do
+    measurement = WeatherMeasurement.new(valid_attrs(
+      temp_humidity: [ { "channel" => 1, "temperature" => 27.6, "battery_low" => false } ]
+    ))
+
+    assert measurement.valid?
+    assert_equal 27.6, measurement.temp_humidity.first["temperature"]
+    assert_nil measurement.temp_humidity.first["humidity"]
+  end
+
+  test "accepts temp_humidity with humidity only" do
+    measurement = WeatherMeasurement.new(valid_attrs(
+      temp_humidity: [ { "channel" => 1, "humidity" => 40, "battery_low" => true } ]
+    ))
+
+    assert measurement.valid?
+    assert_equal 40, measurement.temp_humidity.first["humidity"]
+    assert_nil measurement.temp_humidity.first["temperature"]
   end
 
   test "rejects non-boolean temp_humidity battery_low" do
