@@ -38,6 +38,15 @@
   & h1 {
     @apply font-heading text-5xl font-bold uppercase my-4 tracking-wider text-text-strong;
   }
+  /* `.primary-container h1` is text-5xl and beats `.ui-section-header-title`.
+     "CLIMATOLOGICAL" at that size is wider than a phone, and overflow-x: clip
+     on html cuts the word off. Space Grotesk bold caps plus tracking-wider
+     make that word about 8.8em wide; dividing the container by 9.6 keeps it
+     on one line, capped at the desktop display size. */
+  & h1.ui-section-header-title {
+    @apply max-w-full min-w-0 break-words leading-none text-balance;
+    font-size: clamp(1.5rem, calc(100cqi / 9.6), 3rem);
+  }
   & h2 {
     @apply font-heading text-3xl font-bold uppercase my-4 tracking-wider text-text-strong;
   }
