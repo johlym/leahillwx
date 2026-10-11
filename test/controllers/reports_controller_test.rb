@@ -62,5 +62,26 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
     get report_url(2024, "january", format: :text)
     assert_response :success
     assert_match(/MONTHLY CLIMATOLOGICAL SUMMARY/, response.body)
+    # month_mean_temp is stored in Celsius. 10°C must not be labeled 10°F.
+    assert_match(/Mean Temperature:\s+50\.00°F/, response.body)
+  end
+
+  test "day page overview shows the day's rain rather than the month total" do
+    @report.update!(total_rain: 5.842) # 0.23 in for the month
+    @report.entries.create!(
+      day: 11,
+      mean_temp: 10.0,
+      high_temp: 12.0,
+      low_temp: 8.0,
+      high_temp_time: "15:04",
+      low_temp_time: "06:12",
+      rain: 0.0
+    )
+
+    get report_day_url(2024, "january", 11)
+    assert_response :success
+    assert_select "h2", text: "Daily Overview"
+    assert_match(/0\.00 in\./, response.body)
+    assert_no_match(/0\.23 in\./, response.body)
   end
 end

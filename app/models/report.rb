@@ -80,7 +80,7 @@ class Report < ApplicationRecord
 
   def formatted_temp(temp)
     return "N/A" if temp.nil?
-    format("%.2f", temp)
+    format("%.2f", celsius_to_fahrenheit(temp))
   end
 
   def formatted_degree_days(dd)
