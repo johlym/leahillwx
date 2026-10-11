@@ -15,6 +15,7 @@ module WeatherData
     def aggregate
       report = find_or_create_report
       entry = create_or_update_entry(report)
+      sync_hourly_rain(report)
 
       WeatherData::MonthlyStatsCalculator.new(report).calculate
 
@@ -92,8 +93,9 @@ module WeatherData
       pressures = measurements.map(&:sea_level_pressure_qff)
       mean_pressure = pressures.sum / pressures.size
 
-      # rain_day is a cumulative counter that resets at midnight, so use the maximum value
-      total_rain_mm = measurements.maximum(:rain_day) || 0.0
+      # Match the homepage: the station's counter at the last reading, not the
+      # peak. A spike or a pre-reset carryover from yesterday must not stick.
+      total_rain_mm = rain_attribution.total_mm
 
       # Convert mean temp to Fahrenheit for degree day calculations
       mean_temp_f = celsius_to_fahrenheit(mean_temp_c)
@@ -118,6 +120,32 @@ module WeatherData
         low_pressure: low_pressure_measurement.sea_level_pressure_qff,
         low_pressure_time: format_time(low_pressure_measurement.reading_date_time)
       }
+    end
+
+    def rain_attribution
+      @rain_attribution ||= WeatherData::RainTotal.attribute(
+        measurements.to_a,
+        baseline: rain_baseline
+      )
+    end
+
+    def rain_baseline
+      start_time = @date.in_time_zone("America/Los_Angeles").beginning_of_day
+      WeatherMeasurement.where(reading_date_time: ...start_time)
+                       .order(reading_date_time: :desc)
+                       .first
+    end
+
+    # Hourly rows for this day were built from whatever the counter did inside
+    # each hour. Recompute them with the full day so a later correction removes
+    # rain that the station's counter no longer claims.
+    def sync_hourly_rain(report)
+      return if measurements.empty?
+
+      amounts = rain_attribution.hourly_mm
+      report.entries.hourly.where(day: @date.day).find_each do |entry|
+        entry.update!(rain: amounts[entry.hour] || 0.0)
+      end
     end
 
     def partial_day?

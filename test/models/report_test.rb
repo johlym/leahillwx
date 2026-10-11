@@ -87,6 +87,12 @@ class ReportTest < ActiveSupport::TestCase
     assert_equal report.id, found.id
   end
 
+  test "formatted_temp converts stored celsius to fahrenheit" do
+    report = Report.new(year: 2024, month: 1)
+    assert_equal "50.00", report.formatted_temp(10.0)
+    assert_equal "N/A", report.formatted_temp(nil)
+  end
+
   test "should cascade delete entries" do
     report = Report.create!(year: 2024, month: 1)
     report.entries.create!(day: 1, mean_temp: 50.0)
