@@ -42,7 +42,7 @@ class ReportTitleOverflowTest < ApplicationSystemTestCase
             }).length;
           };
 
-          return { view, title: outside(title), subtitle: outside(subtitle), text: title.innerText };
+          return { view, title: outside(title), subtitle: outside(subtitle), text: title.textContent };
         })()
       JS
 
