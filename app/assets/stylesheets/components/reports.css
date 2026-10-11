@@ -8,7 +8,7 @@
   }
 
   & .stats-table-wrapper {
-    @apply overflow-x-auto table-scroll;
+    @apply max-w-full overflow-x-auto table-scroll;
   }
   & .stats-table {
     @apply w-full text-slate-300 text-xs;
@@ -54,7 +54,7 @@
   }
 
   & .report-table-wrapper {
-    @apply overflow-x-auto table-scroll;
+    @apply max-w-full overflow-x-auto table-scroll;
   }
   & .report-table {
     @apply min-w-full text-slate-300 text-xs;
