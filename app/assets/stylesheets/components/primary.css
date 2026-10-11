@@ -4,6 +4,7 @@
   html {
     @apply antialiased scheme-only-dark font-body;
     background-color: var(--color-bg);
+    overflow-x: clip;
   }
 
   body {
@@ -22,10 +23,17 @@
     color: var(--color-accent-strong);
     text-decoration: none;
   }
+
+  /* Custom elements default to inline. A block alert bar inside an inline
+     turbo-frame widens the page on mobile. */
+  turbo-frame {
+    display: block;
+    max-width: 100%;
+  }
 }
 
 @utility primary-container {
-  @apply container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 my-4 text-text;
+  @apply container mx-auto min-w-0 max-w-7xl px-4 sm:px-6 lg:px-8 my-4 text-text;
 
   & h1 {
     @apply font-heading text-5xl font-bold uppercase my-4 tracking-wider text-text-strong;

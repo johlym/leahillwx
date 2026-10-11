@@ -1,7 +1,8 @@
 /* Header alert strip (above nav) + /alerts detail page. */
 
 @utility forecast-alerts-bar {
-  @apply block border-b border-red-900/50 no-underline
+  @apply block w-full max-w-full overflow-x-clip
+         border-b border-red-900/50 no-underline
          bg-red-950/40
          transition-colors duration-150;
 
@@ -16,25 +17,25 @@
 }
 
 @utility forecast-alerts-bar-inner {
-  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8
+  @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8
          py-2.5 flex flex-col sm:flex-row items-center justify-between
          gap-2 text-xs min-w-0;
 }
 
 @utility forecast-alerts-bar-label {
-  @apply flex items-center gap-2 text-red-400 font-semibold shrink-0;
+  @apply flex min-w-0 max-w-full items-center gap-2 text-red-400 font-semibold;
 }
 
 @utility forecast-alerts-bar-dot {
-  @apply relative flex h-2 w-2;
+  @apply relative flex h-2 w-2 shrink-0;
 }
 
 @utility forecast-alerts-bar-dot-ping {
-  @apply absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 animate-ping;
+  @apply absolute inline-flex h-full w-full rounded-[9999px] bg-red-400 opacity-75 animate-ping;
 }
 
 @utility forecast-alerts-bar-dot-core {
-  @apply relative inline-flex rounded-full h-2 w-2 bg-red-500;
+  @apply relative inline-flex rounded-[9999px] h-2 w-2 bg-red-500;
 }
 
 @utility forecast-alerts-bar-event {
@@ -42,7 +43,8 @@
 }
 
 @utility forecast-alerts-bar-meta {
-  @apply shrink-0 m-0 text-slate-400 font-medium whitespace-nowrap;
+  @apply min-w-0 max-w-full m-0 text-center text-slate-400 font-medium
+         sm:shrink-0 sm:whitespace-nowrap;
 }
 
 /* --- /alerts ---------------------------------------------------- */
