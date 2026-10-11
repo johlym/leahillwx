@@ -19,7 +19,7 @@ module Ui
     end
 
     def call
-      content_tag(:div, class: "ui-section-header") do
+      content_tag(:div, class: header_classes) do
         safe_join([
           title_block,
           actions? ? content_tag(:div, actions, class: "ui-section-header-actions") : nil
@@ -28,6 +28,12 @@ module Ui
     end
 
     private
+
+    def header_classes
+      classes = [ "ui-section-header" ]
+      classes << "ui-section-header-page" if @level == 1
+      classes.join(" ")
+    end
 
     def title_block
       content_tag(:div, class: "ui-section-header-text") do
