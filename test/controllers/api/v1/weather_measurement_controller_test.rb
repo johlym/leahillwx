@@ -119,6 +119,18 @@ class Api::V1::WeatherMeasurementControllerTest < ActionDispatch::IntegrationTes
     assert_equal [], measurement.temp_humidity
   end
 
+  test "create stores a reading when HTTP live-data omits raw uv" do
+    payload = measurement_payload
+    payload[:weather_measurement].delete(:uv)
+
+    assert_difference("WeatherMeasurement.count", 1) do
+      post api_v1_weather_measurement_url, params: payload, headers: auth_headers, as: :json
+    end
+
+    assert_response :no_content
+    assert_equal 0, WeatherMeasurement.order(:id).last.uv
+  end
+
   test "create rejects invalid soil channel" do
     payload = measurement_payload(
       soil: [ { channel: 9, moisture: 78.0, battery: 1.6 } ]
