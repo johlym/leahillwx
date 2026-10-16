@@ -42,6 +42,7 @@ class WeatherMeasurement < ApplicationRecord
   MAX_SOIL_CHANNELS = 8
 
   after_create_commit :broadcast_update
+  before_validation :default_missing_uv
   before_validation :normalize_soil
   before_validation :normalize_temp_probes
   before_validation :normalize_temp_humidity
@@ -251,6 +252,12 @@ class WeatherMeasurement < ApplicationRecord
     return if temp_humidity.nil?
 
     self.temp_humidity = Array(temp_humidity).map { |entry| normalize_temp_humidity_entry(entry) }
+  end
+
+  # Ecowitt HTTP live-data has UVI (0x17) and usually omits raw UV (0x16).
+  # A missing uv used to 422 the whole outdoor reading after the HTTP gateway switch.
+  def default_missing_uv
+    self.uv = 0 if uv.nil?
   end
 
   def normalize_probe_entry(entry, fields)

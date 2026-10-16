@@ -99,6 +99,13 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
     assert_equal [], measurement.soil
   end
 
+  test "defaults omitted uv to zero so HTTP live-data can ingest" do
+    measurement = WeatherMeasurement.new(valid_attrs.except(:uv))
+
+    assert measurement.valid?
+    assert_equal 0, measurement.uv
+  end
+
   test "accepts valid soil channels" do
     measurement = WeatherMeasurement.new(valid_attrs(
       soil: [
