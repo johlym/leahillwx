@@ -239,13 +239,13 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
     assert_nil readings["Veggie Bed"]["temperature_f"]
 
     assert_equal 55, readings["Front Yard"]["moisture"]
-    assert_equal 50, readings["Front Yard"]["temperature_f"]
+    assert_equal 54, readings["Front Yard"]["temperature_f"] # 12°C on probe 1
     assert_equal 1.58, readings["Front Yard"]["moisture_battery"]
-    assert_equal 1.45, readings["Front Yard"]["temperature_battery"]
+    assert_equal 1.4, readings["Front Yard"]["temperature_battery"]
 
     assert_equal 40, readings["Back Yard"]["moisture"]
-    assert_equal 54, readings["Back Yard"]["temperature_f"] # 12°C
-    assert_equal 1.4, readings["Back Yard"]["temperature_battery"]
+    assert_equal 50, readings["Back Yard"]["temperature_f"] # 10°C on probe 2
+    assert_equal 1.45, readings["Back Yard"]["temperature_battery"]
   ensure
     SoilChannels.config_path = nil
     SoilChannels.reload!
