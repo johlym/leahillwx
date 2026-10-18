@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html
+  lang="en"
   data-palette="<%= @palette || :night %>"
   data-controller="palette"
   <% if @palette_almanac&.sunrise_at %>
@@ -37,12 +38,12 @@
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
     <script src="https://kit.fontawesome.com/20b018c776.js" crossorigin="anonymous"></script>
     <script src="https://cdn.usefathom.com/script.js" data-site="ZETHKCED" defer></script>
-    <%= Sentry.get_trace_propagation_meta.html_safe %>
   </head>
 
   <body class="site-body <%= yield(:body_class) %>" data-controller="weather-update">
+    <a href="#main-content" class="skip-link">Skip to content</a>
     <%= render "layouts/shared/header" %>
-    <main class="site-main"><%= yield %></main>
+    <main id="main-content" class="site-main" tabindex="-1"><%= yield %></main>
     <% if content_for?(:footer) %>
       <%= yield :footer %>
     <% else %>

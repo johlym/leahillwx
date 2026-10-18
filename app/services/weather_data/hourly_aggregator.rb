@@ -8,7 +8,7 @@ module WeatherData
     attr_reader :datetime, :measurements
 
     def initialize(datetime)
-      @datetime = datetime.is_a?(Time) ? datetime : Time.parse(datetime.to_s)
+      @datetime = normalize_time(datetime)
       @measurements = fetch_measurements
     end
 
@@ -20,6 +20,19 @@ module WeatherData
     end
 
     private
+
+    # TimeWithZone is not a Time, and Time.parse follows the system zone.
+    # Report hours are Pacific, matching the daily aggregator.
+    def normalize_time(datetime)
+      case datetime
+      when ActiveSupport::TimeWithZone
+        datetime
+      when Time, DateTime
+        datetime.in_time_zone("America/Los_Angeles")
+      else
+        Time.zone.parse(datetime.to_s)
+      end
+    end
 
     def fetch_measurements
       start_time = @datetime.beginning_of_hour
@@ -90,10 +103,7 @@ module WeatherData
       pressures = measurements.map(&:sea_level_pressure_qff)
       mean_pressure = pressures.sum / pressures.size
 
-      # rain_day is a cumulative counter, so calculate the difference between max and min for this hour
-      max_rain = measurements.maximum(:rain_day) || 0.0
-      min_rain = measurements.minimum(:rain_day) || 0.0
-      total_rain_mm = max_rain - min_rain
+      total_rain_mm = hour_rain_mm
 
       # Convert mean temp to Fahrenheit for degree day calculations
       mean_temp_f = celsius_to_fahrenheit(mean_temp_c)
@@ -120,13 +130,24 @@ module WeatherData
       }
     end
 
+    def hour_rain_mm
+      result = WeatherData::RainTotal.attribute(measurements.to_a, baseline: rain_baseline)
+      result.hourly_mm[@datetime.in_time_zone("America/Los_Angeles").hour] || 0.0
+    end
+
+    def rain_baseline
+      WeatherMeasurement.where(reading_date_time: ...@datetime.beginning_of_hour)
+                       .order(reading_date_time: :desc)
+                       .first
+    end
+
     def is_partial_hour?
       measurements.count < (EXPECTED_MEASUREMENTS_PER_HOUR * 0.8)
     end
 
     def format_time(datetime)
       return nil if datetime.nil?
-      datetime.strftime("%H:%M")
+      datetime.in_time_zone("America/Los_Angeles").strftime("%H:%M")
     end
   end
 end

@@ -15,7 +15,7 @@
 #  temp_humidity     :jsonb            not null
 #  temp_probes       :jsonb            not null
 #  temperature       :float            not null
-#  uv                :integer          not null
+#  uv                :integer
 #  uvi               :float            not null
 #  wind_dir          :integer          not null
 #  wind_speed        :float            not null
@@ -48,11 +48,14 @@ class WeatherMeasurement < ApplicationRecord
 
   # Validations
   # Are all the fields present?
-  validates :reading_date_time, :barometer_abs, :barometer_rel, :gust_speed, :light, :humidity, :temperature, :rain_day, :rain_rate, :uv, :uvi, :wind_dir, :wind_speed, presence: true
+  # uv (register 0x16, µW/m²) is optional. NULL means it was not sent.
+  # SQL AVG/MAX/MIN ignore those nulls, so a missing register is not a zero.
+  validates :reading_date_time, :barometer_abs, :barometer_rel, :gust_speed, :light, :humidity, :temperature, :rain_day, :rain_rate, :uvi, :wind_dir, :wind_speed, presence: true
   validates :reading_date_time, uniqueness: true
 
   # Are humidity, UV, wind direction integers?
-  validates :humidity, :uv, :wind_dir, numericality: { only_integer: true }
+  validates :humidity, :wind_dir, numericality: { only_integer: true }
+  validates :uv, numericality: { only_integer: true }, allow_nil: true
   validates :humidity, numericality: { in: 0..100 }, allow_nil: true
   validates :wind_dir, numericality: { in: 0..359 }, allow_nil: true
   validates :rain_day, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
@@ -67,6 +70,15 @@ class WeatherMeasurement < ApplicationRecord
 
   # hectopascals (hPa) to inches of mercury (inHg)
   HPA_TO_INHG = 1.0 / 33.8638866667
+
+  # Ecowitt/Ambient store register 0x15 on `light` as lux = (W/m²) / 0.0079.
+  SOLAR_IRRADIANCE_WM2_PER_LUX = 0.0079
+
+  def self.lux_to_solar_irradiance_wm2(lux)
+    return nil if lux.nil?
+
+    lux.to_f * SOLAR_IRRADIANCE_WM2_PER_LUX
+  end
 
   def barometer_abs_inhg
     barometer_abs * HPA_TO_INHG
@@ -238,13 +250,33 @@ class WeatherMeasurement < ApplicationRecord
   def normalize_soil
     return if soil.nil?
 
-    self.soil = Array(soil).map { |entry| normalize_probe_entry(entry, %w[moisture temperature battery]) }
+    self.soil = Array(soil).filter_map do |entry|
+      normalized = normalize_probe_entry(entry, %w[moisture temperature battery])
+      next if measurement_blank_probe?(normalized, "moisture", "temperature")
+
+      normalized
+    end
   end
 
   def normalize_temp_probes
     return if temp_probes.nil?
 
-    self.temp_probes = Array(temp_probes).map { |entry| normalize_probe_entry(entry, %w[temperature battery]) }
+    self.temp_probes = Array(temp_probes).filter_map do |entry|
+      normalized = normalize_probe_entry(entry, %w[temperature battery])
+      next if measurement_blank_probe?(normalized, "temperature")
+
+      normalized
+    end
+  end
+
+  # Battery-only rows arrive when SENSOR_ID still reports a probe but livedata
+  # missed that channel. Drop them so one incomplete sensor cannot 422 the
+  # rest of the outdoor reading. Keep rows that declare a measurement so
+  # validation can still reject non-numeric values.
+  def measurement_blank_probe?(entry, *fields)
+    return false unless entry.is_a?(Hash)
+
+    fields.none? { |field| entry.key?(field) && !entry[field].nil? }
   end
 
   def normalize_temp_humidity

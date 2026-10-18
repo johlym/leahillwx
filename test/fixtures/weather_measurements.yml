@@ -17,7 +17,7 @@
 #  temp_humidity     :jsonb            not null
 #  temp_probes       :jsonb            not null
 #  temperature       :float            not null
-#  uv                :integer          not null
+#  uv                :integer
 #  uvi               :float            not null
 #  wind_dir          :integer          not null
 #  wind_speed        :float            not null

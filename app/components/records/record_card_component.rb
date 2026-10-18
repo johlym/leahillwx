@@ -147,7 +147,7 @@ module Records
         when :pressure
           raw.round(1)
         when :solar
-          raw.round(1)
+          solar_wm2(raw)
         when :humidity
           raw.to_f.round(1)
         else
@@ -174,7 +174,10 @@ module Records
       when :pressure
         { value: raw.round(2).to_s, unit: "hPa" }
       when :solar
-        { value: raw.round(1).to_s, unit: "W/m²" }
+        wm2 = solar_wm2(raw)
+        return { value: "—", unit: nil } if wm2.nil?
+
+        { value: wm2.to_s, unit: "W/m²" }
       when :wind_run
         { value: raw.round(1).to_s, unit: "mi" }
       when :hours
@@ -189,6 +192,11 @@ module Records
       else
         { value: raw.to_s, unit: nil }
       end
+    end
+
+    # `highest_solar` is the light register in lux. Display it as W/m².
+    def solar_wm2(lux)
+      WeatherMeasurement.lux_to_solar_irradiance_wm2(lux)&.round(1)
     end
 
     def formatted_timestamp

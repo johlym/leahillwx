@@ -28,20 +28,18 @@ jobs:
 
       - name: Scan for common Rails security vulnerabilities using static analysis
         id: brakeman
-        continue-on-error: true
         run: |
           set -o pipefail
           bin/brakeman --no-pager 2>&1 | tee brakeman-output.txt
 
       - name: Scan for known security vulnerabilities in gems used
         id: bundler_audit
-        continue-on-error: true
         run: |
           set -o pipefail
           bin/bundler-audit 2>&1 | tee bundler-audit-output.txt
 
       - name: Build PR comment body
-        if: github.event_name == 'pull_request'
+        if: always() && github.event_name == 'pull_request'
         id: comment
         env:
           BRAKEMAN_OUTCOME: ${{ steps.brakeman.outcome }}
@@ -51,7 +49,7 @@ jobs:
           {
             echo "## Ruby security scan"
             echo
-            echo "These checks no longer fail CI. Address findings below when practical (e.g. gem updates from bundler-audit)."
+            echo "Brakeman and bundler-audit fail this job when they report findings."
             echo
 
             if [ "$BRAKEMAN_OUTCOME" = "failure" ]; then
@@ -95,14 +93,14 @@ jobs:
           fi
 
       - name: Comment scan findings on PR
-        if: github.event_name == 'pull_request' && steps.comment.outputs.has_findings == 'true'
+        if: always() && github.event_name == 'pull_request' && steps.comment.outputs.has_findings == 'true'
         uses: marocchino/sticky-pull-request-comment@v3
         with:
           header: scan-ruby
           path: comment-body.md
 
       - name: Remove stale scan comment when clean
-        if: github.event_name == 'pull_request' && steps.comment.outputs.has_findings == 'false'
+        if: always() && github.event_name == 'pull_request' && steps.comment.outputs.has_findings == 'false'
         uses: marocchino/sticky-pull-request-comment@v3
         with:
           header: scan-ruby

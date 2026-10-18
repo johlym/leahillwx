@@ -75,9 +75,17 @@ class Records::RecordsComponentTest < ViewComponent::TestCase
     ))
 
     assert_text(/No records available yet/)
+    assert_selector "p.heatmap-empty", text: /No daily temperature heatmap yet/
     # No section headers when there's no data
     assert_no_selector "h3", text: "Temperature"
     empty_year_record.destroy
+  end
+
+  test "renders empty heatmap card when heatmap days are missing" do
+    render_inline(build(heatmap_days: [], heatmap_year: @selected_year))
+
+    assert_selector "p.heatmap-empty", text: /No daily temperature heatmap yet for #{@selected_year}/
+    assert_no_selector ".temp-heatmap"
   end
 
   test "pivot_year? is true only for :year pivot" do

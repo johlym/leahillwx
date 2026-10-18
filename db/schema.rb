@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_09_025300) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_18_180800) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -254,7 +254,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_025300) do
     t.jsonb "temp_probes", default: [], null: false
     t.float "temperature", null: false
     t.datetime "updated_at", null: false
-    t.integer "uv", null: false
+    t.integer "uv"
     t.float "uvi", null: false
     t.integer "wind_dir", null: false
     t.float "wind_speed", null: false

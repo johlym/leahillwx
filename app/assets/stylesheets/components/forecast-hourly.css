@@ -14,7 +14,7 @@
 
   & > .hourly-forecast-header > p,
   & > p {
-    @apply text-[10px] text-slate-500 m-0;
+    @apply text-[10px] text-slate-400 m-0;
   }
 
   & > .hourly-forecast-row {
@@ -51,6 +51,6 @@
     @apply hidden;
   }
   & .conditions .precip {
-    @apply text-[10px] text-slate-500 block mt-1 m-0;
+    @apply text-[10px] text-slate-400 block mt-1 m-0;
   }
 }

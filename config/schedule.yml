@@ -62,3 +62,13 @@ generate_all_time_records_job:
   cron: "6 8 * * *"
   class: "GenerateAllTimeRecordsJob"
   description: "Calculate all-time records at 8:06 AM UTC (12:06 AM PST)"
+
+recalculate_measurement_total_count_job:
+  cron: "10 8 * * *"
+  class: "RecalculateMeasurementTotalCountJob"
+  description: "Rebuild the Redis measurement counter from Postgres daily at 8:10 AM UTC"
+
+purge_old_weather_measurements_job:
+  cron: "15 8 * * *"
+  class: "PurgeOldWeatherMeasurementsJob"
+  description: "Delete raw measurements older than MEASUREMENT_RETENTION_DAYS (default 1095) at 8:15 AM UTC"

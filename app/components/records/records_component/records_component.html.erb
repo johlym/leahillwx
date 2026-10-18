@@ -40,6 +40,12 @@
     days: heatmap_days,
     highlight_month: pivot_month? ? selected_month : nil
   ) %>
+<% else %>
+  <%= render Ui::CardComponent.new(padding: :loose) do %>
+    <p class="ui-message heatmap-empty">
+      No daily temperature heatmap yet<%= " for #{heatmap_year}" if heatmap_year %>.
+    </p>
+  <% end %>
 <% end %>
 
 <% if pivot_month? %>

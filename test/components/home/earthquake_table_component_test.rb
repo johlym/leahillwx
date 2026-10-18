@@ -13,7 +13,7 @@ class Home::EarthquakeTableComponentTest < ViewComponent::TestCase
   end
 
   test "renders table headers" do
-    render_inline(Home::EarthquakeTableComponent.new(earthquakes: []))
+    render_inline(Home::EarthquakeTableComponent.new(earthquakes: [ earthquakes(:one) ]))
 
     assert_selector "th.eq-header-cell", text: "Magnitude"
     assert_selector "th.eq-header-cell", text: "Timestamp"
@@ -81,10 +81,10 @@ class Home::EarthquakeTableComponentTest < ViewComponent::TestCase
     assert_selector "tr.eq-row", count: 2
   end
 
-  test "renders empty table when no earthquakes" do
+  test "renders empty state when no earthquakes" do
     render_inline(Home::EarthquakeTableComponent.new(earthquakes: []))
 
-    assert_selector "table.earthquake-table"
-    assert_selector "tr.eq-row", count: 0
+    assert_no_selector "table.earthquake-table"
+    assert_selector "p.earthquake-empty", text: "No recent earthquakes near this station."
   end
 end

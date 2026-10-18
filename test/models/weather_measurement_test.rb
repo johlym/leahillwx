@@ -15,7 +15,7 @@
 #  temp_humidity     :jsonb            not null
 #  temp_probes       :jsonb            not null
 #  temperature       :float            not null
-#  uv                :integer          not null
+#  uv                :integer
 #  uvi               :float            not null
 #  wind_dir          :integer          not null
 #  wind_speed        :float            not null
@@ -264,13 +264,28 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
     assert_equal 12.5, measurement.temp_probes.first["temperature"]
   end
 
-  test "rejects temp_probes without temperature" do
+  test "drops temp_probes that have only battery" do
     measurement = WeatherMeasurement.new(valid_attrs(
-      temp_probes: [ { "channel" => 1, "battery" => 1.55 } ]
+      temp_probes: [
+        { "channel" => 1, "battery" => 1.55 },
+        { "channel" => 2, "temperature" => 11.0, "battery" => 1.4 }
+      ]
     ))
 
-    assert_not measurement.valid?
-    assert_includes measurement.errors[:temp_probes], "temperature must be a number"
+    assert measurement.valid?
+    assert_equal [ { "channel" => 2, "temperature" => 11.0, "battery" => 1.4 } ], measurement.temp_probes
+  end
+
+  test "drops soil entries that have only battery" do
+    measurement = WeatherMeasurement.new(valid_attrs(
+      soil: [
+        { "channel" => 1, "battery" => 1.6 },
+        { "channel" => 2, "moisture" => 40.0, "battery" => 1.5 }
+      ]
+    ))
+
+    assert measurement.valid?
+    assert_equal [ { "channel" => 2, "moisture" => 40.0, "battery" => 1.5 } ], measurement.soil
   end
 
   test "rejects duplicate temp_probe channels" do
@@ -472,6 +487,34 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
     assert_equal true, reading["battery_low"]
   ensure
     SoilChannels.reload!
+  end
+
+  test "accepts a reading with no uv radiation and still requires uvi" do
+    missing_uv = WeatherMeasurement.new(valid_attrs(uv: nil))
+    assert missing_uv.valid?, missing_uv.errors.full_messages.to_sentence
+
+    missing_uvi = WeatherMeasurement.new(valid_attrs(uvi: nil))
+    assert_not missing_uvi.valid?
+    assert_includes missing_uvi.errors[:uvi], "can't be blank"
+  end
+
+  test "uv aggregates ignore readings that did not include the radiation register" do
+    start = Time.zone.parse("2026-06-01 12:00:00")
+    WeatherMeasurement.create!(valid_attrs(reading_date_time: start, uv: 0))
+    WeatherMeasurement.create!(valid_attrs(reading_date_time: start + 1.minute, uv: nil))
+    WeatherMeasurement.create!(valid_attrs(reading_date_time: start + 2.minutes, uv: 10))
+
+    scoped = WeatherMeasurement.where(reading_date_time: start..(start + 2.minutes))
+    assert_in_delta 5.0, scoped.average(:uv), 0.001
+    assert_equal 10, scoped.maximum(:uv)
+    assert_equal 0, scoped.minimum(:uv)
+  end
+
+  test "converts stored lux back to solar irradiance in W/m²" do
+    lux = 31.19 / WeatherMeasurement::SOLAR_IRRADIANCE_WM2_PER_LUX
+
+    assert_in_delta 31.19, WeatherMeasurement.lux_to_solar_irradiance_wm2(lux), 0.000_001
+    assert_nil WeatherMeasurement.lux_to_solar_irradiance_wm2(nil)
   end
 
   test "broadcast payload includes live sparkline series" do

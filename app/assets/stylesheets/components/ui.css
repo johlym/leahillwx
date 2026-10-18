@@ -65,16 +65,22 @@
 }
 
 @utility ui-section-header {
-  @apply relative flex items-end justify-between gap-4 mt-8 mb-4
-         pb-3 border-b border-slate-900;
+  @apply relative flex items-end justify-between gap-4 mt-8 mb-4 w-full
+         min-w-0 max-w-full pb-3 border-b border-slate-900;
+}
+
+@utility ui-section-header-page {
+  /* Page titles size from this box (cqi), not the viewport. */
+  container-type: inline-size;
 }
 
 @utility ui-section-header-text {
-  @apply min-w-0;
+  @apply min-w-0 max-w-full;
 }
 
 @utility ui-section-header-title {
-  @apply font-heading uppercase tracking-wider text-lg font-bold text-white;
+  @apply font-heading uppercase tracking-wider text-lg font-bold text-white
+         max-w-full min-w-0 break-words;
 
   & > i {
     @apply mr-[0.35rem] text-sky-400;
@@ -82,7 +88,7 @@
 }
 
 @utility ui-section-header-subtitle {
-  @apply mt-1 text-xs text-slate-500;
+  @apply mt-1 max-w-full break-words text-xs text-slate-500;
 }
 
 @utility ui-section-header-actions {
@@ -181,6 +187,10 @@
     outline: none;
     @apply border-sky-500;
   }
+
+  &:focus-visible {
+    @apply outline-2 outline-offset-2 outline-sky-400 border-sky-500;
+  }
 }
 
 @utility ui-chart {
@@ -210,7 +220,22 @@
 }
 
 @utility ui-chart-frame-sized {
-  height: var(--chart-height);
+  height: min(var(--chart-height), 16rem);
+
+  @media (min-width: 40rem) {
+    height: var(--chart-height);
+  }
+}
+
+@utility table-scroll {
+  @apply overflow-x-auto;
+  -webkit-overflow-scrolling: touch;
+  background:
+    linear-gradient(to right, rgb(2 6 23), rgb(2 6 23)) left / 1.25rem 100% no-repeat,
+    linear-gradient(to left, rgb(2 6 23), rgb(2 6 23)) right / 1.25rem 100% no-repeat,
+    linear-gradient(to right, rgb(15 23 42 / 0.85), transparent) left / 0.75rem 100% no-repeat,
+    linear-gradient(to left, rgb(15 23 42 / 0.85), transparent) right / 0.75rem 100% no-repeat;
+  background-attachment: local, local, scroll, scroll;
 }
 
 @utility ui-card-grid {

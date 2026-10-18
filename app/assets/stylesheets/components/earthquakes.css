@@ -2,6 +2,11 @@
 
 @utility earthquake-table-container {
   @apply w-full overflow-x-auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@utility earthquake-empty {
+  @apply text-slate-400 text-sm py-4 m-0;
 }
 
 @utility earthquake-table {
@@ -90,7 +95,7 @@
 }
 
 @utility usgs-logo {
-  @apply flex items-center justify-end py-2 gap-2 text-slate-600 text-[10px] mt-2;
+  @apply flex items-center justify-end py-2 gap-2 text-slate-400 text-[10px] mt-2;
 
   & img {
     filter: brightness(0.9) contrast(1.05);

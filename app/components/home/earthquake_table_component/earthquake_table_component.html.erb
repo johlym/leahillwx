@@ -1,40 +1,44 @@
-<div class="earthquake-table-container">
-  <table class="earthquake-table">
-    <thead>
-      <tr class="eq-header">
-        <th class="eq-header-cell mag-header">Magnitude</th>
-        <th class="eq-header-cell timestamp-header">Timestamp</th>
-        <th class="eq-header-cell location-header">Location</th>
-        <th class="eq-header-cell distance-header">Distance</th>
-        <th class="eq-header-cell depth-header">Depth</th>
-      </tr>
-    </thead>
-    <tbody class="eq-body">
-      <% @earthquakes.each do |earthquake| %>
-        <tr class="eq-row mag-<%= earthquake.magnitude.to_i %>" data-usgs-id="<%= earthquake.usgs_id %>">
-          <td class="eq-cell eq-mag-cell">
-            <span class="mag">
-              <%= number_with_precision(earthquake.magnitude, precision: 1) %>
-            </span>
-            <% if earthquake.revised %>
-              <span class="revised-tag ml-1">REV</span>
-            <% end %>
-          </td>
-          <td class="eq-cell eq-timestamp-cell">
-            <% time = earthquake.last_updated || earthquake.eventtime %>
-            <%= time.in_time_zone("America/Los_Angeles").strftime("%b %d, %Y @ %I:%M %p") %>
-          </td>
-          <td class="eq-cell eq-location-cell">
-            <%= link_to earthquake.place, earthquake.url, target: :blank %>
-          </td>
-          <td class="eq-cell eq-distance-cell">
-            <%= number_with_precision(earthquake.distance, precision: 2) %> mi
-          </td>
-          <td class="eq-cell eq-depth-cell">
-            <%= number_with_precision(earthquake.depth, precision: 2) %> mi
-          </td>
+<% if @earthquakes.blank? %>
+  <p class="earthquake-empty">No recent earthquakes near this station.</p>
+<% else %>
+  <div class="earthquake-table-container table-scroll">
+    <table class="earthquake-table">
+      <thead>
+        <tr class="eq-header">
+          <th class="eq-header-cell mag-header">Magnitude</th>
+          <th class="eq-header-cell timestamp-header">Timestamp</th>
+          <th class="eq-header-cell location-header">Location</th>
+          <th class="eq-header-cell distance-header">Distance</th>
+          <th class="eq-header-cell depth-header">Depth</th>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div>
+      </thead>
+      <tbody class="eq-body">
+        <% @earthquakes.each do |earthquake| %>
+          <tr class="eq-row mag-<%= earthquake.magnitude.to_i %>" data-usgs-id="<%= earthquake.usgs_id %>">
+            <td class="eq-cell eq-mag-cell">
+              <span class="mag">
+                <%= number_with_precision(earthquake.magnitude, precision: 1) %>
+              </span>
+              <% if earthquake.revised %>
+                <span class="revised-tag ml-1">REV</span>
+              <% end %>
+            </td>
+            <td class="eq-cell eq-timestamp-cell">
+              <% time = earthquake.last_updated || earthquake.eventtime %>
+              <%= time.in_time_zone("America/Los_Angeles").strftime("%b %d, %Y @ %I:%M %p") %>
+            </td>
+            <td class="eq-cell eq-location-cell">
+              <%= link_to earthquake.place, earthquake.url, target: :blank %>
+            </td>
+            <td class="eq-cell eq-distance-cell">
+              <%= number_with_precision(earthquake.distance, precision: 2) %> mi
+            </td>
+            <td class="eq-cell eq-depth-cell">
+              <%= number_with_precision(earthquake.depth, precision: 2) %> mi
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

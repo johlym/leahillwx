@@ -60,7 +60,8 @@
           },
           "uv": {
             "type": "integer",
-            "description": "UV radiation level (W/m²)"
+            "nullable": true,
+            "description": "Optional UV radiation (µW/m²) from register 0x16. Omit when the station does not send it. This is not the UV index."
           },
           "uvi": {
             "type": "number",
@@ -152,7 +153,6 @@
           "rain_event",
           "rain_rate",
           "temperature",
-          "uv",
           "uvi",
           "wind_dir",
           "wind_speed"

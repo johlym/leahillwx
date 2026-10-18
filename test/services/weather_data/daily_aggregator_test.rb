@@ -105,4 +105,58 @@ class WeatherData::DailyAggregatorTest < ActiveSupport::TestCase
     assert_equal "11:00", entry.high_pressure_time
     assert_equal "12:00", entry.low_pressure_time
   end
+
+  test "daily rain follows the station counter instead of the peak reading" do
+    zone = ActiveSupport::TimeZone["America/Los_Angeles"]
+    date = Date.new(2024, 6, 15)
+    report = Report.create!(year: date.year, month: date.month)
+    report.entries.create!(day: 15, hour: 0, mean_temp: 15.0, rain: 5.842)
+    report.entries.create!(day: 15, hour: 12, mean_temp: 15.0, rain: 5.842)
+
+    create_reading(zone.local(2024, 6, 14, 23, 50, 0), rain_day: 5.842)
+    create_reading(zone.local(2024, 6, 15, 0, 2, 0), rain_day: 5.842)
+    create_reading(zone.local(2024, 6, 15, 0, 8, 0), rain_day: 0.0)
+    create_reading(zone.local(2024, 6, 15, 12, 0, 0), rain_day: 0.0)
+
+    entry = WeatherData::DailyAggregator.new(date).aggregate
+
+    assert_in_delta 0.0, entry.rain, 0.001
+    assert_in_delta 0.0, report.entries.hourly.find_by!(day: 15, hour: 0).reload.rain, 0.001
+    assert_in_delta 0.0, report.entries.hourly.find_by!(day: 15, hour: 12).reload.rain, 0.001
+    assert_in_delta 0.0, report.reload.total_rain, 0.001
+  end
+
+  test "daily rain keeps accumulation after the counter resets" do
+    zone = ActiveSupport::TimeZone["America/Los_Angeles"]
+    date = Date.new(2024, 6, 16)
+
+    create_reading(zone.local(2024, 6, 15, 23, 50, 0), rain_day: 5.842)
+    create_reading(zone.local(2024, 6, 16, 0, 4, 0), rain_day: 0.0)
+    create_reading(zone.local(2024, 6, 16, 8, 0, 0), rain_day: 2.54)
+    create_reading(zone.local(2024, 6, 16, 18, 0, 0), rain_day: 5.08)
+
+    entry = WeatherData::DailyAggregator.new(date).aggregate
+
+    assert_in_delta 5.08, entry.rain, 0.001
+  end
+
+  private
+
+  def create_reading(time, rain_day:)
+    WeatherMeasurement.create!(
+      reading_date_time: time,
+      barometer_abs: 1013.0,
+      barometer_rel: 1013.0,
+      gust_speed: 1.0,
+      humidity: 50,
+      light: 0.0,
+      rain_day: rain_day,
+      rain_rate: 0.0,
+      temperature: 15.0,
+      uv: 0,
+      uvi: 0.0,
+      wind_dir: 180,
+      wind_speed: 1.0
+    )
+  end
 end
