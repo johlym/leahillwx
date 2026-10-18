@@ -72,6 +72,22 @@ class RecordCalculatorTest < ActiveSupport::TestCase
     previous.nil? ? ENV.delete("LOCATION_ELEVATION_FT") : ENV["LOCATION_ELEVATION_FT"] = previous
   end
 
+  test "highest solar stores the light reading in lux" do
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: Time.zone.parse("2024-06-15 13:00:00"),
+      light: 10_000.0
+    ))
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: Time.zone.parse("2024-06-15 14:00:00"),
+      light: 5_000.0,
+      uv: nil
+    ))
+
+    record = RecordCalculator.new(scope: "yearly", year: 2024).calculate_and_save!
+
+    assert_equal 10_000.0, record.highest_solar
+  end
+
   test "calculate_and_save! creates an all_time record" do
     WeatherMeasurement.create!(measurement_attrs(
       reading_date_time: Time.zone.parse("2022-01-01 12:00:00"),

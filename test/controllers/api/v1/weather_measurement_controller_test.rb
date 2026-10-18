@@ -195,6 +195,55 @@ class Api::V1::WeatherMeasurementControllerTest < ActionDispatch::IntegrationTes
     assert_response :no_content
   end
 
+  test "create stores a null uv when the radiation register is omitted" do
+    payload = measurement_payload
+    payload[:weather_measurement].delete(:uv)
+
+    assert_difference("WeatherMeasurement.count", 1) do
+      post api_v1_weather_measurement_url, params: payload, headers: auth_headers, as: :json
+    end
+
+    assert_response :no_content
+    measurement = WeatherMeasurement.order(:id).last
+    assert_nil measurement.uv
+    assert_equal 3.0, measurement.uvi
+  end
+
+  test "create stores an explicit null uv" do
+    assert_difference("WeatherMeasurement.count", 1) do
+      post api_v1_weather_measurement_url,
+           params: measurement_payload(uv: nil),
+           headers: auth_headers,
+           as: :json
+    end
+
+    assert_response :no_content
+    assert_nil WeatherMeasurement.order(:id).last.uv
+  end
+
+  test "create still stores uv when the radiation register is sent" do
+    assert_difference("WeatherMeasurement.count", 1) do
+      post api_v1_weather_measurement_url,
+           params: measurement_payload(uv: 30),
+           headers: auth_headers,
+           as: :json
+    end
+
+    assert_response :no_content
+    assert_equal 30, WeatherMeasurement.order(:id).last.uv
+  end
+
+  test "create rejects a reading without uvi" do
+    payload = measurement_payload
+    payload[:weather_measurement].delete(:uvi)
+
+    assert_no_difference("WeatherMeasurement.count") do
+      post api_v1_weather_measurement_url, params: payload, headers: auth_headers, as: :json
+    end
+
+    assert_response :unprocessable_entity
+  end
+
   test "create ignores legacy heat_index dew_point wind_chill fields" do
     payload = measurement_payload(
       heat_index: 30.0,

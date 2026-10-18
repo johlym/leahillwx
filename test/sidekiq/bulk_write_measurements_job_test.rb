@@ -22,6 +22,22 @@ class BulkWriteMeasurementsJobTest < ActiveSupport::TestCase
     }.merge(overrides)
   end
 
+  test "stores a sent uv and leaves an omitted uv null" do
+    with_uv_at = 2.minutes.ago.change(usec: 0)
+    without_uv_at = Time.current.change(usec: 0)
+    payload = [
+      measurement_hash("uv" => 30, "reading_date_time" => with_uv_at.iso8601),
+      measurement_hash.except("uv").merge("reading_date_time" => without_uv_at.iso8601)
+    ]
+
+    assert_difference("WeatherMeasurement.count", 2) do
+      BulkWriteMeasurementsJob.new.perform(payload)
+    end
+
+    assert_equal 30, WeatherMeasurement.find_by!(reading_date_time: with_uv_at).uv
+    assert_nil WeatherMeasurement.find_by!(reading_date_time: without_uv_at).uv
+  end
+
   test "inserts new measurements by default" do
     payload = [ measurement_hash ]
 
