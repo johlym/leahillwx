@@ -13,8 +13,8 @@ Sentry.init do |config|
   # see https://docs.sentry.io/platforms/ruby/data-management/data-collected/ for more info
   config.send_default_pii = true
 
-  config.enable_logs = true
-  # Metrics are enabled by default (config.enable_metrics).
+  # sentry-ruby 7 enables logs and metrics by default and removes
+  # config.enable_logs / config.enable_metrics.
 
   # Only register Sidekiq-Cron monitors in production — local Sidekiq otherwise
   # creates monitors that miss check-ins whenever the process stops.
