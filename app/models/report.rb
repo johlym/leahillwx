@@ -7,12 +7,17 @@
 #  dominant_wind_dir         :integer
 #  dominant_wind_dir_compass :string
 #  month                     :integer          not null
+#  month_high_pressure       :float
+#  month_high_pressure_day   :integer
 #  month_high_temp           :float
 #  month_high_temp_day       :integer
 #  month_high_wind_day       :integer
 #  month_high_wind_speed     :float
+#  month_low_pressure        :float
+#  month_low_pressure_day    :integer
 #  month_low_temp            :float
 #  month_low_temp_day        :integer
+#  month_mean_pressure       :float
 #  month_mean_temp           :float
 #  total_cool_degree_days    :float
 #  total_heat_degree_days    :float
@@ -75,7 +80,7 @@ class Report < ApplicationRecord
 
   def formatted_temp(temp)
     return "N/A" if temp.nil?
-    format("%.2f", temp)
+    format("%.2f", celsius_to_fahrenheit(temp))
   end
 
   def formatted_degree_days(dd)
@@ -91,5 +96,10 @@ class Report < ApplicationRecord
   def formatted_wind_speed(speed_mps)
     return "N/A" if speed_mps.nil?
     format("%.2f", speed_mps * 2.23694)
+  end
+
+  def formatted_pressure(pressure_hpa)
+    return "N/A" if pressure_hpa.nil?
+    format("%.1f", pressure_hpa)
   end
 end

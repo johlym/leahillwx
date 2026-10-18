@@ -1,5 +1,6 @@
 class ApiController < ApplicationController
   skip_forgery_protection
+
   private
 
   def authenticate
@@ -7,7 +8,10 @@ class ApiController < ApplicationController
     return head(:unauthorized) if api_key.blank?
 
     authenticate_or_request_with_http_token do |token, _options|
-      ActiveSupport::SecurityUtils.secure_compare(token, api_key)
+      ActiveSupport::SecurityUtils.secure_compare(
+        ::Digest::SHA256.hexdigest(token),
+        ::Digest::SHA256.hexdigest(api_key)
+      )
     end
   end
 end

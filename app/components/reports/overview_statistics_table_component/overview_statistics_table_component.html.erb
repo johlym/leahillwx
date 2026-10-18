@@ -1,33 +1,43 @@
 <div class="overview-statistics">
-  <h2><%= type == :monthly ? "Monthly" : "Daily" %> Overview</h2>
-  <div class="stats-table-wrapper">
-    <table class="stats-table">
-      <thead>
-        <tr>
-          <th scope="col">Mean Temp</th>
-          <th scope="col">High Temp</th>
-          <th scope="col">Low Temp</th>
-          <th scope="col">Heat DD</th>
-          <th scope="col">Cool DD</th>
-          <th scope="col">Total Precip</th>
-          <th scope="col">Avg Wind</th>
-          <th scope="col">High Wind</th>
-          <th scope="col">Wind Dir</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><%= number_with_precision(temp_fahrenheit(report.month_mean_temp), precision: 2) %>°F</td>
-          <td><%= number_with_precision(temp_fahrenheit(report.month_high_temp), precision: 2) %>°F<br><span class="stats-day-meta">(Day <%= report.month_high_temp_day || 'N/A' %>)</span></td>
-          <td><%= number_with_precision(temp_fahrenheit(report.month_low_temp), precision: 2) %>°F<br><span class="stats-day-meta">(Day <%= report.month_low_temp_day || 'N/A' %>)</span></td>
-          <td><%= number_with_precision(report.total_heat_degree_days, precision: 2) %></td>
-          <td><%= number_with_precision(report.total_cool_degree_days, precision: 2) %></td>
-          <td><%= number_with_precision(rain_in_inches(report.total_rain), precision: 2) %> in.</td>
-          <td><%= number_with_precision(wind_speed_mph(report.avg_wind_speed), precision: 2) %> mph</td>
-          <td><%= number_with_precision(wind_speed_mph(report.month_high_wind_speed), precision: 2) %> mph<br><span class="stats-day-meta">(Day <%= report.month_high_wind_day || 'N/A' %>)</span></td>
-          <td><%= report.formatted_dominant_wind %> <%= render Elements::WindVaneComponent.new(direction: report.dominant_wind_dir) %></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <h2><%= daily? ? "Daily" : "Monthly" %> Overview</h2>
+  <% if snapshot %>
+    <div class="stats-table-wrapper">
+      <table class="stats-table">
+        <thead>
+          <tr>
+            <th scope="col">Mean Temp</th>
+            <th scope="col">High Temp</th>
+            <th scope="col">Low Temp</th>
+            <th scope="col">Heat DD</th>
+            <th scope="col">Cool DD</th>
+            <th scope="col">Total Precip</th>
+            <th scope="col">Mean Pressure</th>
+            <th scope="col">High Pressure</th>
+            <th scope="col">Low Pressure</th>
+            <th scope="col">Avg Wind</th>
+            <th scope="col">High Wind</th>
+            <th scope="col">Wind Dir</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><%= number_with_precision(temp_fahrenheit(snapshot.mean_temp), precision: 2) %>°F</td>
+            <td><%= number_with_precision(temp_fahrenheit(snapshot.high_temp), precision: 2) %>°F<br><span class="stats-day-meta"><%= snapshot.high_meta %></span></td>
+            <td><%= number_with_precision(temp_fahrenheit(snapshot.low_temp), precision: 2) %>°F<br><span class="stats-day-meta"><%= snapshot.low_meta %></span></td>
+            <td><%= number_with_precision(snapshot.heat_dd, precision: 2) %></td>
+            <td><%= number_with_precision(snapshot.cool_dd, precision: 2) %></td>
+            <td><%= number_with_precision(rain_in_inches(snapshot.rain), precision: 2) %> in.</td>
+            <td><%= number_with_precision(snapshot.mean_pressure, precision: 1) %> hPa</td>
+            <td><%= number_with_precision(snapshot.high_pressure, precision: 1) %> hPa<br><span class="stats-day-meta"><%= snapshot.high_pressure_meta %></span></td>
+            <td><%= number_with_precision(snapshot.low_pressure, precision: 1) %> hPa<br><span class="stats-day-meta"><%= snapshot.low_pressure_meta %></span></td>
+            <td><%= number_with_precision(wind_speed_mph(snapshot.avg_wind), precision: 2) %> mph</td>
+            <td><%= number_with_precision(wind_speed_mph(snapshot.high_wind), precision: 2) %> mph<br><span class="stats-day-meta"><%= snapshot.high_wind_meta %></span></td>
+            <td><%= snapshot.wind_label %> <%= render Elements::WindVaneComponent.new(direction: snapshot.wind_degrees) %></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p class="report-empty">No data available for this day.</p>
+  <% end %>
 </div>

@@ -54,7 +54,7 @@ module ThirdPartyWeather
       assert_equal 65, params[:hum]
       assert_equal 20, params[:wspd]
       assert_equal 40, params[:wspdhi]
-      assert_equal 10150, params[:bar]
+      assert_equal 10132, params[:bar]
     end
 
     test "throttles repeated sends within ten minutes" do

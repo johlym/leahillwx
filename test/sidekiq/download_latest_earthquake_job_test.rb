@@ -57,13 +57,15 @@ class DownloadLatestEarthquakeJobTest < ActiveSupport::TestCase
 
   test "assigns distance computed from ENV location and event coordinates" do
     response = sample_api_response(usgs_id: "us7000dist")
-    with_env("LOCATION_LAT" => "36", "LOCATION_LON" => "-120") do
+    with_env("LOCATION_LAT" => "47.307", "LOCATION_LON" => "-122.228") do
       stub_api(response) { DownloadLatestEarthquakeJob.new.perform }
     end
 
     earthquake = Earthquake.find_by!(usgs_id: "us7000dist")
-    expected = GeoDistance.distance(35.0, -119.0, 36, -120, unit: :mi)
+    truncated = GeoDistance.distance(35.0, -119.0, 47, -122, unit: :mi)
+    expected = GeoDistance.distance(35.0, -119.0, 47.307, -122.228, unit: :mi)
     assert_in_delta expected, earthquake.distance, 0.0001
+    assert_operator (earthquake.distance - truncated).abs, :>, 1.0
   end
 
   test "marks an existing earthquake as revised and updates attributes" do

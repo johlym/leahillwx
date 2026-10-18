@@ -44,7 +44,7 @@ module Almanac
       civil_dawn = @horizon.civil_dawn(day_end, next_day_end) || day_end + 6.hours
 
       planets = BspPositions::NAKED_EYE_PLANETS.map do |body|
-        build_planet(body, day_start, next_day_end, civil_dusk, civil_dawn)
+        build_planet(body, day_start, next_day_end, civil_dusk, civil_dawn, date)
       end
 
       {
@@ -76,13 +76,17 @@ module Almanac
       PlanetNight.find_by!(date: payload[:date])
     end
 
-    def build_planet(body, window_start, window_end, civil_dusk, civil_dawn)
-      rise_at = @horizon.rise(body, window_start, window_end)
-      set_at = @horizon.set(body, window_start, window_end)
-      transit_at = @horizon.transit(body, window_start, window_end)
+    def build_planet(body, window_start, window_end, civil_dusk, civil_dawn, date)
+      interval = night_interval(body, window_start, window_end, civil_dusk, civil_dawn, date)
+      rise_at = interval && interval[0]
+      set_at = interval && interval[1]
+      visible = interval.present?
+
+      transit_window_start = rise_at || civil_dusk
+      transit_window_end = set_at || civil_dawn
+      transit_at = @horizon.transit(body, transit_window_start, transit_window_end)
 
       samples = sample_path(body, rise_at, set_at)
-      visible = visible_during_civil_night?(rise_at, set_at, civil_dusk, civil_dawn)
       direction_az = direction_azimuth(body, rise_at, set_at, transit_at, civil_dusk)
 
       {
@@ -96,6 +100,46 @@ module Almanac
         "visible_tonight" => visible,
         "samples" => samples
       }
+    end
+
+    # Pair every rise with the following set, then pick the apparition that
+    # overlaps civil night. Taking the first rise and first set independently
+    # from local midnight treats last night's set and tonight's rise as one
+    # interval, so morning planets and already-up outer planets never qualify.
+    def night_interval(body, window_start, window_end, civil_dusk, civil_dawn, date)
+      crossings = @horizon.horizon_crossings(body, window_start, window_end)
+      up_at_start = altitude_at(body, window_start) >= 0.0
+      above_horizon_intervals(crossings, up_at_start, window_start, window_end).find do |rise_at, set_at|
+        visible_during_civil_night?(rise_at, set_at, civil_dusk, civil_dawn) &&
+          rise_on_card_date?(rise_at, date)
+      end
+    end
+
+    # "Tonight" is this calendar evening. A predawn rise tomorrow is the
+    # next card's planet, even though it still overlaps civil night.
+    def rise_on_card_date?(rise_at, date)
+      rise_at.in_time_zone(@timezone).to_date <= date
+    end
+
+    def above_horizon_intervals(crossings, up_at_start, window_start, window_end)
+      intervals = []
+      current_start = up_at_start ? window_start : nil
+
+      crossings.each do |crossing|
+        if crossing[:direction] == :rising
+          current_start = crossing[:time]
+        elsif crossing[:direction] == :setting && current_start
+          intervals << [ current_start, crossing[:time] ]
+          current_start = nil
+        end
+      end
+
+      intervals << [ current_start, window_end ] if current_start
+      intervals
+    end
+
+    def altitude_at(body, time)
+      @bsp.position_for(body, datetime_to_julian_date(time))[:altitude]
     end
 
     def sample_path(body, rise_at, set_at)

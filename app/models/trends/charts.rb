@@ -19,6 +19,10 @@ module Trends
       yoy_chart(yoy_series, :wind_peak, " mph", "Peak wind (mph)", 1)
     end
 
+    def yoy_pressure_chart
+      yoy_chart(yoy_series, :pressure_mean, " hPa", "Mean pressure (hPa)", 1)
+    end
+
     def rolling_temp_chart
       rolling = rolling_series
       {
@@ -38,6 +42,32 @@ module Trends
         options: {
           yUnit: "°F",
           yLabel: "Rolling mean (°F)",
+          decimals: 1
+        }
+      }
+    end
+
+    def rolling_pressure_chart
+      rolling = rolling_series
+      return nil if rolling[:pressures].blank?
+
+      {
+        type: "line",
+        data: {
+          labels: rolling[:labels],
+          datasets: rolling[:pressures].map do |series|
+            {
+              label: series[:label],
+              data: series[:data],
+              borderWidth: 2,
+              tension: 0.3,
+              dashed: series[:window] == 30
+            }
+          end
+        },
+        options: {
+          yUnit: " hPa",
+          yLabel: "Rolling mean (hPa)",
           decimals: 1
         }
       }

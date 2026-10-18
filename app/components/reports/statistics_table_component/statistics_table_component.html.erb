@@ -1,6 +1,6 @@
 <div class="<%= daily? ? 'daily-data' : 'hourly-data' %>">
   <h2>Statistics by <%= daily? ? 'Day' : 'Hour' %></h2>
-  <p class="subtitle">Temperature (°F), Rain (in), Wind Speed (mph)</p>
+  <p class="subtitle">Temperature (°F), Rain (in), Wind Speed (mph), Pressure (hPa)</p>
   <div class="partial-day-note">
     <%= partial_note.html_safe %>
   </div>
@@ -15,6 +15,9 @@
           <th scope="col">Heat° Days</th>
           <th scope="col">Cool° Days</th>
           <th scope="col">Rain</th>
+          <th scope="col">Mean<br />Pressure</th>
+          <th scope="col">High<br />Pressure</th>
+          <th scope="col">Low<br />Pressure</th>
           <th scope="col">Avg<br />Wind Speed</th>
           <th scope="col">High<br />Wind Speed</th>
           <th scope="col">Dom.<br />Wind Dir.</th>
@@ -37,9 +40,9 @@
             </td>
             <% if !row.has_data? %>
               <% if row.is_current %>
-                <td colspan="9" class="no-data">current <%= daily? ? 'day' : 'hour' %></td>
+                <td colspan="12" class="no-data">current <%= daily? ? 'day' : 'hour' %></td>
               <% else %>
-                <td colspan="9" class="no-data">N/A</td>
+                <td colspan="12" class="no-data">N/A</td>
               <% end %>
             <% else %>
               <td class="<%= 'report-cell-peak' if row.is_max_mean_temp %>"><%= number_with_precision(temp_fahrenheit(row.entry.mean_temp), precision: 2) %>°F</td>
@@ -48,6 +51,9 @@
               <td class="<%= 'report-cell-peak' if row.is_max_heat_dd %>"><%= number_with_precision(row.entry.heat_degree_days, precision: 2) %>°F</td>
               <td class="<%= 'report-cell-peak' if row.is_max_cool_dd %>"><%= number_with_precision(row.entry.cool_degree_days, precision: 2) %>°F</td>
               <td class="<%= 'report-cell-peak' if row.is_max_rain %>"><%= number_with_precision(rain_in_inches(row.entry.rain), precision: 2) %> in.</td>
+              <td class="<%= 'report-cell-peak' if row.is_max_mean_pressure %>"><%= number_with_precision(row.entry.mean_pressure, precision: 1) %> hPa</td>
+              <td class="<%= 'report-cell-peak' if row.is_max_high_pressure %>"><%= number_with_precision(row.entry.high_pressure, precision: 1) %> hPa @ <%= row.entry.high_pressure_time || 'N/A' %></td>
+              <td class="<%= 'report-cell-peak' if row.is_max_low_pressure %>"><%= number_with_precision(row.entry.low_pressure, precision: 1) %> hPa @ <%= row.entry.low_pressure_time || 'N/A' %></td>
               <td class="<%= 'report-cell-peak' if row.is_max_avg_wind %>"><%= number_with_precision(wind_speed_mph(row.entry.avg_wind_speed), precision: 2) %> mph</td>
               <td class="<%= 'report-cell-peak' if row.is_max_high_wind %>"><%= number_with_precision(wind_speed_mph(row.entry.high_wind_speed), precision: 2) %> mph @ <%= row.entry.high_wind_time || 'N/A' %></td>
               <td><%= row.entry.formatted_wind_dir %> <%= render Elements::WindVaneComponent.new(direction: row.entry.wind_dir) %></td>

@@ -17,8 +17,25 @@ class BulkWriteMeasurementsJobTest < ActiveSupport::TestCase
       "wind_dir" => 180,
       "wind_speed" => 1.2,
       "soil" => [],
-      "temp_probes" => []
+      "temp_probes" => [],
+      "temp_humidity" => []
     }.merge(overrides)
+  end
+
+  test "stores a sent uv and leaves an omitted uv null" do
+    with_uv_at = 2.minutes.ago.change(usec: 0)
+    without_uv_at = Time.current.change(usec: 0)
+    payload = [
+      measurement_hash("uv" => 30, "reading_date_time" => with_uv_at.iso8601),
+      measurement_hash.except("uv").merge("reading_date_time" => without_uv_at.iso8601)
+    ]
+
+    assert_difference("WeatherMeasurement.count", 2) do
+      BulkWriteMeasurementsJob.new.perform(payload)
+    end
+
+    assert_equal 30, WeatherMeasurement.find_by!(reading_date_time: with_uv_at).uv
+    assert_nil WeatherMeasurement.find_by!(reading_date_time: without_uv_at).uv
   end
 
   test "inserts new measurements by default" do
@@ -44,6 +61,23 @@ class BulkWriteMeasurementsJobTest < ActiveSupport::TestCase
     measurement = WeatherMeasurement.order(:id).last
     assert_equal [ { "channel" => 1, "moisture" => 78.0, "battery" => 1.6 } ], measurement.soil
     assert_equal [ { "channel" => 2, "temperature" => 10.0, "battery" => 1.55 } ], measurement.temp_probes
+  end
+
+  test "persists temp_humidity on bulk insert" do
+    payload = [
+      measurement_hash(
+        "temp_humidity" => [ { "channel" => 1, "temperature" => 27.6, "humidity" => 40, "battery_low" => false } ]
+      )
+    ]
+
+    assert_difference("WeatherMeasurement.count", 1) do
+      BulkWriteMeasurementsJob.new.perform(payload)
+    end
+
+    measurement = WeatherMeasurement.order(:id).last
+    assert_equal [
+      { "channel" => 1, "temperature" => 27.6, "humidity" => 40, "battery_low" => false }
+    ], measurement.temp_humidity
   end
 
   test "skips duplicate timestamps by default" do
@@ -103,5 +137,18 @@ class BulkWriteMeasurementsJobTest < ActiveSupport::TestCase
     assert_equal "db down", error.message
   ensure
     WeatherMeasurement.define_singleton_method(:insert_all!, original) if original
+  end
+
+  test "skips invalid measurements instead of inserting them" do
+    payload = [
+      measurement_hash("humidity" => 250, "reading_date_time" => 1.minute.ago.change(usec: 0).iso8601),
+      measurement_hash("humidity" => 55, "reading_date_time" => Time.current.change(usec: 0).iso8601)
+    ]
+
+    assert_difference("WeatherMeasurement.count", 1) do
+      BulkWriteMeasurementsJob.new.perform(payload)
+    end
+
+    assert_equal 55, WeatherMeasurement.order(:id).last.humidity
   end
 end

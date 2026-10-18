@@ -24,8 +24,8 @@ Composite tiles come from `LIBREWXR_API_BASE` (default `https://api.librewxr.net
 - **Snow colors:** always on (`smooth_snow = 1_1`, per-pixel rain/snow)
 - **Regional NWP:** server-side in LibreWXR (HRRR over CONUS, etc.) — no client work beyond attribution
 - **Color scheme:** LibreWXR scheme `6` (NEXRAD Level III) for composite tiles
-- **Performance:** only the active radar frame is mounted. First load freezes on the newest frame until it paints, then plays oldest → newest. Advances keep the previous frame up until the next one loads (no empty flashes; no opacity-0 layer stacking).
-- **Load progress:** a quarter-height bar above the playback controls tracks user-facing loads (initial composite, site, tilt) and hides once the requested frame set is painted. Site/tilt progress follows Level III frame downloads; composite progress follows viewport tile loads for the active frame. Quiet metadata refreshes do not show it.
+- **Performance:** only the active radar frame is mounted. First load (and other user-facing composite loads) cache every frame’s viewport tiles before mounting radar, then paint the newest frame and play oldest → newest. Advances keep the previous frame up until the next one loads (no empty flashes; no opacity-0 layer stacking).
+- **Load progress:** a bar above the playback controls stays visible for the whole user-facing load (initial composite, site, tilt) and hides once the requested frame set is ready to play. Site/tilt progress follows Level III frame downloads; composite progress follows viewport tile prefetch for every frame, then the first paint. Quiet metadata refreshes do not show it.
 
 Weather alerts come from LibreWXR (NWS/WMO CAP near the station), merged with any
 active OpenWeather alerts. The homepage shows a compact bar (indicator, title,
@@ -50,7 +50,7 @@ Single-site Level III uses a client-side NWS-style reflectivity palette (−30 �
 - **LibreWXR precip:** past frames from `/public/weather-maps.json`, plus nowcast when present. Metadata refreshes every ~3 minutes.
 - **Single site:** Unidata Level III objects from `https://unidata-nexrad-level3.s3.amazonaws.com` (`{SECTOR}_{PRODUCT}_{YYYY}_{MM}_{DD}_{HH}_{MI}_{SS}`), decoded in-browser and drawn as Leaflet image overlays (**1800×1800** on desktop, **900×900** on coarse/narrow viewports). Tilt selector (site-only): `0.5°` → `N0B`, `1.0°` → `NAB` (~0.9°), `1.5°` → `N1B`. Level III data loads on demand when a site is selected (or when a non-default tilt is chosen for that site) — not on initial composite load.
 
-Playback controls: play/pause + timestamp (Pacific time). Past frames are prefixed with `Past ·`; nowcast frames with `Future ·`. Default is autoplay.
+Playback controls: play/pause + timestamp (Pacific time). Past frames are prefixed with `Past ·`; nowcast frames with `Future ·`. Default is autoplay once every frame’s viewport tiles are cached.
 
 ### Memory / zoom notes
 
@@ -84,19 +84,20 @@ The map opens at **zoom 7** centered on `LOCATION_LAT` / `LOCATION_LON` (require
 | Stimulus controller | `app/javascript/controllers/radar_controller.js` |
 | Frame helpers | `app/javascript/controllers/helpers/radar_layers.js` |
 
-Leaflet JS comes from the `leaflet` npm package (bundled by esbuild). Leaflet CSS is vendored at `app/assets/stylesheets/vendor/leaflet.css`.
+Leaflet JS comes from the `leaflet` npm package (bundled by esbuild). MapLibre GL (`maplibre-gl` + `@maplibre/maplibre-gl-leaflet`) powers the CARTO vector basemap under Leaflet. Leaflet / MapLibre CSS are vendored at `app/assets/stylesheets/vendor/`.
 
 ### Basemap notes
 
-- Primary basemap: CARTO Dark Matter via the **apex** host `basemaps.cartocdn.com` (letter subdomains like `a.basemaps.cartocdn.com` fail to resolve in some environments).
-- If CARTO tiles error repeatedly, the controller falls back once to Esri World Dark Gray.
-- Leaflet’s default `mix-blend-mode: plus-lighter` on tiles is overridden on this page so dark basemaps stay visible against the site palette.
+- Primary basemap: **CARTO Dark Matter vector** via MapLibre GL (`dark-matter-gl-style`), mounted under Leaflet with `@maplibre/maplibre-gl-leaflet` so radar overlays stay Leaflet tile/image layers.
+- Set `CARTO_API_KEY` (free from [carto.com/basemaps/apikey](https://carto.com/basemaps/apikey/)) so the style URL includes `?key=…`. Vector is not watermarked today without a key, but CARTO recommends attaching one (and may require it later). The key is passed into the page as a Stimulus value (client-side by design; bind it to your site domain when requesting).
+- If the vector basemap errors repeatedly (or MapLibre fails to init), the controller falls back once to Esri World Dark Gray raster tiles.
+- Leaflet’s default `mix-blend-mode: plus-lighter` on raster tiles is overridden on this page; the MapLibre canvas basemap does not use that blend mode.
 
 ## Local development
 
 ```bash
 # Env
-cp env.sample .env   # set LOCATION_LAT / LOCATION_LON
+cp env.sample .env   # set LOCATION_LAT / LOCATION_LON / CARTO_API_KEY
 # optional: LIBREWXR_API_BASE=https://api.librewxr.net
 
 # Assets

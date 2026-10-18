@@ -2,26 +2,31 @@
 #
 # Table name: report_entries
 #
-#  id               :bigint           not null, primary key
-#  avg_wind_speed   :float
-#  cool_degree_days :float
-#  day              :integer          not null
-#  heat_degree_days :float
-#  high_temp        :float
-#  high_temp_time   :string
-#  high_wind_speed  :float
-#  high_wind_time   :string
-#  hour             :integer
-#  low_temp         :float
-#  low_temp_time    :string
-#  mean_temp        :float
-#  partial_period   :boolean          default(FALSE), not null
-#  rain             :float
-#  wind_dir         :integer
-#  wind_dir_compass :string
-#  created_at       :datetime         not null
-#  updated_at       :datetime         not null
-#  report_id        :bigint           not null
+#  id                 :bigint           not null, primary key
+#  avg_wind_speed     :float
+#  cool_degree_days   :float
+#  day                :integer          not null
+#  heat_degree_days   :float
+#  high_pressure      :float
+#  high_pressure_time :string
+#  high_temp          :float
+#  high_temp_time     :string
+#  high_wind_speed    :float
+#  high_wind_time     :string
+#  hour               :integer
+#  low_pressure       :float
+#  low_pressure_time  :string
+#  low_temp           :float
+#  low_temp_time      :string
+#  mean_pressure      :float
+#  mean_temp          :float
+#  partial_period     :boolean          default(FALSE), not null
+#  rain               :float
+#  wind_dir           :integer
+#  wind_dir_compass   :string
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  report_id          :bigint           not null
 #
 # Indexes
 #

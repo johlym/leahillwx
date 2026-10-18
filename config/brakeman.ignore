@@ -1,0 +1,69 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "41c7d61e629e7c5c8f491e0329a39cbe9e134a52f9a5dcb868243022e7d15383",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/services/weather_data/live_card_hourly_ranges.rb",
+      "line": 134,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql(\"AVG(#{SeaLevelPressure.qff_sql})\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "WeatherData::LiveCardHourlyRanges",
+        "method": "weather_buckets"
+      },
+      "user_input": "SeaLevelPressure.qff_sql",
+      "confidence": "Medium",
+      "cwe_id": [89],
+      "note": "qff_sql is a static QFF formula from LOCATION_ELEVATION_FT, not request input."
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "43a28c1c3606491d53834a8694b181d978a40f9788b1957cd7d42ccab2ebcb3f",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/services/weather_data/live_card_hourly_ranges.rb",
+      "line": 135,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql(\"MAX(#{SeaLevelPressure.qff_sql})\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "WeatherData::LiveCardHourlyRanges",
+        "method": "weather_buckets"
+      },
+      "user_input": "SeaLevelPressure.qff_sql",
+      "confidence": "Medium",
+      "cwe_id": [89],
+      "note": "qff_sql is a static QFF formula from LOCATION_ELEVATION_FT, not request input."
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "ac14e479221a5effb7f550be4254003a1354d5468074b4197f27c5e5595b1f6f",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/services/weather_data/live_card_hourly_ranges.rb",
+      "line": 136,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql(\"MIN(#{SeaLevelPressure.qff_sql})\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "WeatherData::LiveCardHourlyRanges",
+        "method": "weather_buckets"
+      },
+      "user_input": "SeaLevelPressure.qff_sql",
+      "confidence": "Medium",
+      "cwe_id": [89],
+      "note": "qff_sql is a static QFF formula from LOCATION_ELEVATION_FT, not request input."
+    }
+  ],
+  "updated": "2026-09-15 18:26:00 +0000",
+  "brakeman_version": "8.0.6"
+}

@@ -25,7 +25,7 @@
     @apply flex justify-between items-center gap-3 text-xs;
   }
   & li > span:first-child {
-    @apply text-slate-500 uppercase tracking-wider text-[10px] font-bold;
+    @apply text-slate-400 uppercase tracking-wider text-[10px] font-bold;
   }
   & li > span:last-child {
     @apply text-white font-heading text-sm font-bold tabular-nums;
@@ -50,7 +50,7 @@
   }
 
   & .table-container {
-    @apply overflow-x-auto bg-slate-900/40 border border-slate-900 rounded-2xl;
+    @apply overflow-x-auto table-scroll bg-slate-900/40 border border-slate-900 rounded-2xl;
   }
 
   & .table-container > table {
@@ -74,7 +74,7 @@
     @apply border-r-0;
   }
   & .table-container > table thead .secondary-header th {
-    @apply text-slate-600 text-[9px] bg-slate-950/40;
+    @apply text-slate-400 text-[9px] bg-slate-950/40;
   }
 
   & .table-container > table tbody tr {
@@ -112,10 +112,10 @@
   }
 
   & .almanac-day-chevron {
-    @apply text-slate-600 font-mono;
+    @apply text-slate-400 font-mono;
   }
 
   & .almanac-cell-meta {
-    @apply text-[10px] text-slate-600;
+    @apply text-[10px] text-slate-400;
   }
 }

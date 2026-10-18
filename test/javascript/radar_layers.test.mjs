@@ -3,7 +3,7 @@ import { describe, it } from "node:test"
 import {
   RIDGE_PRODUCT,
   RIDGE_TILTS,
-  CARTO_DARK_URL,
+  CARTO_DARK_MATTER_STYLE,
   LIBREWXR_COLOR_SCHEME,
   LIBREWXR_DEFAULT_HOST,
   LIBREWXR_OPTIONS_SNOW,
@@ -15,6 +15,8 @@ import {
   boundsForRadius,
   ridgeProductForTilt,
   tileUrlsForViewport,
+  cartoDarkMatterStyleUrl,
+  prefetchImages,
 } from "../../app/javascript/controllers/helpers/radar_layers.js"
 
 describe("ridgeProductForTilt", () => {
@@ -161,9 +163,24 @@ describe("boundsForRadius", () => {
 })
 
 describe("basemap host", () => {
-  it("uses apex CARTO host without letter subdomains", () => {
-    assert.match(CARTO_DARK_URL, /^https:\/\/basemaps\.cartocdn\.com\//)
-    assert.doesNotMatch(CARTO_DARK_URL, /\{s\}/)
+  it("uses CARTO Dark Matter vector style URL", () => {
+    assert.match(
+      CARTO_DARK_MATTER_STYLE,
+      /^https:\/\/basemaps\.cartocdn\.com\/gl\/dark-matter-gl-style\/style\.json$/,
+    )
+  })
+
+  it("appends a CARTO API key query param when provided", () => {
+    assert.equal(cartoDarkMatterStyleUrl(""), CARTO_DARK_MATTER_STYLE)
+    assert.equal(cartoDarkMatterStyleUrl("   "), CARTO_DARK_MATTER_STYLE)
+    assert.equal(
+      cartoDarkMatterStyleUrl("abc123"),
+      `${CARTO_DARK_MATTER_STYLE}?key=abc123`,
+    )
+    assert.equal(
+      cartoDarkMatterStyleUrl("a b/c"),
+      `${CARTO_DARK_MATTER_STYLE}?key=a%20b%2Fc`,
+    )
   })
 })
 
@@ -205,5 +222,40 @@ describe("tileUrlsForViewport", () => {
     assert.ok(urls.includes("https://example.com/5/0/0.png"))
     assert.ok(urls.includes("https://example.com/5/-1/-1.png"))
     assert.ok(urls.every((url) => !url.includes("{r}")))
+  })
+})
+
+describe("prefetchImages", () => {
+  it("reports 0/0 for an empty list", async () => {
+    const events = []
+    await prefetchImages([], { onProgress: (progress) => events.push(progress) })
+    assert.deepEqual(events, [{ completed: 0, total: 0 }])
+  })
+
+  it("dedupes URLs and reports start plus each completion", async () => {
+    const events = []
+    await prefetchImages(
+      ["https://example.com/a.png", "https://example.com/a.png", "https://example.com/b.png"],
+      { concurrency: 1, onProgress: (progress) => events.push({ ...progress }) },
+    )
+
+    assert.deepEqual(events[0], { completed: 0, total: 2 })
+    assert.deepEqual(events.at(-1), { completed: 2, total: 2 })
+    assert.equal(events.length, 3)
+  })
+
+  it("stops requesting more URLs once cancelled", async () => {
+    const events = []
+    await prefetchImages(
+      ["https://example.com/1.png", "https://example.com/2.png", "https://example.com/3.png"],
+      {
+        concurrency: 1,
+        isCancelled: () => events.some((event) => event.completed >= 1),
+        onProgress: (progress) => events.push({ ...progress }),
+      },
+    )
+
+    assert.deepEqual(events[0], { completed: 0, total: 3 })
+    assert.ok(events.at(-1).completed < 3)
   })
 })

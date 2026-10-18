@@ -7,12 +7,17 @@
 #  dominant_wind_dir         :integer
 #  dominant_wind_dir_compass :string
 #  month                     :integer          not null
+#  month_high_pressure       :float
+#  month_high_pressure_day   :integer
 #  month_high_temp           :float
 #  month_high_temp_day       :integer
 #  month_high_wind_day       :integer
 #  month_high_wind_speed     :float
+#  month_low_pressure        :float
+#  month_low_pressure_day    :integer
 #  month_low_temp            :float
 #  month_low_temp_day        :integer
+#  month_mean_pressure       :float
 #  month_mean_temp           :float
 #  total_cool_degree_days    :float
 #  total_heat_degree_days    :float
@@ -80,6 +85,12 @@ class ReportTest < ActiveSupport::TestCase
     report = Report.create!(year: 2024, month: 1)
     found = Report.find_by_month_name(2024, "january")
     assert_equal report.id, found.id
+  end
+
+  test "formatted_temp converts stored celsius to fahrenheit" do
+    report = Report.new(year: 2024, month: 1)
+    assert_equal "50.00", report.formatted_temp(10.0)
+    assert_equal "N/A", report.formatted_temp(nil)
   end
 
   test "should cascade delete entries" do

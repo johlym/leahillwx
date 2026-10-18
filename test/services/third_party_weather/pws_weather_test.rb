@@ -48,6 +48,7 @@ module ThirdPartyWeather
       assert_equal PwsWeather::URL, captured_url
       assert_equal "2026-07-18 12:00:00", captured[:query][:dateutc]
       refute_includes captured[:query][:dateutc], "+"
+      assert_in_delta @measurement.sea_level_pressure_inhg.round(3), captured[:query][:baromin], 0.001
     end
 
     test "swallows transient connection resets without raising" do

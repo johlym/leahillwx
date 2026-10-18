@@ -27,6 +27,9 @@ module Reports
           is_max_rain: entry&.rain == max_values[:rain],
           is_max_avg_wind: entry&.avg_wind_speed == max_values[:avg_wind],
           is_max_high_wind: entry&.high_wind_speed == max_values[:high_wind],
+          is_max_mean_pressure: entry&.mean_pressure == max_values[:mean_pressure],
+          is_max_high_pressure: entry&.high_pressure == max_values[:high_pressure],
+          is_max_low_pressure: entry&.low_pressure == max_values[:low_pressure],
           report: @report
         )
       end.reject(&:is_future)
@@ -91,7 +94,10 @@ module Reports
         cool_dd: entries_with_data.map(&:cool_degree_days).compact.max,
         rain: entries_with_data.map(&:rain).compact.max,
         avg_wind: entries_with_data.map(&:avg_wind_speed).compact.max,
-        high_wind: entries_with_data.map(&:high_wind_speed).compact.max
+        high_wind: entries_with_data.map(&:high_wind_speed).compact.max,
+        mean_pressure: entries_with_data.map(&:mean_pressure).compact.max,
+        high_pressure: entries_with_data.map(&:high_pressure).compact.max,
+        low_pressure: entries_with_data.map(&:low_pressure).compact.min
       }
     end
 
@@ -127,12 +133,16 @@ module Reports
       attr_reader :period, :period_type, :entry, :is_future, :is_current,
                   :is_max_mean_temp, :is_max_high_temp, :is_max_low_temp,
                   :is_max_heat_dd, :is_max_cool_dd, :is_max_rain,
-                  :is_max_avg_wind, :is_max_high_wind, :report
+                  :is_max_avg_wind, :is_max_high_wind,
+                  :is_max_mean_pressure, :is_max_high_pressure, :is_max_low_pressure,
+                  :report
 
       def initialize(period:, period_type:, entry:, is_future:, is_current:,
                      is_max_mean_temp:, is_max_high_temp:, is_max_low_temp:,
                      is_max_heat_dd:, is_max_cool_dd:, is_max_rain:,
-                     is_max_avg_wind:, is_max_high_wind:, report:)
+                     is_max_avg_wind:, is_max_high_wind:,
+                     is_max_mean_pressure:, is_max_high_pressure:, is_max_low_pressure:,
+                     report:)
         @period = period
         @period_type = period_type
         @entry = entry
@@ -146,6 +156,9 @@ module Reports
         @is_max_rain = is_max_rain
         @is_max_avg_wind = is_max_avg_wind
         @is_max_high_wind = is_max_high_wind
+        @is_max_mean_pressure = is_max_mean_pressure
+        @is_max_high_pressure = is_max_high_pressure
+        @is_max_low_pressure = is_max_low_pressure
         @report = report
       end
 

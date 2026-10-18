@@ -8,7 +8,7 @@ class RootController < ApplicationController
     forecast_record = Forecast.latest
 
     if forecast_record.nil? || forecast_record.created_at < 1.hour.ago
-      DownloadOpenWeatherForecastJob.perform_async
+      JobEnqueue.once(DownloadOpenWeatherForecastJob, cooldown: 10.minutes)
     end
 
     @forecast = ForecastParser.new(forecast_record || {}).parse
@@ -17,7 +17,7 @@ class RootController < ApplicationController
     @today_peaks = WeatherData::TodayPeaks.from_hourly_ranges(@hourly_ranges)
     @aqi = Aqi.latest
     if @aqi.nil? || @aqi.stale? || @aqi.source != "airnow"
-      DownloadAirNowAqiJob.perform_async
+      JobEnqueue.once(DownloadAirNowAqiJob, cooldown: 10.minutes)
     end
     latest_wildfire = WildfireSnapshot.latest
     @wildfire = WildfireSnapshot.latest_active
@@ -39,22 +39,22 @@ class RootController < ApplicationController
     night = PlanetNight.for_date(Time.zone.today)
     return night if night
 
-    GeneratePlanetNightJob.perform_async(Time.zone.today.iso8601)
+    JobEnqueue.once(GeneratePlanetNightJob, Time.zone.today.iso8601, cooldown: 30.minutes)
     nil
   end
 
   def enqueue_sky_hazard_refreshes(latest_wildfire)
     if latest_wildfire.nil? || latest_wildfire.fetched_at < 30.minutes.ago
-      DownloadNearestWildfireJob.perform_async
+      JobEnqueue.once(DownloadNearestWildfireJob, cooldown: 15.minutes)
     end
 
     if @aurora.nil? || @aurora.fetched_at < 15.minutes.ago
-      DownloadAuroraOutlookJob.perform_async
+      JobEnqueue.once(DownloadAuroraOutlookJob, cooldown: 10.minutes)
     end
 
     next_pass = IssPass.next_any
     if next_pass.nil? || next_pass.fetched_at < 6.hours.ago
-      DownloadIssPassesJob.perform_async
+      JobEnqueue.once(DownloadIssPassesJob, cooldown: 1.hour)
     end
   end
 end

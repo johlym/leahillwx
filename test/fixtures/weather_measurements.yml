@@ -14,9 +14,10 @@
 #  rain_rate         :float            not null
 #  reading_date_time :datetime         not null
 #  soil              :jsonb            not null
+#  temp_humidity     :jsonb            not null
 #  temp_probes       :jsonb            not null
 #  temperature       :float            not null
-#  uv                :integer          not null
+#  uv                :integer
 #  uvi               :float            not null
 #  wind_dir          :integer          not null
 #  wind_speed        :float            not null
@@ -25,6 +26,7 @@
 #
 # Indexes
 #
+#  index_weather_measurements_on_barometer_abs      (barometer_abs)
 #  index_weather_measurements_on_barometer_rel      (barometer_rel)
 #  index_weather_measurements_on_gust_speed         (gust_speed)
 #  index_weather_measurements_on_humidity           (humidity)

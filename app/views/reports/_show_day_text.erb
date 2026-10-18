@@ -8,6 +8,9 @@ DAILY STATISTICS:
   Heat Degree Days:     <%= daily_entry.formatted_degree_days(daily_entry.heat_degree_days) %>
   Cool Degree Days:     <%= daily_entry.formatted_degree_days(daily_entry.cool_degree_days) %>
   Total Precipitation:  <%= daily_entry.formatted_rain %> in
+  Mean Pressure:        <%= daily_entry.formatted_pressure(daily_entry.mean_pressure) %> hPa
+  High Pressure:        <%= daily_entry.formatted_pressure(daily_entry.high_pressure) %> hPa @ <%= daily_entry.high_pressure_time || 'N/A' %>
+  Low Pressure:         <%= daily_entry.formatted_pressure(daily_entry.low_pressure) %> hPa @ <%= daily_entry.low_pressure_time || 'N/A' %>
   Avg Wind Speed:       <%= daily_entry.formatted_wind_speed(daily_entry.avg_wind_speed) %> mph
   High Wind Speed:      <%= daily_entry.formatted_wind_speed(daily_entry.high_wind_speed) %> mph @ <%= daily_entry.high_wind_time || 'N/A' %>
   Dominant Wind Dir:    <%= daily_entry.formatted_wind_dir %>
@@ -16,10 +19,10 @@ DAILY STATISTICS:
   No data available for this day.
 <% end %>
 
-                    TEMPERATURE (°F), RAIN (in), WIND SPEED (mph)
+                    TEMPERATURE (°F), RAIN (in), PRESSURE (hPa), WIND SPEED (mph)
 
-                                              HEAT   COOL          AVG
-HOUR  MEAN   HIGH  TIME    LOW  TIME    DEG    DEG   RAIN   WIND   HIGH  TIME    DOM DIR
+                                              HEAT   COOL          MEAN   HIGH   LOW           AVG
+HOUR  MEAN   HIGH  TIME    LOW  TIME    DEG    DEG   RAIN   PRES   PRES   TIME   PRES   TIME   WIND   HIGH  TIME    DOM DIR
 --------------------------------------------------------------------------------------------
 <% hourly_entries = report.entries.select { |e| e.hour.present? && e.day == day }.sort_by(&:hour) -%>
 <% entries_by_hour = hourly_entries.index_by(&:hour) -%>

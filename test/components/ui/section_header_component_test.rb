@@ -22,6 +22,19 @@ class Ui::SectionHeaderComponentTest < ViewComponent::TestCase
     assert_no_selector "div.ui-section-header p"
   end
 
+  test "marks a level-1 header as a page title container" do
+    render_inline(Ui::SectionHeaderComponent.new(title: "Climatological Summary", level: 1))
+
+    assert_selector "div.ui-section-header.ui-section-header-page h1"
+  end
+
+  test "does not mark lower headings as page titles" do
+    render_inline(Ui::SectionHeaderComponent.new(title: "Trends", level: 2))
+
+    assert_selector "div.ui-section-header"
+    assert_no_selector "div.ui-section-header-page"
+  end
+
   test "renders heading at the requested level" do
     render_inline(Ui::SectionHeaderComponent.new(title: "Trends", level: 3))
 

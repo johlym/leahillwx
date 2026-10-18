@@ -78,9 +78,28 @@ class BulkWriteMeasurementsJob
   private
 
   def insert_measurements!(records)
-    WeatherMeasurement.insert_all!(records, unique_by: :reading_date_time)
-  rescue ArgumentError
-    # unique_by requires a unique index; fall back until migration is applied
-    WeatherMeasurement.insert_all!(records)
+    valid_records = validate_records!(records)
+    return if valid_records.empty?
+
+    WeatherMeasurement.insert_all!(valid_records)
+  end
+
+  # insert_all! skips Active Record validations; mirror create-path checks first.
+  def validate_records!(records)
+    valid = []
+    records.each do |attrs|
+      measurement = WeatherMeasurement.new(attrs.except("created_at", "updated_at"))
+      if measurement.valid?
+        row = measurement.attributes.except("id")
+        row["created_at"] = attrs["created_at"] || attrs[:created_at] || Time.current
+        row["updated_at"] = attrs["updated_at"] || attrs[:updated_at] || Time.current
+        valid << row
+      else
+        Rails.logger.warn(
+          "Skipping invalid bulk measurement at #{attrs["reading_date_time"]}: #{measurement.errors.full_messages.join(", ")}"
+        )
+      end
+    end
+    valid
   end
 end

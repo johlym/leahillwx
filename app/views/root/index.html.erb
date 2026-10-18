@@ -1,18 +1,22 @@
 <%= turbo_stream_from "weather_measurements" %>
 
-<%= render Home::CurrentWeather::ConditionsComponent.new(
-  current: @current,
-  almanac: @almanac,
-  today_forecast: @forecast&.days&.first,
-  current_forecast: @forecast&.current,
-  today_peaks: @today_peaks,
-  aqi: @aqi,
-  hourly_ranges: @hourly_ranges,
-  wildfire: @wildfire,
-  aurora: @aurora,
-  planet_night: @planet_night,
-  iss_pass: @iss_pass
-) %>
+<% if @current %>
+  <%= render Home::CurrentWeather::ConditionsComponent.new(
+    current: @current,
+    almanac: @almanac,
+    today_forecast: @forecast&.days&.first,
+    current_forecast: @forecast&.current,
+    today_peaks: @today_peaks,
+    aqi: @aqi,
+    hourly_ranges: @hourly_ranges,
+    wildfire: @wildfire,
+    aurora: @aurora,
+    planet_night: @planet_night,
+    iss_pass: @iss_pass
+  ) %>
+<% else %>
+  <%= render "root/station_offline" %>
+<% end %>
 
 <section class="home-section">
   <div class="home-section-inner">

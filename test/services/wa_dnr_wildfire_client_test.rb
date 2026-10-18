@@ -29,6 +29,7 @@ class WaDnrWildfireClientTest < ActiveSupport::TestCase
     assert_includes captured[:where], "FIRE_OUT_DT IS NULL"
     assert_includes captured[:where], "CONTROL_DT IS NULL"
     assert_includes captured[:where], "FIREEVNT_CLASS_LABEL_NM = 'WF'"
+    assert_includes captured[:outFields], "DSCVR_DT"
   end
 
   test "normalizes live fire features" do
@@ -41,7 +42,8 @@ class WaDnrWildfireClientTest < ActiveSupport::TestCase
             "LAT_COORD" => 47.4,
             "LON_COORD" => -122.1,
             "FIREEVENT_ID" => 99,
-            "FIREEVNT_CLASS_LABEL_NM" => "WF"
+            "FIREEVNT_CLASS_LABEL_NM" => "WF",
+            "DSCVR_DT" => 1_784_962_800_000
           },
           "geometry" => { "x" => -122.1, "y" => 47.4 }
         }
@@ -57,5 +59,6 @@ class WaDnrWildfireClientTest < ActiveSupport::TestCase
     assert_equal "Brown Weiler", fires.first[:name]
     assert_equal 3.0, fires.first[:acres]
     assert_equal "wadnr", fires.first[:source]
+    assert_equal Time.zone.at(1_784_962_800), fires.first[:discovered_at]
   end
 end

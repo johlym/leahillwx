@@ -15,6 +15,7 @@ module WeatherData
     def aggregate
       report = find_or_create_report
       entry = create_or_update_entry(report)
+      sync_hourly_rain(report)
 
       WeatherData::MonthlyStatsCalculator.new(report).calculate
 
@@ -64,6 +65,11 @@ module WeatherData
         high_wind_time: nil,
         wind_dir: nil,
         wind_dir_compass: nil,
+        mean_pressure: nil,
+        high_pressure: nil,
+        high_pressure_time: nil,
+        low_pressure: nil,
+        low_pressure_time: nil,
         partial_period: false
       }
     end
@@ -75,6 +81,8 @@ module WeatherData
       high_measurement = measurements.max_by(&:temperature)
       low_measurement = measurements.min_by(&:temperature)
       gust_measurement = measurements.max_by(&:gust_speed)
+      high_pressure_measurement = measurements.max_by(&:sea_level_pressure_qff)
+      low_pressure_measurement = measurements.min_by(&:sea_level_pressure_qff)
 
       wind_dir_degrees = self.class.calculate_dominant_wind_direction(measurements)
       wind_dir_compass = degrees_to_compass(wind_dir_degrees)
@@ -82,8 +90,12 @@ module WeatherData
       wind_speeds_mps = measurements.map(&:wind_speed)
       avg_wind_speed_mps = wind_speeds_mps.sum / wind_speeds_mps.size
 
-      # rain_day is a cumulative counter that resets at midnight, so use the maximum value
-      total_rain_mm = measurements.maximum(:rain_day) || 0.0
+      pressures = measurements.map(&:sea_level_pressure_qff)
+      mean_pressure = pressures.sum / pressures.size
+
+      # Match the homepage: the station's counter at the last reading, not the
+      # peak. A spike or a pre-reset carryover from yesterday must not stick.
+      total_rain_mm = rain_attribution.total_mm
 
       # Convert mean temp to Fahrenheit for degree day calculations
       mean_temp_f = celsius_to_fahrenheit(mean_temp_c)
@@ -101,8 +113,39 @@ module WeatherData
         high_wind_speed: gust_measurement.gust_speed,
         high_wind_time: format_time(gust_measurement.reading_date_time),
         wind_dir: wind_dir_degrees,
-        wind_dir_compass: wind_dir_compass
+        wind_dir_compass: wind_dir_compass,
+        mean_pressure: mean_pressure,
+        high_pressure: high_pressure_measurement.sea_level_pressure_qff,
+        high_pressure_time: format_time(high_pressure_measurement.reading_date_time),
+        low_pressure: low_pressure_measurement.sea_level_pressure_qff,
+        low_pressure_time: format_time(low_pressure_measurement.reading_date_time)
       }
+    end
+
+    def rain_attribution
+      @rain_attribution ||= WeatherData::RainTotal.attribute(
+        measurements.to_a,
+        baseline: rain_baseline
+      )
+    end
+
+    def rain_baseline
+      start_time = @date.in_time_zone("America/Los_Angeles").beginning_of_day
+      WeatherMeasurement.where(reading_date_time: ...start_time)
+                       .order(reading_date_time: :desc)
+                       .first
+    end
+
+    # Hourly rows for this day were built from whatever the counter did inside
+    # each hour. Recompute them with the full day so a later correction removes
+    # rain that the station's counter no longer claims.
+    def sync_hourly_rain(report)
+      return if measurements.empty?
+
+      amounts = rain_attribution.hourly_mm
+      report.entries.hourly.where(day: @date.day).find_each do |entry|
+        entry.update!(rain: amounts[entry.hour] || 0.0)
+      end
     end
 
     def partial_day?

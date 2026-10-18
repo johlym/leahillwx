@@ -42,3 +42,5 @@
 /.DS_Store
 
 /coverage
+mise.local.toml
+mise.toml

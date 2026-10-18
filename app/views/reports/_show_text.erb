@@ -7,14 +7,17 @@ MONTHLY STATISTICS:
   Heat Degree Days:     <%= report.formatted_degree_days(report.total_heat_degree_days) %>
   Cool Degree Days:     <%= report.formatted_degree_days(report.total_cool_degree_days) %>
   Total Precipitation:  <%= report.formatted_rain(report.total_rain) %> in
+  Mean Pressure:        <%= report.formatted_pressure(report.month_mean_pressure) %> hPa
+  High Pressure:        <%= report.formatted_pressure(report.month_high_pressure) %> hPa (Day <%= report.month_high_pressure_day || 'N/A' %>)
+  Low Pressure:         <%= report.formatted_pressure(report.month_low_pressure) %> hPa (Day <%= report.month_low_pressure_day || 'N/A' %>)
   Avg Wind Speed:       <%= report.formatted_wind_speed(report.avg_wind_speed) %> mph
   High Wind Speed:      <%= report.formatted_wind_speed(report.month_high_wind_speed) %> mph (Day <%= report.month_high_wind_day || 'N/A' %>)
   Dominant Wind Dir:    <%= report.formatted_dominant_wind %>
 
-                    TEMPERATURE (°F), RAIN (in), WIND SPEED (mph)
+                    TEMPERATURE (°F), RAIN (in), PRESSURE (hPa), WIND SPEED (mph)
 
-                                              HEAT   COOL          AVG
-DAY   MEAN   HIGH  TIME    LOW  TIME    DEG    DEG   RAIN   WIND   HIGH  TIME    DOM DIR
+                                              HEAT   COOL          MEAN   HIGH   LOW           AVG
+DAY   MEAN   HIGH  TIME    LOW  TIME    DEG    DEG   RAIN   PRES   PRES   TIME   PRES   TIME   WIND   HIGH  TIME    DOM DIR
 --------------------------------------------------------------------------------------------
 <% entries_by_day = report.entries.select { |e| e.hour.nil? }.index_by(&:day) -%>
 <% (1..report.days_in_month).each do |day| -%>

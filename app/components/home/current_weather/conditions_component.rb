@@ -73,7 +73,7 @@ class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
   end
 
   def current_solar_irradiance
-    @current.uv.round(0)
+    @current.uv&.round(0)
   end
 
   def current_uv_index_category
@@ -119,6 +119,10 @@ class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
 
   def current_dew_point
     @current.dew_point.to_fahrenheit.round(0)
+  end
+
+  def current_barometric_pressure
+    @current.sea_level_pressure_qff.round(0)
   end
 
   def reading_timestamp

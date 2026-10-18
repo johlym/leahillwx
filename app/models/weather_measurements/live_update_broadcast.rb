@@ -57,6 +57,12 @@ module WeatherMeasurements
         barometer_abs_mb: helpers.number_with_precision(
           measurement.barometer_abs, precision: 2, strip_insignificant_zeros: true
         ),
+        barometer_rel_mb: helpers.number_with_precision(
+          measurement.barometer_rel, precision: 2, strip_insignificant_zeros: true
+        ),
+        barometer_msl_mb: helpers.number_with_precision(
+          measurement.sea_level_pressure_qff, precision: 2, strip_insignificant_zeros: true
+        ),
         uv: helpers.number_with_precision(
           measurement.uv, precision: 2, strip_insignificant_zeros: true
         ),

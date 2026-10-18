@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_05_174000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_18_180800) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -191,13 +191,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_05_174000) do
     t.datetime "created_at", null: false
     t.integer "day", null: false
     t.float "heat_degree_days"
+    t.float "high_pressure"
+    t.string "high_pressure_time"
     t.float "high_temp"
     t.string "high_temp_time"
     t.float "high_wind_speed"
     t.string "high_wind_time"
     t.integer "hour"
+    t.float "low_pressure"
+    t.string "low_pressure_time"
     t.float "low_temp"
     t.string "low_temp_time"
+    t.float "mean_pressure"
     t.float "mean_temp"
     t.boolean "partial_period", default: false, null: false
     t.float "rain"
@@ -214,12 +219,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_05_174000) do
     t.integer "dominant_wind_dir"
     t.string "dominant_wind_dir_compass"
     t.integer "month", null: false
+    t.float "month_high_pressure"
+    t.integer "month_high_pressure_day"
     t.float "month_high_temp"
     t.integer "month_high_temp_day"
     t.integer "month_high_wind_day"
     t.float "month_high_wind_speed"
+    t.float "month_low_pressure"
+    t.integer "month_low_pressure_day"
     t.float "month_low_temp"
     t.integer "month_low_temp_day"
+    t.float "month_mean_pressure"
     t.float "month_mean_temp"
     t.float "total_cool_degree_days"
     t.float "total_heat_degree_days"
@@ -240,13 +250,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_05_174000) do
     t.float "rain_rate", null: false
     t.datetime "reading_date_time", null: false
     t.jsonb "soil", default: [], null: false
+    t.jsonb "temp_humidity", default: [], null: false
     t.jsonb "temp_probes", default: [], null: false
     t.float "temperature", null: false
     t.datetime "updated_at", null: false
-    t.integer "uv", null: false
+    t.integer "uv"
     t.float "uvi", null: false
     t.integer "wind_dir", null: false
     t.float "wind_speed", null: false
+    t.index ["barometer_abs"], name: "index_weather_measurements_on_barometer_abs"
     t.index ["barometer_rel"], name: "index_weather_measurements_on_barometer_rel"
     t.index ["gust_speed"], name: "index_weather_measurements_on_gust_speed"
     t.index ["humidity"], name: "index_weather_measurements_on_humidity"

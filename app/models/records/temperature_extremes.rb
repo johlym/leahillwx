@@ -27,53 +27,58 @@ module Records
     end
 
     def apparent_temp_extremes
-      highest_apparent = @measurements
-        .select(:temperature, :humidity, :wind_speed, :reading_date_time)
-        .order(Arel.sql("temperature - ((100 - humidity) / 5.0)"))
-        .reverse_order
-        .limit(1)
-        .first
-      if highest_apparent
-        @record.highest_apparent_temp = highest_apparent.feels_like
-        @record.highest_apparent_temp_at = highest_apparent.reading_date_time
+      # Rank by the same feels_like value we store (not the dew-point proxy).
+      # Pre-narrow with temperature order so all-time scans stay bounded.
+      highest = extreme_by_feels_like(
+        @measurements.select(:temperature, :humidity, :wind_speed, :reading_date_time)
+                     .order(temperature: :desc).limit(250),
+        :max
+      )
+      if highest
+        @record.highest_apparent_temp = highest.feels_like
+        @record.highest_apparent_temp_at = highest.reading_date_time
       end
 
-      lowest_apparent = @measurements
-        .select(:temperature, :humidity, :wind_speed, :reading_date_time)
-        .order(Arel.sql("temperature - ((100 - humidity) / 5.0)"))
-        .limit(1)
-        .first
-      if lowest_apparent
-        @record.lowest_apparent_temp = lowest_apparent.feels_like
-        @record.lowest_apparent_temp_at = lowest_apparent.reading_date_time
+      lowest = extreme_by_feels_like(
+        @measurements.select(:temperature, :humidity, :wind_speed, :reading_date_time)
+                     .order(temperature: :asc).limit(250),
+        :min
+      )
+      if lowest
+        @record.lowest_apparent_temp = lowest.feels_like
+        @record.lowest_apparent_temp_at = lowest.reading_date_time
       end
     end
 
     def heat_index_and_wind_chill
-      highest_heat_index = @measurements
-        .select(:temperature, :humidity, :wind_speed, :reading_date_time)
-        .where("temperature > 27")
-        .where("humidity >= 40")
-        .order(Arel.sql("temperature - ((100 - humidity) / 5.0)"))
-        .reverse_order
-        .limit(1)
-        .first
+      highest_heat_index = extreme_by_feels_like(
+        @measurements.select(:temperature, :humidity, :wind_speed, :reading_date_time)
+                     .where("temperature > 27")
+                     .where("humidity >= 40"),
+        :max
+      )
       if highest_heat_index
         @record.highest_heat_index = highest_heat_index.feels_like
         @record.highest_heat_index_at = highest_heat_index.reading_date_time
       end
 
-      lowest_wind_chill = @measurements
-        .select(:temperature, :humidity, :wind_speed, :reading_date_time)
-        .where("temperature < 10")
-        .where("wind_speed > 1.34")
-        .order(Arel.sql("temperature - ((100 - humidity) / 5.0)"))
-        .limit(1)
-        .first
+      lowest_wind_chill = extreme_by_feels_like(
+        @measurements.select(:temperature, :humidity, :wind_speed, :reading_date_time)
+                     .where("temperature < 10")
+                     .where("wind_speed > 1.34"),
+        :min
+      )
       if lowest_wind_chill
         @record.lowest_wind_chill = lowest_wind_chill.feels_like
         @record.lowest_wind_chill_at = lowest_wind_chill.reading_date_time
       end
+    end
+
+    def extreme_by_feels_like(relation, direction)
+      candidates = relation.to_a
+      return if candidates.empty?
+
+      direction == :max ? candidates.max_by(&:feels_like) : candidates.min_by(&:feels_like)
     end
 
     def daily_temp_ranges

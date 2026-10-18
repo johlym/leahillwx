@@ -1,15 +1,16 @@
 import { Controller } from "@hotwired/stimulus"
 import L from "leaflet"
+import { maplibreGL } from "@maplibre/maplibre-gl-leaflet"
 import {
   LIBREWXR_DEFAULT_HOST,
   LIBREWXR_OPTIONS_SNOW,
   LIBREWXR_MAX_NATIVE_ZOOM,
   LIBREWXR_METADATA_TTL_MS,
   LIBREWXR_ATTR,
-  CARTO_DARK_URL,
   CARTO_ATTR,
   ESRI_DARK_URL,
   ESRI_ATTR,
+  cartoDarkMatterStyleUrl,
   RIDGE_PRODUCT,
   RIDGE_TILTS,
   librewxrMetadataUrl,
@@ -44,6 +45,7 @@ export default class extends Controller {
     lon: Number,
     sites: { type: Array, default: [] },
     librewxrHost: { type: String, default: LIBREWXR_DEFAULT_HOST },
+    cartoApiKey: { type: String, default: "" },
   }
 
   connect() {
@@ -158,33 +160,54 @@ export default class extends Controller {
   }
 
   addBasemap() {
-    this.basemap = L.tileLayer(CARTO_DARK_URL, {
-      attribution: CARTO_ATTR,
+    const styleUrl = cartoDarkMatterStyleUrl(this.cartoApiKeyValue)
+
+    try {
+      this.basemap = maplibreGL({
+        style: styleUrl,
+        interactive: false,
+      })
+    } catch {
+      this.addEsriBasemapFallback()
+      return
+    }
+
+    this.basemap.addTo(this.map)
+
+    const glMap = this.basemap.getMaplibreMap?.()
+    if (glMap) {
+      glMap.on("error", () => {
+        this.basemapErrors += 1
+        if (this.basemapErrors >= 4 && !this.basemapFallback) {
+          this.addEsriBasemapFallback()
+        }
+      })
+    }
+
+    // Style-source attribution arrives async on MapLibre load; seed Leaflet now
+    // so OSM/CARTO credit is present before (and if) that fires.
+    if (this.map.attributionControl) {
+      this.map.attributionControl.addAttribution(CARTO_ATTR)
+    }
+  }
+
+  addEsriBasemapFallback() {
+    if (this.basemapFallback) return
+    this.basemapFallback = true
+
+    if (this.basemap && this.map?.hasLayer(this.basemap)) {
+      this.map.removeLayer(this.basemap)
+    }
+    this.basemap = null
+
+    L.tileLayer(ESRI_DARK_URL, {
+      attribution: ESRI_ATTR,
       maxZoom: this.mapMaxZoom,
       keepBuffer: 1,
       updateWhenIdle: true,
       updateWhenZooming: false,
       crossOrigin: true,
-    })
-
-    this.basemap.on("tileerror", () => {
-      this.basemapErrors += 1
-      // After a handful of failures, swap to Esri dark gray once.
-      if (this.basemapErrors >= 4 && !this.basemapFallback) {
-        this.basemapFallback = true
-        if (this.map.hasLayer(this.basemap)) this.map.removeLayer(this.basemap)
-        L.tileLayer(ESRI_DARK_URL, {
-          attribution: ESRI_ATTR,
-          maxZoom: this.mapMaxZoom,
-          keepBuffer: 1,
-          updateWhenIdle: true,
-          updateWhenZooming: false,
-          crossOrigin: true,
-        }).addTo(this.map)
-      }
-    })
-
-    this.basemap.addTo(this.map)
+    }).addTo(this.map)
   }
 
   async bootstrap() {
@@ -459,8 +482,10 @@ export default class extends Controller {
 
   /**
    * Apply a loaded frame set.
-   * Initial loads: freeze on the newest frame until its tiles are ready, then
+   * User-facing loads: cache every composite frame's viewport tiles (progress
+   * bar stays visible) before mounting radar, then paint the newest frame and
    * animate oldest → newest (wrapping from newest to oldest on the first tick).
+   * Level III frames are already decoded before this runs.
    * Frame advances keep the previous layer up until the next one has loaded so
    * we never flash an empty radar pane.
    * Quiet refreshes: preserve playback index and resume after the new layer paints.
@@ -480,7 +505,6 @@ export default class extends Controller {
     // Invalidate any in-flight reveal; must clear revealingFrame or playback
     // stays stuck after a mode swap (and play/pause cannot recover).
     this.cancelPendingFrameReveal()
-    this.warmingFrames = false
     // Capture before replacing this.frames (quiet refresh keeps old list until now).
     const anchorFrame = preserve ? this.frames[this.frameIndex] : null
     const nextLayers = frames.map((frame) => this.createFrameLayer(frame))
@@ -491,21 +515,46 @@ export default class extends Controller {
     this.frameIndex = preserve
       ? resolvePreservedFrameIndex(frames, anchorFrame)
       : frames.length - 1
+
+    // Hold the overlay and timer until the loop is cached so the first play
+    // does not hitch, and so the progress bar remains the only radar chrome.
+    this.warmingFrames = true
+    const progressToken = this.loadProgressToken
+
+    if (!preserve && mode === "librewxr") {
+      const prefetchFloor = this.loadProgressValue
+      await this.prefetchAllFrameTiles(generation, {
+        onProgress: trackPaintProgress
+          ? ({ completed, total }) => {
+              if (progressToken !== this.loadProgressToken) return
+              if (total <= 0) {
+                this.setLoadProgress(92)
+                return
+              }
+              this.setLoadProgress(prefetchFloor + (92 - prefetchFloor) * (completed / total))
+            }
+          : null,
+      })
+      if (generation !== this.syncGeneration || !this.map) {
+        this.warmingFrames = false
+        this.removeMountedLayers(previousLayers)
+        return
+      }
+    }
+
     this.showFrame(this.frameIndex, { immediate: true })
     this.detachInactiveRadarLayers(this.frameIndex)
 
     // Wait for the mounted frame before tearing down the previous set so quiet
     // refreshes do not blink to the basemap.
-    this.warmingFrames = true
-    const progressToken = this.loadProgressToken
-    const progressFloor = this.loadProgressValue
+    const paintFloor = this.loadProgressValue
     await this.waitForLayerLoad(this.tileLayers[this.frameIndex], 8000, {
       onProgress: trackPaintProgress
         ? ({ loaded, expected }) => {
             if (progressToken !== this.loadProgressToken) return
             const total = Math.max(expected, 1)
             const t = Math.min(1, loaded / total)
-            this.setLoadProgress(progressFloor + (100 - progressFloor) * t)
+            this.setLoadProgress(paintFloor + (100 - paintFloor) * t)
           }
         : null,
     })
@@ -521,11 +570,6 @@ export default class extends Controller {
 
     this.warmingFrames = false
     if (this.playing && !this.zooming) this.startTimer()
-
-    if (!preserve) {
-      // Prefetch the next few frames ahead of the oldest→newest loop.
-      void this.prefetchUpcomingFrames(this.frameIndex, generation, 2)
-    }
   }
 
   flushPendingQuietRefresh() {
@@ -588,6 +632,27 @@ export default class extends Controller {
         const loading = typeof layer.isLoading === "function" ? layer.isLoading() : true
         if (!loading && tileCount > 0) done()
       })
+    })
+  }
+
+  /**
+   * Cache every frame's current-viewport tiles before first paint.
+   * Composite only — Level III overlays are already decoded blobs.
+   */
+  async prefetchAllFrameTiles(generation, { onProgress = null } = {}) {
+    if (!this.map || this.frames.length === 0) {
+      onProgress?.({ completed: 0, total: 0 })
+      return
+    }
+
+    const urls = this.frames.flatMap((frame) => this.viewportUrlsForFrame(frame))
+    await prefetchImages(urls, {
+      // Nothing is mounted yet, so we can pull tiles a bit more eagerly
+      // than the in-playback prefetch (which stays at 4).
+      concurrency: this.limitMemory ? 4 : 8,
+      timeoutMs: 4000,
+      isCancelled: () => generation !== this.syncGeneration || !this.map,
+      onProgress,
     })
   }
 

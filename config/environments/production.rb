@@ -60,6 +60,7 @@ Rails.application.configure do
   config.action_cable.allowed_request_origins = [
     "https://lhwx-e1aba94eba7d.herokuapp.com",
     "https://two.leahillwx.org",
+    "https://lhwx.org",
     /https:\/\/.*\.lhwx\.org/
   ]
 

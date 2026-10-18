@@ -2,7 +2,9 @@
   <%= turbo_frame_tag "weather_alerts_bar", src: alerts_bar_path %>
 
   <nav aria-label="Global" class="site-header-nav">
-    <div class="site-header-brand-wrap" data-controller="connection-status">
+    <div class="site-header-brand-wrap"
+         data-controller="connection-status"
+         data-connection-status-has-reading-value="<%= @current&.reading_date_time.present? || content_for?(:header_meta) %>">
       <a href="/" class="site-header-brand">
         <span class="site-header-logo-tile" aria-hidden="true">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="site-header-logo">
@@ -11,9 +13,12 @@
         </span>
         <span class="site-header-brand-text">
           <span class="site-header-title">Lea Hill Weather</span>
-          <span class="site-header-live-row hidden" data-connection-status-target="badge">
+          <span class="site-header-live-row site-header-live-row-offline"
+                data-connection-status-target="badge"
+                data-status="offline"
+                aria-live="polite">
             <span class="site-header-live-dot" aria-hidden="true"></span>
-            <span class="site-header-live-badge">LIVE</span>
+            <span class="site-header-live-badge" data-connection-status-target="label">OFFLINE</span>
           </span>
         </span>
       </a>
@@ -21,9 +26,13 @@
 
     <div class="site-header-menu-toggle-wrap">
       <button type="button"
+              id="mobile-menu-toggle"
               class="site-header-menu-toggle"
-              data-mobile-menu-target="button" data-action="click->mobile-menu#toggle" aria-expanded="false">
-        <span class="sr-only">Open main menu</span>
+              data-mobile-menu-target="button"
+              data-action="click->mobile-menu#toggle"
+              aria-expanded="false"
+              aria-controls="mobile-menu">
+        <span class="sr-only" data-mobile-menu-target="label">Open main menu</span>
         <span data-mobile-menu-target="openIcon">
           <i class="fa-regular fa-bars" aria-hidden="true"></i>
         </span>
@@ -51,7 +60,7 @@
         <% else %>
           <span class="site-header-meta-label">Last Updated</span>
           <span class="site-header-meta-value" data-weather-update-target="timestamp">
-            <%= @current.reading_date_time.in_time_zone("America/Los_Angeles").strftime("%b %-d, %Y @ %-I:%M %p") %>
+            <%= @current&.reading_date_time&.in_time_zone("America/Los_Angeles")&.strftime("%b %-d, %Y @ %-I:%M %p") %>
           </span>
         <% end %>
       </div>
@@ -60,7 +69,9 @@
 
   <div id="mobile-menu"
        class="site-header-mobile-menu hidden"
-       data-mobile-menu-target="menu">
+       data-mobile-menu-target="menu"
+       role="navigation"
+       aria-labelledby="mobile-menu-toggle">
     <div class="site-header-mobile-links">
       <% [
            ["Live",    root_path],

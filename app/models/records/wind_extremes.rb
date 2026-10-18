@@ -22,8 +22,8 @@ module Records
 
     def highest_wind_run
       highest_run = @measurements
-        .select("DATE(reading_date_time) as date, SUM(wind_speed * 2.23694 / 60.0 * 5) as wind_run_miles")
-        .group("DATE(reading_date_time)")
+        .select("(reading_date_time AT TIME ZONE 'America/Los_Angeles')::date as date, SUM(wind_speed * 2.23694 / 60.0 * 5) as wind_run_miles")
+        .group("(reading_date_time AT TIME ZONE 'America/Los_Angeles')::date")
         .order("wind_run_miles DESC")
         .limit(1)
         .first

@@ -74,7 +74,9 @@ export default class extends Controller {
       this.humidityTarget.textContent = this.asInt(data.humidity)
     }
     if (this.hasPressureTarget) {
-      this.pressureTarget.textContent = this.asInt(data.barometer_abs_mb)
+      this.pressureTarget.textContent = this.asInt(
+        data.barometer_msl_mb ?? data.barometer_rel_mb ?? data.barometer_abs_mb
+      )
     }
     if (this.hasUviTarget) {
       this.uviTarget.textContent = this.asInt(data.uvi)
@@ -176,10 +178,11 @@ export default class extends Controller {
     }
 
     return readings.map((reading) => {
-      const name = reading.name || `Ch ${reading.channel}`
+      const name = this.escapeHtml(reading.name || `Ch ${reading.channel}`)
+      const percent = reading.moisture != null ? reading.moisture : reading.humidity
       let valueHtml = `<span class="soil-channel-na">N/A</span>`
-      if (reading.moisture != null) {
-        valueHtml = `<span class="soil-channel-number">${this.asInt(reading.moisture)}</span><span class="soil-channel-unit">%</span>`
+      if (percent != null) {
+        valueHtml = `<span class="soil-channel-number">${this.asInt(percent)}</span><span class="soil-channel-unit">%</span>`
         if (reading.temperature_f != null) {
           valueHtml += `<span class="soil-channel-temp"> / ${this.asInt(reading.temperature_f)}°F</span>`
         }
@@ -189,6 +192,15 @@ export default class extends Controller {
         <span class="soil-channel-value">${valueHtml}</span>
       </div>`
     }).join("")
+  }
+
+  escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#39;")
   }
 
   asInt(value) {

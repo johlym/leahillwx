@@ -36,7 +36,8 @@ class TrendsAnalyzer
         temps: months.map { |m| c_to_f(by_month[m]&.month_mean_temp) },
         rain: months.map { |m| mm_to_in(by_month[m]&.total_rain) },
         wind_peak: months.map { |m| mps_to_mph(by_month[m]&.month_high_wind_speed) },
-        wind_avg: months.map { |m| mps_to_mph(by_month[m]&.avg_wind_speed) }
+        wind_avg: months.map { |m| mps_to_mph(by_month[m]&.avg_wind_speed) },
+        pressure_mean: months.map { |m| by_month[m]&.month_mean_pressure&.round(1) }
       }
     end
 
@@ -50,25 +51,35 @@ class TrendsAnalyzer
       .joins(:report)
       .where(hour: nil)
       .order("reports.year, reports.month, day")
-      .pluck(Arel.sql("reports.year"), Arel.sql("reports.month"), :day, :mean_temp, :rain)
+      .pluck(Arel.sql("reports.year"), Arel.sql("reports.month"), :day, :mean_temp, :rain, :mean_pressure)
 
-    dated = daily.filter_map do |year, month, day, mean_c, rain_mm|
+    dated = daily.filter_map do |year, month, day, mean_c, rain_mm, mean_pressure|
       next unless Date.valid_date?(year, month, day)
       {
         date: Date.new(year, month, day),
         mean_f: mean_c ? c_to_f(mean_c) : nil,
-        rain_in: rain_mm ? mm_to_in(rain_mm) : 0.0
+        rain_in: rain_mm ? mm_to_in(rain_mm) : 0.0,
+        mean_pressure: mean_pressure
       }
     end
 
     labels = dated.map { |d| d[:date].to_s }
     temps = dated.map { |d| d[:mean_f] }
+    pressures = dated.map { |d| d[:mean_pressure] }
 
     temp_series = ROLLING_WINDOWS.map do |w|
       {
         label: "#{w}-day mean temp",
         window: w,
         data: rolling_average(temps, w).map { |v| v&.round(2) }
+      }
+    end
+
+    pressure_series = ROLLING_WINDOWS.map do |w|
+      {
+        label: "#{w}-day mean pressure",
+        window: w,
+        data: rolling_average(pressures, w).map { |v| v&.round(1) }
       }
     end
 
@@ -79,7 +90,7 @@ class TrendsAnalyzer
       data: cumulative(year_daily.map { |d| d[:rain_in] || 0.0 }).map { |v| v.round(2) }
     }
 
-    { labels: labels, temps: temp_series, rain_cumulative: rain_cumulative }
+    { labels: labels, temps: temp_series, pressures: pressure_series, rain_cumulative: rain_cumulative }
   end
 
   # ---- Anomaly summary cards --------------------------------------
@@ -94,18 +105,22 @@ class TrendsAnalyzer
     baseline = Report.where(year: normal_years).group(:month).average(:month_mean_temp)
     baseline_rain = Report.where(year: normal_years).group(:month).average(:total_rain)
     baseline_wind = Report.where(year: normal_years).group(:month).average(:avg_wind_speed)
+    baseline_pressure = Report.where(year: normal_years).group(:month).average(:month_mean_pressure)
 
     ytd_focus_mean = focus_reports.average(:month_mean_temp)
     ytd_focus_rain_mm = focus_reports.sum(:total_rain)
     ytd_focus_wind_mps = focus_reports.average(:avg_wind_speed)
+    ytd_focus_pressure = focus_reports.average(:month_mean_pressure)
 
     months_in_focus = focus_reports.pluck(:month).uniq
     baseline_mean = baseline.values_at(*months_in_focus).compact
     baseline_rain_total_mm = baseline_rain.values_at(*months_in_focus).compact.sum
     baseline_wind_mean = baseline_wind.values_at(*months_in_focus).compact
+    baseline_pressure_mean = baseline_pressure.values_at(*months_in_focus).compact
 
     baseline_mean_avg = baseline_mean.any? ? baseline_mean.sum / baseline_mean.length : nil
     baseline_wind_avg = baseline_wind_mean.any? ? baseline_wind_mean.sum / baseline_wind_mean.length : nil
+    baseline_pressure_avg = baseline_pressure_mean.any? ? baseline_pressure_mean.sum / baseline_pressure_mean.length : nil
 
     cards = []
 
@@ -149,6 +164,19 @@ class TrendsAnalyzer
         delta: delta_mph,
         positive_label: "windier",
         negative_label: "calmer"
+      )
+    end
+
+    if ytd_focus_pressure && baseline_pressure_avg
+      delta_hpa = ytd_focus_pressure - baseline_pressure_avg
+      cards << anomaly_card(
+        label: "vs #{normal_years.length}-year normal",
+        title: "Pressure",
+        value: format_delta(delta_hpa, " hPa"),
+        secondary: "focus #{ytd_focus_pressure.round(1)} hPa · normal #{baseline_pressure_avg.round(1)} hPa",
+        delta: delta_hpa,
+        positive_label: "higher",
+        negative_label: "lower"
       )
     end
 

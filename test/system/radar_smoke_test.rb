@@ -15,6 +15,13 @@ class RadarSmokeTest < ApplicationSystemTestCase
     ENV["LOCATION_LON"] = @original_lon
   end
 
+  test "composite load shows the progress bar before radar frames appear" do
+    visit radar_url
+
+    assert_selector "[data-radar-target='loadProgress']:not(.hidden)", wait: 5
+    assert_selector "[data-radar-target='timestamp']", text: "Loading…"
+  end
+
   test "radar page loads with map shell and controls" do
     visit radar_url
 

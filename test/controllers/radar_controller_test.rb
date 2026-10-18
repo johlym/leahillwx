@@ -7,9 +7,11 @@ class RadarControllerTest < ActionDispatch::IntegrationTest
     @original_lat = ENV["LOCATION_LAT"]
     @original_lon = ENV["LOCATION_LON"]
     @original_librewxr = ENV["LIBREWXR_API_BASE"]
+    @original_carto = ENV["CARTO_API_KEY"]
     ENV["LOCATION_LAT"] = "47.3073"
     ENV["LOCATION_LON"] = "-122.2285"
     ENV.delete("LIBREWXR_API_BASE")
+    ENV.delete("CARTO_API_KEY")
   end
 
   teardown do
@@ -19,6 +21,11 @@ class RadarControllerTest < ActionDispatch::IntegrationTest
       ENV["LIBREWXR_API_BASE"] = @original_librewxr
     else
       ENV.delete("LIBREWXR_API_BASE")
+    end
+    if @original_carto
+      ENV["CARTO_API_KEY"] = @original_carto
+    else
+      ENV.delete("CARTO_API_KEY")
     end
   end
 
@@ -38,6 +45,7 @@ class RadarControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-controller='radar'][data-radar-lat-value='47.3073'][data-radar-lon-value='-122.2285']"
     assert_select "[data-radar-target='map'][role='application']"
     assert_select "[data-radar-librewxr-host-value='https://api.librewxr.net']"
+    assert_select "[data-radar-carto-api-key-value='']"
   end
 
   test "index uses LIBREWXR_API_BASE when configured" do
@@ -46,6 +54,14 @@ class RadarControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-radar-librewxr-host-value='https://radar.example.com']"
   ensure
     ENV.delete("LIBREWXR_API_BASE")
+  end
+
+  test "index passes CARTO_API_KEY to the radar controller" do
+    ENV["CARTO_API_KEY"] = "test-carto-key"
+    get radar_url
+    assert_select "[data-radar-carto-api-key-value='test-carto-key']"
+  ensure
+    ENV.delete("CARTO_API_KEY")
   end
 
   test "index embeds the three local radar sites as JSON" do

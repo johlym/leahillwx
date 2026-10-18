@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
-# Site-configured friendly names for soil moisture and temperature probe channels.
-# Edit config/soil_channels.yml; unnamed channels fall back to "Ch N" / "Temp Ch N".
+# Site-configured friendly names for soil moisture, temperature probe, and
+# wireless temp/humidity channels.
+# Edit config/soil_channels.yml; unnamed channels fall back to
+# "Ch N" / "Temp Ch N" / "TH Ch N".
 class SoilChannels
   CONFIG_PATH = Rails.root.join("config/soil_channels.yml")
   MAX_CHANNEL = WeatherMeasurement::MAX_SOIL_CHANNELS
@@ -27,12 +29,23 @@ class SoilChannels
       temp_probe_names[channel] || default_temp_probe_name(channel)
     end
 
+    def name_for_temp_humidity(channel)
+      channel = Integer(channel, exception: false)
+      return nil unless channel
+
+      temp_humidity_names[channel] || default_temp_humidity_name(channel)
+    end
+
     def default_soil_name(channel)
       "Ch #{channel}"
     end
 
     def default_temp_probe_name(channel)
       "Temp Ch #{channel}"
+    end
+
+    def default_temp_humidity_name(channel)
+      "TH Ch #{channel}"
     end
 
     def soil_names
@@ -43,38 +56,45 @@ class SoilChannels
       @temp_probe_names ||= load_maps[:temp_probe]
     end
 
+    def temp_humidity_names
+      @temp_humidity_names ||= load_maps[:temp_humidity]
+    end
+
     def reload!
       @soil_names = nil
       @temp_probe_names = nil
+      @temp_humidity_names = nil
       @maps = nil
       soil_names
       temp_probe_names
+      temp_humidity_names
     end
 
     private
 
     def load_maps
       @maps ||= begin
-        empty = { soil: {}, temp_probe: {} }
+        empty = { soil: {}, temp_probe: {}, temp_humidity: {} }
         return empty unless File.exist?(config_path)
 
         raw = YAML.load_file(config_path)
         return empty unless raw.is_a?(Hash)
 
-        raw.each_with_object({ soil: {}, temp_probe: {} }) do |(name, body), maps|
+        raw.each_with_object({ soil: {}, temp_probe: {}, temp_humidity: {} }) do |(name, body), maps|
           name = name.to_s.strip
           next if name.blank?
 
           unless body.is_a?(Hash)
             raise ArgumentError,
               "Invalid soil_channels.yml entry #{name.inspect}: expected a mapping with " \
-              "`soil:` and/or `temp_probe:` keys (legacy `#{name}: #{body}` channel-keyed " \
-              "format is no longer supported)"
+              "`soil:`, `temp_probe:`, and/or `temp_humidity:` keys (legacy `#{name}: #{body}` " \
+              "channel-keyed format is no longer supported)"
           end
 
           body = body.stringify_keys
           assign_channel_name(maps[:soil], body["soil"], name, kind: "soil")
           assign_channel_name(maps[:temp_probe], body["temp_probe"], name, kind: "temp_probe")
+          assign_channel_name(maps[:temp_humidity], body["temp_humidity"], name, kind: "temp_humidity")
         end
       end
     end

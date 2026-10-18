@@ -26,11 +26,22 @@ export function ridgeProductForTilt(degrees, fallback = RIDGE_PRODUCT) {
   return match?.product || fallback
 }
 
-/** Primary dark basemap (CARTO). Avoid a/b/c/d letter subdomains — some
- * resolvers only answer the apex basemaps.cartocdn.com host. */
-export const CARTO_DARK_URL = "https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+/** CARTO Dark Matter vector style (MapLibre GL). Raster dark_all is retiring. */
+export const CARTO_DARK_MATTER_STYLE =
+  "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
 export const CARTO_ATTR =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+
+/**
+ * CARTO basemap style URL with optional free API key (`?key=`).
+ * Keys are free within fair use — https://carto.com/basemaps/apikey/
+ * Vector works without a key today, but CARTO recommends attaching one.
+ */
+export function cartoDarkMatterStyleUrl(apiKey) {
+  const key = String(apiKey || "").trim()
+  if (!key) return CARTO_DARK_MATTER_STYLE
+  return `${CARTO_DARK_MATTER_STYLE}?key=${encodeURIComponent(key)}`
+}
 
 /** Fallback dark basemap (Esri). Note z/y/x order. */
 export const ESRI_DARK_URL =
@@ -186,21 +197,39 @@ export function tileUrlsForViewport(
   return urls
 }
 
-/** Prefetch image URLs into the browser cache (no DOM / map attachment). */
+/**
+ * Prefetch image URLs into the browser cache (no DOM / map attachment).
+ * @param {string[]} urls
+ * @param {{
+ *   concurrency?: number,
+ *   timeoutMs?: number,
+ *   isCancelled?: () => boolean,
+ *   onProgress?: (p: { completed: number, total: number }) => void,
+ * }} [opts]
+ */
 export async function prefetchImages(
   urls,
-  { concurrency = 6, timeoutMs = 4000, isCancelled = null } = {},
+  { concurrency = 6, timeoutMs = 4000, isCancelled = null, onProgress = null } = {},
 ) {
   const list = [ ...new Set((urls || []).filter(Boolean)) ]
-  if (list.length === 0) return
+  if (list.length === 0) {
+    onProgress?.({ completed: 0, total: 0 })
+    return
+  }
 
   let cursor = 0
+  let completed = 0
+  const total = list.length
+  onProgress?.({ completed: 0, total })
+
   const workers = Array.from({ length: Math.min(concurrency, list.length) }, async () => {
     while (cursor < list.length) {
       if (isCancelled?.()) return
       const url = list[cursor]
       cursor += 1
       await prefetchImage(url, timeoutMs)
+      completed += 1
+      onProgress?.({ completed, total })
     }
   })
   await Promise.all(workers)
