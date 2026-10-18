@@ -162,6 +162,22 @@ class Api::V1::WeatherMeasurementControllerTest < ActionDispatch::IntegrationTes
     assert_equal [ { "channel" => 2, "temperature" => 10.0, "battery" => 1.4 } ], measurement.temp_probes
   end
 
+  test "create keeps outdoor reading when temp_humidity is temperature-only" do
+    payload = measurement_payload(
+      temp_humidity: [ { channel: 1, temperature: 27.6, battery_low: false } ]
+    )
+
+    assert_difference("WeatherMeasurement.count", 1) do
+      post api_v1_weather_measurement_url, params: payload, headers: auth_headers, as: :json
+    end
+
+    assert_response :no_content
+    measurement = WeatherMeasurement.order(:id).last
+    assert_equal [
+      { "channel" => 1, "temperature" => 27.6, "battery_low" => false }
+    ], measurement.temp_humidity
+  end
+
   test "create rejects invalid temp_humidity channel" do
     payload = measurement_payload(
       temp_humidity: [ { channel: 9, temperature: 27.6, humidity: 40, battery_low: false } ]

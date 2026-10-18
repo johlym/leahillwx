@@ -93,9 +93,9 @@ class SoilChannelsTest < ActiveSupport::TestCase
 
     assert_equal "Veggie Bed", SoilChannels.name_for_soil(1)
     assert_equal "Front Yard", SoilChannels.name_for_soil(2)
-    assert_equal "Front Yard", SoilChannels.name_for_temp_probe(2)
+    assert_equal "Front Yard", SoilChannels.name_for_temp_probe(1)
     assert_equal "Back Yard", SoilChannels.name_for_soil(3)
-    assert_equal "Back Yard", SoilChannels.name_for_temp_probe(1)
+    assert_equal "Back Yard", SoilChannels.name_for_temp_probe(2)
   end
 
   test "rejects legacy channel-keyed yaml" do

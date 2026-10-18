@@ -88,6 +88,63 @@ class RecordCalculatorTest < ActiveSupport::TestCase
     assert_equal 10_000.0, record.highest_solar
   end
 
+  test "highest daily wind run groups 8pm Pacific onto that Pacific date not the next UTC morning" do
+    zone = Time.find_zone!("America/Los_Angeles")
+    # 2025-12-31 8pm PST == 2026-01-01 04:00 UTC. Naive AT TIME ZONE 'America/Los_Angeles'
+    # treats the stored UTC 04:00 as 4am Pacific Jan 1 and credits the run to Jan 1.
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: zone.local(2025, 12, 31, 20, 0, 0),
+      wind_speed: 20.0
+    ))
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: zone.local(2026, 1, 1, 10, 0, 0),
+      wind_speed: 1.0
+    ))
+
+    record = RecordCalculator.new(scope: "all_time").calculate_and_save!
+
+    assert_equal Date.new(2025, 12, 31), record.highest_wind_run_date
+  end
+
+  test "largest daily pressure swing groups an evening Pacific pair onto that Pacific date" do
+    zone = Time.find_zone!("America/Los_Angeles")
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: zone.local(2025, 12, 31, 20, 0, 0),
+      barometer_abs: 1040.0,
+      barometer_rel: 1040.0
+    ))
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: zone.local(2025, 12, 31, 21, 0, 0),
+      barometer_abs: 990.0,
+      barometer_rel: 990.0
+    ))
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: zone.local(2026, 1, 1, 10, 0, 0),
+      barometer_abs: 1013.0,
+      barometer_rel: 1013.0
+    ))
+
+    record = RecordCalculator.new(scope: "all_time").calculate_and_save!
+
+    assert_equal Date.new(2025, 12, 31), record.largest_pressure_swing_date
+  end
+
+  test "yearly 2025 wind run still attributes New Year's Eve evening to 2025-12-31" do
+    zone = Time.find_zone!("America/Los_Angeles")
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: zone.local(2025, 12, 31, 20, 0, 0),
+      wind_speed: 20.0
+    ))
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: zone.local(2025, 6, 15, 12, 0, 0),
+      wind_speed: 1.0
+    ))
+
+    record = RecordCalculator.new(scope: "yearly", year: 2025).calculate_and_save!
+
+    assert_equal Date.new(2025, 12, 31), record.highest_wind_run_date
+  end
+
   test "calculate_and_save! creates an all_time record" do
     WeatherMeasurement.create!(measurement_attrs(
       reading_date_time: Time.zone.parse("2022-01-01 12:00:00"),
@@ -105,5 +162,121 @@ class RecordCalculatorTest < ActiveSupport::TestCase
     assert_nil record.year
     assert_equal 40.0, record.highest_temp
     assert_equal(-5.0, record.lowest_temp)
+  end
+
+  test "all_time recalc keeps measurement extremes after raw rows are purged" do
+    historic_high_at = Time.zone.parse("2022-07-15 16:00:00")
+    historic_low_at = Time.zone.parse("2022-01-02 06:00:00")
+    Record.create!(
+      scope: "all_time",
+      highest_temp: 45.0,
+      highest_temp_at: historic_high_at,
+      lowest_temp: -12.0,
+      lowest_temp_at: historic_low_at,
+      strongest_gust: 28.0,
+      strongest_gust_at: historic_high_at,
+      highest_rain_rate: 15.0,
+      highest_rain_rate_at: historic_high_at,
+      highest_solar: 1200.0,
+      highest_solar_at: historic_high_at
+    )
+
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: Time.zone.parse("2025-08-01 12:00:00"),
+      temperature: 32.0,
+      gust_speed: 8.0,
+      rain_rate: 2.0,
+      light: 800.0
+    ))
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: Time.zone.parse("2025-01-10 12:00:00"),
+      temperature: 2.0,
+      gust_speed: 3.0,
+      rain_rate: 0.0,
+      light: 200.0
+    ))
+
+    record = RecordCalculator.new(scope: "all_time").calculate_and_save!
+
+    assert_equal 45.0, record.highest_temp
+    assert_equal historic_high_at, record.highest_temp_at
+    assert_equal(-12.0, record.lowest_temp)
+    assert_equal historic_low_at, record.lowest_temp_at
+    assert_equal 28.0, record.strongest_gust
+    assert_equal 15.0, record.highest_rain_rate
+    assert_equal 1200.0, record.highest_solar
+  end
+
+  test "all_time recalc still advances when remaining measurements set a new extreme" do
+    Record.create!(
+      scope: "all_time",
+      highest_temp: 30.0,
+      highest_temp_at: Time.zone.parse("2022-07-15 16:00:00"),
+      lowest_temp: 0.0,
+      lowest_temp_at: Time.zone.parse("2022-01-02 06:00:00")
+    )
+
+    new_high_at = Time.zone.parse("2025-08-01 15:00:00")
+    new_low_at = Time.zone.parse("2025-01-10 07:00:00")
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: new_high_at,
+      temperature: 41.0
+    ))
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: new_low_at,
+      temperature: -8.0
+    ))
+
+    record = RecordCalculator.new(scope: "all_time").calculate_and_save!
+
+    assert_equal 41.0, record.highest_temp
+    assert_equal new_high_at, record.highest_temp_at
+    assert_equal(-8.0, record.lowest_temp)
+    assert_equal new_low_at, record.lowest_temp_at
+  end
+
+  test "all_time recalc recovers a purged extreme from a yearly record" do
+    historic_high_at = Time.zone.parse("2022-07-15 16:00:00")
+    Record.create!(
+      scope: "yearly",
+      year: 2022,
+      highest_temp: 44.0,
+      highest_temp_at: historic_high_at
+    )
+
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: Time.zone.parse("2025-08-01 12:00:00"),
+      temperature: 31.0
+    ))
+
+    record = RecordCalculator.new(scope: "all_time").calculate_and_save!
+
+    assert_equal 44.0, record.highest_temp
+    assert_equal historic_high_at, record.highest_temp_at
+  end
+
+  test "yearly recalc still overwrites from that year's remaining measurements" do
+    Record.create!(
+      scope: "yearly",
+      year: 2024,
+      highest_temp: 50.0,
+      highest_temp_at: Time.zone.parse("2024-07-01 12:00:00"),
+      lowest_temp: -20.0,
+      lowest_temp_at: Time.zone.parse("2024-01-01 12:00:00")
+    )
+
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: Time.zone.parse("2024-07-10 12:00:00"),
+      temperature: 33.0
+    ))
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: Time.zone.parse("2024-01-10 12:00:00"),
+      temperature: 4.0
+    ))
+
+    record = RecordCalculator.new(scope: "yearly", year: 2024).calculate_and_save!
+
+    assert_equal 33.0, record.highest_temp
+    assert_equal 4.0, record.lowest_temp
   end
 end

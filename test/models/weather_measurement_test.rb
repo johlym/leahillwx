@@ -239,13 +239,13 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
     assert_nil readings["Veggie Bed"]["temperature_f"]
 
     assert_equal 55, readings["Front Yard"]["moisture"]
-    assert_equal 50, readings["Front Yard"]["temperature_f"]
+    assert_equal 54, readings["Front Yard"]["temperature_f"] # 12°C on probe 1
     assert_equal 1.58, readings["Front Yard"]["moisture_battery"]
-    assert_equal 1.45, readings["Front Yard"]["temperature_battery"]
+    assert_equal 1.4, readings["Front Yard"]["temperature_battery"]
 
     assert_equal 40, readings["Back Yard"]["moisture"]
-    assert_equal 54, readings["Back Yard"]["temperature_f"] # 12°C
-    assert_equal 1.4, readings["Back Yard"]["temperature_battery"]
+    assert_equal 50, readings["Back Yard"]["temperature_f"] # 10°C on probe 2
+    assert_equal 1.45, readings["Back Yard"]["temperature_battery"]
   ensure
     SoilChannels.config_path = nil
     SoilChannels.reload!
@@ -435,8 +435,27 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
     ))
 
     assert_not measurement.valid?
-    assert_includes measurement.errors[:temp_humidity], "temperature must be a number"
-    assert_includes measurement.errors[:temp_humidity], "humidity must be a number"
+    assert_includes measurement.errors[:temp_humidity], "entry must include temperature or humidity"
+  end
+
+  test "accepts temp_humidity with temperature only" do
+    measurement = WeatherMeasurement.new(valid_attrs(
+      temp_humidity: [ { "channel" => 1, "temperature" => 27.6, "battery_low" => false } ]
+    ))
+
+    assert measurement.valid?
+    assert_equal 27.6, measurement.temp_humidity.first["temperature"]
+    assert_nil measurement.temp_humidity.first["humidity"]
+  end
+
+  test "accepts temp_humidity with humidity only" do
+    measurement = WeatherMeasurement.new(valid_attrs(
+      temp_humidity: [ { "channel" => 1, "humidity" => 40, "battery_low" => true } ]
+    ))
+
+    assert measurement.valid?
+    assert_equal 40, measurement.temp_humidity.first["humidity"]
+    assert_nil measurement.temp_humidity.first["temperature"]
   end
 
   test "rejects non-boolean temp_humidity battery_low" do
