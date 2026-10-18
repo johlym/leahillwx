@@ -88,6 +88,63 @@ class RecordCalculatorTest < ActiveSupport::TestCase
     assert_equal 10_000.0, record.highest_solar
   end
 
+  test "highest daily wind run groups 8pm Pacific onto that Pacific date not the next UTC morning" do
+    zone = Time.find_zone!("America/Los_Angeles")
+    # 2025-12-31 8pm PST == 2026-01-01 04:00 UTC. Naive AT TIME ZONE 'America/Los_Angeles'
+    # treats the stored UTC 04:00 as 4am Pacific Jan 1 and credits the run to Jan 1.
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: zone.local(2025, 12, 31, 20, 0, 0),
+      wind_speed: 20.0
+    ))
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: zone.local(2026, 1, 1, 10, 0, 0),
+      wind_speed: 1.0
+    ))
+
+    record = RecordCalculator.new(scope: "all_time").calculate_and_save!
+
+    assert_equal Date.new(2025, 12, 31), record.highest_wind_run_date
+  end
+
+  test "largest daily pressure swing groups an evening Pacific pair onto that Pacific date" do
+    zone = Time.find_zone!("America/Los_Angeles")
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: zone.local(2025, 12, 31, 20, 0, 0),
+      barometer_abs: 1040.0,
+      barometer_rel: 1040.0
+    ))
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: zone.local(2025, 12, 31, 21, 0, 0),
+      barometer_abs: 990.0,
+      barometer_rel: 990.0
+    ))
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: zone.local(2026, 1, 1, 10, 0, 0),
+      barometer_abs: 1013.0,
+      barometer_rel: 1013.0
+    ))
+
+    record = RecordCalculator.new(scope: "all_time").calculate_and_save!
+
+    assert_equal Date.new(2025, 12, 31), record.largest_pressure_swing_date
+  end
+
+  test "yearly 2025 wind run still attributes New Year's Eve evening to 2025-12-31" do
+    zone = Time.find_zone!("America/Los_Angeles")
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: zone.local(2025, 12, 31, 20, 0, 0),
+      wind_speed: 20.0
+    ))
+    WeatherMeasurement.create!(measurement_attrs(
+      reading_date_time: zone.local(2025, 6, 15, 12, 0, 0),
+      wind_speed: 1.0
+    ))
+
+    record = RecordCalculator.new(scope: "yearly", year: 2025).calculate_and_save!
+
+    assert_equal Date.new(2025, 12, 31), record.highest_wind_run_date
+  end
+
   test "calculate_and_save! creates an all_time record" do
     WeatherMeasurement.create!(measurement_attrs(
       reading_date_time: Time.zone.parse("2022-01-01 12:00:00"),
