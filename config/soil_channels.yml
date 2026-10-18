@@ -18,8 +18,8 @@ Veggie Bed:
 
 Front Yard:
   soil: 2
-  temp_probe: 2
+  temp_probe: 1
 
 Back Yard:
   soil: 3
-  temp_probe: 1
+  temp_probe: 2
