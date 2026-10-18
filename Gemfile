@@ -3,7 +3,7 @@ source "https://rubygems.org"
 ruby file: ".ruby-version"
 
 gem "barnes", "~> 1.0"
-gem "bootsnap", "~> 1.24", require: false
+gem "bootsnap", "~> 1.25", require: false
 gem "cssbundling-rails", "~> 1.4"
 gem "dotenv", "~> 3.2"
 gem "ephem", "~> 0.5"
