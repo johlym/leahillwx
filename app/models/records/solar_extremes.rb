@@ -9,6 +9,7 @@ module Records
 
     def calculate
       highest = @measurements.select(:light, :reading_date_time).order(light: :desc).limit(1).first
+      # Store the light register in lux. The record card converts to W/m².
       @record.highest_solar = highest&.light
       @record.highest_solar_at = highest&.reading_date_time
     end

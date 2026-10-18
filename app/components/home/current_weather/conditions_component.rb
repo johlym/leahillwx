@@ -73,7 +73,7 @@ class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
   end
 
   def current_solar_irradiance
-    @current.uv.round(0)
+    @current.uv&.round(0)
   end
 
   def current_uv_index_category

@@ -46,7 +46,11 @@ Auth: `Authorization: Bearer <MEASUREMENT_API_KEY>`. Blank or wrong key → **40
 
 Single create is idempotent on `reading_date_time` (duplicate → 204). Bulk max is **1000** rows; the write runs in `BulkWriteMeasurementsJob`. Bulk flags (string `"true"` only): `update_records`, `overwrite`.
 
-Required scalar fields (model validations): `reading_date_time`, `barometer_abs`, `barometer_rel`, `gust_speed`, `light`, `humidity`, `temperature`, `rain_day`, `rain_rate`, `uv`, `uvi`, `wind_dir`, `wind_speed`.
+Required scalar fields (model validations): `reading_date_time`, `barometer_abs`, `barometer_rel`, `gust_speed`, `light`, `humidity`, `temperature`, `rain_day`, `rain_rate`, `uvi`, `wind_dir`, `wind_speed`.
+
+`uv` is optional. It is UV radiation in µW/m² (register 0x16). Leave it out when the gateway does not send that register. A missing value is stored as NULL, and averages and peaks ignore it rather than treating it as zero. `uvi` is the UV index and stays required. When a payload does include `uv`, that value is stored.
+
+The records page shows highest solar irradiance in W/m². That number is the daily high `light` reading (lux) converted with `lux * 0.0079`.
 
 Units on the wire: temperature **°C**, barometer **hPa**, wind **m/s**, rain **mm**. The UI converts to °F / inHg / mph / inches.
 
@@ -67,7 +71,6 @@ curl -X POST http://localhost:3000/api/v1/weather_measurement \
       "temperature": 18.5,
       "rain_day": 0.0,
       "rain_rate": 0.0,
-      "uv": 3,
       "uvi": 3.0,
       "wind_dir": 180,
       "wind_speed": 1.2
