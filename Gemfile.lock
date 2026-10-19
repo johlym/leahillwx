@@ -368,7 +368,7 @@ GEM
       fugit (~> 1.8, >= 1.11.1)
       globalid (>= 1.0.1)
       sidekiq (>= 6.5.0)
-    simplecov (1.1.1)
+    simplecov (1.3.2)
     sorbet-runtime (0.6.13342)
     stimulus-rails (1.3.4)
       railties (>= 6.0.0)
@@ -591,7 +591,7 @@ CHECKSUMS
   sentry-sidekiq (7.0.0) sha256=ae875787e5d4ae8d19c3ec4a91897806e8495c14d622956b0a6abbf739fc04b1
   sidekiq (8.1.7) sha256=91ad48c7e6c32e1846bf1d5b74c27948758049b93fed0cb539f8d586c7de3415
   sidekiq-cron (2.4.0) sha256=25595c5aee0c16d13a89466e5108af047fa4cfbf388199b39e1a600ca39472d4
-  simplecov (1.1.1) sha256=25825ef13f0b2e74694d769817dad6ab8e90131dabdaa666e522fea105521e78
+  simplecov (1.3.2) sha256=2a22ec1759f1b8db60881a2e038758956fc69ef93ed669be0bde0678de6d0e85
   sorbet-runtime (0.6.13342) sha256=dbeb9892597f593ed2b29e38018912787f6c4e0c4b736d8af0d6bd3c63bde3c3
   stimulus-rails (1.3.4) sha256=765676ffa1f33af64ce026d26b48e8ffb2e0b94e0f50e9119e11d6107d67cb06
   strong_migrations (2.8.0) sha256=cb9c0f8160e60f3e9c0e76098d57a6f61825b9618e8eb41cebbd1c1079874439
