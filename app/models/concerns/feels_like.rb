@@ -1,6 +1,40 @@
 module FeelsLike
   extend ActiveSupport::Concern
 
+  # Same Rothfusz / Environment Canada formulas as the Ruby methods, so record
+  # jobs can ORDER BY heat index and wind chill in SQL. Ranking by temperature
+  # misses a humid peak or a windy near-freezing storm.
+  TEMP_F_SQL = "(temperature * 9.0 / 5.0 + 32)".freeze
+  WIND_KMH_SQL = "(wind_speed * 3.6)".freeze
+
+  HEAT_INDEX_C_SQL = <<~SQL.squish.freeze
+    GREATEST(
+      ((
+        -42.379
+        + 2.04901523 * #{TEMP_F_SQL}
+        + 10.14333127 * humidity
+        - 0.22475541 * #{TEMP_F_SQL} * humidity
+        - 0.00683783 * POWER(#{TEMP_F_SQL}, 2)
+        - 0.05481717 * POWER(humidity::float, 2)
+        + 0.00122874 * POWER(#{TEMP_F_SQL}, 2) * humidity
+        + 0.00085282 * #{TEMP_F_SQL} * POWER(humidity::float, 2)
+        - 0.00000199 * POWER(#{TEMP_F_SQL}, 2) * POWER(humidity::float, 2)
+        - 32
+      ) * 5.0 / 9.0),
+      temperature
+    )
+  SQL
+
+  WIND_CHILL_C_SQL = <<~SQL.squish.freeze
+    LEAST(
+      13.12
+      + 0.6215 * temperature
+      - 11.37 * POWER(#{WIND_KMH_SQL}, 0.16)
+      + 0.3965 * temperature * POWER(#{WIND_KMH_SQL}, 0.16),
+      temperature
+    )
+  SQL
+
   def feels_like_c(temp_c:, humidity:, wind_speed_mps:, cloud_pct:, is_daytime:)
     if cold_enough_for_wind_chill?(temp_c, wind_speed_mps)
       wind_chill_c(temp_c, wind_speed_mps)
