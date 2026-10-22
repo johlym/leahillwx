@@ -84,13 +84,14 @@ Optional nested arrays (channels **1–8**, unique per array; extras → **422**
 | ----- | ------ | --------------- | -------- |
 | `soil[]` | WH51 moisture (and legacy soil temp) | `channel` plus `moisture` and/or `temperature` | `battery` (volts, ≥ 0). Battery-only rows are dropped. |
 | `temp_probes[]` | WN34/WN34S probes | `channel`, `temperature` (°C) | `battery` (volts, ≥ 0). Battery-only rows are dropped. |
-| `temp_humidity[]` | WH31/WN31 dip-switch | `channel`, `temperature` (°C), and `humidity` (%) | `battery_low` (boolean; `"true"`/`"1"`/`"t"` coerce) |
+| `temp_humidity[]` | WH31/WN31 dip-switch | `channel` plus **`temperature` (°C) and/or `humidity` (%)** | `battery_low` (boolean; `"true"`/`"1"`/`"t"` coerce). Battery-only rows **422** (unlike soil/probes). |
 
-wxlistener maps WN31 livedata into `temp_humidity[]`. Indoor WH25 `intemp`/`inhumid` are **not** accepted on this API.
+wxlistener maps WN31 livedata into `temp_humidity[]` and may send only temperature or only humidity for a channel. Requiring both used to **422** the whole outdoor reading. Indoor WH25 `intemp`/`inhumid` are **not** accepted on this API.
 
 ```json
 "temp_humidity": [
-  { "channel": 1, "temperature": 27.6, "humidity": 40, "battery_low": false }
+  { "channel": 1, "temperature": 27.6, "humidity": 40, "battery_low": false },
+  { "channel": 2, "temperature": 18.1 }
 ]
 ```
 
@@ -102,9 +103,17 @@ Display names live in `config/soil_channels.yml` (`SoilChannels`). Each key is o
 
 Temperature preference when merging: dedicated `temp_probes`, then `temp_humidity`, then legacy `soil.temperature`. The `%` column prefers soil `moisture`; otherwise it shows WN31 `humidity`. The YAML map is process-cached — restart Puma/Sidekiq after editing.
 
-**Trust the model, not `/docs`.** `lib/assets/oas.json` still lists dropped `day_max_wind` / `rain_event` as required, omits `temp_humidity`, documents imperial units, and the bulk action annotation says 201. As-built wire units are °C / hPa / m/s / mm; bulk is **202**.
+**Trust the model, not `/docs`.** `lib/assets/oas.json` now marks `uv` nullable, but it still lists dropped `day_max_wind` / `rain_event` as required, omits `temp_humidity`, and documents imperial units. As-built wire units are °C / hPa / m/s / mm; bulk is **202**.
 
-**Bulk vs single:** only `POST /api/v1/weather_measurement` returns **422** `{ errors: [...] }` for validation. Bulk always **202** once enqueued (payload >1000 rows is **422** before enqueue); invalid rows are logged and skipped. Sidekiq retries the job up to 3 times on hard failures. `overwrite=true` wins over `update_records` (delete + insert). Default mode skips duplicate `reading_date_time` rows. Bulk uses `insert_all!` and does **not** fire Action Cable — use single create for live dashboard pushes.
+**Bulk vs single:** only `POST /api/v1/weather_measurement` returns **422** `{ errors: [...] }` for validation. Bulk always **202** once enqueued (payload >1000 rows is **422** before enqueue); invalid rows are logged and skipped. Sidekiq retries the job up to 3 times on hard failures. Default mode skips duplicate `reading_date_time` rows. Bulk uses `insert_all!` and does **not** fire Action Cable — use single create for live dashboard pushes.
+
+| Bulk flag | As-built |
+| --------- | -------- |
+| (none) | Insert new timestamps; skip duplicates |
+| `update_records=true` | Update existing timestamps; insert new ones |
+| `overwrite=true` | Wins over `update_records`. Rows are **validated before delete**. Invalid replacements are skipped and **leave the existing reading** for that timestamp. |
+
+wxlistener 0.5.1 still POSTs `uv` and `uvi` as `0` when the station omits them. This API accepts omit/null `uv` and stores NULL; a sent `0` is stored as zero.
 
 **Rate limits** (Rack::Attack): 120 req/min per IP on `/api/`, 60/min on measurement POSTs → **429** JSON. `/docs` is 30/min. A blank or wrong `MEASUREMENT_API_KEY` → **401** (SHA256 digest compare). Public celestial JSON (`GET /celestial/sun`, `GET /celestial/moon`) is 60/min and requires `year`/`month`/`day`.
 
@@ -173,7 +182,19 @@ DNR “Current Fire Statistics” keeps rows until `CONTROL_DT` / `FIRE_OUT_DT` 
 
 Reports (`reports` / `report_entries`) and records (`records`) are the long-term store for daily/hourly extremes and all-time highs. Raw `weather_measurements` are kept for the live dashboard, re-aggregation, and a rolling history window.
 
-`PurgeOldWeatherMeasurementsJob` (08:15 UTC daily) deletes raw rows older than `MEASUREMENT_RETENTION_DAYS` (default 3 years) in batches, then rebuilds the Redis vanity counter. `RecalculateMeasurementTotalCountJob` (08:10 UTC) repairs `WeatherMeasurements::TotalCount` if increments drift. Increment and the homepage seed use Redis `SET NX` so filling a missing key does not clobber a concurrent increment. The nightly repair writes the count with a plain `SET`.
+Nightly order (UTC) is recalc **before** purge so all-time extremes can still see the oldest raw rows that morning:
+
+| Time | Job |
+| ---- | --- |
+| 08:01 | `GenerateReportJob` (daily report) |
+| 08:02 | `GenerateYearRecordsJob` |
+| 08:06 | `GenerateAllTimeRecordsJob` |
+| 08:10 | `RecalculateMeasurementTotalCountJob` |
+| 08:15 | `PurgeOldWeatherMeasurementsJob` |
+
+`PurgeOldWeatherMeasurementsJob` deletes raw rows older than `MEASUREMENT_RETENTION_DAYS` (default 3 years) in batches of 1000, then rebuilds the Redis vanity counter. It does **not** delete `records` or `report_entries`. `RecalculateMeasurementTotalCountJob` repairs `WeatherMeasurements::TotalCount` if increments drift. Increment and the homepage seed use Redis `SET NX` so filling a missing key does not clobber a concurrent increment. The nightly repair writes the count with a plain `SET`.
+
+All-time recalc (`Records::Calculation`) then takes the **envelope** of (1) the previous all-time row, (2) the fresh scan of remaining measurements, and (3) every yearly `Record` for measurement-sourced highs/lows (`MEASUREMENT_HIGHS` / `MEASUREMENT_LOWS`: temps, apparent/heat index/wind chill, humidity/dew point, pressure, rain rate, solar, gust, wind-run date, pressure-swing date). A later all-time job cannot shrink those historic extremes after purge. Yearly recalc still overwrites from measurements left in that Pacific year.
 
 ### Rain on reports (Pacific midnight counter)
 
@@ -203,6 +224,17 @@ A reading from yesterday still shows **STALE** (not OFFLINE) if the page rendere
 
 Yearly record scans use **America/Los_Angeles** calendar bounds (`Records::MeasurementScope.pacific_year_bounds`), not the database session time zone. A reading at 2025-12-31 16:00 Pacific (2026-01-01 00:00 UTC) is inside the **2025** year. The current calendar year excludes today’s readings (scope ends at the start of today Pacific). Past years run through the end of Dec 31.
 
+Daily aggregates (highest wind run, largest pressure swing) use the same UTC→Pacific date expression (`Records::MeasurementScope::PACIFIC_DATE_SQL`). `reading_date_time` is a naive UTC timestamp; applying `AT TIME ZONE 'America/Los_Angeles'` alone groups 4pm–midnight Pacific onto the next calendar day.
+
+Heat-index and wind-chill records pre-filter in SQL, then pick max/min `feels_like` from at most **250** rows ordered by temperature (`Records::TemperatureExtremes`):
+
+| Record | Qualifiers | Scan |
+| ------ | ---------- | ---- |
+| Highest heat index | `temperature > 27` °C and `humidity >= 40` | warmest 250, then max `feels_like` |
+| Lowest wind chill | `temperature < 10` °C and `wind_speed > 1.34` m/s | coldest 250, then min `feels_like` |
+
+The true extreme must appear in that temperature-ordered window.
+
 ## Lint / test
 
 ```bash
@@ -223,5 +255,5 @@ GitHub `scan_ruby` fails the job on Brakeman or bundler-audit findings. `config/
 - **Assets are gitignored.** Build (`yarn build` / `yarn build:css`) before serving.
 - **Do not plot `barometer_rel`.** Display and uploads reduce `barometer_abs`. Tests should set `LOCATION_ELEVATION_FT` (helper defaults to `0` so fixtures stay identity).
 - Forecast cron and `Forecast` model comments both say every **10** minutes (`*/10`). Homepage still backfills if the latest row is older than **1 hour** (debounced 10 minutes).
-- **`temp_humidity` is not indoor WH25.** Indoor gateway fields stay off the ingest API; WN31 channels belong in `temp_humidity[]`. Edit `config/soil_channels.yml` then restart to rename Auxiliary Sensors rows.
+- **`temp_humidity` is not indoor WH25.** Indoor gateway fields stay off the ingest API; WN31 channels belong in `temp_humidity[]`. A channel may send only temperature or only humidity. Edit `config/soil_channels.yml` then restart to rename Auxiliary Sensors rows.
 - Production CSP is **report-only** (`config/initializers/content_security_policy.rb`).
