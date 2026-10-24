@@ -2,7 +2,7 @@
 
 ## Cursor Cloud specific instructions
 
-This is the **lhwx.org** personal weather-station website: a Rails 8 app (Ruby 4.0.1, Node 24) backed by PostgreSQL and Redis, with Sidekiq for background jobs. Data is ingested via the authenticated measurement API (normally from an external Rust `wxlistener`, which is **not** in this repo) and shown on a live dashboard (home, reports, graphs, records, trends, almanac).
+This is the **lhwx.org** personal weather-station website: a Rails 8 app (Ruby 4.0.9, Node 24) backed by PostgreSQL and Redis, with Sidekiq for background jobs. Data is ingested via the authenticated measurement API (normally from an external Rust `wxlistener`, which is **not** in this repo) and shown on a live dashboard (home, reports, graphs, records, trends, almanac).
 
 ### Toolchain
 - Ruby and Node are managed by **mise** (`~/.local/bin/mise`), activated in `~/.bashrc`. Interactive shells already have `ruby`, `node`, `bundle`, `yarn` on `PATH`. In non-interactive scripts, run `eval "$(/home/ubuntu/.local/bin/mise activate bash)"` first.

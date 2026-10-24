@@ -17,6 +17,13 @@ gem "propshaft", "~> 1.3"
 gem "puma", ">= 8.0"
 gem "rails", "~> 8.1.1"
 gem "redis", ">= 5.4"
+# Floors for 2026 advisories so Bundler cannot activate a vulnerable copy.
+# crass GHSA-pq4g-8rxf-4g29; erb CVE-2026-41316;
+# resolv CVE-2026-80212 and CVE-2026-80213; zlib CVE-2026-27820.
+gem "crass", ">= 1.0.8"
+gem "erb", ">= 6.0.7"
+gem "resolv", ">= 0.7.2"
+gem "zlib", ">= 3.2.3"
 gem "rack-attack", "~> 6.7"
 gem "sentry-rails"
 gem "sentry-ruby"
