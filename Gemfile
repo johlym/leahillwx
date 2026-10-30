@@ -15,7 +15,7 @@ gem "parallel", "~> 1.24"
 gem "pg", "~> 1.6"
 gem "propshaft", "~> 1.3"
 gem "puma", ">= 8.0"
-gem "rails", "~> 8.1.1"
+gem "rails", "~> 8.1.4"
 gem "redis", ">= 5.4"
 # Floors for 2026 advisories so Bundler cannot activate a vulnerable copy.
 # crass GHSA-pq4g-8rxf-4g29; erb CVE-2026-41316;
