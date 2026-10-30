@@ -226,7 +226,7 @@ GEM
       easy_talk_two (~> 1.1.3)
       oas_core (>= 1.1.0)
     ostruct (0.6.3)
-    parallel (1.28.0)
+    parallel (2.3.0)
     parser (3.3.12.0)
       ast (~> 2.4.1)
       racc
@@ -439,7 +439,7 @@ DEPENDENCIES
   jbuilder (~> 2.14)
   jsbundling-rails (~> 1.3)
   oas_rails (~> 1.3)
-  parallel (~> 1.24)
+  parallel (~> 2.3)
   pg (~> 1.6)
   propshaft (~> 1.3)
   prosopite (~> 2.5)
@@ -546,7 +546,7 @@ CHECKSUMS
   oas_core (1.4.0) sha256=18e4d4476b08d47db528d33e65e29ebf09f66cce3107a57dbf84678f26842762
   oas_rails (1.4.0) sha256=0dadaa37a56f9760efcca1ff5a8735fdb64af43a5852e65265d2e0153624f427
   ostruct (0.6.3) sha256=95a2ed4a4bd1d190784e666b47b2d3f078e4a9efda2fccf18f84ddc6538ed912
-  parallel (1.28.0) sha256=33e6de1484baf2524792d178b0913fc8eb94c628d6cfe45599ad4458c638c970
+  parallel (2.3.0) sha256=f75a3e904101ce6a1ccb6b8dc800cbafd42166d83330192438dcf29395167a6f
   parser (3.3.12.0) sha256=21a6d7f755d5a24dfbdc6e6b772e4e879a52e7631a88bc5a3a134606052c9828
   pg (1.6.3) sha256=1388d0563e13d2758c1089e35e973a3249e955c659592d10e5b77c468f628a99
   pg (1.6.3-aarch64-linux) sha256=0698ad563e02383c27510b76bf7d4cd2de19cd1d16a5013f375dd473e4be72ea
