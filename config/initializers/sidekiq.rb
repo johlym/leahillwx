@@ -15,6 +15,12 @@ Sidekiq.configure_server do |config|
 
   config.server_middleware do |chain|
     chain.add SentryJobMetrics
+
+    # Development and test only. Prosopite is not bundled in production.
+    next if Rails.env.production?
+
+    require "prosopite/middleware/sidekiq"
+    chain.add Prosopite::Middleware::Sidekiq
   end
 
   config.on(:startup) do

@@ -31,8 +31,14 @@ module ActiveSupport
 
     # TotalCount lives in Redis; transactional fixtures roll back Postgres but not
     # Redis, so clear the per-worker key before every test to avoid drift.
+    # Scan after fixtures load so their inserts are not part of the test's query set.
     setup do
       WeatherMeasurements::TotalCount.clear!
+      Prosopite.scan("#{self.class}##{name}")
+    end
+
+    teardown do
+      Prosopite.finish
     end
 
     def with_env(vars)

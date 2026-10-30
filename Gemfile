@@ -39,6 +39,8 @@ group :development, :test do
   gem "brakeman", require: false
   gem "bundler-audit", require: false
   gem "database_consistency", require: false
+  # N+1 detection. PostgreSQL fingerprints work without the optional pg_query extension.
+  gem "prosopite", "~> 2.5"
   gem "rubocop-rails-omakase", require: false
 end
 
@@ -46,7 +48,6 @@ group :development do
   gem "annotaterb"
   gem "web-console"
   gem "ruby-lsp-rails", require: false
-  gem "bullet"
 end
 
 group :test do
