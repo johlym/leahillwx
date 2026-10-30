@@ -13,6 +13,9 @@ class PurgeOldWeatherMeasurementsJob
       break if ids.empty?
 
       deleted += WeatherMeasurement.where(id: ids).delete_all
+      # A short page is the end of the scan. Stopping here avoids a second
+      # identical SELECT that only checks for an empty page.
+      break if ids.size < BATCH_SIZE
     end
 
     WeatherMeasurements::TotalCount.recalculate! if deleted.positive?
