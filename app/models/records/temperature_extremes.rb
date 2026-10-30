@@ -82,7 +82,9 @@ module Records
       candidates = relation.to_a
       return if candidates.empty?
 
-      direction == :max ? candidates.max_by(&:feels_like) : candidates.min_by(&:feels_like)
+      WeatherMeasurement.with_feels_like_batch(candidates) do
+        direction == :max ? candidates.max_by(&:feels_like) : candidates.min_by(&:feels_like)
+      end
     end
 
     def daily_temp_ranges

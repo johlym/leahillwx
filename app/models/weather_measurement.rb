@@ -141,7 +141,22 @@ class WeatherMeasurement < ApplicationRecord
     )
   end
 
-  def current_cloud_cover
+  # One almanac query and one forecast query for a set of rows, instead of
+  # one of each per feels_like call. Used when ranking many measurements.
+  def self.with_feels_like_batch(measurements)
+    dates = measurements.map { |measurement| measurement.pacific_reading_date }.uniq
+    previous = Thread.current[:feels_like_batch]
+    Thread.current[:feels_like_batch] = {
+      dates: dates,
+      almanac_by_date: AlmanacEntry.where(date: dates).index_by(&:date),
+      cloud_pct: latest_current_cloud_pct
+    }
+    yield
+  ensure
+    Thread.current[:feels_like_batch] = previous
+  end
+
+  def self.latest_current_cloud_pct
     current_forecast = Forecast.where(interval: "current").order(created_at: :desc).first
     return 50.0 unless current_forecast
 
@@ -149,11 +164,28 @@ class WeatherMeasurement < ApplicationRecord
     forecast_data.dig(:current, :clouds) || 50.0
   end
 
+  def current_cloud_cover
+    batch = Thread.current[:feels_like_batch]
+    return batch[:cloud_pct] if batch
+
+    self.class.latest_current_cloud_pct
+  end
+
   def daytime?
-    almanac = AlmanacEntry.find_by(date: reading_date_time.in_time_zone("America/Los_Angeles").to_date)
+    date = pacific_reading_date
+    batch = Thread.current[:feels_like_batch]
+    almanac = if batch && batch[:dates].include?(date)
+      batch[:almanac_by_date][date]
+    else
+      AlmanacEntry.find_by(date: date)
+    end
     return false unless almanac&.sunrise_at && almanac&.sunset_at
 
     reading_date_time.between?(almanac.sunrise_at, almanac.sunset_at)
+  end
+
+  def pacific_reading_date
+    reading_date_time.in_time_zone("America/Los_Angeles").to_date
   end
 
   def heading_compass
