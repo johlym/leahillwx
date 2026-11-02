@@ -348,15 +348,15 @@ GEM
       ruby-lsp (>= 0.26.0, < 0.27.0)
     ruby-progressbar (1.13.0)
     securerandom (0.4.1)
-    sentry-rails (7.0.0)
+    sentry-rails (7.2.0)
       railties (>= 5.2.0)
-      sentry-ruby (~> 7.0.0)
-    sentry-ruby (7.0.0)
+      sentry-ruby (~> 7.2.0)
+    sentry-ruby (7.2.0)
       bigdecimal
       concurrent-ruby (~> 1.0, >= 1.0.2)
       logger
-    sentry-sidekiq (7.0.0)
-      sentry-ruby (~> 7.0.0)
+    sentry-sidekiq (7.2.0)
+      sentry-ruby (~> 7.2.0)
       sidekiq (>= 5.0)
     sidekiq (8.1.7)
       connection_pool (>= 3.0.0)
@@ -591,9 +591,9 @@ CHECKSUMS
   ruby-lsp-rails (0.4.8) sha256=f09d1f926d4063deeb2f3049311925c20dfe6c912371e3bcd04a265a865c44ae
   ruby-progressbar (1.13.0) sha256=80fc9c47a9b640d6834e0dc7b3c94c9df37f08cb072b7761e4a71e22cff29b33
   securerandom (0.4.1) sha256=cc5193d414a4341b6e225f0cb4446aceca8e50d5e1888743fac16987638ea0b1
-  sentry-rails (7.0.0) sha256=6ac6a010e088632e46710ce42db75aa5281a6b52a547efee10568cc2ed80605a
-  sentry-ruby (7.0.0) sha256=e9616ff521355a983fad404ca575d8bb1f1949a8cac42a7a893dd02156bcdb1a
-  sentry-sidekiq (7.0.0) sha256=ae875787e5d4ae8d19c3ec4a91897806e8495c14d622956b0a6abbf739fc04b1
+  sentry-rails (7.2.0) sha256=c3874fed94a68f3f60a917243b6e25414ff284455abd14e3351479a32807af79
+  sentry-ruby (7.2.0) sha256=2da448c2b7028a7691f31ae5c946830b8e694d0aec78ef2b9e5c7e1da9c3e01a
+  sentry-sidekiq (7.2.0) sha256=3b2f3cd73ddc0c6a60fdf6a37c411b2d19f97b6291b4a88ef8594d554710ccd6
   sidekiq (8.1.7) sha256=91ad48c7e6c32e1846bf1d5b74c27948758049b93fed0cb539f8d586c7de3415
   sidekiq-cron (2.4.0) sha256=25595c5aee0c16d13a89466e5108af047fa4cfbf388199b39e1a600ca39472d4
   simplecov (1.1.1) sha256=25825ef13f0b2e74694d769817dad6ab8e90131dabdaa666e522fea105521e78
