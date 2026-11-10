@@ -63,4 +63,45 @@ class Home::CurrentWeather::SoilComponentTest < ViewComponent::TestCase
     assert_text "Auxiliary Sensors"
     assert_text "No sensors reporting"
   end
+
+  test "shows a paired temperature when its humidity sensor is not reporting" do
+    readings = [
+      { "channel" => 1, "name" => "Front Yard", "temperature_f" => 54 },
+      { "channel" => 2, "name" => "TH Ch 1", "temperature_f" => 82, "battery_low" => false },
+      { "channel" => 3, "name" => "Veggie Bed", "moisture" => 70 }
+    ]
+
+    render_inline(Home::CurrentWeather::SoilComponent.new(readings: readings))
+
+    assert_text "Front Yard"
+    assert_text "54°F"
+    assert_text "TH Ch 1"
+    assert_text "82°F"
+    assert_text "70%"
+    assert_no_text "N/A"
+  end
+
+  test "shows humidity when the paired temperature is not reporting" do
+    readings = [
+      { "channel" => 1, "name" => "TH Ch 1", "humidity" => 40, "battery_low" => true }
+    ]
+
+    render_inline(Home::CurrentWeather::SoilComponent.new(readings: readings))
+
+    assert_text "TH Ch 1"
+    assert_text "40%"
+    assert_no_text "°F"
+    assert_no_text "N/A"
+  end
+
+  test "shows N/A only when a sensor row has neither humidity nor temperature" do
+    readings = [
+      { "channel" => 1, "name" => "TH Ch 1" }
+    ]
+
+    render_inline(Home::CurrentWeather::SoilComponent.new(readings: readings))
+
+    assert_text "TH Ch 1"
+    assert_text "N/A"
+  end
 end
