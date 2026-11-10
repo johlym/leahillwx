@@ -12,7 +12,7 @@ gem "jbuilder", "~> 2.14"
 gem "jsbundling-rails", "~> 1.3"
 gem "oas_rails", "~> 1.3"
 gem "parallel", "~> 1.24"
-gem "pg", "~> 1.6"
+gem "pg", "~> 1.7"
 gem "propshaft", "~> 1.3"
 gem "puma", ">= 8.0"
 # 8.1.4 accepts redis-rb 6 in the Action Cable adapter. 8.1.3.x raises
