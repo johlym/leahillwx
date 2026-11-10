@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { renderSoilReadings } from "./helpers/soil_readings"
 
 // Writes live weather values into stat cards. Keep units / decimal
 // precision identical to Home::CurrentWeather::ConditionsComponent.
@@ -173,34 +174,7 @@ export default class extends Controller {
   }
 
   renderSoil(readings) {
-    if (!Array.isArray(readings) || readings.length === 0) {
-      return `<p class="live-tile-meta">No sensors reporting</p>`
-    }
-
-    return readings.map((reading) => {
-      const name = this.escapeHtml(reading.name || `Ch ${reading.channel}`)
-      const percent = reading.moisture != null ? reading.moisture : reading.humidity
-      let valueHtml = `<span class="soil-channel-na">N/A</span>`
-      if (percent != null) {
-        valueHtml = `<span class="soil-channel-number">${this.asInt(percent)}</span><span class="soil-channel-unit">%</span>`
-        if (reading.temperature_f != null) {
-          valueHtml += `<span class="soil-channel-temp"> / ${this.asInt(reading.temperature_f)}°F</span>`
-        }
-      }
-      return `<div class="soil-channel">
-        <span class="soil-channel-name">${name}</span>
-        <span class="soil-channel-value">${valueHtml}</span>
-      </div>`
-    }).join("")
-  }
-
-  escapeHtml(value) {
-    return String(value)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#39;")
+    return renderSoilReadings(readings)
   }
 
   asInt(value) {

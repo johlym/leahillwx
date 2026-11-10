@@ -467,6 +467,44 @@ class WeatherMeasurementTest < ActiveSupport::TestCase
     assert_includes measurement.errors[:temp_humidity], "battery_low must be a boolean"
   end
 
+  test "soil_readings keeps a paired temperature when humidity is not reporting" do
+    SoilChannels.instance_variable_set(:@soil_names, { 2 => "Front Yard" })
+    SoilChannels.instance_variable_set(:@temp_probe_names, { 1 => "Front Yard" })
+    SoilChannels.instance_variable_set(:@temp_humidity_names, { 1 => "Shed" })
+
+    measurement = WeatherMeasurement.new(valid_attrs(
+      temp_probes: [ { "channel" => 1, "temperature" => 12.0, "battery" => 1.4 } ],
+      temp_humidity: [ { "channel" => 1, "temperature" => 27.6, "battery_low" => false } ]
+    ))
+
+    readings = measurement.soil_readings.index_by { |reading| reading["name"] }
+
+    assert_equal [ "Front Yard", "Shed" ], measurement.soil_readings.map { |reading| reading["name"] }
+    assert_nil readings["Front Yard"]["moisture"]
+    assert_equal 54, readings["Front Yard"]["temperature_f"]
+    assert_nil readings["Shed"]["humidity"]
+    assert_equal 82, readings["Shed"]["temperature_f"]
+  ensure
+    SoilChannels.reload!
+  end
+
+  test "soil_readings keeps humidity when the paired temperature is not reporting" do
+    SoilChannels.instance_variable_set(:@soil_names, {})
+    SoilChannels.instance_variable_set(:@temp_probe_names, {})
+    SoilChannels.instance_variable_set(:@temp_humidity_names, {})
+
+    measurement = WeatherMeasurement.new(valid_attrs(
+      temp_humidity: [ { "channel" => 1, "humidity" => 40, "battery_low" => true } ]
+    ))
+
+    reading = measurement.soil_readings.first
+    assert_equal "TH Ch 1", reading["name"]
+    assert_equal 40, reading["humidity"]
+    assert_nil reading["temperature_f"]
+  ensure
+    SoilChannels.reload!
+  end
+
   test "soil_readings includes temp_humidity with humidity and fahrenheit temp" do
     SoilChannels.instance_variable_set(:@soil_names, {})
     SoilChannels.instance_variable_set(:@temp_probe_names, {})

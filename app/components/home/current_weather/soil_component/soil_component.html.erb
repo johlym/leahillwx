@@ -7,17 +7,23 @@
         <div class="soil-channels" data-weather-update-target="soil">
           <% if readings? %>
             <% readings.each do |reading| %>
+              <%# A pair can lose humidity or temperature independently. Show whichever side is still reporting. %>
               <% percent = reading["moisture"].nil? ? reading["humidity"] : reading["moisture"] %>
+              <% temperature = reading["temperature_f"] %>
               <div class="soil-channel">
                 <span class="soil-channel-name"><%= reading["name"] %></span>
                 <span class="soil-channel-value">
-                  <% if !percent.nil? %>
-                    <span class="soil-channel-number"><%= percent %></span><span class="soil-channel-unit">%</span>
-                    <% if !reading["temperature_f"].nil? %>
-                      <span class="soil-channel-temp"> / <%= reading["temperature_f"] %>°F</span>
-                    <% end %>
-                  <% else %>
+                  <% if percent.nil? && temperature.nil? %>
                     <span class="soil-channel-na">N/A</span>
+                  <% else %>
+                    <% if !percent.nil? %>
+                      <span class="soil-channel-number"><%= percent %></span><span class="soil-channel-unit">%</span>
+                    <% end %>
+                    <% if !percent.nil? && !temperature.nil? %>
+                      <span class="soil-channel-temp"> / <%= temperature %>°F</span>
+                    <% elsif !temperature.nil? %>
+                      <span class="soil-channel-number"><%= temperature %></span><span class="soil-channel-unit">°F</span>
+                    <% end %>
                   <% end %>
                 </span>
               </div>
