@@ -7,7 +7,7 @@ gem "bootsnap", "~> 1.25", require: false
 gem "cssbundling-rails", "~> 1.4"
 gem "dotenv", "~> 3.2"
 gem "ephem", "~> 0.5"
-gem "httparty", "~> 0.24.0"
+gem "httparty", "~> 0.24.3"
 gem "jbuilder", "~> 2.14"
 gem "jsbundling-rails", "~> 1.3"
 gem "oas_rails", "~> 1.3"
