@@ -51,29 +51,36 @@ module Records
     end
 
     def heat_index_and_wind_chill
-      # Bound like apparent_temp_extremes so all-time winter/summer scans
-      # cannot materialize the full matching set into Ruby.
-      highest_heat_index = extreme_by_feels_like(
-        @measurements.select(:temperature, :humidity, :wind_speed, :reading_date_time)
-                     .where("temperature > 27")
-                     .where("humidity >= 40")
-                     .order(temperature: :desc).limit(250),
-        :max
-      )
+      # Rank by the stored formula, not temperature. A cooler humid minute can
+      # beat a hotter dry slice; a windy near-freezing storm can beat a calmer
+      # colder night. SQL ORDER BY keeps the scan to one row (no N+1 feels_like).
+      highest_heat_index = @measurements
+        .select(:temperature, :humidity, :wind_speed, :reading_date_time)
+        .where("temperature > 27")
+        .where("humidity >= 40")
+        .order(Arel.sql("#{FeelsLike::HEAT_INDEX_C_SQL} DESC"))
+        .limit(1)
+        .first
       if highest_heat_index
-        @record.highest_heat_index = highest_heat_index.feels_like
+        @record.highest_heat_index = highest_heat_index.heat_index_c(
+          highest_heat_index.temperature,
+          highest_heat_index.humidity
+        )
         @record.highest_heat_index_at = highest_heat_index.reading_date_time
       end
 
-      lowest_wind_chill = extreme_by_feels_like(
-        @measurements.select(:temperature, :humidity, :wind_speed, :reading_date_time)
-                     .where("temperature < 10")
-                     .where("wind_speed > 1.34")
-                     .order(temperature: :asc).limit(250),
-        :min
-      )
+      lowest_wind_chill = @measurements
+        .select(:temperature, :humidity, :wind_speed, :reading_date_time)
+        .where("temperature < 10")
+        .where("wind_speed > 1.34")
+        .order(Arel.sql("#{FeelsLike::WIND_CHILL_C_SQL} ASC"))
+        .limit(1)
+        .first
       if lowest_wind_chill
-        @record.lowest_wind_chill = lowest_wind_chill.feels_like
+        @record.lowest_wind_chill = lowest_wind_chill.wind_chill_c(
+          lowest_wind_chill.temperature,
+          lowest_wind_chill.wind_speed
+        )
         @record.lowest_wind_chill_at = lowest_wind_chill.reading_date_time
       end
     end
