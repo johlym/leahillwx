@@ -1,5 +1,11 @@
 # Audit all gems listed in the Gemfile for known security problems by running bin/bundler-audit.
-# CVEs that are not relevant to the application can be enumerated on the ignore list below.
+# Advisories that do not apply to this deployment can be listed below.
 
 ignore:
-  - CVE-THAT-DOES-NOT-APPLY
+  # GHSA-r6vf-943r-2wvw is a Windows path traversal in Minitar.unpack and
+  # Minitar::Input#extract_entry. Patched releases are minitar 1.1.1 and
+  # 1.2.0. ephem 0.5.0 (and current ruby-ephem main) requires minitar ~> 0.12,
+  # so Bundler cannot select a patched release. This site runs on Linux and
+  # only opens a local DE440s BSP with Ephem::SPK. It does not unpack tar
+  # archives.
+  - GHSA-r6vf-943r-2wvw

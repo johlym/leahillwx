@@ -14,7 +14,9 @@ gem "oas_rails", "~> 1.3"
 gem "parallel", "~> 1.24"
 gem "pg", "~> 1.6"
 gem "propshaft", "~> 1.3"
-gem "puma", ">= 8.0"
+# 8.0.3 fixes the November 2026 Puma connection advisories. 8.0.4 also
+# closes fatal TLS read errors (GHSA-4v6q-hvv7-49h9).
+gem "puma", ">= 8.0.4"
 # 8.1.4 accepts redis-rb 6 in the Action Cable adapter. 8.1.3.x raises
 # Gem::LoadError (can't activate redis >= 4, < 6) once redis 6 is loaded.
 # 8.1.4.1 is the floor for the November 2026 Rails security advisories.
@@ -26,9 +28,11 @@ gem "redis", ">= 5.4"
 # addressable GHSA-4w5q-wg7v-w6gp and the 2.9.0 template, path, and display_uri advisories.
 # nokogiri GHSA-4p39-36wj-23h4, GHSA-v995-44v6-5fqm, GHSA-3w22-6jfg-527w.
 # rails-html-sanitizer GHSA-cpgf-5mjf-73p7, GHSA-h7wh-q2qr-458c.
+# msgpack CVE-2026-126366 (JRuby unpacker, GHSA-73v3-wf97-vpgj).
 gem "addressable", ">= 2.9.1"
 gem "crass", ">= 1.0.8"
 gem "erb", ">= 6.0.7"
+gem "msgpack", ">= 1.8.7"
 gem "nokogiri", ">= 1.19.5"
 gem "rails-html-sanitizer", ">= 1.7.2"
 gem "resolv", ">= 0.7.2"

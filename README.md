@@ -214,7 +214,7 @@ bin/bundler-audit
 bin/database_consistency
 ```
 
-GitHub `scan_ruby` fails the job on Brakeman or bundler-audit findings. `config/brakeman.ignore` documents three static QFF `Arel.sql` fragments in `LiveCardHourlyRanges` (station elevation, not request input).
+GitHub `scan_ruby` fails the job on Brakeman or bundler-audit findings. `config/brakeman.ignore` documents three static QFF `Arel.sql` fragments in `LiveCardHourlyRanges` (station elevation, not request input). `config/bundler-audit.yml` ignores minitar GHSA-r6vf-943r-2wvw because ephem 0.5.0 requires minitar 0.12, the issue is a Windows tar extract, and this app only opens a local BSP file on Linux.
 
 ## Pitfalls
 
