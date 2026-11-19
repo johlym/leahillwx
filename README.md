@@ -8,7 +8,7 @@ Visual language: [`DESIGN.md`](DESIGN.md). Radar ops: [`docs/radar/README.md`](d
 
 | Layer | Version / notes |
 | ----- | --------------- |
-| Ruby | 4.0.9 (`.ruby-version`) |
+| Ruby | 4.0.10 (`.ruby-version`) |
 | Rails | 8.1 |
 | Node | 24.x |
 | DB / jobs | PostgreSQL, Redis, Sidekiq + sidekiq-cron (`config/schedule.yml`) |
@@ -214,7 +214,7 @@ bin/bundler-audit
 bin/database_consistency
 ```
 
-GitHub `scan_ruby` fails the job on Brakeman or bundler-audit findings. `config/brakeman.ignore` documents three static QFF `Arel.sql` fragments in `LiveCardHourlyRanges` (station elevation, not request input).
+GitHub `scan_ruby` fails the job on Brakeman or bundler-audit findings. `config/brakeman.ignore` documents three static QFF `Arel.sql` fragments in `LiveCardHourlyRanges` (station elevation, not request input). `config/bundler-audit.yml` ignores minitar GHSA-r6vf-943r-2wvw because ephem 0.5.0 requires minitar 0.12, the issue is a Windows tar extract, and this app only opens a local BSP file on Linux.
 
 ## Pitfalls
 
