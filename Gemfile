@@ -12,7 +12,7 @@ gem "jbuilder", "~> 2.14"
 gem "jsbundling-rails", "~> 1.3"
 gem "oas_rails", "~> 1.3"
 gem "parallel", "~> 1.24"
-gem "pg", "~> 1.6"
+gem "pg", "~> 1.7"
 gem "propshaft", "~> 1.3"
 # 8.0.3 fixes the November 2026 Puma connection advisories. 8.0.4 also
 # closes fatal TLS read errors (GHSA-4v6q-hvv7-49h9).
