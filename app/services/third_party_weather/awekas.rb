@@ -3,7 +3,10 @@
 require "digest"
 
 module ThirdPartyWeather
-  # AWEKAS semicolon-delimited GET. See weewx restx AWEKASThread.
+  # AWEKAS semicolon-delimited GET.
+  # Rain is millimeters since local midnight and mm/h. weewx multiplies those
+  # fields by 10; AWEKAS stores the number as mm, so that scale is 10x too high.
+  # Solar radiation is W/m². The station light register is lux (brightness).
   class Awekas < Base
     URL = "https://data.awekas.at/eingabe_pruefung.php"
     MIN_INTERVAL = 5.minutes
@@ -13,6 +16,7 @@ module ThirdPartyWeather
     def upload(measurement)
       password_hash = Digest::MD5.hexdigest(ENV.fetch("AWEKAS_PASSWORD"))
       time_utc = measurement.reading_date_time.utc
+      solar_wm2 = WeatherMeasurement.lux_to_solar_irradiance_wm2(measurement.light)
 
       values = [
         ENV.fetch("AWEKAS_USERNAME"),
@@ -22,7 +26,7 @@ module ThirdPartyWeather
         measurement.temperature,
         measurement.humidity,
         measurement.sea_level_pressure_qff&.round(1), # QFF hPa; AWEKAS QC vs neighbors
-        (measurement.rain_day * 10).round(1), # mm * 10 as per AWEKAS spec
+        measurement.rain_day.round(2), # mm since local midnight
         (measurement.wind_speed * 3.6).round(1), # m/s to km/h
         measurement.wind_dir,
         "", # weather condition
@@ -31,12 +35,12 @@ module ThirdPartyWeather
         "en", # language
         "", # tendency
         (measurement.gust_speed * 3.6).round(1), # m/s to km/h
-        measurement.light,
+        solar_wm2&.round(1), # W/m²
         measurement.uvi,
-        "", # brightness in lux
+        measurement.light.round(0), # lux
         "", # sunshine hours
         "", # soil temperature
-        (measurement.rain_rate * 10).round(1), # mm/h * 10 as per AWEKAS spec
+        measurement.rain_rate.round(2), # mm/h
         SOFTWARE_TYPE,
         ENV.fetch("LOCATION_LON"),
         ENV.fetch("LOCATION_LAT")
