@@ -57,6 +57,12 @@ module ThirdPartyWeather
       assert_equal "12:00", values[3]
       assert_equal "20.0", values[4]
       assert_in_delta @measurement.sea_level_pressure_qff.round(1), values[6].to_f, 0.001
+      # 2.54 mm and 1.27 mm/h must be sent as millimeters. *10 reported
+      # 19.0 mm (0.75 in at 06:00 on 2026-11-26) as 190 mm.
+      assert_equal "2.54", values[7]
+      assert_equal "1.27", values[21]
+      assert_in_delta WeatherMeasurement.lux_to_solar_irradiance_wm2(500.0).round(1), values[16].to_f, 0.001
+      assert_equal "500", values[18]
       assert_equal "-122.2285", values[-2]
       assert_equal "47.3073", values[-1]
     end
