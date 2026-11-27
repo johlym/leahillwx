@@ -1,110 +1,65 @@
 <%= turbo_stream_from "weather_measurements" %>
 
-<% if @current %>
-  <%= render Home::CurrentWeather::ConditionsComponent.new(
-    current: @current,
-    almanac: @almanac,
-    today_forecast: @forecast&.days&.first,
-    current_forecast: @forecast&.current,
-    today_peaks: @today_peaks,
-    aqi: @aqi,
-    hourly_ranges: @hourly_ranges,
-    wildfire: @wildfire,
-    aurora: @aurora,
-    planet_night: @planet_night,
-    iss_pass: @iss_pass
-  ) %>
+<% if tv_display? %>
+  <% content_for :title, "Display — Lea Hill Weather" %>
+  <%= render "root/tv_display" %>
 <% else %>
-  <%= render "root/station_offline" %>
-<% end %>
+  <% if @current %>
+    <%= render Home::CurrentWeather::ConditionsComponent.new(
+      current: @current,
+      almanac: @almanac,
+      today_forecast: @forecast&.days&.first,
+      current_forecast: @forecast&.current,
+      today_peaks: @today_peaks,
+      aqi: @aqi,
+      hourly_ranges: @hourly_ranges,
+      wildfire: @wildfire,
+      aurora: @aurora,
+      planet_night: @planet_night,
+      iss_pass: @iss_pass
+    ) %>
+  <% else %>
+    <%= render "root/station_offline" %>
+  <% end %>
 
-<section class="home-section">
-  <div class="home-section-inner">
-    <% if @forecast&.created_at %>
-      <%= render Home::Forecast::HourlyForecastComponent.new(hours: @forecast.hours.first(8), timestamp: @forecast.created_at) %>
-    <% end %>
-  </div>
-</section>
-
-<section class="home-section">
-  <div class="home-section-inner">
-    <div class="home-columns">
-      <div class="home-column home-column-forecast">
-        <% if @forecast&.created_at %>
-          <%= render Home::Forecast::DailyForecastComponent.new(days: @forecast.days, timestamp: @forecast.created_at) %>
-        <% end %>
-      </div>
-
-      <div class="home-column home-column-cameras">
-        <div class="ui-card ui-card-pad-loose" data-controller="image-refresh">
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="ui-card-title m-0">Auburn Traffic Feeds</h2>
-            <span class="camera-status">Active</span>
-          </div>
-          <div class="camera-grid" id="traffic_cameras">
-            <figure>
-              <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/226.jpg", alt: "A ST SE / 2nd ST SE" %>
-              <figcaption>A ST SE / 2ND ST SE</figcaption>
-            </figure>
-            <figure>
-              <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/28.jpg", alt: "8th ST NE / Harvey" %>
-              <figcaption>8TH ST NE / HARVEY</figcaption>
-            </figure>
-            <figure>
-              <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/12.jpg", alt: "S 277th ST / Auburn Way N" %>
-              <figcaption>S 277TH / AUBURN WAY N</figcaption>
-            </figure>
-            <figure>
-              <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/161.jpg", alt: "SE 312th ST / 124th AVE SE" %>
-              <figcaption>SE 312TH / 124TH AVE SE</figcaption>
-            </figure>
-          </div>
-        </div>
-
-        <div class="ui-card ui-card-pad-loose" data-controller="image-refresh">
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="ui-card-title m-0">Auburn Muni (S50)</h2>
-            <span class="camera-refresh">
-              Updates in <span data-image-refresh-target="countdown">60</span>s
-            </span>
-          </div>
-          <div class="camera-grid" id="airport_cameras">
-            <figure>
-              <%= image_tag "https://images.wsdot.wa.gov/airports/auburn2.jpg", alt: "North" %>
-              <figcaption>NORTH VIEW</figcaption>
-            </figure>
-            <figure>
-              <%= image_tag "https://images.wsdot.wa.gov/airports/auburn4.jpg", alt: "East" %>
-              <figcaption>EAST VIEW</figcaption>
-            </figure>
-            <figure>
-              <%= image_tag "https://images.wsdot.wa.gov/airports/auburn3.jpg", alt: "South" %>
-              <figcaption>SOUTH VIEW</figcaption>
-            </figure>
-            <figure>
-              <%= image_tag "https://images.wsdot.wa.gov/airports/auburn1.jpg", alt: "West" %>
-              <figcaption>WEST VIEW</figcaption>
-            </figure>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="home-section">
-  <div class="home-section-inner">
-    <div class="border-t border-slate-900 pt-8">
-      <%= render Ui::CardComponent.new(
-            title: "Earthquakes",
-            subtitle: "The last 5 earthquakes nearest to this location",
-            padding: :loose
-          ) do |c| %>
-        <% c.with_actions do %>
-          <span class="text-[10px] text-slate-500">Earthquake feed provided by USGS</span>
-        <% end %>
-        <%= render Home::EarthquakeTableComponent.new(earthquakes: @earthquakes) %>
+  <section class="home-section">
+    <div class="home-section-inner">
+      <% if @forecast&.created_at %>
+        <%= render Home::Forecast::HourlyForecastComponent.new(hours: @forecast.hours.first(8), timestamp: @forecast.created_at) %>
       <% end %>
     </div>
-  </div>
-</section>
+  </section>
+
+  <section class="home-section">
+    <div class="home-section-inner">
+      <div class="home-columns">
+        <div class="home-column home-column-forecast">
+          <% if @forecast&.created_at %>
+            <%= render Home::Forecast::DailyForecastComponent.new(days: @forecast.days, timestamp: @forecast.created_at) %>
+          <% end %>
+        </div>
+
+        <div class="home-column home-column-cameras">
+          <%= render "root/cameras" %>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="home-section">
+    <div class="home-section-inner">
+      <div class="border-t border-slate-900 pt-8">
+        <%= render Ui::CardComponent.new(
+              title: "Earthquakes",
+              subtitle: "The last 5 earthquakes nearest to this location",
+              padding: :loose
+            ) do |c| %>
+          <% c.with_actions do %>
+            <span class="text-[10px] text-slate-500">Earthquake feed provided by USGS</span>
+          <% end %>
+          <%= render Home::EarthquakeTableComponent.new(earthquakes: @earthquakes) %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+<% end %>

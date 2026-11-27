@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html
   lang="en"
+  class="<%= "tv-display-root" if tv_display? %>"
   data-palette="<%= @palette || :night %>"
   data-controller="palette"
   <% if @palette_almanac&.sunrise_at %>
@@ -19,7 +20,7 @@
     <meta name="application-name" content="Lea Hill Weather">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="description" content="Current weather conditions and forecasts for Lea Hill, Auburn, WA">
-    <meta name="theme-color" content="#020617">
+    <meta name="theme-color" content="<%= tv_display? ? "#000000" : "#020617" %>">
     <meta name="color-scheme" content="dark">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -40,13 +41,15 @@
     <script src="https://cdn.usefathom.com/script.js" data-site="ZETHKCED" defer></script>
   </head>
 
-  <body class="site-body <%= yield(:body_class) %>" data-controller="weather-update">
+  <body class="<%= class_names("site-body", ("tv-display" if tv_display?), yield(:body_class)) %>" data-controller="weather-update">
     <a href="#main-content" class="skip-link">Skip to content</a>
-    <%= render "layouts/shared/header" %>
+    <% unless tv_display? %>
+      <%= render "layouts/shared/header" %>
+    <% end %>
     <main id="main-content" class="site-main" tabindex="-1"><%= yield %></main>
     <% if content_for?(:footer) %>
       <%= yield :footer %>
-    <% else %>
+    <% elsif !tv_display? %>
       <%= render "layouts/shared/footer" %>
     <% end %>
   </body>

@@ -1,0 +1,645 @@
+/* Full-viewport display at /?tv=true. Four slides share the screen;
+   the page background stays pure black. Landscape displays are the target. */
+
+html.tv-display-root {
+  background: #000;
+  height: 100%;
+  overflow: hidden;
+}
+
+html.tv-display-root body.tv-display {
+  background: #000;
+  color: #fff;
+  height: 100dvh;
+  max-height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+html.tv-display-root body.tv-display .site-main {
+  background: #000;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+html.tv-display-root body.tv-display .site-main > turbo-cable-stream-source {
+  display: none;
+}
+
+.tv-stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  background: #000;
+}
+
+.tv-slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 1.25rem 1.5rem 5.25rem;
+  background: #000;
+  opacity: 0;
+  visibility: hidden;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.tv-slide.is-active,
+.tv-slide.is-leaving {
+  visibility: visible;
+}
+
+.tv-slide.is-active {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 1;
+}
+
+.tv-slide.is-leaving {
+  opacity: 1;
+  z-index: 0;
+}
+
+.tv-stage.is-animate .tv-slide.is-active {
+  animation: tv-fade-in var(--tv-fade, 0.5s) linear;
+}
+
+@keyframes tv-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tv-stage.is-animate .tv-slide.is-active {
+    animation: none;
+  }
+}
+
+.tv-slide--conditions > .current-conditions,
+.tv-slide--sky > .sky-hazards,
+.tv-slide--forecast > .weekly-forecast,
+.tv-slide--forecast > .tv-empty,
+.tv-slide--cameras > .tv-camera-groups {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
+/* Current conditions: three bands share the frame. */
+.tv-slide--conditions .current-conditions {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  background: transparent;
+}
+
+.tv-slide--conditions .current-conditions-inner {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-width: none;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0;
+}
+
+.tv-slide--conditions .current-conditions-inner:has(.station-offline-card) {
+  justify-content: center;
+  align-items: center;
+}
+
+.tv-slide--conditions .station-offline-card {
+  margin: 0;
+  max-width: 42rem;
+  background: #161616;
+  border-color: #333;
+}
+
+.tv-slide--conditions .station-offline-card h1 {
+  font-size: clamp(2.5rem, 6vh, 4.5rem);
+}
+
+.tv-slide--conditions .current-conditions-hero,
+.tv-slide--conditions .live-strip,
+.tv-slide--conditions .live-strip-secondary {
+  display: grid;
+  gap: 0.75rem;
+  min-height: 0;
+  margin: 0;
+}
+
+.tv-slide--conditions .current-conditions-hero {
+  flex: 1.35 1 0;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 3.2fr) minmax(0, 3.8fr);
+}
+
+.tv-slide--conditions .live-strip,
+.tv-slide--conditions .live-strip-secondary {
+  flex: 0.78 1 0;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.tv-slide--conditions .current-hero-card,
+.tv-slide--conditions .current-wind-card,
+.tv-slide--conditions .current-sky-card,
+.tv-slide--conditions .live-strip > *,
+.tv-slide--conditions .live-strip-secondary > * {
+  grid-column: auto;
+  width: auto;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  background: #161616;
+  border-color: #333;
+}
+
+.tv-slide--conditions .current-hero-card,
+.tv-slide--conditions .current-wind-card,
+.tv-slide--conditions .current-sky-card,
+.tv-slide--conditions .ui-card {
+  padding: 0.85rem 1rem;
+}
+
+.tv-slide--conditions .current-hero-label,
+.tv-slide--conditions .live-tile-label,
+.tv-slide--conditions .live-tile-source,
+.tv-slide--conditions .current-hero-stat-label {
+  font-size: clamp(0.75rem, 1.45vh, 0.95rem);
+  color: #cbd5e1;
+}
+
+.tv-slide--conditions .current-hero-temp {
+  font-size: clamp(3.5rem, 11vh, 7.5rem);
+  line-height: 0.92;
+}
+
+.tv-slide--conditions .current-hero-unit {
+  font-size: clamp(1.75rem, 4vh, 3rem);
+}
+
+.tv-slide--conditions .current-hero-temp-row {
+  margin-top: 0.35rem;
+}
+
+.tv-slide--conditions .current-hero-icon {
+  font-size: clamp(1.75rem, 3.6vh, 2.75rem);
+}
+
+.tv-slide--conditions .current-hero-summary {
+  font-size: clamp(1.05rem, 2.2vh, 1.5rem);
+}
+
+.tv-slide--conditions .current-hero-stats {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  font-size: clamp(0.8rem, 1.6vh, 1rem);
+}
+
+.tv-slide--conditions .current-hero-stat-value,
+.tv-slide--conditions .current-hero-stat-high,
+.tv-slide--conditions .current-hero-stat-low {
+  font-size: clamp(1rem, 2vh, 1.35rem);
+}
+
+.tv-slide--conditions .current-wind-dial-wrap {
+  margin-top: 0.35rem;
+}
+
+.tv-slide--conditions .compass-lg {
+  --compass-size: clamp(3.5rem, 11vh, 7.25rem);
+}
+
+.tv-slide--conditions .compass-ring,
+.tv-slide--conditions .compass-ticks line {
+  stroke: #8a8a8a;
+}
+
+.tv-slide--conditions .compass-cardinals text,
+.tv-slide--conditions .compass-cardinals text.compass-cardinal-secondary {
+  fill: #cbd5e1;
+}
+
+.tv-slide--conditions .compass-needle-aft {
+  fill: #94a3b8;
+}
+
+.tv-slide--conditions .sky-arc-horizon {
+  stroke: #8a8a8a;
+}
+
+.tv-slide--conditions .sky-arc-time {
+  fill: #cbd5e1;
+}
+
+.tv-slide--conditions .sky-arc-body-dim {
+  opacity: 0.85;
+}
+
+.tv-slide--conditions .current-wind-card .text-3xl {
+  font-size: clamp(1.75rem, 4vh, 3rem);
+  line-height: 1;
+}
+
+.tv-slide--conditions .current-wind-footer {
+  margin-top: 0.35rem;
+  padding-top: 0.35rem;
+}
+
+.tv-slide--conditions .current-wind-footer,
+.tv-slide--conditions .live-tile-meta,
+.tv-slide--conditions .live-tile-peak,
+.tv-slide--conditions .soil-channel-name,
+.tv-slide--conditions .soil-channel-temp,
+.tv-slide--conditions .soil-channel-na {
+  color: #cbd5e1;
+  font-size: clamp(0.75rem, 1.5vh, 0.95rem);
+}
+
+.tv-slide--conditions .live-tile {
+  justify-content: center;
+  height: 100%;
+}
+
+.tv-slide--conditions .live-tile-number {
+  font-size: clamp(2rem, 4.8vh, 3.5rem);
+  line-height: 1.05;
+}
+
+.tv-slide--conditions .live-tile-source {
+  white-space: normal;
+}
+
+.tv-slide--conditions .live-tile-unit,
+.tv-slide--conditions .live-tile-unit-lg {
+  font-size: clamp(0.9rem, 1.8vh, 1.2rem);
+  color: #cbd5e1;
+}
+
+.tv-slide--conditions .current-sky-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.tv-slide--conditions .current-sky-card > div {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.tv-slide--conditions .current-sky-card .mt-4 {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+
+.tv-slide--conditions .sky-arc {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  height: auto;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+
+.tv-slide--conditions .sky-arc-svg {
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
+  aspect-ratio: auto;
+  margin-inline: auto;
+}
+
+.tv-slide--conditions .sky-arc-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.tv-slide--conditions .sky-arc-legend-times {
+  white-space: nowrap;
+}
+
+.tv-slide--conditions .sky-arc-legend,
+.tv-slide--conditions .sky-arc-legend-row,
+.tv-slide--conditions .sky-arc-legend-times {
+  font-size: clamp(0.75rem, 1.5vh, 0.95rem);
+}
+
+.tv-slide--conditions .status-badge {
+  font-size: clamp(0.7rem, 1.4vh, 0.9rem);
+}
+
+/* Sky and hazards: four equal cards. */
+.tv-slide--sky .sky-hazards {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  background: transparent;
+}
+
+.tv-slide--sky .sky-hazards-inner {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-width: none;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.tv-slide--sky .sky-hazards-header {
+  flex: 0 0 auto;
+  border: 0;
+  padding: 0;
+  margin: 0 0 0.75rem;
+}
+
+.tv-slide--sky .sky-hazards-title {
+  font-size: clamp(1.35rem, 2.8vh, 2rem);
+}
+
+.tv-slide--sky .sky-hazards-strip {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.tv-slide--sky .sky-hazards-strip > * {
+  min-height: 0;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  justify-content: center;
+  background: #161616;
+  border-color: #333;
+  padding: clamp(1rem, 2.5vh, 2rem) clamp(1rem, 2vw, 1.75rem);
+}
+
+.tv-slide--sky .sky-hazards-card-label {
+  font-size: clamp(0.8rem, 1.6vh, 1.05rem);
+}
+
+.tv-slide--sky .text-3xl {
+  font-size: clamp(2.5rem, 7vh, 5rem);
+  line-height: 1.05;
+}
+
+.tv-slide--sky .text-lg {
+  font-size: clamp(1.5rem, 3.4vh, 2.5rem);
+  line-height: 1.15;
+}
+
+.tv-slide--sky .text-xs,
+.tv-slide--sky .sky-hazards-planet-list,
+.tv-slide--sky .live-tile-meta,
+.tv-slide--sky .sky-hazards-planet-times,
+.tv-slide--sky .sky-hazards-credits {
+  font-size: clamp(0.85rem, 1.7vh, 1.1rem);
+  color: #cbd5e1;
+}
+
+.tv-slide--sky .sky-hazards-planet-list {
+  overflow: hidden;
+}
+
+.tv-slide--sky .sky-hazards-planet-row {
+  flex-wrap: wrap;
+  gap: 0.15rem 0.6rem;
+}
+
+.tv-slide--sky .sky-hazards-planet-times {
+  white-space: normal;
+}
+
+.tv-slide--sky .sky-hazards-credits {
+  flex: 0 0 auto;
+  margin-top: 0.6rem;
+}
+
+.tv-slide--sky .status-badge {
+  font-size: clamp(0.8rem, 1.6vh, 1rem);
+}
+
+/* 7-day forecast: one row per day, filling the frame. */
+.tv-slide--forecast .weekly-forecast {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+}
+
+.tv-slide--forecast .weather-tile-heading,
+.tv-empty-title {
+  flex: 0 0 auto;
+  margin: 0 0 0.35rem;
+  font-family: var(--font-heading);
+  font-size: clamp(1.35rem, 2.8vh, 2rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.tv-slide--forecast .forecast-entry {
+  flex: 1 1 0;
+  min-height: 0;
+  align-items: center;
+  padding: 0.35rem 1rem;
+  background: #161616;
+  border: 1px solid #333;
+  border-radius: 0.75rem;
+}
+
+.tv-slide--forecast .forecast-entry:hover {
+  background: #161616;
+}
+
+.tv-slide--forecast .date-grid {
+  width: 7.5rem;
+}
+
+.tv-slide--forecast .dayname {
+  font-size: clamp(1rem, 2.3vh, 1.55rem);
+}
+
+.tv-slide--forecast .daynum,
+.tv-slide--forecast .forecast-summary,
+.tv-slide--forecast .forecast-condition-label {
+  color: #cbd5e1;
+  font-size: clamp(0.85rem, 1.7vh, 1.15rem);
+}
+
+.tv-slide--forecast .forecast-condition-label {
+  display: inline-block;
+}
+
+.tv-slide--forecast .forecast-summary {
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.tv-slide--forecast .forecast-temps .high,
+.tv-slide--forecast .forecast-temps .low {
+  font-size: clamp(1.35rem, 3.2vh, 2.25rem);
+}
+
+.tv-slide--forecast .forecast-temps .low {
+  color: #cbd5e1;
+}
+
+.tv-slide--forecast .conditions .icon {
+  font-size: clamp(1.5rem, 3vh, 2.25rem);
+}
+
+.tv-empty {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.tv-empty-copy {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: clamp(1rem, 2vh, 1.35rem);
+}
+
+/* Webcams: two labeled rows, four feeds each. */
+.tv-camera-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 0;
+}
+
+.tv-slide--cameras .ui-card {
+  flex: 1 1 0;
+  min-height: 0;
+  padding: 0.35rem 0.15rem 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+
+.tv-slide--cameras .ui-card:hover {
+  background: transparent;
+  border-color: transparent;
+}
+
+.tv-slide--cameras .ui-card-title {
+  font-size: clamp(1rem, 2.2vh, 1.5rem);
+}
+
+.tv-slide--cameras .camera-status,
+.tv-slide--cameras .camera-refresh {
+  font-size: clamp(0.75rem, 1.5vh, 0.95rem);
+  color: #cbd5e1;
+}
+
+.tv-slide--cameras .camera-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+.tv-slide--cameras .camera-grid figure {
+  aspect-ratio: auto;
+  height: 100%;
+  min-height: 0;
+  border-color: #333;
+  background: #111;
+}
+
+.tv-slide--cameras .camera-grid figcaption {
+  font-size: clamp(0.7rem, 1.45vh, 0.95rem);
+  padding: 0.55rem 0.7rem;
+}
+
+.tv-progress {
+  position: absolute;
+  z-index: 5;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.tv-progress:focus {
+  outline: none;
+}
+
+.tv-progress:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 4px;
+}
+
+.tv-progress.is-paused {
+  box-shadow: inset 0 0 0 2px #fff;
+}
+
+.tv-progress-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.tv-progress-track,
+.tv-progress-value {
+  fill: none;
+  stroke-width: 2.5;
+}
+
+.tv-progress-track {
+  stroke: #8a8a8a;
+}
+
+.tv-progress-value {
+  stroke: #fff;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: rotate(-90deg);
+}
+
+.tv-progress-count {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: #fff;
+}

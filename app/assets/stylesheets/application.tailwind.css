@@ -26,3 +26,4 @@
 /* Unlayered; must follow vendor/leaflet so zoom-bar overrides win. */
 @import "./components/radar-leaflet";
 @import "./components/radar-maplibre";
+@import "./components/tv-display";

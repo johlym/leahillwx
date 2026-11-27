@@ -8,7 +8,7 @@
     </div>
     <div class="conditions">
       <div class="icon">
-        <%= render "root/shared/weather_icon", icon: entry.weather_icon %>
+        <%= render "root/shared/weather_icon", icon: entry.weather_icon, decorative: true %>
       </div>
       <span class="forecast-condition-label"><%= entry.weather_description&.titleize %></span>
     </div>
@@ -16,8 +16,8 @@
       <p class="forecast-summary"><%= entry.summary %>.</p>
     </div>
     <div class="forecast-temps">
-      <span class="high"><%= entry.temp_max.round %>°</span>
-      <span class="low"><%= entry.temp_min.round %>°</span>
+      <span class="high"><span class="forecast-temp-label">High</span> <%= entry.temp_max.round %>°</span>
+      <span class="low"><span class="forecast-temp-label">Low</span> <%= entry.temp_min.round %>°</span>
     </div>
   </div>
   <% end %>

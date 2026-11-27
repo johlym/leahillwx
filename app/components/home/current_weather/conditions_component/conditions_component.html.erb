@@ -12,7 +12,7 @@
           </div>
           <div class="current-hero-desc">
             <div class="current-hero-icon">
-              <%= render "root/shared/weather_icon", icon: weather_icon, night: night_time?, blackout: true %>
+              <%= render "root/shared/weather_icon", icon: weather_icon, night: night_time?, blackout: true, decorative: true %>
             </div>
             <p class="current-hero-summary"><%= weather_description %></p>
           </div>
@@ -163,9 +163,11 @@
   </div>
 </section>
 
-<%= render Home::CurrentWeather::SkyHazardsComponent.new(
-      wildfire: wildfire,
-      aurora: aurora,
-      planet_night: planet_night,
-      iss_pass: iss_pass
-    ) %>
+<% if show_sky_hazards? %>
+  <%= render Home::CurrentWeather::SkyHazardsComponent.new(
+        wildfire: wildfire,
+        aurora: aurora,
+        planet_night: planet_night,
+        iss_pass: iss_pass
+      ) %>
+<% end %>

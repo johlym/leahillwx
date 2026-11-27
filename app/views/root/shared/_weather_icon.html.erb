@@ -16,6 +16,9 @@
   precip = "var(--weather-precip)"
   style_pair = "--fa-primary-color: #{primary}; --fa-secondary-color: #{cloud}; --fa-secondary-opacity: 1;"
 %>
+<% if local_assigns[:decorative] %>
+<span aria-hidden="true">
+<% end %>
 <% case base_icon %>
 <% when '01' %>
   <i class="<%= isize %> <%= prefix %> fa-<%= sun_moon %>" style="--fa-primary-color: <%= primary %>; --fa-secondary-color: <%= primary %>;"></i>
@@ -37,4 +40,7 @@
   <i class="<%= isize %> <%= prefix %> fa-cloud-fog" style="--fa-primary-color: <%= cloud %>; --fa-secondary-color: var(--subtle); --fa-secondary-opacity: 1;"></i>
 <% else %>
   <i class="<%= isize %> <%= prefix %> fa-question" style="--fa-primary-color: <%= cloud %>; --fa-secondary-color: <%= cloud %>;"></i>
+<% end %>
+<% if local_assigns[:decorative] %>
+</span>
 <% end %>

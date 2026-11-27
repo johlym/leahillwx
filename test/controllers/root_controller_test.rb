@@ -16,6 +16,63 @@ class RootControllerTest < ActionDispatch::IntegrationTest
   test "should get index" do
     get root_url
     assert_response :success
+    assert_select "header.site-header"
+    assert_select "section.sky-hazards", count: 1
+    assert_select ".tv-stage", count: 0
+  end
+
+  test "tv display cycles four full-screen slides without site chrome" do
+    get root_url(tv: "true")
+
+    assert_response :success
+    assert_select "html.tv-display-root"
+    assert_select "body.tv-display"
+    assert_select "title", text: "Display — Lea Hill Weather"
+    assert_select "meta[name=theme-color][content='#000000']"
+    assert_select "header.site-header", count: 0
+    assert_select "footer.site-footer", count: 0
+    assert_select "a.skip-link[href='#main-content']"
+    assert_select "main#main-content"
+    assert_select "h1", text: "Lea Hill Weather display"
+    assert_select ".tv-stage[data-controller=tv-cycle][data-tv-cycle-interval-value='10000'][aria-roledescription=carousel]"
+    assert_select ".tv-slide", count: 4
+    assert_select ".tv-slide.is-active", count: 1
+    assert_select ".tv-slide--conditions.is-active[aria-label='1 of 4: Current conditions']"
+    assert_select ".tv-slide--conditions section.sky-hazards", count: 0
+    assert_select ".tv-slide--conditions .current-hero-temp"
+    assert_select ".tv-slide--sky[inert][aria-hidden=true] section.sky-hazards", count: 1
+    assert_select ".tv-slide--forecast[inert] .weekly-forecast"
+    assert_select ".tv-slide--forecast .forecast-temps .high", text: /High \d+°/
+    assert_select ".tv-slide--cameras[inert] #traffic_cameras"
+    assert_select ".tv-slide--cameras #airport_cameras"
+    assert_select ".hourly-forecast", count: 0
+    assert_select "table.earthquake-table", count: 0
+    assert_select "button.tv-progress[type=button][aria-pressed=false][aria-label='Pause display rotation']"
+    assert_select "svg.tv-progress-svg[aria-hidden=true]"
+    assert_select ".tv-progress-count", text: "10"
+    assert_select "#tv-progress-help"
+    assert_select "[data-tv-cycle-target=status][aria-live=polite]"
+  end
+
+  test "tv query other than true keeps the normal homepage" do
+    get root_url(tv: "1")
+
+    assert_response :success
+    assert_select "header.site-header"
+    assert_select ".tv-stage", count: 0
+  end
+
+  test "tv display shows the offline state inside the first slide" do
+    WeatherMeasurement.delete_all
+
+    get root_url(tv: "true")
+
+    assert_response :success
+    assert_select "header.site-header", count: 0
+    assert_select ".tv-slide", count: 4
+    assert_select "h1", text: "Lea Hill Weather display"
+    assert_select ".tv-slide--conditions h2", text: "Station offline"
+    assert_select "h1", count: 1
   end
 
   test "layout exposes language, skip link, and mobile menu controls" do

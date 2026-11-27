@@ -1,0 +1,51 @@
+<div class="ui-card ui-card-pad-loose" data-controller="image-refresh">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="ui-card-title m-0">Auburn Traffic Feeds</h2>
+    <span class="camera-status">Active</span>
+  </div>
+  <div class="camera-grid" id="traffic_cameras">
+    <figure>
+      <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/226.jpg", alt: "A ST SE / 2nd ST SE" %>
+      <figcaption>A ST SE / 2ND ST SE</figcaption>
+    </figure>
+    <figure>
+      <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/28.jpg", alt: "8th ST NE / Harvey" %>
+      <figcaption>8TH ST NE / HARVEY</figcaption>
+    </figure>
+    <figure>
+      <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/12.jpg", alt: "S 277th ST / Auburn Way N" %>
+      <figcaption>S 277TH / AUBURN WAY N</figcaption>
+    </figure>
+    <figure>
+      <%= image_tag "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/161.jpg", alt: "SE 312th ST / 124th AVE SE" %>
+      <figcaption>SE 312TH / 124TH AVE SE</figcaption>
+    </figure>
+  </div>
+</div>
+
+<div class="ui-card ui-card-pad-loose" data-controller="image-refresh">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="ui-card-title m-0">Auburn Muni (S50)</h2>
+    <span class="camera-refresh">
+      Updates in <span data-image-refresh-target="countdown">60</span>s
+    </span>
+  </div>
+  <div class="camera-grid" id="airport_cameras">
+    <figure>
+      <%= image_tag "https://images.wsdot.wa.gov/airports/auburn2.jpg", alt: "North" %>
+      <figcaption>NORTH VIEW</figcaption>
+    </figure>
+    <figure>
+      <%= image_tag "https://images.wsdot.wa.gov/airports/auburn4.jpg", alt: "East" %>
+      <figcaption>EAST VIEW</figcaption>
+    </figure>
+    <figure>
+      <%= image_tag "https://images.wsdot.wa.gov/airports/auburn3.jpg", alt: "South" %>
+      <figcaption>SOUTH VIEW</figcaption>
+    </figure>
+    <figure>
+      <%= image_tag "https://images.wsdot.wa.gov/airports/auburn1.jpg", alt: "West" %>
+      <figcaption>WEST VIEW</figcaption>
+    </figure>
+  </div>
+</div>

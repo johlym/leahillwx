@@ -49,3 +49,12 @@
 @utility sky-arc-swatch-moon {
   @apply bg-indigo-400;
 }
+
+.sky-arc-horizon {
+  stroke: color-mix(in oklab, var(--color-border-strong) 65%, transparent);
+}
+
+.sky-arc-time {
+  fill: #64748b;
+  font-family: var(--font-mono);
+}

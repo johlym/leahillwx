@@ -1,0 +1,110 @@
+<% conditions_label = @current ? "Current conditions" : "Station offline" %>
+
+<section
+  class="tv-stage"
+  data-controller="tv-cycle"
+  data-tv-cycle-interval-value="10000"
+  aria-roledescription="carousel"
+  aria-label="Weather display">
+  <h1 class="sr-only">Lea Hill Weather display</h1>
+
+  <button
+    type="button"
+    class="tv-progress"
+    data-tv-cycle-target="toggle"
+    data-action="tv-cycle#togglePause"
+    aria-pressed="false"
+    aria-label="Pause display rotation"
+    aria-describedby="tv-progress-help">
+    <svg class="tv-progress-svg" viewBox="0 0 36 36" aria-hidden="true" focusable="false">
+      <circle class="tv-progress-track" cx="18" cy="18" r="15.5" pathLength="100"></circle>
+      <circle
+        class="tv-progress-value"
+        data-tv-cycle-target="ring"
+        cx="18"
+        cy="18"
+        r="15.5"
+        pathLength="100"
+        stroke-dasharray="100"
+        stroke-dashoffset="0"></circle>
+    </svg>
+    <span class="tv-progress-count" data-tv-cycle-target="count" aria-hidden="true">10</span>
+  </button>
+  <p id="tv-progress-help" class="sr-only">Each screen stays up for 10 seconds. Left and right arrow keys change screens.</p>
+
+  <section
+    class="tv-slide tv-slide--conditions is-active"
+    data-tv-cycle-target="slide"
+    data-tv-label="<%= conditions_label %>"
+    role="group"
+    aria-roledescription="slide"
+    aria-label="1 of 4: <%= conditions_label %>">
+    <% if @current %>
+      <h2 class="sr-only">Current conditions</h2>
+      <%= render Home::CurrentWeather::ConditionsComponent.new(
+            current: @current,
+            almanac: @almanac,
+            today_forecast: @forecast&.days&.first,
+            current_forecast: @forecast&.current,
+            today_peaks: @today_peaks,
+            aqi: @aqi,
+            hourly_ranges: @hourly_ranges,
+            show_sky_hazards: false
+          ) %>
+    <% else %>
+      <%= render "root/station_offline", heading_tag: :h2 %>
+    <% end %>
+  </section>
+
+  <section
+    class="tv-slide tv-slide--sky"
+    data-tv-cycle-target="slide"
+    data-tv-label="Sky and nearby hazards"
+    role="group"
+    aria-roledescription="slide"
+    aria-label="2 of 4: Sky and nearby hazards"
+    aria-hidden="true"
+    inert>
+    <%= render Home::CurrentWeather::SkyHazardsComponent.new(
+          wildfire: @wildfire,
+          aurora: @aurora,
+          planet_night: @planet_night,
+          iss_pass: @iss_pass
+        ) %>
+  </section>
+
+  <section
+    class="tv-slide tv-slide--forecast"
+    data-tv-cycle-target="slide"
+    data-tv-label="7-day forecast"
+    role="group"
+    aria-roledescription="slide"
+    aria-label="3 of 4: 7-day forecast"
+    aria-hidden="true"
+    inert>
+    <% if @forecast&.created_at && @forecast.days.any? %>
+      <%= render Home::Forecast::DailyForecastComponent.new(days: @forecast.days, timestamp: @forecast.created_at) %>
+    <% else %>
+      <div class="tv-empty">
+        <h2 class="tv-empty-title">7-Day Forecast</h2>
+        <p class="tv-empty-copy">Forecast unavailable.</p>
+      </div>
+    <% end %>
+  </section>
+
+  <section
+    class="tv-slide tv-slide--cameras"
+    data-tv-cycle-target="slide"
+    data-tv-label="Webcams"
+    role="group"
+    aria-roledescription="slide"
+    aria-label="4 of 4: Webcams"
+    aria-hidden="true"
+    inert>
+    <div class="tv-camera-groups">
+      <%= render "root/cameras" %>
+    </div>
+  </section>
+
+  <p class="sr-only" data-tv-cycle-target="status" aria-live="polite" aria-atomic="true"></p>
+</section>
