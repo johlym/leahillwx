@@ -453,24 +453,16 @@ html.tv-display-root body.tv-display .site-main > turbo-cable-stream-source {
 }
 
 .tv-slide--forecast {
-  --tv-forecast-icon: clamp(4.5rem, 13vh, 6.75rem);
+  --tv-forecast-icon: clamp(3.75rem, 10vh, 5.5rem);
 }
 
 .tv-slide--forecast .forecast-days {
   display: grid;
   grid-template-columns: repeat(var(--forecast-days, 1), minmax(0, 1fr));
-  grid-template-rows:
-    auto
-    auto
-    var(--tv-forecast-icon)
-    auto
-    auto
-    auto
-    minmax(0, 1fr);
   flex: 1 1 auto;
   min-height: 0;
-  column-gap: 0.75rem;
-  row-gap: clamp(0.35rem, 1vh, 0.7rem);
+  height: 100%;
+  gap: 0.75rem;
   align-items: stretch;
 }
 
@@ -487,16 +479,17 @@ html.tv-display-root body.tv-display .site-main > turbo-cable-stream-source {
 }
 
 .tv-slide--forecast .forecast-entry {
-  display: grid;
-  grid-row: 1 / -1;
-  grid-template-rows: subgrid;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
   min-width: 0;
   min-height: 0;
-  height: auto;
-  padding: 0;
+  height: 100%;
+  padding: 1rem 0.45rem 1.1rem;
   text-align: center;
+  container-type: inline-size;
   background: #161616;
   border: 1px solid #333;
   border-radius: 0.75rem;
@@ -506,43 +499,37 @@ html.tv-display-root body.tv-display .site-main > turbo-cable-stream-source {
   background: #161616;
 }
 
-.tv-slide--forecast .forecast-entry > .date-grid,
-.tv-slide--forecast .forecast-entry > .conditions,
-.tv-slide--forecast .forecast-entry > .forecast-text,
-.tv-slide--forecast .forecast-entry > .forecast-temps {
-  display: grid;
-  grid-template-rows: subgrid;
-  gap: 0;
+.tv-slide--forecast .date-grid,
+.tv-slide--forecast .conditions,
+.tv-slide--forecast .forecast-temps,
+.tv-slide--forecast .forecast-text {
   width: 100%;
   min-width: 0;
   margin: 0;
-  padding-inline: 0.6rem;
   text-align: center;
-  justify-items: center;
-  align-items: center;
 }
 
-.tv-slide--forecast .date-grid {
-  grid-row: 1 / span 2;
-  width: 100%;
-  padding-top: 0.9rem;
-}
+.tv-slide--forecast .date-grid { order: 1; }
 
 .tv-slide--forecast .conditions {
-  grid-row: 3 / span 2;
+  order: 2;
+  display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
 }
 
 .tv-slide--forecast .forecast-temps {
-  grid-row: 5 / span 2;
+  order: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
 }
 
-.tv-slide--forecast .forecast-entry > .forecast-text {
-  grid-row: 7;
-  align-self: stretch;
-  align-items: start;
-  justify-content: start;
-  padding-bottom: 1rem;
+.tv-slide--forecast .forecast-text {
+  order: 4;
 }
 
 .tv-slide--forecast .forecast-temps .low {
@@ -598,22 +585,22 @@ html.tv-display-root body.tv-display .site-main > turbo-cable-stream-source {
 }
 
 .tv-slide--forecast .forecast-temps .high {
-  font-size: clamp(3.1rem, 8vh, 5.4rem);
+  font-size: min(2.9rem, 28cqi);
 }
 
 .tv-slide--forecast .forecast-temps .low {
   color: #cbd5e1;
-  font-size: clamp(2.1rem, 5.2vh, 3.5rem);
+  font-size: min(2rem, 20cqi);
 }
 
 .tv-slide--forecast .conditions .icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  font-size: calc(var(--tv-forecast-icon) * 0.78);
+  width: var(--tv-forecast-icon);
+  height: var(--tv-forecast-icon);
+  flex: 0 0 auto;
+  font-size: calc(var(--tv-forecast-icon) * 0.72);
   line-height: 1;
 }
 
