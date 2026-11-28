@@ -12,7 +12,8 @@ class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
     wildfire: nil,
     aurora: nil,
     planet_night: nil,
-    iss_pass: nil
+    iss_pass: nil,
+    show_sky_hazards: true
   )
     @current = current
     @almanac = almanac
@@ -25,9 +26,14 @@ class Home::CurrentWeather::ConditionsComponent < ViewComponent::Base
     @aurora = aurora
     @planet_night = planet_night
     @iss_pass = iss_pass
+    @show_sky_hazards = show_sky_hazards
   end
 
   attr_reader :today_peaks, :aqi, :hourly_ranges, :wildfire, :aurora, :planet_night, :iss_pass
+
+  def show_sky_hazards?
+    @show_sky_hazards
+  end
 
   def season
     @almanac.season

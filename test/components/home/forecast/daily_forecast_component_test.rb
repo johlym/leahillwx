@@ -56,8 +56,8 @@ class Home::Forecast::DailyForecastComponentTest < ViewComponent::TestCase
     render_inline(component)
 
     first_day = @parsed_forecast.days.first
-    assert_selector "div.forecast-temps span.high", text: "#{first_day.temp_max.round}°"
-    assert_selector "div.forecast-temps span.low", text: "#{first_day.temp_min.round}°"
+    assert_selector "div.forecast-temps span.high", text: "High #{first_day.temp_max.round}°"
+    assert_selector "div.forecast-temps span.low", text: "Low #{first_day.temp_min.round}°"
   end
 
   def test_renders_weather_description

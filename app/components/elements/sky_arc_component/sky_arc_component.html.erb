@@ -17,9 +17,7 @@
           fill="url(#sky-fill-<%= uid %>)"
           opacity="0.9" />
 
-    <line x1="6" y1="100" x2="194" y2="100"
-          style="stroke: color-mix(in oklab, var(--color-border-strong) 65%, transparent)"
-          stroke-width="1" />
+    <line class="sky-arc-horizon" x1="6" y1="100" x2="194" y2="100" stroke-width="1" />
 
     <% bodies.each do |body| %>
       <path d="<%= arc_d(body) %>"
@@ -45,12 +43,10 @@
 
     <% sun = bodies.find { |b| b.key == "sun" } %>
     <% if sun %>
-      <text x="10" y="118" text-anchor="start" font-size="8"
-            style="fill: #64748b; font-family: var(--font-mono)">
+      <text class="sky-arc-time" x="10" y="118" text-anchor="start" font-size="8">
         <%= format_hm(sun.rise_at) %>
       </text>
-      <text x="190" y="118" text-anchor="end" font-size="8"
-            style="fill: #64748b; font-family: var(--font-mono)">
+      <text class="sky-arc-time" x="190" y="118" text-anchor="end" font-size="8">
         <%= format_hm(sun.set_at) %>
       </text>
     <% end %>

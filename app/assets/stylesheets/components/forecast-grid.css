@@ -69,6 +69,9 @@
   & > .forecast-temps .low {
     @apply font-heading text-sm font-bold text-slate-500 ml-2;
   }
+  & > .forecast-temps .forecast-temp-label {
+    @apply text-[0.65em] font-bold uppercase tracking-wide mr-1;
+  }
 
   & > .wind {
     @apply hidden;
