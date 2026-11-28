@@ -474,16 +474,14 @@ html.tv-display-root body.tv-display .site-main > turbo-cable-stream-source {
 
 .tv-slide--forecast .forecast-entry {
   display: flex;
-  flex: 1 1 0;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  gap: 0.65rem;
+  justify-content: space-between;
+  gap: 0.75rem;
   min-width: 0;
   min-height: 0;
   height: 100%;
-  align-self: stretch;
-  padding: 0.85rem 0.55rem;
+  padding: 1.15rem 0.7rem 1.35rem;
   text-align: center;
   background: #161616;
   border: 1px solid #333;
@@ -507,27 +505,32 @@ html.tv-display-root body.tv-display .site-main > turbo-cable-stream-source {
 .tv-slide--forecast .date-grid {
   width: auto;
   order: 1;
+  flex: 0 0 auto;
 }
 
 .tv-slide--forecast .conditions {
+  flex: 0 0 auto;
   flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
   order: 2;
 }
 
 .tv-slide--forecast .forecast-temps {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.85rem, 2.5vh, 1.75rem);
   order: 3;
 }
 
 .tv-slide--forecast .forecast-text {
   order: 4;
-  flex: 1 1 auto;
-}
-
-.tv-slide--forecast .forecast-temps {
+  flex: 0 0 auto;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.2rem;
+  align-items: flex-end;
 }
 
 .tv-slide--forecast .forecast-temps .low {
@@ -535,36 +538,59 @@ html.tv-display-root body.tv-display .site-main > turbo-cable-stream-source {
 }
 
 .tv-slide--forecast .dayname {
-  font-size: clamp(1.15rem, 2.6vh, 1.85rem);
+  font-size: clamp(1.65rem, 3.6vh, 2.6rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
 }
 
-.tv-slide--forecast .daynum,
-.tv-slide--forecast .forecast-summary,
-.tv-slide--forecast .forecast-condition-label {
+.tv-slide--forecast .daynum {
+  margin-top: 0.2rem;
   color: #cbd5e1;
-  font-size: clamp(0.85rem, 1.7vh, 1.15rem);
+  font-size: clamp(0.85rem, 1.7vh, 1.1rem);
+}
+
+.tv-slide--forecast .forecast-condition-label,
+.tv-slide--forecast .forecast-summary {
+  color: #cbd5e1;
+  font-size: clamp(0.95rem, 1.9vh, 1.25rem);
+  line-height: 1.35;
 }
 
 .tv-slide--forecast .forecast-condition-label {
-  display: inline-block;
+  display: block;
 }
 
 .tv-slide--forecast .forecast-summary {
-  -webkit-line-clamp: 6;
-  line-clamp: 6;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
 }
 
 .tv-slide--forecast .forecast-temps .high,
 .tv-slide--forecast .forecast-temps .low {
-  font-size: clamp(1.35rem, 3.2vh, 2.25rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 0.9;
+}
+
+.tv-slide--forecast .forecast-temps .forecast-temp-label {
+  display: block;
+  margin: 0 0 0.25rem;
+  font-size: clamp(0.72rem, 1.45vh, 0.95rem);
+  letter-spacing: 0.16em;
+}
+
+.tv-slide--forecast .forecast-temps .high {
+  font-size: clamp(3.1rem, 8vh, 5.4rem);
 }
 
 .tv-slide--forecast .forecast-temps .low {
   color: #cbd5e1;
+  font-size: clamp(2.1rem, 5.2vh, 3.5rem);
 }
 
 .tv-slide--forecast .conditions .icon {
-  font-size: clamp(1.5rem, 3vh, 2.25rem);
+  font-size: clamp(1.7rem, 4.2vh, 2.6rem);
 }
 
 .tv-empty {
