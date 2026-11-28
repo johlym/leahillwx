@@ -529,7 +529,7 @@ html.tv-display-root body.tv-display .site-main > turbo-cable-stream-source {
 }
 
 .tv-slide--forecast .forecast-text {
-  order: 4;
+  display: none;
 }
 
 .tv-slide--forecast .forecast-temps .low {
