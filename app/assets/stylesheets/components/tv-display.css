@@ -1,5 +1,6 @@
-/* Full-viewport display at /?tv=true. Five slides share the screen;
-   the page background stays pure black. Landscape displays are the target. */
+/* Full-viewport display at /?tv=true.
+   One broadcast board per slide: type on black, hairline rules,
+   content anchored to the edges of the frame. */
 
 html.tv-display-root {
   background: #000;
@@ -35,6 +36,9 @@ html.tv-display-root body.tv-display .site-main > turbo-cable-stream-source {
   min-height: 0;
   height: 100%;
   background: #000;
+  color: #fff;
+  font-family: "Barlow Condensed", "Arial Narrow", var(--font-heading), sans-serif;
+  font-synthesis: none;
 }
 
 .tv-slide {
@@ -43,7 +47,7 @@ html.tv-display-root body.tv-display .site-main > turbo-cable-stream-source {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  padding: 1.25rem 1.5rem 5.25rem;
+  padding: 0;
   background: #000;
   opacity: 0;
   visibility: hidden;
@@ -83,609 +87,444 @@ html.tv-display-root body.tv-display .site-main > turbo-cable-stream-source {
   }
 }
 
-.tv-slide--conditions > .current-conditions,
-.tv-slide--sky > .sky-hazards,
-.tv-slide--forecast > .weekly-forecast,
-.tv-slide--forecast > .tv-empty,
-.tv-slide--cameras > .tv-camera-groups {
+.tv-now,
+.tv-quads,
+.tv-cast,
+.tv-cams,
+.tv-empty {
   flex: 1 1 auto;
   min-height: 0;
   width: 100%;
-}
-
-/* Current conditions: three bands share the frame. */
-.tv-slide--conditions .current-conditions {
-  display: flex;
-  flex-direction: column;
-  padding: 0;
-  background: transparent;
-}
-
-.tv-slide--conditions .current-conditions-inner {
-  flex: 1 1 auto;
-  min-height: 0;
-  max-width: none;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding: 0;
 }
 
-.tv-slide--conditions .current-conditions-inner:has(.station-offline-card) {
-  justify-content: center;
-  align-items: center;
-}
-
-.tv-slide--conditions .station-offline-card {
-  margin: 0;
-  max-width: 42rem;
-  background: #161616;
-  border-color: #333;
-}
-
-.tv-slide--conditions .station-offline-card h1 {
-  font-size: clamp(2.5rem, 6vh, 4.5rem);
-}
-
-.tv-slide--conditions .current-conditions-hero,
-.tv-slide--conditions .live-strip,
-.tv-slide--conditions .live-strip-secondary {
+/* Current conditions: billboard temperature, condition opposite, lower third. */
+.tv-now {
   display: grid;
-  gap: 0.75rem;
-  min-height: 0;
-  margin: 0;
+  grid-template-rows: minmax(0, 1fr) 32vh;
 }
 
-.tv-slide--conditions .current-conditions-hero {
-  flex: 1.35 1 0;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 3.2fr) minmax(0, 3.8fr);
-}
-
-.tv-slide--conditions .live-strip,
-.tv-slide--conditions .live-strip-secondary {
-  flex: 0.78 1 0;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.tv-slide--conditions .current-hero-card,
-.tv-slide--conditions .current-wind-card,
-.tv-slide--conditions .current-sky-card,
-.tv-slide--conditions .live-strip > *,
-.tv-slide--conditions .live-strip-secondary > * {
-  grid-column: auto;
-  width: auto;
-  height: 100%;
-  min-height: 0;
+.tv-now-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4vw;
   min-width: 0;
-  overflow: hidden;
-  background: #161616;
-  border-color: #333;
+  min-height: 0;
+  padding: 0 6vw 0 4.5vw;
 }
 
-.tv-slide--conditions .current-hero-card,
-.tv-slide--conditions .current-wind-card,
-.tv-slide--conditions .current-sky-card,
-.tv-slide--conditions .ui-card {
-  padding: 0.85rem 1rem;
+.tv-now-temp {
+  margin: 0;
+  font-size: min(38vh, 28vw);
+  font-weight: 700;
+  line-height: 0.78;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
 }
 
-.tv-slide--conditions .current-hero-label,
-.tv-slide--conditions .live-tile-label,
-.tv-slide--conditions .live-tile-source,
-.tv-slide--conditions .current-hero-stat-label {
-  font-size: clamp(0.75rem, 1.45vh, 0.95rem);
-  color: #cbd5e1;
+.tv-now-cond {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1vh;
+  margin: 0;
+  text-align: right;
 }
 
-.tv-slide--conditions .current-hero-temp {
-  font-size: clamp(3.5rem, 11vh, 7.5rem);
-  line-height: 0.92;
-}
-
-.tv-slide--conditions .current-hero-unit {
-  font-size: clamp(1.75rem, 4vh, 3rem);
-}
-
-.tv-slide--conditions .current-hero-temp-row {
-  margin-top: 0.35rem;
-}
-
-.tv-slide--conditions .current-hero-icon {
-  font-size: clamp(1.75rem, 3.6vh, 2.75rem);
-}
-
-.tv-slide--conditions .current-hero-summary {
-  font-size: clamp(1.05rem, 2.2vh, 1.5rem);
-}
-
-.tv-slide--conditions .current-hero-stats {
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  font-size: clamp(0.8rem, 1.6vh, 1rem);
-}
-
-.tv-slide--conditions .current-hero-stat-value,
-.tv-slide--conditions .current-hero-stat-high,
-.tv-slide--conditions .current-hero-stat-low {
-  font-size: clamp(1rem, 2vh, 1.35rem);
-}
-
-.tv-slide--conditions .current-wind-dial-wrap {
-  margin-top: 0.35rem;
-}
-
-.tv-slide--conditions .compass-lg {
-  --compass-size: clamp(3.5rem, 11vh, 7.25rem);
-}
-
-.tv-slide--conditions .compass-ring,
-.tv-slide--conditions .compass-ticks line {
-  stroke: #8a8a8a;
-}
-
-.tv-slide--conditions .compass-cardinals text,
-.tv-slide--conditions .compass-cardinals text.compass-cardinal-secondary {
-  fill: #cbd5e1;
-}
-
-.tv-slide--conditions .compass-needle-aft {
-  fill: #94a3b8;
-}
-
-.tv-slide--conditions .sky-arc-horizon {
-  stroke: #8a8a8a;
-}
-
-.tv-slide--conditions .sky-arc-time {
-  fill: #cbd5e1;
-}
-
-.tv-slide--conditions .sky-arc-body-dim {
-  opacity: 0.85;
-}
-
-.tv-slide--conditions .current-wind-card .text-3xl {
-  font-size: clamp(1.75rem, 4vh, 3rem);
+.tv-now-icon {
+  font-size: min(20vh, 14vw);
   line-height: 1;
 }
 
-.tv-slide--conditions .current-wind-footer {
-  margin-top: 0.35rem;
-  padding-top: 0.35rem;
+.tv-now-cond-name {
+  font-size: min(7vh, 4.6vw);
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-.tv-slide--conditions .current-wind-footer,
-.tv-slide--conditions .live-tile-meta,
-.tv-slide--conditions .live-tile-peak,
-.tv-slide--conditions .soil-channel-name,
-.tv-slide--conditions .soil-channel-temp,
-.tv-slide--conditions .soil-channel-na {
-  color: #cbd5e1;
-  font-size: clamp(0.75rem, 1.5vh, 0.95rem);
-}
-
-.tv-slide--conditions .live-tile {
-  justify-content: center;
-  height: 100%;
-}
-
-.tv-slide--conditions .live-tile-number {
-  font-size: clamp(2rem, 4.8vh, 3.5rem);
-  line-height: 1.05;
-}
-
-.tv-slide--conditions .live-tile-source {
-  white-space: normal;
-}
-
-.tv-slide--conditions .live-tile-unit,
-.tv-slide--conditions .live-tile-unit-lg {
-  font-size: clamp(0.9rem, 1.8vh, 1.2rem);
-  color: #cbd5e1;
-}
-
-.tv-slide--conditions .current-sky-card {
-  display: flex;
-  flex-direction: column;
-}
-
-.tv-slide--conditions .current-sky-card > div {
-  flex: 1 1 auto;
-  min-height: 0;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.tv-slide--conditions .current-sky-card .mt-4 {
-  position: relative;
-  flex: 1 1 auto;
-  min-height: 0;
-  margin-top: 0.5rem;
-  overflow: hidden;
-}
-
-.tv-slide--conditions .sky-arc {
-  position: absolute;
-  inset: 0;
-  min-height: 0;
-  height: auto;
+.tv-now-rail {
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-  overflow: hidden;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.62);
 }
 
-.tv-slide--conditions .sky-arc-svg {
-  width: 100%;
-  max-width: 100%;
-  height: 100%;
-  max-height: 100%;
-  aspect-ratio: auto;
-  margin-inline: auto;
-}
-
-.tv-slide--conditions .sky-arc-legend {
+.tv-now-rail li {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  justify-content: center;
+  gap: 0.8vh;
+  min-width: 0;
+  padding: 0 1.4vw 7vh;
 }
 
-.tv-slide--conditions .sky-arc-legend-times {
+.tv-now-rail li + li {
+  box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.62);
+}
+
+.tv-now-rail li > span {
+  font-size: clamp(1.15rem, 2.6vh, 1.85rem);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.tv-now-rail strong {
+  font-size: min(8.5vh, 4.8vw);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-.tv-slide--conditions .sky-arc-legend,
-.tv-slide--conditions .sky-arc-legend-row,
-.tv-slide--conditions .sky-arc-legend-times {
-  font-size: clamp(0.75rem, 1.5vh, 0.95rem);
+.tv-unit {
+  font-size: 0.42em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.tv-slide--conditions .status-badge {
-  font-size: clamp(0.7rem, 1.4vh, 0.9rem);
-}
-
-/* Sky and hazards: four equal cards. */
-.tv-slide--sky .sky-hazards {
-  display: flex;
-  flex-direction: column;
-  padding: 0;
-  background: transparent;
-}
-
-.tv-slide--sky .sky-hazards-inner {
-  flex: 1 1 auto;
-  min-height: 0;
-  max-width: none;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: 0;
-}
-
-.tv-slide--sky .sky-hazards-header {
-  flex: 0 0 auto;
-  border: 0;
-  padding: 0;
-  margin: 0 0 0.75rem;
-}
-
-.tv-slide--sky .sky-hazards-title {
-  font-size: clamp(1.35rem, 2.8vh, 2rem);
-}
-
-.tv-slide--sky .sky-hazards-strip {
-  flex: 1 1 auto;
-  min-height: 0;
+/* Sky: four quadrants split by a cross, value centered in each. */
+.tv-quads {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.62)) 50% 0 / 1px 100% no-repeat,
+    linear-gradient(rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.62)) 0 50% / 100% 1px no-repeat;
 }
 
-.tv-slide--sky .sky-hazards-strip > * {
-  min-height: 0;
+.tv-quad {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   min-width: 0;
-  height: 100%;
-  overflow: hidden;
-  justify-content: center;
-  background: #161616;
-  border-color: #333;
-  padding: clamp(1rem, 2.5vh, 2rem) clamp(1rem, 2vw, 1.75rem);
+  min-height: 0;
+  padding: 4.5vh 3vw 4vh;
 }
 
-.tv-slide--sky .sky-hazards-card-label {
-  font-size: clamp(0.8rem, 1.6vh, 1.05rem);
+.tv-quad:nth-child(n + 3) {
+  padding-bottom: 10vh;
 }
 
-.tv-slide--sky .text-3xl {
-  font-size: clamp(2.5rem, 7vh, 5rem);
-  line-height: 1.05;
+.tv-quad--list {
+  justify-content: flex-start;
+  gap: 2vh;
 }
 
-.tv-slide--sky .text-lg {
-  font-size: clamp(1.5rem, 3.4vh, 2.5rem);
+.tv-kicker {
+  margin: 0;
+  font-size: clamp(1.35rem, 3vh, 2.15rem);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.tv-kicker-hot { color: #ff5d73; }
+.tv-kicker-live { color: #3dff9a; }
+
+.tv-quad-value {
+  margin: 0;
+  font-size: min(16vh, 8.5vw);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.03em;
+}
+
+.tv-quad-value span {
+  margin-left: 0.12em;
+  font-size: 0.4em;
+  letter-spacing: 0.04em;
+}
+
+.tv-quad-note {
+  margin: 0;
+  font-size: clamp(1.45rem, 3.2vh, 2.35rem);
+  font-weight: 600;
   line-height: 1.15;
 }
 
-.tv-slide--sky .text-xs,
-.tv-slide--sky .sky-hazards-planet-list,
-.tv-slide--sky .live-tile-meta,
-.tv-slide--sky .sky-hazards-planet-times,
-.tv-slide--sky .sky-hazards-credits {
-  font-size: clamp(0.85rem, 1.7vh, 1.1rem);
-  color: #cbd5e1;
-}
-
-.tv-slide--sky .sky-hazards-planet-list {
-  overflow: hidden;
-}
-
-.tv-slide--sky .sky-hazards-planet-row {
-  flex-wrap: wrap;
-  gap: 0.15rem 0.6rem;
-}
-
-.tv-slide--sky .sky-hazards-planet-times {
-  white-space: normal;
-}
-
-.tv-slide--sky .sky-hazards-credits {
-  flex: 0 0 auto;
-  margin-top: 0.6rem;
-}
-
-.tv-slide--sky .status-badge {
-  font-size: clamp(0.8rem, 1.6vh, 1rem);
-}
-
-/* 7-day forecast: one column per day. */
-.tv-slide--forecast .weekly-forecast {
+.tv-planet {
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  gap: 0.75rem;
-  background: transparent;
-  border: 0;
-  border-radius: 0;
+  justify-content: space-evenly;
+  min-height: 0;
+  margin: 0;
   padding: 0;
+  list-style: none;
 }
 
-.tv-slide--forecast {
-  --tv-forecast-icon: clamp(3.75rem, 10vh, 5.5rem);
+.tv-planet li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1.5rem;
+  font-size: clamp(1.8rem, 4.4vh, 3.15rem);
+  font-weight: 700;
+  line-height: 1.05;
 }
 
-.tv-slide--forecast .forecast-days {
+.tv-planet li span:last-child {
+  font-weight: 600;
+  text-align: right;
+}
+
+/* Forecast: one full-height column per day. Day at the top edge,
+   icon in the middle, high and low on the bottom edge. */
+.tv-cast {
   display: grid;
   grid-template-columns: repeat(var(--forecast-days, 1), minmax(0, 1fr));
-  flex: 1 1 auto;
-  min-height: 0;
-  height: 100%;
-  gap: 0.75rem;
-  align-items: stretch;
 }
 
-.tv-slide--forecast .weather-tile-heading,
-.tv-empty-title {
-  flex: 0 0 auto;
-  margin: 0;
-  font-family: var(--font-heading);
-  font-size: clamp(1.35rem, 2.8vh, 2rem);
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #fff;
-}
-
-.tv-slide--forecast .forecast-entry {
+.tv-cast-day {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
-  min-width: 0;
-  min-height: 0;
   height: 100%;
-  padding: 1rem 0.45rem 1.1rem;
-  text-align: center;
-  container-type: inline-size;
-  background: #161616;
-  border: 1px solid #333;
-  border-radius: 0.75rem;
-}
-
-.tv-slide--forecast .forecast-entry:hover {
-  background: #161616;
-}
-
-.tv-slide--forecast .date-grid,
-.tv-slide--forecast .conditions,
-.tv-slide--forecast .forecast-temps,
-.tv-slide--forecast .forecast-text {
-  width: 100%;
   min-width: 0;
-  margin: 0;
-  text-align: center;
+  padding: 3.5vh 0.35rem 8vh;
+  box-sizing: border-box;
+  container-type: inline-size;
 }
 
-.tv-slide--forecast .date-grid { order: 1; }
-
-.tv-slide--forecast .conditions {
-  order: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.55rem;
+@media (max-height: 800px) {
+  .tv-cast-day {
+    padding-bottom: 16vh;
+  }
 }
 
-.tv-slide--forecast .forecast-temps {
-  order: 3;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.65rem;
+.tv-cast-day + .tv-cast-day {
+  box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.62);
 }
 
-.tv-slide--forecast .forecast-text {
-  display: none;
-}
-
-.tv-slide--forecast .forecast-temps .low {
-  margin-left: 0;
-}
-
-.tv-slide--forecast .dayname {
-  font-size: clamp(1.65rem, 3.6vh, 2.6rem);
-  font-weight: 800;
-  letter-spacing: 0.04em;
-}
-
-.tv-slide--forecast .dayname,
-.tv-slide--forecast .daynum {
+.tv-cast-name,
+.tv-cast-icon,
+.tv-cast-high,
+.tv-cast-low {
   margin: 0;
 }
 
-.tv-slide--forecast .daynum {
-  color: #cbd5e1;
-  font-size: clamp(0.85rem, 1.7vh, 1.1rem);
+.tv-cast-name {
+  font-size: min(34cqi, 8vh);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 0.85;
+  text-transform: uppercase;
 }
 
-.tv-slide--forecast .forecast-condition-label,
-.tv-slide--forecast .forecast-summary {
-  color: #cbd5e1;
-  font-size: clamp(0.95rem, 1.9vh, 1.25rem);
-  line-height: 1.35;
-}
-
-.tv-slide--forecast .forecast-condition-label {
-  display: block;
-}
-
-.tv-slide--forecast .forecast-summary {
-  margin: 0;
-  -webkit-line-clamp: 5;
-  line-clamp: 5;
-}
-
-.tv-slide--forecast .forecast-temps .high,
-.tv-slide--forecast .forecast-temps .low {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  line-height: 0.9;
-}
-
-.tv-slide--forecast .forecast-temps .forecast-temp-label {
-  display: block;
-  margin: 0 0 0.25rem;
-  font-size: clamp(0.72rem, 1.45vh, 0.95rem);
-  letter-spacing: 0.16em;
-}
-
-.tv-slide--forecast .forecast-temps .high {
-  font-size: min(2.9rem, 28cqi);
-}
-
-.tv-slide--forecast .forecast-temps .low {
-  color: #cbd5e1;
-  font-size: min(2rem, 20cqi);
-}
-
-.tv-slide--forecast .conditions .icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--tv-forecast-icon);
-  height: var(--tv-forecast-icon);
-  flex: 0 0 auto;
-  font-size: calc(var(--tv-forecast-icon) * 0.72);
+.tv-cast-icon {
+  display: grid;
+  place-items: center;
+  font-size: min(64cqi, 18vh);
   line-height: 1;
 }
 
-.tv-slide--forecast .conditions .icon i,
-.tv-slide--forecast .conditions .icon svg {
-  display: block;
+.tv-cast-temps {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.6vh;
+  width: 100%;
+}
+
+.tv-cast-high,
+.tv-cast-low {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 0.8;
+}
+
+.tv-cast-tag {
+  margin-bottom: 0.28em;
+  font-size: clamp(0.95rem, 2.1vh, 1.4rem);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.tv-cast-num {
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.tv-cast-high .tv-cast-num {
+  font-size: min(60cqi, 13vh);
+}
+
+.tv-cast-low .tv-cast-num {
+  font-size: min(42cqi, 8.5vh);
+}
+
+.tv-slide .fa-2x {
   font-size: 1em;
+  line-height: 1;
+}
+
+.tv-cast-icon i,
+.tv-cast-icon svg,
+.tv-now-icon i,
+.tv-now-icon svg {
+  display: block;
   width: 1em;
   height: 1em;
   line-height: 1;
+  overflow: visible;
 }
 
 .tv-empty {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  display: grid;
+  place-items: center;
+  padding: 8vh;
 }
 
 .tv-empty-copy {
   margin: 0;
-  color: #cbd5e1;
-  font-size: clamp(1rem, 2vh, 1.35rem);
+  font-size: clamp(2.5rem, 7vh, 5rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-/* Webcams: one group per frame, four feeds in a 2×2 grid. */
-.tv-camera-groups {
+/* Cameras: full-bleed quad split, caption burned into each picture. */
+.tv-cams {
+  position: relative;
+}
+
+.tv-bug {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0.75rem 1.15rem 0.6rem;
+  background: #000;
+  color: #fff;
+  font-size: clamp(1.2rem, 2.6vh, 1.85rem);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.tv-cam-grid {
+  display: grid;
+  height: 100%;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 4px;
+  background: #000;
+}
+
+.tv-cam {
+  position: relative;
+  margin: 0;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: #000;
+}
+
+.tv-cam img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tv-cam figcaption {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  padding: 0.7rem 1rem 0.65rem;
+  background: #000;
+  color: #fff;
+  font-size: clamp(1.2rem, 2.7vh, 1.95rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.tv-cam:nth-child(4) figcaption {
+  padding-right: 5.5rem;
+}
+
+/* Station offline, when the first slide has no reading yet. */
+.tv-slide--conditions .current-conditions,
+.tv-slide--conditions .current-conditions-inner {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
-  gap: 0.75rem;
-  min-height: 0;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 6vh 8vw;
+  background: transparent;
 }
 
-.tv-slide--cameras .ui-card {
-  flex: 1 1 0;
-  min-height: 0;
-  padding: 0.35rem 0.15rem 0;
+.tv-slide--conditions .station-offline-card,
+.tv-slide--conditions .station-offline-card:hover {
+  align-items: center;
   background: transparent;
   border: 0;
   border-radius: 0;
+  box-shadow: none;
+  text-align: center;
 }
 
-.tv-slide--cameras .ui-card:hover {
+.tv-slide--conditions .station-offline-card .status-badge {
+  margin-bottom: 1.5rem;
+  padding: 0;
   background: transparent;
-  border-color: transparent;
+  border: 0;
+  color: #fff;
+  font-size: clamp(1.2rem, 2.6vh, 1.8rem);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
 
-.tv-slide--cameras .ui-card-title {
-  font-size: clamp(1rem, 2.2vh, 1.5rem);
+.tv-slide--conditions .station-offline-card h2 {
+  font-size: clamp(4rem, 12vh, 8.5rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 0.9;
+  text-transform: uppercase;
 }
 
-.tv-slide--cameras .camera-status,
-.tv-slide--cameras .camera-refresh {
-  font-size: clamp(0.75rem, 1.5vh, 0.95rem);
-  color: #cbd5e1;
-}
-
-.tv-slide--cameras .camera-grid {
-  flex: 1 1 auto;
-  min-height: 0;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
-}
-
-.tv-slide--cameras .camera-grid figure {
-  aspect-ratio: auto;
-  height: 100%;
-  min-height: 0;
-  border-color: #333;
-  background: #111;
-}
-
-.tv-slide--cameras .camera-grid figcaption {
-  font-size: clamp(0.7rem, 1.45vh, 0.95rem);
-  padding: 0.55rem 0.7rem;
+.tv-slide--conditions .station-offline-card p {
+  max-width: 36rem;
+  color: #fff;
+  font-size: clamp(1.4rem, 3vh, 2.25rem);
+  font-weight: 600;
+  line-height: 1.25;
 }
 
 .tv-progress {
   position: absolute;
   z-index: 5;
-  right: 1.25rem;
-  bottom: 1.25rem;
-  width: 3.5rem;
-  height: 3.5rem;
+  right: 1.15rem;
+  bottom: 1.15rem;
+  width: 3.25rem;
+  height: 3.25rem;
   padding: 0;
   border: 0;
   border-radius: 999px;
@@ -723,7 +562,7 @@ html.tv-display-root body.tv-display .site-main > turbo-cable-stream-source {
 }
 
 .tv-progress-track {
-  stroke: #8a8a8a;
+  stroke: rgba(255, 255, 255, 0.45);
 }
 
 .tv-progress-value {
@@ -736,224 +575,9 @@ html.tv-display-root body.tv-display .site-main > turbo-cable-stream-source {
 .tv-progress-count {
   position: relative;
   z-index: 1;
-  font-family: var(--font-heading);
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 1.15rem;
   font-variant-numeric: tabular-nums;
   line-height: 1;
   color: #fff;
-}
-
-/* Broadcast package. Type on black. No panels. */
-.tv-slide {
-  padding: 3.5vh 3.5vw 9vh;
-}
-
-.tv-slide .ui-card,
-.tv-slide .current-hero-card,
-.tv-slide .current-wind-card,
-.tv-slide .current-sky-card,
-.tv-slide .forecast-entry,
-.tv-slide--sky .sky-hazards-strip > *,
-.tv-slide .station-offline-card {
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  overflow: visible;
-}
-
-.tv-slide .ui-card:hover,
-.tv-slide .forecast-entry:hover {
-  background: transparent;
-  border-color: transparent;
-}
-
-.tv-slide .current-hero-glow,
-.tv-slide .uv-scale,
-.tv-slide .aqi-scale,
-.tv-slide .meter-track,
-.tv-slide .live-tile-peak,
-.tv-slide .sky-hazards-credits {
-  display: none;
-}
-
-.tv-slide .current-hero-label,
-.tv-slide .live-tile-label,
-.tv-slide .live-tile-source,
-.tv-slide .current-hero-stat-label,
-.tv-slide .sky-hazards-title,
-.tv-slide .weather-tile-heading,
-.tv-slide .ui-card-title,
-.tv-slide .forecast-temp-label,
-.tv-slide .daynum {
-  color: #fff;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-}
-
-.tv-slide .current-hero-summary,
-.tv-slide .current-hero-stat-value,
-.tv-slide .current-hero-stat-high,
-.tv-slide .current-hero-stat-low,
-.tv-slide .current-wind-footer,
-.tv-slide .live-tile-meta,
-.tv-slide .live-tile-unit,
-.tv-slide .live-tile-unit-lg,
-.tv-slide .live-tile-number,
-.tv-slide .forecast-condition-label,
-.tv-slide .forecast-temps .low,
-.tv-slide .soil-channel-name,
-.tv-slide .soil-channel-temp,
-.tv-slide .soil-channel-value,
-.tv-slide .sky-hazards-planet-times,
-.tv-slide .text-slate-300,
-.tv-slide .text-slate-400,
-.tv-slide .text-slate-500 {
-  color: #fff;
-}
-
-.tv-slide--conditions .current-hero-temp {
-  font-size: clamp(6rem, 14vh, 10.5rem);
-}
-
-.tv-slide--conditions .current-hero-unit {
-  font-size: clamp(2.5rem, 6vh, 5rem);
-  color: #fff;
-}
-
-.tv-slide--conditions .current-hero-summary {
-  font-size: clamp(2rem, 4.5vh, 3.75rem);
-  font-weight: 700;
-}
-
-.tv-slide--conditions .current-hero-label,
-.tv-slide--conditions .live-tile-label,
-.tv-slide--conditions .current-hero-stat-label {
-  font-size: clamp(1rem, 2.2vh, 1.45rem);
-}
-
-.tv-slide--conditions .current-hero-stat-value,
-.tv-slide--conditions .current-hero-stat-high,
-.tv-slide--conditions .current-hero-stat-low {
-  font-size: clamp(2rem, 4.5vh, 3.5rem);
-  font-weight: 800;
-}
-
-.tv-slide--conditions .current-hero-stats {
-  border: 0;
-  margin-top: 1.5rem;
-  padding-top: 0;
-}
-
-.tv-slide--conditions .current-wind-card .text-3xl,
-.tv-slide--conditions .live-tile-number {
-  font-size: clamp(3.5rem, 8vh, 6.5rem);
-  font-weight: 800;
-}
-
-.tv-slide--conditions .live-tile-meta,
-.tv-slide--conditions .current-wind-footer,
-.tv-slide--conditions .live-tile-unit,
-.tv-slide--conditions .live-tile-unit-lg {
-  font-size: clamp(1.05rem, 2.2vh, 1.5rem);
-  font-weight: 700;
-}
-
-.tv-slide--conditions .status-badge,
-.tv-slide--sky .status-badge {
-  background: transparent;
-  border: 0;
-  padding: 0;
-  color: #fff;
-  font-size: clamp(1.15rem, 2.4vh, 1.75rem);
-  font-weight: 800;
-  letter-spacing: 0.12em;
-}
-
-.tv-slide--sky .sky-hazards-title,
-.tv-slide--forecast .weather-tile-heading,
-.tv-slide--cameras .ui-card-title {
-  font-size: clamp(1.75rem, 4vh, 3.25rem);
-}
-
-.tv-slide--sky .sky-hazards-strip {
-  gap: 2.5rem 3rem;
-}
-
-.tv-slide--sky .sky-hazards-card-label {
-  font-size: clamp(1.05rem, 2.3vh, 1.6rem);
-}
-
-.tv-slide--sky .text-3xl {
-  font-size: clamp(4rem, 10vh, 7.5rem);
-}
-
-.tv-slide--sky .text-lg {
-  font-size: clamp(2.25rem, 5vh, 4rem);
-}
-
-.tv-slide--sky .text-xs,
-.tv-slide--sky .sky-hazards-planet-list,
-.tv-slide--sky .sky-hazards-planet-times,
-.tv-slide--sky .live-tile-meta {
-  font-size: clamp(1.15rem, 2.4vh, 1.7rem);
-  font-weight: 700;
-}
-
-.tv-slide--forecast .forecast-entry {
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  padding-inline: 0.35rem;
-}
-
-.tv-slide--forecast .dayname {
-  font-size: clamp(2rem, 4.5vh, 3.5rem);
-}
-
-.tv-slide--forecast .daynum,
-.tv-slide--forecast .forecast-condition-label {
-  font-size: clamp(1.05rem, 2.3vh, 1.55rem);
-  font-weight: 700;
-}
-
-.tv-slide--forecast .forecast-temps .forecast-temp-label {
-  font-size: clamp(0.85rem, 1.8vh, 1.15rem);
-}
-
-.tv-slide--forecast .forecast-temps .high {
-  font-size: min(4.25rem, 34cqi);
-  color: #ff5d73;
-}
-
-.tv-slide--forecast .forecast-temps .low {
-  font-size: min(3rem, 26cqi);
-  color: #fff;
-}
-
-.tv-slide--cameras .camera-grid {
-  gap: 0.85rem;
-}
-
-.tv-slide--cameras .camera-grid figure {
-  border: 0;
-  border-radius: 0;
-}
-
-.tv-slide--cameras .camera-grid figcaption {
-  font-size: clamp(1rem, 2.3vh, 1.65rem);
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: #fff;
-  background: #000;
-  padding: 0.7rem 0.85rem;
-}
-
-.tv-slide--cameras .camera-status,
-.tv-slide--cameras .camera-refresh {
-  color: #fff;
-  font-size: clamp(0.95rem, 2vh, 1.35rem);
-  font-weight: 700;
-  letter-spacing: 0.12em;
 }

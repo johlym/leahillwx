@@ -40,17 +40,33 @@
     aria-roledescription="slide"
     aria-label="1 of 5: <%= conditions_label %>">
     <% if @current %>
-      <h2 class="sr-only">Current conditions</h2>
-      <%= render Home::CurrentWeather::ConditionsComponent.new(
-            current: @current,
-            almanac: @almanac,
-            today_forecast: @forecast&.days&.first,
-            current_forecast: @forecast&.current,
-            today_peaks: @today_peaks,
-            aqi: @aqi,
-            hourly_ranges: @hourly_ranges,
-            show_sky_hazards: false
-          ) %>
+      <% wx = Home::CurrentWeather::ConditionsComponent.new(
+           current: @current,
+           almanac: @almanac,
+           today_forecast: @forecast&.days&.first,
+           current_forecast: @forecast&.current
+         ) %>
+      <div class="tv-now">
+        <h2 class="sr-only">Current conditions</h2>
+        <div class="tv-now-hero">
+          <p class="tv-now-temp" data-weather-update-target="temperature"><%= wx.current_temperature %>°</p>
+          <p class="tv-now-cond">
+            <span class="tv-now-icon"><%= render "root/shared/weather_icon", icon: wx.weather_icon, night: wx.night_time?, blackout: true, decorative: true %></span>
+            <span class="tv-now-cond-name"><%= wx.weather_description %></span>
+          </p>
+        </div>
+        <ul class="tv-now-rail">
+          <li><span>Feels<span class="sr-only">, </span></span><strong data-weather-update-target="feelsLike"><%= wx.current_feels_like %>°F</strong></li>
+          <li><span>High<span class="sr-only">, </span></span><strong><%= wx.today_high ? "#{wx.today_high}°" : "—" %></strong></li>
+          <li><span>Low<span class="sr-only">, </span></span><strong><%= wx.today_low ? "#{wx.today_low}°" : "—" %></strong></li>
+          <li>
+            <span>Wind<span class="sr-only">, </span></span>
+            <strong><span data-weather-update-target="windSpeed"><%= wx.current_wind_speed %></span> <span data-weather-update-target="windDirection"><%= wx.current_wind_direction %></span></strong>
+          </li>
+          <li><span>Humidity<span class="sr-only">, </span></span><strong data-weather-update-target="humidity"><%= wx.current_humidity %>%</strong></li>
+          <li><span>Rain<span class="sr-only">, </span></span><strong><span data-weather-update-target="rainDay"><%= wx.current_rain_day %></span><span class="tv-unit"> in</span></strong></li>
+        </ul>
+      </div>
     <% else %>
       <%= render "root/station_offline", heading_tag: :h2 %>
     <% end %>
@@ -65,12 +81,61 @@
     aria-label="2 of 5: Sky and nearby hazards"
     aria-hidden="true"
     inert>
-    <%= render Home::CurrentWeather::SkyHazardsComponent.new(
-          wildfire: @wildfire,
-          aurora: @aurora,
-          planet_night: @planet_night,
-          iss_pass: @iss_pass
-        ) %>
+    <% sky = Home::CurrentWeather::SkyHazardsComponent.new(
+         wildfire: @wildfire,
+         aurora: @aurora,
+         planet_night: @planet_night,
+         iss_pass: @iss_pass
+       ) %>
+    <h2 class="sr-only">Sky and nearby hazards</h2>
+    <div class="tv-quads">
+      <div class="tv-quad">
+        <p class="tv-kicker tv-kicker-hot">Wildfire</p>
+        <% if @wildfire %>
+          <p class="tv-quad-value"><%= number_with_precision(@wildfire.distance_mi, precision: 0) %><span class="sr-only"> </span><span>mi</span></p>
+          <p class="tv-quad-note"><%= @wildfire.name %><% if @wildfire.percent_contained %> · <%= sky.wildfire_status_label %><% end %></p>
+        <% else %>
+          <p class="tv-quad-value">None</p>
+          <p class="tv-quad-note">No active fires nearby</p>
+        <% end %>
+      </div>
+      <div class="tv-quad <%= "tv-quad--list" if sky.visible_planets.any? %>">
+        <p class="tv-kicker">Planets</p>
+        <% if sky.visible_planets.any? %>
+          <ul class="tv-planet">
+            <% sky.visible_planets.each do |planet| %>
+              <li>
+                <span><%= planet["label"] %><span class="sr-only">, </span></span>
+                <span><%= sky.format_planet_time(planet["rise_at"]) %> – <%= sky.format_planet_set_time(planet) %></span>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="tv-quad-value">None</p>
+          <p class="tv-quad-note">No planets tonight</p>
+        <% end %>
+      </div>
+      <div class="tv-quad">
+        <p class="tv-kicker tv-kicker-live">Aurora</p>
+        <% if @aurora %>
+          <p class="tv-quad-value"><%= @aurora.status_label %></p>
+          <p class="tv-quad-note">Kp <%= number_with_precision(@aurora.kp, precision: 1) %><% if @aurora.local_ovation_pct %> · <%= @aurora.local_ovation_pct.round(0) %>%<% end %></p>
+        <% else %>
+          <p class="tv-quad-value">—</p>
+          <p class="tv-quad-note">Outlook unavailable</p>
+        <% end %>
+      </div>
+      <div class="tv-quad">
+        <p class="tv-kicker">ISS</p>
+        <% if @iss_pass %>
+          <p class="tv-quad-value"><%= sky.iss_when %></p>
+          <p class="tv-quad-note"><%= sky.iss_countdown %> · <%= sky.iss_duration %></p>
+        <% else %>
+          <p class="tv-quad-value">None</p>
+          <p class="tv-quad-note">No pass in the next day</p>
+        <% end %>
+      </div>
+    </div>
   </section>
 
   <section
@@ -83,11 +148,26 @@
     aria-hidden="true"
     inert>
     <% if @forecast&.created_at && @forecast.days.any? %>
-      <%= render Home::Forecast::DailyForecastComponent.new(days: @forecast.days, timestamp: @forecast.created_at) %>
+      <h2 class="sr-only">7-day forecast</h2>
+      <div class="tv-cast" style="--forecast-days: <%= @forecast.days.size %>">
+        <% @forecast.days.each do |day| %>
+          <div class="tv-cast-day">
+            <p class="tv-cast-name">
+              <span aria-hidden="true"><%= day.date.strftime("%a") %></span>
+              <span class="sr-only"><%= day.date.strftime("%A, %B %-d") %><% if day.weather_description.present? %>, <%= day.weather_description %><% end %></span>
+            </p>
+            <p class="tv-cast-icon"><%= render "root/shared/weather_icon", icon: day.weather_icon, decorative: true %></p>
+            <div class="tv-cast-temps">
+              <p class="tv-cast-high"><span class="tv-cast-tag">High</span><span class="tv-cast-num"><span class="sr-only">, </span><%= day.temp_max.round %>°</span></p>
+              <p class="tv-cast-low"><span class="tv-cast-tag">Low</span><span class="tv-cast-num"><span class="sr-only">, </span><%= day.temp_min.round %>°</span></p>
+            </div>
+          </div>
+        <% end %>
+      </div>
     <% else %>
       <div class="tv-empty">
-        <h2 class="tv-empty-title">7-Day Forecast</h2>
-        <p class="tv-empty-copy">Forecast unavailable.</p>
+        <h2 class="sr-only">7-day forecast</h2>
+        <p class="tv-empty-copy">Forecast unavailable</p>
       </div>
     <% end %>
   </section>
@@ -101,9 +181,7 @@
     aria-label="4 of 5: Traffic cameras"
     aria-hidden="true"
     inert>
-    <div class="tv-camera-groups">
-      <%= render "root/cameras", groups: [:traffic] %>
-    </div>
+    <%= render "root/tv_cameras", group: :traffic %>
   </section>
 
   <section
@@ -115,9 +193,7 @@
     aria-label="5 of 5: Airport cameras"
     aria-hidden="true"
     inert>
-    <div class="tv-camera-groups">
-      <%= render "root/cameras", groups: [:airport] %>
-    </div>
+    <%= render "root/tv_cameras", group: :airport %>
   </section>
 
   <p class="sr-only" data-tv-cycle-target="status" aria-live="polite" aria-atomic="true"></p>

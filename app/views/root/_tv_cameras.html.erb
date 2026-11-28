@@ -1,0 +1,34 @@
+<% cameras = {
+  traffic: {
+    title: "Auburn Traffic",
+    id: "traffic_cameras",
+    shots: [
+      [ "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/226.jpg", "A ST SE / 2nd ST SE", "A ST SE / 2ND ST SE" ],
+      [ "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/28.jpg", "8th ST NE / Harvey", "8TH ST NE / HARVEY" ],
+      [ "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/12.jpg", "S 277th ST / Auburn Way N", "S 277TH / AUBURN WAY N" ],
+      [ "https://gis.auburnwa.gov/TrafficPhotoWall/TrafficPhotos/161.jpg", "SE 312th ST / 124th AVE SE", "SE 312TH / 124TH AVE SE" ]
+    ]
+  },
+  airport: {
+    title: "Auburn Muni",
+    id: "airport_cameras",
+    shots: [
+      [ "https://images.wsdot.wa.gov/airports/auburn2.jpg", "North view of Auburn Municipal Airport", "NORTH" ],
+      [ "https://images.wsdot.wa.gov/airports/auburn4.jpg", "East view of Auburn Municipal Airport", "EAST" ],
+      [ "https://images.wsdot.wa.gov/airports/auburn3.jpg", "South view of Auburn Municipal Airport", "SOUTH" ],
+      [ "https://images.wsdot.wa.gov/airports/auburn1.jpg", "West view of Auburn Municipal Airport", "WEST" ]
+    ]
+  }
+} %>
+<% feed = cameras.fetch(group.to_sym) %>
+<div class="tv-cams">
+  <h2 class="tv-bug"><%= feed[:title] %></h2>
+  <div class="tv-cam-grid" id="<%= feed[:id] %>">
+    <% feed[:shots].each do |src, alt, caption| %>
+      <figure class="tv-cam">
+        <%= image_tag src, alt: alt %>
+        <figcaption><%= caption %></figcaption>
+      </figure>
+    <% end %>
+  </div>
+</div>

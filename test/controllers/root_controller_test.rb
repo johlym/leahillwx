@@ -39,10 +39,11 @@ class RootControllerTest < ActionDispatch::IntegrationTest
     assert_select ".tv-slide.is-active", count: 1
     assert_select ".tv-slide--conditions.is-active[aria-label='1 of 5: Current conditions']"
     assert_select ".tv-slide--conditions section.sky-hazards", count: 0
-    assert_select ".tv-slide--conditions .current-hero-temp"
-    assert_select ".tv-slide--sky[inert][aria-hidden=true][aria-label='2 of 5: Sky and nearby hazards'] section.sky-hazards", count: 1
-    assert_select ".tv-slide--forecast[inert][aria-label='3 of 5: 7-day forecast'] .weekly-forecast"
-    assert_select ".tv-slide--forecast .forecast-temps .high", text: /High \d+°/
+    assert_select ".tv-slide--conditions .tv-now-temp"
+    assert_select ".tv-slide--sky[inert][aria-hidden=true][aria-label='2 of 5: Sky and nearby hazards'] .tv-quad", count: 4
+    assert_select ".tv-slide--forecast[inert][aria-label='3 of 5: 7-day forecast'] .tv-cast"
+    assert_select ".tv-slide--forecast .tv-cast-high", text: /\d+°/
+    assert_select ".tv-slide--forecast .forecast-summary", count: 0
     assert_select ".tv-slide--cameras", count: 2
     assert_select ".tv-slide--cameras[aria-label='4 of 5: Traffic cameras'] #traffic_cameras"
     assert_select ".tv-slide--cameras[aria-label='4 of 5: Traffic cameras'] #airport_cameras", count: 0
