@@ -743,3 +743,217 @@ html.tv-display-root body.tv-display .site-main > turbo-cable-stream-source {
   line-height: 1;
   color: #fff;
 }
+
+/* Broadcast package. Type on black. No panels. */
+.tv-slide {
+  padding: 3.5vh 3.5vw 9vh;
+}
+
+.tv-slide .ui-card,
+.tv-slide .current-hero-card,
+.tv-slide .current-wind-card,
+.tv-slide .current-sky-card,
+.tv-slide .forecast-entry,
+.tv-slide--sky .sky-hazards-strip > *,
+.tv-slide .station-offline-card {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.tv-slide .ui-card:hover,
+.tv-slide .forecast-entry:hover {
+  background: transparent;
+  border-color: transparent;
+}
+
+.tv-slide .current-hero-glow,
+.tv-slide .uv-scale,
+.tv-slide .aqi-scale,
+.tv-slide .meter-track,
+.tv-slide .live-tile-peak,
+.tv-slide .sky-hazards-credits {
+  display: none;
+}
+
+.tv-slide .current-hero-label,
+.tv-slide .live-tile-label,
+.tv-slide .live-tile-source,
+.tv-slide .current-hero-stat-label,
+.tv-slide .sky-hazards-title,
+.tv-slide .weather-tile-heading,
+.tv-slide .ui-card-title,
+.tv-slide .forecast-temp-label,
+.tv-slide .daynum {
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.tv-slide .current-hero-summary,
+.tv-slide .current-hero-stat-value,
+.tv-slide .current-hero-stat-high,
+.tv-slide .current-hero-stat-low,
+.tv-slide .current-wind-footer,
+.tv-slide .live-tile-meta,
+.tv-slide .live-tile-unit,
+.tv-slide .live-tile-unit-lg,
+.tv-slide .live-tile-number,
+.tv-slide .forecast-condition-label,
+.tv-slide .forecast-temps .low,
+.tv-slide .soil-channel-name,
+.tv-slide .soil-channel-temp,
+.tv-slide .soil-channel-value,
+.tv-slide .sky-hazards-planet-times,
+.tv-slide .text-slate-300,
+.tv-slide .text-slate-400,
+.tv-slide .text-slate-500 {
+  color: #fff;
+}
+
+.tv-slide--conditions .current-hero-temp {
+  font-size: clamp(6rem, 14vh, 10.5rem);
+}
+
+.tv-slide--conditions .current-hero-unit {
+  font-size: clamp(2.5rem, 6vh, 5rem);
+  color: #fff;
+}
+
+.tv-slide--conditions .current-hero-summary {
+  font-size: clamp(2rem, 4.5vh, 3.75rem);
+  font-weight: 700;
+}
+
+.tv-slide--conditions .current-hero-label,
+.tv-slide--conditions .live-tile-label,
+.tv-slide--conditions .current-hero-stat-label {
+  font-size: clamp(1rem, 2.2vh, 1.45rem);
+}
+
+.tv-slide--conditions .current-hero-stat-value,
+.tv-slide--conditions .current-hero-stat-high,
+.tv-slide--conditions .current-hero-stat-low {
+  font-size: clamp(2rem, 4.5vh, 3.5rem);
+  font-weight: 800;
+}
+
+.tv-slide--conditions .current-hero-stats {
+  border: 0;
+  margin-top: 1.5rem;
+  padding-top: 0;
+}
+
+.tv-slide--conditions .current-wind-card .text-3xl,
+.tv-slide--conditions .live-tile-number {
+  font-size: clamp(3.5rem, 8vh, 6.5rem);
+  font-weight: 800;
+}
+
+.tv-slide--conditions .live-tile-meta,
+.tv-slide--conditions .current-wind-footer,
+.tv-slide--conditions .live-tile-unit,
+.tv-slide--conditions .live-tile-unit-lg {
+  font-size: clamp(1.05rem, 2.2vh, 1.5rem);
+  font-weight: 700;
+}
+
+.tv-slide--conditions .status-badge,
+.tv-slide--sky .status-badge {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: #fff;
+  font-size: clamp(1.15rem, 2.4vh, 1.75rem);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.tv-slide--sky .sky-hazards-title,
+.tv-slide--forecast .weather-tile-heading,
+.tv-slide--cameras .ui-card-title {
+  font-size: clamp(1.75rem, 4vh, 3.25rem);
+}
+
+.tv-slide--sky .sky-hazards-strip {
+  gap: 2.5rem 3rem;
+}
+
+.tv-slide--sky .sky-hazards-card-label {
+  font-size: clamp(1.05rem, 2.3vh, 1.6rem);
+}
+
+.tv-slide--sky .text-3xl {
+  font-size: clamp(4rem, 10vh, 7.5rem);
+}
+
+.tv-slide--sky .text-lg {
+  font-size: clamp(2.25rem, 5vh, 4rem);
+}
+
+.tv-slide--sky .text-xs,
+.tv-slide--sky .sky-hazards-planet-list,
+.tv-slide--sky .sky-hazards-planet-times,
+.tv-slide--sky .live-tile-meta {
+  font-size: clamp(1.15rem, 2.4vh, 1.7rem);
+  font-weight: 700;
+}
+
+.tv-slide--forecast .forecast-entry {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding-inline: 0.35rem;
+}
+
+.tv-slide--forecast .dayname {
+  font-size: clamp(2rem, 4.5vh, 3.5rem);
+}
+
+.tv-slide--forecast .daynum,
+.tv-slide--forecast .forecast-condition-label {
+  font-size: clamp(1.05rem, 2.3vh, 1.55rem);
+  font-weight: 700;
+}
+
+.tv-slide--forecast .forecast-temps .forecast-temp-label {
+  font-size: clamp(0.85rem, 1.8vh, 1.15rem);
+}
+
+.tv-slide--forecast .forecast-temps .high {
+  font-size: min(4.25rem, 34cqi);
+  color: #ff5d73;
+}
+
+.tv-slide--forecast .forecast-temps .low {
+  font-size: min(3rem, 26cqi);
+  color: #fff;
+}
+
+.tv-slide--cameras .camera-grid {
+  gap: 0.85rem;
+}
+
+.tv-slide--cameras .camera-grid figure {
+  border: 0;
+  border-radius: 0;
+}
+
+.tv-slide--cameras .camera-grid figcaption {
+  font-size: clamp(1rem, 2.3vh, 1.65rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #fff;
+  background: #000;
+  padding: 0.7rem 0.85rem;
+}
+
+.tv-slide--cameras .camera-status,
+.tv-slide--cameras .camera-refresh {
+  color: #fff;
+  font-size: clamp(0.95rem, 2vh, 1.35rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
