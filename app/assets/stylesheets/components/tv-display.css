@@ -1,4 +1,4 @@
-/* Full-viewport display at /?tv=true. Four slides share the screen;
+/* Full-viewport display at /?tv=true. Five slides share the screen;
    the page background stays pure black. Landscape displays are the target. */
 
 html.tv-display-root {
@@ -379,7 +379,8 @@ html.tv-display-root body.tv-display .site-main > turbo-cable-stream-source {
   flex: 1 1 auto;
   min-height: 0;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
   gap: 0.75rem;
 }
 
@@ -439,21 +440,30 @@ html.tv-display-root body.tv-display .site-main > turbo-cable-stream-source {
   font-size: clamp(0.8rem, 1.6vh, 1rem);
 }
 
-/* 7-day forecast: one row per day, filling the frame. */
+/* 7-day forecast: one column per day. */
 .tv-slide--forecast .weekly-forecast {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  height: 100%;
+  gap: 0.75rem;
   background: transparent;
   border: 0;
   border-radius: 0;
   padding: 0;
 }
 
+.tv-slide--forecast .forecast-days {
+  display: grid;
+  grid-template-columns: repeat(var(--forecast-days, 1), minmax(0, 1fr));
+  flex: 1 1 auto;
+  min-height: 0;
+  gap: 0.75rem;
+}
+
 .tv-slide--forecast .weather-tile-heading,
 .tv-empty-title {
   flex: 0 0 auto;
-  margin: 0 0 0.35rem;
+  margin: 0;
   font-family: var(--font-heading);
   font-size: clamp(1.35rem, 2.8vh, 2rem);
   font-weight: 700;
@@ -463,10 +473,18 @@ html.tv-display-root body.tv-display .site-main > turbo-cable-stream-source {
 }
 
 .tv-slide--forecast .forecast-entry {
+  display: flex;
   flex: 1 1 0;
-  min-height: 0;
+  flex-direction: column;
   align-items: center;
-  padding: 0.35rem 1rem;
+  justify-content: flex-start;
+  gap: 0.65rem;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  align-self: stretch;
+  padding: 0.85rem 0.55rem;
+  text-align: center;
   background: #161616;
   border: 1px solid #333;
   border-radius: 0.75rem;
@@ -476,12 +494,48 @@ html.tv-display-root body.tv-display .site-main > turbo-cable-stream-source {
   background: #161616;
 }
 
+.tv-slide--forecast .forecast-entry > .date-grid,
+.tv-slide--forecast .forecast-entry > .conditions,
+.tv-slide--forecast .forecast-entry > .forecast-text,
+.tv-slide--forecast .forecast-entry > .forecast-temps {
+  width: 100%;
+  min-width: 0;
+  text-align: center;
+  justify-content: center;
+}
+
 .tv-slide--forecast .date-grid {
-  width: 7.5rem;
+  width: auto;
+  order: 1;
+}
+
+.tv-slide--forecast .conditions {
+  flex-direction: column;
+  order: 2;
+}
+
+.tv-slide--forecast .forecast-temps {
+  order: 3;
+}
+
+.tv-slide--forecast .forecast-text {
+  order: 4;
+  flex: 1 1 auto;
+}
+
+.tv-slide--forecast .forecast-temps {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.tv-slide--forecast .forecast-temps .low {
+  margin-left: 0;
 }
 
 .tv-slide--forecast .dayname {
-  font-size: clamp(1rem, 2.3vh, 1.55rem);
+  font-size: clamp(1.15rem, 2.6vh, 1.85rem);
 }
 
 .tv-slide--forecast .daynum,
@@ -496,8 +550,8 @@ html.tv-display-root body.tv-display .site-main > turbo-cable-stream-source {
 }
 
 .tv-slide--forecast .forecast-summary {
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+  -webkit-line-clamp: 6;
+  line-clamp: 6;
 }
 
 .tv-slide--forecast .forecast-temps .high,
@@ -525,7 +579,7 @@ html.tv-display-root body.tv-display .site-main > turbo-cable-stream-source {
   font-size: clamp(1rem, 2vh, 1.35rem);
 }
 
-/* Webcams: two labeled rows, four feeds each. */
+/* Webcams: one group per frame, four feeds in a 2×2 grid. */
 .tv-camera-groups {
   display: flex;
   flex-direction: column;
@@ -561,8 +615,8 @@ html.tv-display-root body.tv-display .site-main > turbo-cable-stream-source {
   flex: 1 1 auto;
   min-height: 0;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  grid-template-rows: minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
   gap: 0.75rem;
 }
 

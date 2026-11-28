@@ -38,7 +38,7 @@
     data-tv-label="<%= conditions_label %>"
     role="group"
     aria-roledescription="slide"
-    aria-label="1 of 4: <%= conditions_label %>">
+    aria-label="1 of 5: <%= conditions_label %>">
     <% if @current %>
       <h2 class="sr-only">Current conditions</h2>
       <%= render Home::CurrentWeather::ConditionsComponent.new(
@@ -62,7 +62,7 @@
     data-tv-label="Sky and nearby hazards"
     role="group"
     aria-roledescription="slide"
-    aria-label="2 of 4: Sky and nearby hazards"
+    aria-label="2 of 5: Sky and nearby hazards"
     aria-hidden="true"
     inert>
     <%= render Home::CurrentWeather::SkyHazardsComponent.new(
@@ -79,7 +79,7 @@
     data-tv-label="7-day forecast"
     role="group"
     aria-roledescription="slide"
-    aria-label="3 of 4: 7-day forecast"
+    aria-label="3 of 5: 7-day forecast"
     aria-hidden="true"
     inert>
     <% if @forecast&.created_at && @forecast.days.any? %>
@@ -95,14 +95,28 @@
   <section
     class="tv-slide tv-slide--cameras"
     data-tv-cycle-target="slide"
-    data-tv-label="Webcams"
+    data-tv-label="Traffic cameras"
     role="group"
     aria-roledescription="slide"
-    aria-label="4 of 4: Webcams"
+    aria-label="4 of 5: Traffic cameras"
     aria-hidden="true"
     inert>
     <div class="tv-camera-groups">
-      <%= render "root/cameras" %>
+      <%= render "root/cameras", groups: [:traffic] %>
+    </div>
+  </section>
+
+  <section
+    class="tv-slide tv-slide--cameras"
+    data-tv-cycle-target="slide"
+    data-tv-label="Airport cameras"
+    role="group"
+    aria-roledescription="slide"
+    aria-label="5 of 5: Airport cameras"
+    aria-hidden="true"
+    inert>
+    <div class="tv-camera-groups">
+      <%= render "root/cameras", groups: [:airport] %>
     </div>
   </section>
 

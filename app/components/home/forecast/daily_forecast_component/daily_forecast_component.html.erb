@@ -1,5 +1,6 @@
 <div class="weather-tile weekly-forecast">
   <h2 class="weather-tile-heading">7-Day Forecast</h2>
+  <div class="forecast-days" style="--forecast-days: <%= days.size.positive? ? days.size : 1 %>">
   <% days.each do |entry| %>
   <div class="forecast-entry">
     <div class="date-grid">
@@ -21,4 +22,5 @@
     </div>
   </div>
   <% end %>
+  </div>
 </div>

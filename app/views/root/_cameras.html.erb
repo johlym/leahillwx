@@ -1,3 +1,6 @@
+<% groups = Array(local_assigns.fetch(:groups, %i[traffic airport])).map(&:to_sym) %>
+
+<% if groups.include?(:traffic) %>
 <div class="ui-card ui-card-pad-loose" data-controller="image-refresh">
   <div class="flex justify-between items-center mb-4">
     <h2 class="ui-card-title m-0">Auburn Traffic Feeds</h2>
@@ -22,7 +25,9 @@
     </figure>
   </div>
 </div>
+<% end %>
 
+<% if groups.include?(:airport) %>
 <div class="ui-card ui-card-pad-loose" data-controller="image-refresh">
   <div class="flex justify-between items-center mb-4">
     <h2 class="ui-card-title m-0">Auburn Muni (S50)</h2>
@@ -49,3 +54,4 @@
     </figure>
   </div>
 </div>
+<% end %>
